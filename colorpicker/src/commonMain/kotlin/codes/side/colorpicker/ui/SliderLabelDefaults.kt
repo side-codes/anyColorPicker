@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontFamily
  * slots can keep visual consistency with the default style.
  */
 @Composable
-fun SliderLabel(text: String) {
+public fun SliderLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
@@ -26,7 +26,7 @@ fun SliderLabel(text: String) {
  * stable digit alignment as the value changes.
  */
 @Composable
-fun SliderValueLabel(text: String) {
+public fun SliderValueLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,

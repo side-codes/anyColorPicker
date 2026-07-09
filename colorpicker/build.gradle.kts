@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidKmpLibrary)
+    alias(libs.plugins.dokka)
     `maven-publish`
     signing
 }
@@ -14,12 +15,16 @@ group = "codes.side"
 version = "1.0.0"
 
 kotlin {
+    explicitApi()
+
     jvm()
 
     android {
         namespace = "codes.side.colorpicker"
         compileSdk = 37
         minSdk = 24
+
+        withHostTest {}
 
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
@@ -41,12 +46,21 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
+            // api: types from these modules appear in the library's public API
+            // (@Composable/@Immutable/@Stable from runtime; Modifier, Color, Shape,
+            // Dp from ui; ImmutableList in ColorSlider's signature). Consumers
+            // compile against them, so they must be on the consumer's compile
+            // classpath. foundation is api because every public picker composable
+            // is designed to be composed with foundation layouts and its widgets
+            // are foundation-based slot hosts.
+            api(libs.compose.runtime)
+            api(libs.compose.foundation)
+            api(libs.compose.ui)
+            api(libs.kotlinx.collections.immutable)
+            // implementation: no material3 or coroutines types leak into public
+            // signatures (material3 is an internal rendering detail).
             implementation(libs.compose.material3)
-            implementation(libs.compose.ui)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.collections.immutable)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -58,9 +72,13 @@ kotlin {
     }
 }
 
-// Maven Central publication
+// Maven Central publication. The -javadoc jar packages the Dokka HTML output so the
+// published artifact carries real API documentation.
 val javadocJar = tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
+    val dokkaHtml = tasks.named("dokkaGeneratePublicationHtml")
+    dependsOn(dokkaHtml)
+    from(dokkaHtml)
 }
 
 publishing {

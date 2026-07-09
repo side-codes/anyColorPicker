@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class RgbConversionsTest {
 
-    // ---- contrastColor threshold: luminance > 0.729f ----
+    // ---- contrastColor: WCAG relative luminance, black text if luminance > 0.179 ----
 
     @Test
     fun contrastColorOnBlack() {
@@ -22,66 +22,64 @@ class RgbConversionsTest {
 
     @Test
     fun contrastColorOnDarkRed() {
-        // luminance = 0.392 * 0.299 = ~0.117 -> < 0.729 -> White
+        // luminance = 0.2126 * linearize(0.392) = ~0.027 -> <= 0.179 -> White
         val contrast = RgbColor(red = 0.392f, green = 0f, blue = 0f).contrastColor()
         assertEquals(RgbColor.White, contrast)
     }
 
     @Test
     fun contrastColorOnBrightYellow() {
-        // luminance = 1.0 * 0.299 + 1.0 * 0.587 + 0 * 0.114 = 0.886 -> > 0.729 -> Black
+        // luminance = 0.2126 + 0.7152 = 0.9278 -> > 0.179 -> Black
         val contrast = RgbColor(red = 1f, green = 1f, blue = 0f).contrastColor()
         assertEquals(RgbColor.Black, contrast)
     }
 
     @Test
     fun contrastColorOnMidGray() {
-        // luminance = 0.502 * (0.299 + 0.587 + 0.114) = 0.502 -> < 0.729 -> White
+        // luminance = linearize(0.502) = ~0.216 -> > 0.179 -> Black
         val contrast = RgbColor(0.502f, 0.502f, 0.502f).contrastColor()
-        assertEquals(RgbColor.White, contrast)
+        assertEquals(RgbColor.Black, contrast)
     }
 
     @Test
     fun contrastColorOnLightGray() {
-        // luminance = 0.784 * 1.0 = 0.784 -> > 0.729 -> Black
+        // luminance = linearize(0.784) = ~0.577 -> > 0.179 -> Black
         val contrast = RgbColor(0.784f, 0.784f, 0.784f).contrastColor()
         assertEquals(RgbColor.Black, contrast)
     }
 
     @Test
     fun contrastColorOnPureRed() {
-        // luminance = 1.0 * 0.299 = 0.299 -> < 0.729 -> White
+        // luminance = 0.2126 -> > 0.179 -> Black
         val contrast = RgbColor.Red.contrastColor()
-        assertEquals(RgbColor.White, contrast)
+        assertEquals(RgbColor.Black, contrast)
     }
 
     @Test
     fun contrastColorOnPureGreen() {
-        // luminance = 1.0 * 0.587 = 0.587 -> < 0.729 -> White
+        // luminance = 0.7152 -> > 0.179 -> Black
         val contrast = RgbColor.Green.contrastColor()
-        assertEquals(RgbColor.White, contrast)
+        assertEquals(RgbColor.Black, contrast)
     }
 
     @Test
     fun contrastColorOnPureBlue() {
-        // luminance = 1.0 * 0.114 = 0.114 -> < 0.729 -> White
+        // luminance = 0.0722 -> <= 0.179 -> White
         val contrast = RgbColor.Blue.contrastColor()
         assertEquals(RgbColor.White, contrast)
     }
 
     @Test
-    fun contrastColorNearThreshold() {
-        // luminance exactly 0.729 -> NOT > 0.729 -> White
-        // R * 0.299 + G * 0.587 + B * 0.114 = 0.729
-        // Use achromatic: 0.729 * (0.299+0.587+0.114) = 0.729, so R=G=B=0.729
-        val contrast = RgbColor(0.729f, 0.729f, 0.729f).contrastColor()
+    fun contrastColorJustBelowThreshold() {
+        // luminance = linearize(0.45) = ~0.171 -> <= 0.179 -> White
+        val contrast = RgbColor(0.45f, 0.45f, 0.45f).contrastColor()
         assertEquals(RgbColor.White, contrast)
     }
 
     @Test
     fun contrastColorJustAboveThreshold() {
-        // 0.73 > 0.729 -> Black
-        val contrast = RgbColor(0.73f, 0.73f, 0.73f).contrastColor()
+        // luminance = linearize(0.47) = ~0.187 -> > 0.179 -> Black
+        val contrast = RgbColor(0.47f, 0.47f, 0.47f).contrastColor()
         assertEquals(RgbColor.Black, contrast)
     }
 }

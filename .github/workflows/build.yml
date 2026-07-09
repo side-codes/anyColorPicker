@@ -43,3 +43,5 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
       - name: Build iOS framework
         run: ./gradlew :colorpicker:linkDebugFrameworkIosSimulatorArm64
+      - name: Run iOS simulator tests
+        run: ./gradlew :colorpicker:iosSimulatorArm64Test

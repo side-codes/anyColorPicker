@@ -52,20 +52,37 @@ class LabConversionsTest {
 
     @Test
     fun rgbWhiteToLab() {
+        // With XN/ZN matching the sRGB matrices' D65 white point, white maps to a*=0, b*=0
         val rgb = RgbColor(1f, 1f, 1f)
         val lab = rgb.toLab()
-        assertNear(100f, lab.l, tolerance = 0.5f, msg = "L")
-        assertNear(0f, lab.a, tolerance = 0.5f, msg = "a")
-        assertNear(0f, lab.b, tolerance = 0.5f, msg = "b")
+        assertNear(100f, lab.l, tolerance = 0.01f, msg = "L")
+        assertNear(0f, lab.a, tolerance = 0.01f, msg = "a")
+        assertNear(0f, lab.b, tolerance = 0.01f, msg = "b")
+    }
+
+    @Test
+    fun rgbNeutralGrayToLab() {
+        // Any neutral gray must map to a*~0, b*~0
+        val lab = RgbColor(0.5f, 0.5f, 0.5f).toLab()
+        assertNear(0f, lab.a, tolerance = 0.01f, msg = "a")
+        assertNear(0f, lab.b, tolerance = 0.01f, msg = "b")
+    }
+
+    @Test
+    fun rgbDarkNeutralGrayToLab() {
+        // Dark gray goes through the linear (KAPPA) branch and must stay neutral too
+        val lab = RgbColor(0.01f, 0.01f, 0.01f).toLab()
+        assertNear(0f, lab.a, tolerance = 0.01f, msg = "a")
+        assertNear(0f, lab.b, tolerance = 0.01f, msg = "b")
     }
 
     @Test
     fun rgbBlackToLab() {
         val rgb = RgbColor(0f, 0f, 0f)
         val lab = rgb.toLab()
-        assertNear(0f, lab.l, tolerance = 0.5f, msg = "L")
-        assertNear(0f, lab.a, tolerance = 0.5f, msg = "a")
-        assertNear(0f, lab.b, tolerance = 0.5f, msg = "b")
+        assertNear(0f, lab.l, tolerance = 0.01f, msg = "L")
+        assertNear(0f, lab.a, tolerance = 0.01f, msg = "a")
+        assertNear(0f, lab.b, tolerance = 0.01f, msg = "b")
     }
 
     @Test

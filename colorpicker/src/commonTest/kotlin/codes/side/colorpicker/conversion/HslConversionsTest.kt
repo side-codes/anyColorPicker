@@ -27,6 +27,16 @@ class HslConversionsTest {
     }
 
     @Test
+    fun hue360HslToRgbIsPureRed() {
+        // Hue 360 is normalized to 0 by the model, so it converts exactly like pure red
+        val hsl = HslColor(hue = 360f, saturation = 1f, lightness = 0.5f)
+        val rgb = hsl.toRgb()
+        assertNear(1f, rgb.red, msg = "red")
+        assertNear(0f, rgb.green, msg = "green")
+        assertNear(0f, rgb.blue, msg = "blue")
+    }
+
+    @Test
     fun greenHslToRgb() {
         val hsl = HslColor(hue = 120f, saturation = 1f, lightness = 0.5f)
         val rgb = hsl.toRgb()

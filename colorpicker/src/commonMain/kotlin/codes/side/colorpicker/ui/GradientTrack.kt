@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -18,8 +19,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 
@@ -29,15 +32,13 @@ private val PressedHandleWidth = 2.dp
 private val ThumbTrackGapSize = 6.dp
 private val TrackInsideCornerSize = 2.dp
 
-private val CheckerLight = Color(0xFFFFFFFF)
-private val CheckerDark = Color(0xFFCCCCCC)
-private val CheckerCellSize = 6.dp
-
 /**
  * Gradient track with an M3-style gap around the thumb.
  *
  * The gap shrinks when the thumb is pressed/dragged (matching M3's behavior where
- * the thumb narrows on interaction, causing the track to come closer).
+ * the thumb narrows on interaction, causing the track to come closer). The track's
+ * outer corners come from [trackShape]; in right-to-left layouts the gradient and
+ * the thumb gap are mirrored to match the mirrored M3 [androidx.compose.material3.Slider].
  *
  * @param showCheckerboard if true, draws a transparency checkerboard underneath
  * the gradient (only within the track segments). Used by [AlphaSlider].
@@ -47,6 +48,9 @@ internal fun GradientTrack(
     colors: ImmutableList<Color>,
     thumbFraction: Float,
     interactionSource: MutableInteractionSource,
+    checkerboardLight: Color,
+    checkerboardDark: Color,
+    trackShape: Shape,
     modifier: Modifier = Modifier,
     showCheckerboard: Boolean = false,
 ) {
@@ -67,28 +71,51 @@ internal fun GradientTrack(
     val isActive = interactions.isNotEmpty()
     val currentThumbWidth = if (isActive) PressedHandleWidth else HandleWidth
 
-    val brush = Brush.horizontalGradient(colors)
+    val layoutDirection = LocalLayoutDirection.current
+    val brush = remember(colors, layoutDirection) {
+        Brush.horizontalGradient(
+            if (layoutDirection == LayoutDirection.Rtl) colors.reversed() else colors,
+        )
+    }
+    val checkerboardBrush = if (showCheckerboard) {
+        rememberCheckerboardBrush(
+            cellSize = CheckerboardCellSize,
+            light = checkerboardLight,
+            dark = checkerboardDark,
+        )
+    } else {
+        null
+    }
+    val segmentsPath = remember { Path() }
 
-    Canvas(modifier = modifier) {
-        val cornerSize = size.height / 2f
+    Canvas(modifier = modifier.clip(trackShape)) {
         val insideCornerSize = TrackInsideCornerSize.toPx()
         val gap = currentThumbWidth.toPx() / 2f + ThumbTrackGapSize.toPx()
-        val thumbCenter = thumbFraction.coerceIn(0f, 1f) * size.width
+        val fractionCenter = thumbFraction.coerceIn(0f, 1f) * size.width
+        // M3 Slider mirrors the thumb position in RTL, so the gap must mirror
+        // to stay underneath the thumb.
+        val thumbCenter = if (this.layoutDirection == LayoutDirection.Rtl) {
+            size.width - fractionCenter
+        } else {
+            fractionCenter
+        }
 
         val leftEnd = thumbCenter - gap
         val rightStart = thumbCenter + gap
 
-        val clipPath = Path()
+        // Outer corners are clipped by trackShape; only the corners facing the
+        // thumb gap are rounded here.
+        segmentsPath.reset()
 
         if (leftEnd > 0f) {
-            clipPath.addRoundRect(
+            segmentsPath.addRoundRect(
                 RoundRect(
                     rect = Rect(
                         offset = Offset.Zero,
                         size = Size(leftEnd, size.height),
                     ),
-                    topLeft = CornerRadius(cornerSize),
-                    bottomLeft = CornerRadius(cornerSize),
+                    topLeft = CornerRadius.Zero,
+                    bottomLeft = CornerRadius.Zero,
                     topRight = CornerRadius(insideCornerSize),
                     bottomRight = CornerRadius(insideCornerSize),
                 )
@@ -96,7 +123,7 @@ internal fun GradientTrack(
         }
 
         if (rightStart < size.width) {
-            clipPath.addRoundRect(
+            segmentsPath.addRoundRect(
                 RoundRect(
                     rect = Rect(
                         offset = Offset(rightStart, 0f),
@@ -104,29 +131,17 @@ internal fun GradientTrack(
                     ),
                     topLeft = CornerRadius(insideCornerSize),
                     bottomLeft = CornerRadius(insideCornerSize),
-                    topRight = CornerRadius(cornerSize),
-                    bottomRight = CornerRadius(cornerSize),
+                    topRight = CornerRadius.Zero,
+                    bottomRight = CornerRadius.Zero,
                 )
             )
         }
 
-        clipPath(clipPath) {
-            if (showCheckerboard) {
-                val cell = CheckerCellSize.toPx()
-                val cols = (size.width / cell).toInt() + 1
-                val rows = (size.height / cell).toInt() + 1
-                for (row in 0 until rows) {
-                    for (col in 0 until cols) {
-                        val color = if ((row + col) % 2 == 0) CheckerLight else CheckerDark
-                        drawRect(
-                            color = color,
-                            topLeft = Offset(col * cell, row * cell),
-                            size = Size(cell, cell),
-                        )
-                    }
-                }
+        clipPath(segmentsPath) {
+            if (checkerboardBrush != null) {
+                drawRect(brush = checkerboardBrush)
             }
-            drawRect(brush = brush, topLeft = Offset.Zero, size = size)
+            drawRect(brush = brush)
         }
     }
 }

@@ -47,6 +47,16 @@ class LabColorTest {
         assertEquals(-30.5f, lab.a)
     }
 
+    // ---- Signed zero normalization ----
+
+    @Test
+    fun negativeZeroEqualsZero() {
+        val negativeZero = LabColor(l = -0.0f, a = -0.0f, b = -0.0f)
+        val zero = LabColor(l = 0f, a = 0f, b = 0f)
+        assertEquals(zero, negativeZero)
+        assertEquals(zero.hashCode(), negativeZero.hashCode())
+    }
+
     // ---- B boundaries ----
 
     @Test

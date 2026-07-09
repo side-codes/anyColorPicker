@@ -18,9 +18,25 @@ class HslColorTest {
     // ---- Hue boundaries ----
 
     @Test
-    fun boundaryHue360IsValid() {
+    fun boundaryHue360IsAcceptedAndNormalizedToZero() {
         val hsl = HslColor(hue = 360f)
-        assertEquals(360f, hsl.hue)
+        assertEquals(0f, hsl.hue)
+    }
+
+    @Test
+    fun hue360EqualsHue0() {
+        val fromMax = HslColor(hue = 360f, saturation = 0.5f, lightness = 0.5f)
+        val fromZero = HslColor(hue = 0f, saturation = 0.5f, lightness = 0.5f)
+        assertEquals(fromZero, fromMax)
+        assertEquals(fromZero.hashCode(), fromMax.hashCode())
+    }
+
+    @Test
+    fun negativeZeroHueEqualsZeroHue() {
+        val negativeZero = HslColor(hue = -0.0f, saturation = -0.0f, lightness = -0.0f, alpha = 1f)
+        val zero = HslColor(hue = 0f, saturation = 0f, lightness = 0f, alpha = 1f)
+        assertEquals(zero, negativeZero)
+        assertEquals(zero.hashCode(), negativeZero.hashCode())
     }
 
     @Test
@@ -115,11 +131,17 @@ class HslColorTest {
 
     @Test
     fun intAccessorsAtMax() {
-        val hsl = HslColor(hue = 360f, saturation = 1f, lightness = 1f, alpha = 1f)
+        val hsl = HslColor(hue = 359.6f, saturation = 1f, lightness = 1f, alpha = 1f)
         assertEquals(360, hsl.intHue)
         assertEquals(100, hsl.intSaturation)
         assertEquals(100, hsl.intLightness)
         assertEquals(255, hsl.intAlpha)
+    }
+
+    @Test
+    fun intHueIsZeroForNormalizedHue360() {
+        val hsl = HslColor(hue = 360f)
+        assertEquals(0, hsl.intHue)
     }
 
     @Test
@@ -149,7 +171,7 @@ class HslColorTest {
         assertEquals(0.5f, HslColor.Red.lightness)
     }
 
-    // ---- data class semantics ----
+    // ---- value semantics ----
 
     @Test
     fun dataCopyCopiesIndependently() {
@@ -188,7 +210,8 @@ class HslColorTest {
     @Test
     fun fromIntClampsValues() {
         val hsl = HslColor.fromInt(hue = 999, saturation = 200, lightness = -10, alpha = 300)
-        assertEquals(360f, hsl.hue)
+        // hue clamps to 360, which the constructor normalizes to 0
+        assertEquals(0f, hsl.hue)
         assertEquals(1f, hsl.saturation)
         assertEquals(0f, hsl.lightness)
         assertEquals(1f, hsl.alpha)

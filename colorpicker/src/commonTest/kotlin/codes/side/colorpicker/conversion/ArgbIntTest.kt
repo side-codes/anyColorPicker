@@ -84,6 +84,19 @@ class ArgbIntTest {
         assertEquals(0x00000000, packed)
     }
 
+    @Test
+    fun argbClampsOutOfRangeComponents() {
+        // 256 clamps to 255, -1 clamps to 0 (instead of wrapping through the 0xFF mask)
+        val packed = argb(256, -1, 0, 0)
+        assertEquals(argb(255, 0, 0, 0), packed)
+    }
+
+    @Test
+    fun argbClampsLargeValues() {
+        val packed = argb(1000, 512, -300, 300)
+        assertEquals(argb(255, 255, 0, 255), packed)
+    }
+
     // ---- setAlphaComponent ----
 
     @Test
@@ -114,6 +127,13 @@ class ArgbIntTest {
         assertEquals(255, rgb.intAlpha)
     }
 
+    @Test
+    fun setAlphaClampsOutOfRangeValues() {
+        val color = argb(255, 50, 100, 150)
+        assertEquals(255, setAlphaComponent(color, 300).toRgbColor().intAlpha)
+        assertEquals(0, setAlphaComponent(color, -5).toRgbColor().intAlpha)
+    }
+
     // ---- blendArgb ----
 
     @Test
@@ -122,9 +142,10 @@ class ArgbIntTest {
         val white = argb(255, 255, 255, 255)
         val mid = blendArgb(black, white, 0.5f)
         val rgb = mid.toRgbColor()
-        assertEquals(127, rgb.intRed)
-        assertEquals(127, rgb.intGreen)
-        assertEquals(127, rgb.intBlue)
+        // 127.5 rounds to 128 (blendArgb rounds instead of truncating)
+        assertEquals(128, rgb.intRed)
+        assertEquals(128, rgb.intGreen)
+        assertEquals(128, rgb.intBlue)
         assertEquals(255, rgb.intAlpha)
     }
 

@@ -24,10 +24,11 @@ class BlendArgbTest {
 
     @Test
     fun blendHalfway() {
+        // 127.5 rounds to 128 (unlike AndroidX ColorUtils.blendARGB, which truncates to 127)
         val result = blendArgb(black, white, 0.5f).toRgbColor()
-        assertEquals(127, result.intRed)
-        assertEquals(127, result.intGreen)
-        assertEquals(127, result.intBlue)
+        assertEquals(128, result.intRed)
+        assertEquals(128, result.intGreen)
+        assertEquals(128, result.intBlue)
         assertEquals(255, result.intAlpha)
     }
 
@@ -36,28 +37,30 @@ class BlendArgbTest {
         val transparent = argb(0, 255, 0, 0)
         val opaque = argb(255, 255, 0, 0)
         val result = blendArgb(transparent, opaque, 0.5f).toRgbColor()
-        assertEquals(127, result.intAlpha)
+        assertEquals(128, result.intAlpha)
         assertEquals(255, result.intRed)
     }
 
     @Test
     fun blendQuarterWay() {
+        // 63.75 rounds to 64
         val result = blendArgb(black, white, 0.25f).toRgbColor()
-        assertEquals(63, result.intRed)
-        assertEquals(63, result.intGreen)
-        assertEquals(63, result.intBlue)
+        assertEquals(64, result.intRed)
+        assertEquals(64, result.intGreen)
+        assertEquals(64, result.intBlue)
     }
 
     @Test
     fun blendDifferentColors() {
         val result = blendArgb(red, blue, 0.5f).toRgbColor()
-        assertEquals(127, result.intRed)
+        assertEquals(128, result.intRed)
         assertEquals(0, result.intGreen)
-        assertEquals(127, result.intBlue)
+        assertEquals(128, result.intBlue)
     }
 
     @Test
     fun blendThreeQuarterWay() {
+        // 191.25 rounds to 191
         val result = blendArgb(black, white, 0.75f).toRgbColor()
         assertEquals(191, result.intRed)
         assertEquals(191, result.intGreen)
@@ -75,9 +78,30 @@ class BlendArgbTest {
         val c1 = argb(0, 100, 100, 100)
         val c2 = argb(255, 100, 100, 100)
         val result = blendArgb(c1, c2, 0.5f).toRgbColor()
-        assertEquals(127, result.intAlpha)
+        assertEquals(128, result.intAlpha)
         assertEquals(100, result.intRed)
         assertEquals(100, result.intGreen)
         assertEquals(100, result.intBlue)
+    }
+
+    // ---- Ratio clamping & NaN ----
+
+    @Test
+    fun blendRatioAboveOneClampsToColor2() {
+        val result = blendArgb(black, white, 1.5f)
+        assertEquals(white, result)
+    }
+
+    @Test
+    fun blendRatioBelowZeroClampsToColor1() {
+        val result = blendArgb(black, white, -0.5f)
+        assertEquals(black, result)
+    }
+
+    @Test
+    fun blendNaNRatioReturnsColor1() {
+        // Documented behavior: NaN ratio is treated as 0
+        val result = blendArgb(red, blue, Float.NaN)
+        assertEquals(red, result)
     }
 }

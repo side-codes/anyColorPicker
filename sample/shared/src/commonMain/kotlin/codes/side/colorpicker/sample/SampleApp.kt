@@ -202,12 +202,12 @@ fun SampleApp() {
 
         if (showDialog) {
             ColorPickerDialog(
-                initialColor = state.hslColor,
                 onColorSelected = { color ->
                     state.updateFromHsl(color)
                     showDialog = false
                 },
                 onDismiss = { showDialog = false },
+                initialColor = state.hslColor,
             )
         }
     }

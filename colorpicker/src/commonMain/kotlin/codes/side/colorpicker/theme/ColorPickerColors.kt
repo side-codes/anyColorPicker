@@ -2,11 +2,16 @@ package codes.side.colorpicker.theme
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
+/**
+ * Colors used by color picker components. Obtain instances via
+ * [ColorPickerDefaults.colors] so defaults come from a single source.
+ *
+ * @property checkerboardLight color of the light cells of the transparency checkerboard.
+ * @property checkerboardDark color of the dark cells of the transparency checkerboard.
+ */
 @Immutable
-data class ColorPickerColors(
-    val thumbColor: Color = Color.White,
-    val thumbElevation: Dp = 2.dp,
+public data class ColorPickerColors(
+    public val checkerboardLight: Color,
+    public val checkerboardDark: Color,
 )

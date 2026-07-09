@@ -4,7 +4,8 @@ import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.RgbColor
 
-fun CmykColor.toRgb(): RgbColor {
+/** Converts this CMYK color to RGB. Alpha is carried over unchanged. */
+public fun CmykColor.toRgb(): RgbColor {
     val r = (1f - cyan) * (1f - key)
     val g = (1f - magenta) * (1f - key)
     val b = (1f - yellow) * (1f - key)
@@ -17,7 +18,11 @@ fun CmykColor.toRgb(): RgbColor {
     )
 }
 
-fun RgbColor.toCmyk(): CmykColor {
+/**
+ * Converts this RGB color to CMYK. Pure black maps to `key = 1` with zero ink in the
+ * other channels. Alpha is carried over unchanged.
+ */
+public fun RgbColor.toCmyk(): CmykColor {
     val k = 1f - maxOf(red, green, blue)
 
     if (k >= 1f) {
@@ -37,10 +42,14 @@ fun RgbColor.toCmyk(): CmykColor {
     )
 }
 
-fun CmykColor.toHsl(): HslColor = toRgb().toHsl()
+/** Converts this CMYK color to HSL by way of RGB. Alpha is carried over unchanged. */
+public fun CmykColor.toHsl(): HslColor = toRgb().toHsl()
 
-fun HslColor.toCmyk(): CmykColor = toRgb().toCmyk()
+/** Converts this HSL color to CMYK by way of RGB. Alpha is carried over unchanged. */
+public fun HslColor.toCmyk(): CmykColor = toRgb().toCmyk()
 
-fun CmykColor.toArgbInt(): Int = toRgb().toArgbInt()
+/** Packs this CMYK color into an ARGB [Int] (`0xAARRGGBB`); see [RgbColor.toArgbInt]. */
+public fun CmykColor.toArgbInt(): Int = toRgb().toArgbInt()
 
-fun Int.toCmykColor(): CmykColor = toRgbColor().toCmyk()
+/** Unpacks this ARGB [Int] (`0xAARRGGBB`) into a [CmykColor]; see [Int.toRgbColor]. */
+public fun Int.toCmykColor(): CmykColor = toRgbColor().toCmyk()

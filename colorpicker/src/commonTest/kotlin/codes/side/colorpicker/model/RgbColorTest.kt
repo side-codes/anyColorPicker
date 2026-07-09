@@ -144,7 +144,7 @@ class RgbColorTest {
         assertEquals(1f, rgb.alpha)
     }
 
-    // ---- data class semantics ----
+    // ---- value semantics ----
 
     @Test
     fun equalityByValue() {
@@ -152,6 +152,21 @@ class RgbColorTest {
         val b = RgbColor(red = 0.3f, green = 0.5f, blue = 0.7f, alpha = 0.9f)
         assertEquals(a, b)
         assertEquals(a.hashCode(), b.hashCode())
+    }
+
+    @Test
+    fun negativeZeroEqualsZero() {
+        val negativeZero = RgbColor(red = -0.0f, green = -0.0f, blue = -0.0f, alpha = 1f)
+        val zero = RgbColor(red = 0f, green = 0f, blue = 0f, alpha = 1f)
+        assertEquals(zero, negativeZero)
+        assertEquals(zero.hashCode(), negativeZero.hashCode())
+        assertEquals(0f, negativeZero.red)
+    }
+
+    @Test
+    fun copyNormalizesNegativeZero() {
+        val copy = RgbColor(red = 0.5f).copy(red = -0.0f)
+        assertEquals(RgbColor(red = 0f), copy)
     }
 
     @Test

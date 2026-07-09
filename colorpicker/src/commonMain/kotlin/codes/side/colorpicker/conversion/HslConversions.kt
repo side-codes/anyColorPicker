@@ -4,7 +4,8 @@ import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.RgbColor
 import kotlin.math.abs
 
-fun HslColor.toRgb(): RgbColor {
+/** Converts this HSL color to RGB. Alpha is carried over unchanged. */
+public fun HslColor.toRgb(): RgbColor {
     val h = hue
     val s = saturation
     val l = lightness
@@ -36,7 +37,11 @@ fun HslColor.toRgb(): RgbColor {
     )
 }
 
-fun RgbColor.toHsl(): HslColor {
+/**
+ * Converts this RGB color to HSL. Achromatic colors (grays) map to hue 0 and
+ * saturation 0. Alpha is carried over unchanged.
+ */
+public fun RgbColor.toHsl(): HslColor {
     val max = maxOf(red, green, blue)
     val min = minOf(red, green, blue)
     val delta = max - min
@@ -67,6 +72,8 @@ fun RgbColor.toHsl(): HslColor {
     )
 }
 
-fun HslColor.toArgbInt(): Int = toRgb().toArgbInt()
+/** Packs this HSL color into an ARGB [Int] (`0xAARRGGBB`); see [RgbColor.toArgbInt]. */
+public fun HslColor.toArgbInt(): Int = toRgb().toArgbInt()
 
-fun Int.toHslColor(): HslColor = toRgbColor().toHsl()
+/** Unpacks this ARGB [Int] (`0xAARRGGBB`) into an [HslColor]; see [Int.toRgbColor]. */
+public fun Int.toHslColor(): HslColor = toRgbColor().toHsl()

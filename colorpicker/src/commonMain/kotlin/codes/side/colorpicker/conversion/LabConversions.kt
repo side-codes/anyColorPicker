@@ -6,11 +6,20 @@ import codes.side.colorpicker.model.RgbColor
 import kotlin.math.cbrt
 import kotlin.math.pow
 
-private const val XN = 0.950456
+// D65 reference white matching the sRGB conversion matrices below.
+private const val XN = 0.95047
 private const val YN = 1.0
-private const val ZN = 1.088754
+private const val ZN = 1.08883
 
-fun LabColor.toRgb(): RgbColor {
+// CIE standard constants: EPSILON = (6/29)^3, KAPPA = (29/3)^3.
+private const val EPSILON = 216.0 / 24389.0
+private const val KAPPA = 24389.0 / 27.0
+
+/**
+ * Converts this CIELAB color (D65 reference white) to sRGB. Out-of-gamut results are
+ * clamped channel-wise into `0..1`. Alpha is carried over unchanged.
+ */
+public fun LabColor.toRgb(): RgbColor {
     val lD = l.toDouble()
     val aD = a.toDouble()
     val bD = b.toDouble()
@@ -19,9 +28,12 @@ fun LabColor.toRgb(): RgbColor {
     val fx = aD / 500.0 + fy
     val fz = fy - bD / 200.0
 
-    val xr = if (fx.pow(3) > 0.008856) fx.pow(3) else (116.0 * fx - 16.0) / 903.3
-    val yr = if (lD > 7.9996) fy.pow(3) else lD / 903.3
-    val zr = if (fz.pow(3) > 0.008856) fz.pow(3) else (116.0 * fz - 16.0) / 903.3
+    val fx3 = fx.pow(3)
+    val fz3 = fz.pow(3)
+
+    val xr = if (fx3 > EPSILON) fx3 else (116.0 * fx - 16.0) / KAPPA
+    val yr = if (lD > 8.0) fy.pow(3) else lD / KAPPA
+    val zr = if (fz3 > EPSILON) fz3 else (116.0 * fz - 16.0) / KAPPA
 
     val x = xr * XN
     val y = yr * YN
@@ -39,7 +51,8 @@ fun LabColor.toRgb(): RgbColor {
     )
 }
 
-fun RgbColor.toLab(): LabColor {
+/** Converts this sRGB color to CIELAB (D65 reference white). Alpha is carried over unchanged. */
+public fun RgbColor.toLab(): LabColor {
     val rLinear = linearize(red.toDouble())
     val gLinear = linearize(green.toDouble())
     val bLinear = linearize(blue.toDouble())
@@ -65,15 +78,22 @@ fun RgbColor.toLab(): LabColor {
 }
 
 private fun labF(t: Double): Double =
-    if (t > 0.008856) cbrt(t) else (903.3 * t + 16.0) / 116.0
+    if (t > EPSILON) cbrt(t) else (KAPPA * t + 16.0) / 116.0
 
-private fun linearize(c: Double): Double =
+internal fun linearize(c: Double): Double =
     if (c <= 0.04045) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
 
 private fun delinearize(c: Double): Double =
     if (c <= 0.0031308) c * 12.92 else 1.055 * c.pow(1.0 / 2.4) - 0.055
 
-fun LabColor.toHsl(): HslColor = toRgb().toHsl()
-fun HslColor.toLab(): LabColor = toRgb().toLab()
-fun LabColor.toArgbInt(): Int = toRgb().toArgbInt()
-fun Int.toLabColor(): LabColor = toRgbColor().toLab()
+/** Converts this CIELAB color to HSL by way of RGB. Alpha is carried over unchanged. */
+public fun LabColor.toHsl(): HslColor = toRgb().toHsl()
+
+/** Converts this HSL color to CIELAB by way of RGB. Alpha is carried over unchanged. */
+public fun HslColor.toLab(): LabColor = toRgb().toLab()
+
+/** Packs this CIELAB color into an ARGB [Int] (`0xAARRGGBB`); see [RgbColor.toArgbInt]. */
+public fun LabColor.toArgbInt(): Int = toRgb().toArgbInt()
+
+/** Unpacks this ARGB [Int] (`0xAARRGGBB`) into a [LabColor]; see [Int.toRgbColor]. */
+public fun Int.toLabColor(): LabColor = toRgbColor().toLab()

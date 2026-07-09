@@ -58,6 +58,16 @@ class CmykColorTest {
         assertFailsWith<IllegalArgumentException> { CmykColor(alpha = -0.01f) }
     }
 
+    // ---- Signed zero normalization ----
+
+    @Test
+    fun negativeZeroEqualsZero() {
+        val negativeZero = CmykColor(cyan = -0.0f, magenta = -0.0f, yellow = -0.0f, key = -0.0f)
+        val zero = CmykColor(cyan = 0f, magenta = 0f, yellow = 0f, key = 0f)
+        assertEquals(zero, negativeZero)
+        assertEquals(zero.hashCode(), negativeZero.hashCode())
+    }
+
     // ---- Int accessors ----
 
     @Test
