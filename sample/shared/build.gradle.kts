@@ -11,7 +11,7 @@ plugins {
 kotlin {
     android {
         namespace = "codes.side.colorpicker.sample.shared"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 24
 
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -21,7 +21,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->

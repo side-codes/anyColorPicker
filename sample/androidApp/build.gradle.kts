@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "codes.side.colorpicker.sample"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "codes.side.colorpicker.sample"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
     }

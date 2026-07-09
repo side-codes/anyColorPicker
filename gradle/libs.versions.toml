@@ -1,20 +1,18 @@
 [versions]
-kotlin = "2.3.20"
-agp = "9.1.0"
-compose-multiplatform = "1.10.3"
+kotlin = "2.4.0"
+agp = "9.2.1"
+compose-multiplatform = "1.11.1"
 compose-material3 = "1.9.0"
-compose-bom = "2026.03.01"
 androidx-activity-compose = "1.13.0"
-androidx-lifecycle = "2.10.0"
-kotlinx-coroutines = "1.10.2"
-kotlinx-collections-immutable = "0.4.0"
+androidx-lifecycle = "2.11.0"
+kotlinx-coroutines = "1.11.0"
+kotlinx-collections-immutable = "0.5.1"
 
 [libraries]
 compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose-multiplatform" }
 compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose-multiplatform" }
 compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose-multiplatform" }
 compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "compose-material3" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }

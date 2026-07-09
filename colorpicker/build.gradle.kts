@@ -18,7 +18,7 @@ kotlin {
 
     android {
         namespace = "codes.side.colorpicker"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 24
 
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -27,8 +27,9 @@ kotlin {
         }
     }
 
+    // iosX64 (Intel simulator) removed: Compose Multiplatform stopped publishing
+    // iosx64 artifacts as of 1.11.0.
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -58,7 +59,7 @@ kotlin {
 }
 
 // Maven Central publication
-val javadocJar by tasks.registering(Jar::class) {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
 }
 
@@ -99,8 +100,11 @@ publishing {
     repositories {
         maven {
             name = "sonatype"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            // OSSRH (s01.oss.sonatype.org) was decommissioned 2025-06-30. These endpoints are the
+            // Central Portal's OSSRH Staging API compatibility service; credentials must be
+            // Central Portal user tokens, and deployments are released from central.sonatype.com.
+            val releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+            val snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
             credentials {
                 username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
