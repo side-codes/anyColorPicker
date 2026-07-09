@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1423154511c5f94767bed3726b37a00e2fcfb6c6",
+  "prompts": {},
+  "humans": {
+    "h_ce1a8f5327b455": {
+      "author": "Illia Achour <iacho@softserveinc.com>"
+    }
+  }
+}
