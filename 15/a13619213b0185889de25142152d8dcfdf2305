@@ -1,0 +1,39 @@
+gradle/libs.versions.toml
+  s_6d150d20295882::t_c5df82c4bd80f6 2-4
+  s_6d150d20295882::t_87714c9b47c304 7-9
+gradle.properties
+  s_6d150d20295882::t_0978b042bf6585 1
+gradle/wrapper/gradle-wrapper.properties
+  h_ce1a8f5327b455 3
+.github/dependabot.yml
+  s_6d150d20295882::t_e7725760007dd0 8-11
+.github/workflows/build.yml
+  s_6d150d20295882::t_41add702730194 17-18,22,30,36,38-39,43
+.github/workflows/publish.yml
+  s_6d150d20295882::t_c0dca59a359c70 9,11-12,16
+sample/androidApp/build.gradle.kts
+  s_6d150d20295882::t_0e07a958afdae8 8,13
+sample/shared/build.gradle.kts
+  s_6d150d20295882::t_dca1b31d90c501 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "15a13619213b0185889de25142152d8dcfdf2305",
+  "prompts": {},
+  "humans": {
+    "h_ce1a8f5327b455": {
+      "author": "Illia Achour <iacho@softserveinc.com>"
+    }
+  },
+  "sessions": {
+    "s_6d150d20295882": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "49c2db21-ae0b-4fa3-b98d-074ef6260cd3",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Illia Achour <iacho@softserveinc.com>"
+    }
+  }
+}
