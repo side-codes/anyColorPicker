@@ -1,0 +1,45 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build library
+        run: ./gradlew :colorpicker:assemble
+      - name: Run tests
+        run: ./gradlew :colorpicker:allTests
+      - name: Build sample APK
+        run: ./gradlew :sample:androidApp:assembleDebug
+      - name: Upload sample APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-apk
+          path: sample/androidApp/build/outputs/apk/debug/*.apk
+
+  build-ios:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build iOS framework
+        run: ./gradlew :colorpicker:linkDebugFrameworkIosSimulatorArm64
