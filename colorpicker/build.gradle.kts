@@ -66,10 +66,15 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.compose.ui.test)
         }
         jvmTest.dependencies {
-            // runComposeUiTest needs a real renderer on the JVM target.
+            // Compose UI tests are JVM-only on purpose. In commonTest they compile into
+            // every target: androidHostTest has no Android runtime for runComposeUiTest to
+            // attach to, and on iOS instantiating real UI makes CMP's UIKit view layer
+            // reachable from the test binary, which then needs UIKit symbols newer than the
+            // runner's Xcode SDK provides. The desktop renderer gives the same coverage
+            // without either problem.
+            implementation(libs.compose.ui.test)
             implementation(compose.desktop.currentOs)
         }
         androidMain.dependencies {
