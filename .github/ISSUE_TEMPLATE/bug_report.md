@@ -27,13 +27,12 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
- - Device: [e.g. Pixel XL]
- - OS: [e.g. Android 10]
- - Library version [e.g. 1.0.1]
--  Used Android SDK library versions [androidx.appcompat:appcompat:1.2.0-alpha03...]
--  Used gradle and wrapper version
--  Used tooling / Android Studio version
--  Other potentially conflicting libraries
+ - Library version: [e.g. 1.0.1]
+ - Kotlin version: [e.g. 2.4.0]
+ - Compose Multiplatform version: [e.g. 1.11.1]
+ - Platform(s) affected: [Android API level / iOS version / Desktop JVM]
+ - Device/simulator: [e.g. Pixel 8, iPhone 16 Simulator, macOS desktop]
+ - Reproduction steps/snippet: [minimal code snippet or sample project reproducing the issue]
 
 **Additional context**
 Add any other context about the problem here.

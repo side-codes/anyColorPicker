@@ -1,0 +1,95 @@
+name: Publish
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      snapshot:
+        description: "Publish a snapshot instead of a release (leaves the release coordinate untouched)"
+        type: boolean
+        default: true
+
+# Least privilege: publishing reads the repo and pushes to Maven Central, which uses
+# its own credentials — the GitHub token needs nothing beyond read.
+permissions:
+  contents: read
+
+# Never let two releases race. Maven Central is immutable, so a duplicate in-flight
+# deployment is not something that can be undone.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # macOS is required: the iOS targets can only be built on an Apple host, and all five
+    # publications have to go up in one deployment.
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v6
+
+      # macos-15 defaults to Xcode 16.4, whose iOS SDK predates UIViewLayoutRegion — a
+      # symbol Compose Multiplatform's ui-uikit references. Kotlin/Native static caches
+      # link whole modules rather than tree-shaking, so any iOS *test executable* fails to
+      # link without a 26.x SDK (the static framework link survives because an archive
+      # never resolves external symbols). The image ships several Xcodes; take the newest.
+      - name: Select the newest installed Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
+
+      # The version lives in gradle.properties, not in the tag. Publishing the wrong one
+      # is unrecoverable because Maven Central is immutable, so refuse to start on a
+      # mismatch rather than redeploying an already-released coordinate.
+      - name: Check the tag matches VERSION_NAME
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PROJECT_VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          echo "tag=$TAG_VERSION gradle.properties=$PROJECT_VERSION"
+          if [ "$TAG_VERSION" != "$PROJECT_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION_NAME=$PROJECT_VERSION. Bump VERSION_NAME and retag."
+            exit 1
+          fi
+
+      - name: Run tests
+        run: ./gradlew :colorpicker:allTests
+
+      - name: Check the public API matches the committed dump
+        run: ./gradlew apiCheck
+
+      # Uploads one deployment holding all five publications to the Central Portal and
+      # releases it. The previous OSSRH Staging API upload only *staged* a deployment;
+      # nothing closed or released it, so nothing ever reached Maven Central.
+      # A snapshot is the safe rehearsal: it exercises the Portal token, the signing key
+      # and the whole upload path, but goes to the snapshot repository rather than
+      # consuming an immutable release coordinate. The version is overridden on the
+      # command line so gradle.properties is never edited just to test.
+      - name: Publish to Maven Central
+        run: |
+          VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          if [ "${{ inputs.snapshot }}" = "true" ]; then
+            echo "Publishing snapshot ${VERSION}-SNAPSHOT"
+            ./gradlew publishToMavenCentral -PVERSION_NAME="${VERSION}-SNAPSHOT" --no-configuration-cache
+          else
+            echo "Publishing and releasing ${VERSION}"
+            ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+          fi
+        env:
+          # Central Portal user tokens. An old OSSRH token returns 401 here.
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          # Armoured private key, its key id, and its passphrase.
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}

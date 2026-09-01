@@ -1,8 +1,42 @@
 version: 2
 updates:
-- package-ecosystem: gradle
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
-  target-branch: develop
+  # Kotlin, Compose Multiplatform and AGP have to move together — a lone bump of one
+  # produces a PR that fails for reasons unrelated to the dependency being updated.
+  # Grouping keeps each PR to something that can actually be judged on its own.
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      kotlin-and-compose:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.compose*"
+          - "androidx.compose*"
+      build-plugins:
+        patterns:
+          - "com.android*"
+          - "com.vanniktech*"
+          - "org.jetbrains.dokka*"
+          - "org.jetbrains.kotlinx.binary-compatibility-validator*"
+      kotlinx:
+        patterns:
+          - "org.jetbrains.kotlinx*"
+        exclude-patterns:
+          - "org.jetbrains.kotlinx.binary-compatibility-validator*"
+      androidx:
+        patterns:
+          - "androidx.*"
+        exclude-patterns:
+          - "androidx.compose*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"

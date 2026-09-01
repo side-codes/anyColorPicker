@@ -1,193 +1,354 @@
-# andColorPicker — Color Picker library for Android
+# anyColorPicker
 
-:avocado: Handy, :snake: flexible, and :zap: lightning-fast Android color picker views and utilities.
+Multiplatform color picker library for Android, iOS, and Desktop (JVM), built with Compose Multiplatform and Material 3.
 
-![andColorPicker logo](https://github.com/side-codes/andColorPicker/raw/master/github/logo.png)
+## Features
 
-## :pill: Features
-
-- Clean, easy-to-use components and API
-- High performance
-- Material styling in mind
-- Standard Android SDK view family
-- Wide color models support
-- Tooling and utilities
+- Compose Multiplatform (Android, iOS, Desktop/JVM)
+- Material 3 theming via `ColorPickerDefaults`
+- HSL, RGB, CMYK, and LAB color models
 - Alpha channel support
-- Cutting edge tech stack
-- Active development and support
+- Zero-drift editing: `ColorPickerState` keeps the authoritative color in the space you edited, so edit-in-X-read-X is always exact (conversions themselves are float-based)
+- Unidirectional data flow with `ColorPickerState`
+- Hex string parsing and formatting
+- Color picker dialog
+- Accessibility semantics and RTL layout support
 
-## :hammer: Setup
+## Setup
 
-Gradle dependency:
-
-```gradle
-implementation "codes.side:andcolorpicker:0.6.2"
-```
-
-## :art: Picker types
-
-### HSL (hue, saturation, lightness)
-
-- *Add color model description*
-
-![](https://github.com/side-codes/andColorPicker/raw/master/github/seek_bar_hsl_pure.png)
-
-#### Layout XML Snippet
-
-Basic HSL components:
-```xml
-<codes.side.andcolorpicker.hsl.HSLColorPickerSeekBar
-  android:id="@+id/hueSeekBar"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  app:hslColoringMode="pure"
-  app:hslMode="hue" />
-```
-
-Supported `hslMode` values:
-- `hue` (default)
-- `saturation`
-- `lightness`
-
-Supported `hslColoringMode` values:
-- `pure` (default)
-- `output`
-
-Alpha component:
-```xml
-<codes.side.andcolorpicker.alpha.HSLAlphaColorPickerSeekBar
-  android:id="@+id/alphaSeekBar"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content" />
-```
-
-#### Kotlin Snippet
 ```kotlin
-// Configure color model programmatically
-hueSeekBar.mode = Mode.MODE_HUE // Mode.MODE_SATURATION, Mode.MODE_LIGHTNESS
-
-// Configure coloring mode programmatically
-hueSeekBar.coloringMode = ColoringMode.PURE_COLOR // ColoringMode.OUTPUT_COLOR
-
-// Group pickers with PickerGroup to automatically synchronize color across them
-val group = PickerGroup<IntegerHSLColor>().also {
-  it.registerPickers(
-    hueSeekBar,
-    saturationSeekBar,
-    lightnessSeekBar,
-    alphaSeekBar
-  )
-}
-
-// Get current color immediately
-Log.d(
-  TAG,
-  "Current color is ${hueSeekBar.pickedColor}"
-)
-
-// Listen individual pickers or groups for changes
-group.addListener(
-  object : HSLColorPickerSeekBar.DefaultOnColorPickListener() {
-    override fun onColorChanged(
-      picker: ColorSeekBar<IntegerHSLColor>,
-      color: IntegerHSLColor,
-      value: Int
-    ) {
-      Log.d(
-        TAG,
-        "$color picked"
-      )
-      swatchView.setSwatchColor(
-        color
-      )
-    }
-  }
-)
-
-// Set desired color programmatically
-group.setColor(
-  IntegerHSLColor().also {
-    it.setFromColorInt(
-      Color.rgb(
-        28,
-        84,
-        187
-      )
-    )
-  }
-)
-
-// Set color components programmatically
-hueSeekBar.progress = 50
+// build.gradle.kts
+implementation("codes.side:colorpicker:1.0.0")
 ```
 
-### RGB (red, green, blue)
+In a Kotlin Multiplatform project, add it to `commonMain`:
 
-![](https://github.com/side-codes/andColorPicker/raw/master/github/seek_bar_rgb_pure.png)
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("codes.side:colorpicker:1.0.0")
+        }
+    }
+}
+```
 
-#### Properties
+Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`.
 
-- View name: ```RGBColorPickerSeekBar```
-- ```app:rgbMode``` for RGB component selection
+## Quick Start
+
+```kotlin
+@Composable
+fun MyScreen() {
+    val state = rememberColorPickerState(
+        initialColor = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)
+    )
+
+    Column {
+        HslColorPicker(state = state)
+        ColorSwatch(
+            color = state.hslColor.toComposeColor(),
+            modifier = Modifier.size(48.dp)
+        )
+    }
+}
+```
+
+## Color Models
+
+All color models use **Float** for full precision. Integer accessors and factories are provided for convenience.
+
+### HSL
+
+```kotlin
+val color = HslColor(hue = 210f, saturation = 0.8f, lightness = 0.5f, alpha = 1f)
+// hue: [0, 360], saturation/lightness/alpha: [0, 1]
+
+// Integer accessors
+color.intHue        // 210
+color.intSaturation // 80
+color.intLightness  // 50
+color.intAlpha      // 255
+
+// From integers
+HslColor.fromInt(hue = 210, saturation = 80, lightness = 50, alpha = 255)
+```
+
+### RGB
+
+```kotlin
+val color = RgbColor(red = 0.2f, green = 0.5f, blue = 0.8f, alpha = 1f)
+// All components: [0, 1]
+
+color.intRed   // 51
+color.intGreen // 128
+color.intBlue  // 204
+
+RgbColor.fromInt(red = 51, green = 128, blue = 204)
+```
+
+### CMYK
+
+```kotlin
+val color = CmykColor(cyan = 0.3f, magenta = 0.6f, yellow = 0.1f, key = 0.2f)
+// All components: [0, 1]
+
+CmykColor.fromInt(cyan = 30, magenta = 60, yellow = 10, key = 20)
+```
 
 ### LAB
 
-![](https://github.com/side-codes/andColorPicker/raw/master/github/seek_bar_lab_output.png)
-
-#### Properties
-
-- View name: ```LABColorPickerSeekBar```
-- ```app:labMode``` for LAB component selection
-
-### CMYK (cyan, magenta, yellow, key)
-
-![](https://github.com/side-codes/andColorPicker/raw/master/github/seek_bar_cmyk_pure.png)
-
-#### Properties
-
-- View name: ```CMYKColorPickerSeekBar```
-- ```app:cmykMode``` for CMYK component selection
-- ```app:cmykColoringMode``` for coloring mode selection
-
-Supported `cmykMode` values:
-- `cyan` (default)
-- `magenta`
-- `yellow`
-- `black`
-
-Supported `cmykColoringMode` values:
-- `pure` (default)
-- `output`
-
-### Swatches
-
-SwatchView component:
-```xml
-<codes.side.andcolorpicker.view.swatch.SwatchView
-  android:id="@+id/swatchView"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content" />
-```
-
-#### Kotlin Snippet:
 ```kotlin
-swatchView.setSwatchPatternTint(
-  Color.LTGRAY
+val color = LabColor(l = 53.23f, a = 80.11f, b = 67.22f)
+// l: [0, 100], a: [-128, 127], b: [-128, 127], alpha: [0, 1]
+
+LabColor.fromInt(l = 53, a = 80, b = 67)
+```
+
+## Conversions
+
+Conversions are extension functions. They operate on floats end to end — nothing is quantized to integers until you explicitly ask for an ARGB `Int` or a hex string. Like any color space conversion, a cross-space round trip is not guaranteed to be bit-exact; the zero-drift guarantee comes from `ColorPickerState`'s origin tracking (see [Architecture](#architecture-zero-drift-color-conversions)).
+
+```kotlin
+val hsl = HslColor(hue = 0f, saturation = 1f, lightness = 0.5f)
+val rgb = hsl.toRgb()
+val cmyk = rgb.toCmyk()
+val lab = rgb.toLab()
+val argb = rgb.toArgbInt()
+
+// Compose interop, both ways
+val composeColor: Color = hsl.toComposeColor()
+val backToHsl: HslColor = composeColor.toHslColor()
+val backToRgb: RgbColor = composeColor.toRgbColor()
+val backToCmyk: CmykColor = composeColor.toCmykColor()
+val backToLab: LabColor = composeColor.toLabColor()
+```
+
+### Hex strings
+
+```kotlin
+val rgb = RgbColor(red = 0.2f, green = 0.5f, blue = 0.8f)
+
+// Formatting: any PickerColor or packed ARGB Int
+rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha first)
+rgb.toHexString(includeAlpha = false)      // "#3380CC"
+0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
+
+// Parsing: accepts #RGB, #RRGGBB, and #AARRGGBB; the '#' is optional
+"#3380CC".toRgbColorOrNull()               // RgbColor, alpha defaults to FF
+"#ABC".toRgbColorOrNull()                  // shorthand, expands to #AABBCC
+"not a color".toRgbColorOrNull()           // null, never throws
+"#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
+```
+
+## Color Picker Components
+
+### Full Pickers
+
+Each color model has a ready-made picker that stacks its channel sliders (plus an optional alpha slider):
+
+```kotlin
+val state = rememberColorPickerState()
+
+HslColorPicker(
+    state = state,
+    showAlpha = true,
+    coloringMode = ColoringMode.Independent, // or Contextual
 )
 
-swatchView.setSwatchColor(
-  IntegerHSLColor().also {
-    it.setFromColorInt(
-      ColorUtils.setAlphaComponent(
-        Color.MAGENTA,
-        128
-      )
-    )
-  }
+RgbColorPicker(state = state, showAlpha = true)
+CmykColorPicker(state = state, showAlpha = true)
+LabColorPicker(state = state, showAlpha = true)
+```
+
+`ColoringMode` controls the slider gradients: `Independent` shows each channel's full range regardless of the other channels, `Contextual` previews the actual resulting color at each position.
+
+### Individual Sliders
+
+Every channel is available as a standalone slider. Compose any subset against a shared state:
+
+```kotlin
+// HSL
+HueSlider(state = state)
+SaturationSlider(state = state)
+LightnessSlider(state = state)
+
+// RGB
+RedSlider(state = state)
+GreenSlider(state = state)
+BlueSlider(state = state)
+
+// CMYK
+CyanSlider(state = state)
+MagentaSlider(state = state)
+YellowSlider(state = state)
+KeySlider(state = state)
+
+// LAB
+LightnessLabSlider(state = state)
+LabASlider(state = state)
+LabBSlider(state = state)
+
+// Alpha (works with any origin space)
+AlphaSlider(state = state)
+```
+
+Sliders expose slots and semantics for customization:
+
+```kotlin
+HueSlider(
+    state = state,
+    label = { SliderLabel("Hue") },              // leading label slot (null to hide)
+    valueLabel = { SliderValueLabel("200°") },   // trailing value slot (null to hide)
+    semanticLabel = "Hue",                       // accessibility label
+    semanticValueText = "200°",                  // accessibility value announcement
 )
 ```
 
-## :memo: License
+### Color Swatch
+
+Renders a color over a transparency checkerboard:
+
+```kotlin
+ColorSwatch(
+    color = state.hslColor.toComposeColor(),
+    modifier = Modifier.fillMaxWidth().height(48.dp),
+    contentDescription = "Selected color",
+)
+```
+
+### Dialog
+
+A Material 3 `AlertDialog` with an HSL picker and a live swatch. Callbacks come first; everything else has defaults:
+
+```kotlin
+ColorPickerDialog(
+    onColorSelected = { hsl -> /* confirmed color */ },
+    onDismiss = { /* close */ },
+    initialColor = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f),
+    title = "Pick a Color",
+    confirmText = "Select",
+    dismissText = "Cancel",
+    showAlpha = true,
+)
+```
+
+In-progress edits inside the dialog survive configuration changes; passing a new `initialColor` resets the picker.
+
+### Theming
+
+All pickers and sliders accept `colors` and `shapes` built with `ColorPickerDefaults`, which derive from `MaterialTheme` by default:
+
+```kotlin
+HslColorPicker(
+    state = state,
+    colors = ColorPickerDefaults.colors(
+        checkerboardLight = Color.White,
+        checkerboardDark = Color.LightGray,
+    ),
+    shapes = ColorPickerDefaults.shapes(
+        trackShape = RoundedCornerShape(4.dp),
+        swatchShape = RoundedCornerShape(8.dp),
+    ),
+)
+```
+
+## State Management
+
+`ColorPickerState` is the single source of truth. It reads and writes each color space natively, with no round-trip conversions.
+
+```kotlin
+val state = rememberColorPickerState()
+
+// Read any color space (derived from the authoritative color)
+state.hslColor
+state.rgbColor
+state.cmykColor
+state.labColor
+state.argbInt
+state.pickerColor // the authoritative color, in whichever space was last written
+
+// Per-channel updates (NaN ignored, values clamped)
+state.updateHue(180f)
+state.updateSaturation(0.5f)
+state.updateLightness(0.5f)
+state.updateRed(1f)
+state.updateGreen(0f)
+state.updateBlue(0f)
+state.updateCyan(0.3f)
+state.updateMagenta(0.6f)
+state.updateYellow(0.1f)
+state.updateKey(0.2f)
+state.updateLabLightness(50f)
+state.updateLabA(20f)
+state.updateLabB(-30f)
+state.updateAlpha(0.5f) // keeps the current origin space
+
+// Whole-color updates (the written space becomes the origin)
+state.updateFromHsl(HslColor(hue = 0f, saturation = 1f, lightness = 0.5f))
+state.updateFromRgb(RgbColor(1f, 0f, 0f))
+state.updateFromCmyk(cmykColor)
+state.updateFromLab(labColor)
+state.updateFromArgbInt(0xFFFF0000.toInt())
+
+// True while the user is dragging a slider
+state.isInteracting
+```
+
+`ColorPickerState` has a public constructor, so it can also be created and held outside of composition (e.g. in a ViewModel).
+
+Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color.
+
+## Architecture: Zero-Drift Color Conversions
+
+Color space conversions are inherently lossy when values are quantized to integers, and even with floats, transcendental functions (used in LAB) introduce IEEE 754 rounding errors. Industry-standard tools (Photoshop, CSS Color Level 4, Sass) solve this the same way we do:
+
+**Store colors in their authored color space. Convert forward only. Never convert back.**
+
+`ColorPickerState` tracks which color space was last written to (the *origin*). When you read a different space, it converts forward once from the origin. The origin value is never re-derived from a conversion.
+
+```
+User drags Red slider
+  -> the authoritative color is written as RGB (origin = RGB, zero conversions)
+  -> UI reads hslColor -> converts RGB->HSL once (forward only)
+  -> UI reads rgbColor -> returns the authoritative RGB value as-is (zero conversions)
+```
+
+This means:
+- Editing in RGB and reading back RGB produces **the exact original value**
+- Editing in HSL and reading back HSL produces **the exact original value**
+- Cross-space reads involve a single forward conversion, never a round-trip
+- No precision loss accumulates over time, regardless of how many edits are made
+
+For more details, see:
+- [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/) -- the W3C spec mandates the same approach
+- [Sass Color Spaces](https://css.oddbird.net/sass/color-spaces/proposal/) -- stores colors in their original space
+
+## Migrating from andcolorpicker (0.6.x)
+
+The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar` and friends) is discontinued. This library is a full Compose Multiplatform rewrite published under new coordinates:
+
+```diff
+- implementation("codes.side:andcolorpicker:0.6.2")
++ implementation("codes.side:colorpicker:1.0.0")
+```
+
+There is no 1:1 API mapping — migrate by concept:
+
+| andcolorpicker (View-based)                                    | colorpicker (Compose)                                                                                                                                      |
+|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `HSLColorPickerSeekBar` (`hslMode` = hue/saturation/lightness) | `HueSlider` / `SaturationSlider` / `LightnessSlider`, or `HslColorPicker` for all three                                                                    |
+| `RGBColorPickerSeekBar`                                        | `RedSlider` / `GreenSlider` / `BlueSlider`, or `RgbColorPicker`                                                                                            |
+| `CMYKColorPickerSeekBar`                                       | `CyanSlider` / `MagentaSlider` / `YellowSlider` / `KeySlider`, or `CmykColorPicker`                                                                        |
+| `LABColorPickerSeekBar`                                        | `LightnessLabSlider` / `LabASlider` / `LabBSlider`, or `LabColorPicker`                                                                                    |
+| `HSLAlphaColorPickerSeekBar`                                   | `AlphaSlider`                                                                                                                                              |
+| `PickerGroup` + `registerPickers`                              | Pass one `ColorPickerState` to every component — they stay in sync automatically                                                                           |
+| `SwatchView`                                                   | `ColorSwatch`                                                                                                                                              |
+| `OnColorPickListener` / `addListener`                          | Read `state.hslColor` (or any other space) — it is Compose snapshot state, so composition recomposes automatically; use `snapshotFlow` outside composition |
+| `IntegerHSLColor` and friends                                  | `HslColor`, `RgbColor`, `CmykColor`, `LabColor` (float-based, with `fromInt` factories)                                                                    |
+| `hslColoringMode` = `pure` / `output`                          | `ColoringMode.Independent` / `ColoringMode.Contextual`                                                                                                     |
+
+## License
 
 ```
 Copyright 2020 Illia Achour
