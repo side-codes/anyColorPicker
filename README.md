@@ -1,10 +1,10 @@
 # anyColorPicker
 
-Multiplatform color picker library for Android, iOS, and Desktop (JVM), built with Compose Multiplatform and Material 3.
+Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
 
 ## Features
 
-- Compose Multiplatform (Android, iOS, Desktop/JVM)
+- Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm)
 - Material 3 theming via `ColorPickerDefaults`
 - HSL, RGB, CMYK, and LAB color models
 - Alpha channel support
@@ -33,7 +33,30 @@ kotlin {
 }
 ```
 
-Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`.
+Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
+
+## Gallery
+
+|                                             |                                           |
+|---------------------------------------------|-------------------------------------------|
+| **HSL** — `HslColorPicker`                  | **RGB** — `RgbColorPicker`                |
+| ![HSL picker](docs/images/hsl-picker.png)   | ![RGB picker](docs/images/rgb-picker.png) |
+| **CMYK** — `CmykColorPicker`                | **LAB** — `LabColorPicker`                |
+| ![CMYK picker](docs/images/cmyk-picker.png) | ![LAB picker](docs/images/lab-picker.png) |
+
+`ColoringMode.Independent` shows each channel's full range; `ColoringMode.Contextual`
+previews the resulting color at every slider position:
+
+| Independent                                | Contextual                                           |
+|--------------------------------------------|------------------------------------------------------|
+| ![Independent](docs/images/hsl-picker.png) | ![Contextual](docs/images/hsl-picker-contextual.png) |
+
+`ColorSwatch` draws the color over a transparency checkerboard, so alpha reads correctly:
+
+![Color swatch](docs/images/color-swatch.png)
+
+These images are rendered by `PreviewGoldenTest` from the library's own components and
+checked on every build, so they cannot drift from what the code actually draws.
 
 ## Quick Start
 
@@ -323,6 +346,20 @@ This means:
 For more details, see:
 - [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/) -- the W3C spec mandates the same approach
 - [Sass Color Spaces](https://css.oddbird.net/sass/color-spaces/proposal/) -- stores colors in their original space
+
+## Running the samples
+
+The same sample app runs on every supported platform:
+
+```sh
+./gradlew :sample:desktopApp:run             # desktop window
+./gradlew :sample:androidApp:installDebug    # device or emulator
+```
+
+`sample/iosApp` holds the SwiftUI entry points. The Xcode project is not checked in, so
+it needs creating once on a Mac against the `ComposeApp` framework that `:sample:shared`
+produces.
+
 
 ## Migrating from andcolorpicker (0.6.x)
 

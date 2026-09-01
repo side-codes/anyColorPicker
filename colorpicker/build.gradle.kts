@@ -83,6 +83,12 @@ kotlin {
     }
 }
 
+// Golden images for the README are rendered by PreviewGoldenTest. Regenerate with
+// ./gradlew :colorpicker:jvmTest --tests "*PreviewGoldenTest*" -PupdateGoldens=true
+tasks.withType<Test>().configureEach {
+    systemProperty("updateGoldens", providers.gradleProperty("updateGoldens").getOrElse("false"))
+}
+
 // ---- Maven Central publication ----
 //
 // Publishing goes through the Central Portal (central.sonatype.com). Uploading to the old
