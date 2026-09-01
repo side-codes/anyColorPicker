@@ -34,3 +34,4 @@ rootProject.name = "anyColorPicker"
 include(":colorpicker")
 include(":sample:shared")
 include(":sample:androidApp")
+include(":sample:desktopApp")

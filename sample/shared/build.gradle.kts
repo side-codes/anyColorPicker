@@ -9,6 +9,9 @@ plugins {
 }
 
 kotlin {
+    // Consumed by the desktop sample; the library already publishes a jvm target.
+    jvm()
+
     android {
         namespace = "codes.side.colorpicker.sample.shared"
         compileSdk = 37
