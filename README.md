@@ -55,8 +55,10 @@ previews the resulting color at every slider position:
 
 ![Color swatch](docs/images/color-swatch.png)
 
-These images are rendered by `PreviewGoldenTest` from the library's own components and
-checked on every build, so they cannot drift from what the code actually draws.
+These images are the Compose Preview Screenshot Testing references, rendered from the
+library's own components and re-checked on every CI run, so they cannot drift from what
+the code actually draws. Regenerate them with
+`./gradlew :screenshot-tests:updateDebugScreenshotTest`.
 
 ## Quick Start
 

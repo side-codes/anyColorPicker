@@ -5,10 +5,12 @@ compose-multiplatform = "1.12.0"
 compose-material3 = "1.9.0"
 androidx-activity-compose = "1.13.0"
 androidx-lifecycle = "2.11.0"
+androidx-compose-ui = "1.12.0"
 kotlinx-coroutines = "1.11.0"
 kotlinx-collections-immutable = "0.5.2"
 binary-compatibility-validator = "0.18.1"
 dokka = "2.2.0"
+screenshot = "0.0.1-alpha16"
 
 maven-publish = "0.37.0"
 
@@ -17,6 +19,9 @@ compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", v
 compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose-multiplatform" }
 compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose-multiplatform" }
 compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "compose-multiplatform" }
+screenshot-validation-api = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "screenshot" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "androidx-compose-ui" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "androidx-compose-ui" }
 compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "compose-material3" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -35,3 +40,5 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }

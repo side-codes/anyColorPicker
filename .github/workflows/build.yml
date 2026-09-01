@@ -34,6 +34,20 @@ jobs:
       # binary-compatibility plugin is configured but never consulted.
       - name: Check the public API matches the committed dump
         run: ./gradlew apiCheck
+      # The references under screenshot-tests/src/screenshotTestDebug/reference are only a
+      # regression check if something compares against them. These render host-side, so
+      # ubuntu-latest needs no emulator.
+      - name: Validate the Compose preview goldens
+        run: ./gradlew :screenshot-tests:validateDebugScreenshotTest
+      # A failure here is a visual difference, which the log reports only as a pixel count.
+      # The report holds the reference, the actual and the diff for each preview.
+      - name: Upload the screenshot diff report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot-diff-report
+          path: screenshot-tests/build/reports/screenshotTest/
+
       - name: Build sample APK
         run: ./gradlew :sample:androidApp:assembleDebug
       - name: Upload sample APK
