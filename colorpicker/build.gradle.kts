@@ -1,6 +1,7 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -17,6 +18,18 @@ version = providers.gradleProperty("VERSION_NAME").get()
 
 kotlin {
     explicitApi()
+
+    // Compose Multiplatform for web. The DSL is still marked experimental in the Kotlin
+    // Gradle plugin, so the opt-in is required and the shape may change between Kotlin
+    // versions; the library itself needs no wasm-specific source.
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        // Required even for a library: without an executable binary webpack does not
+        // bundle the Skiko runtime, and the browser test target cannot load Compose.
+        // See https://youtrack.jetbrains.com/issue/CMP-4906
+        binaries.executable()
+    }
 
     jvm()
 

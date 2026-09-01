@@ -1,7 +1,6 @@
 package codes.side.colorpicker.ui
 
 import codes.side.colorpicker.state.ColorPickerState
-import kotlin.math.nextDown
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -11,6 +10,11 @@ import kotlin.test.assertTrue
  * the equivalent 0, so the slider must never write exactly 360 — otherwise dragging
  * the thumb to the right end of the track would snap it back to the far left.
  */
+// kotlin.math.nextDown is unavailable on wasmJs, and this test runs in commonTest, so it
+// compiles for every target. Computed here from the bit pattern rather than reusing the
+// implementation's own constant, which would make these assertions circular.
+private val JUST_BELOW_360 = Float.fromBits(360f.toRawBits() - 1)
+
 class HueFractionMappingTest {
 
     @Test
@@ -27,7 +31,7 @@ class HueFractionMappingTest {
     fun fullFractionMapsJustBelow360() {
         val hue = hueFromFraction(1f)
         assertTrue(hue < 360f, "hue at the track end must stay below 360, was $hue")
-        assertEquals(360f.nextDown(), hue)
+        assertEquals(JUST_BELOW_360, hue)
     }
 
     @Test
@@ -36,7 +40,7 @@ class HueFractionMappingTest {
         // hue must read back unchanged instead of wrapping to 0.
         val state = ColorPickerState()
         state.updateHue(hueFromFraction(1f))
-        assertEquals(360f.nextDown(), state.hslColor.hue)
+        assertEquals(JUST_BELOW_360, state.hslColor.hue)
     }
 
     @Test
@@ -58,6 +62,6 @@ class HueFractionMappingTest {
         state.updateHue(hueFromFraction(1f))
         val redisplayedFraction = state.hslColor.hue / 360f
         state.updateHue(hueFromFraction(redisplayedFraction))
-        assertEquals(360f.nextDown(), state.hslColor.hue)
+        assertEquals(JUST_BELOW_360, state.hslColor.hue)
     }
 }
