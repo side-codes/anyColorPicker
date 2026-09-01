@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -7,8 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.dokka)
-    `maven-publish`
-    signing
+    alias(libs.plugins.mavenPublish)
 }
 
 group = "codes.side"
@@ -65,8 +66,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
-            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
+            implementation(libs.compose.ui.test)
         }
         jvmTest.dependencies {
             // runComposeUiTest needs a real renderer on the JVM target.
@@ -78,75 +78,57 @@ kotlin {
     }
 }
 
-// Maven Central publication. The -javadoc jar packages the Dokka HTML output so the
-// published artifact carries real API documentation.
-val javadocJar = tasks.register<Jar>("javadocJar") {
-    archiveClassifier.set("javadoc")
-    val dokkaHtml = tasks.named("dokkaGeneratePublicationHtml")
-    dependsOn(dokkaHtml)
-    from(dokkaHtml)
-}
+// ---- Maven Central publication ----
+//
+// Publishing goes through the Central Portal (central.sonatype.com). Uploading to the old
+// OSSRH Staging API only stages a deployment: something still has to close and release it,
+// which nothing here used to do. publishAndReleaseToMavenCentral does both in one task.
+//
+// Credentials are Central Portal *user tokens* — an OSSRH token returns 401. The plugin
+// reads them from mavenCentralUsername / mavenCentralPassword, which CI supplies as
+// ORG_GRADLE_PROJECT_* environment variables.
 
-publishing {
-    publications.withType<MavenPublication> {
-        artifact(javadocJar)
+mavenPublishing {
+    // Bundles all five publications (kotlinMultiplatform, android, jvm and the two iOS
+    // targets) into one deployment, with the Dokka HTML as the -javadoc jar.
+    configure(KotlinMultiplatform(javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml")))
 
-        pom {
-            name.set("andColorPicker")
-            description.set("Multiplatform color picker library for Android & iOS")
+    publishToMavenCentral(automaticRelease = true)
+
+    // Signing keys only exist on CI; without this guard every sign* task fails with
+    // "no configured signatory" and blocks publishToMavenLocal for contributors.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+
+    pom {
+        name.set("andColorPicker")
+        description.set("Multiplatform color picker library for Android & iOS")
+        inceptionYear.set("2020")
+        url.set("https://github.com/side-codes/andColorPicker")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("smelfungus")
+                name.set("Illia Achour")
+                email.set("ilyaachour@gmail.com")
+            }
+            developer {
+                id.set("N7k")
+                name.set("Maksim Novik")
+                email.set("nvk.mse@gmail.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/side-codes/andColorPicker.git")
+            developerConnection.set("scm:git:ssh://git@github.com/side-codes/andColorPicker.git")
             url.set("https://github.com/side-codes/andColorPicker")
-            licenses {
-                license {
-                    name.set("The Apache License, Version 2.0")
-                    url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                }
-            }
-            developers {
-                developer {
-                    id.set("dummyco")
-                    name.set("Illia Achour")
-                    email.set("ilyaachour@gmail.com")
-                }
-                developer {
-                    id.set("N7k")
-                    name.set("Maksim Novik")
-                    email.set("nvk.mse@gmail.com")
-                }
-            }
-            scm {
-                connection.set("scm:git:github.com/side-codes/andColorPicker.git")
-                developerConnection.set("scm:git:ssh://github.com/side-codes/andColorPicker.git")
-                url.set("https://github.com/side-codes/andColorPicker/tree/master")
-            }
         }
     }
-
-    repositories {
-        maven {
-            name = "sonatype"
-            // OSSRH (s01.oss.sonatype.org) was decommissioned 2025-06-30. These endpoints are the
-            // Central Portal's OSSRH Staging API compatibility service; credentials must be
-            // Central Portal user tokens, and deployments are released from central.sonatype.com.
-            val releasesRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
-            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
-            credentials {
-                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
-                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD")
-            }
-        }
-    }
-}
-
-signing {
-    val signingKeyId = findProperty("signing.keyId") as String? ?: System.getenv("SIGNING_KEY_ID")
-    val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_PASSWORD")
-    val signingKey = findProperty("signing.key") as String? ?: System.getenv("SIGNING_KEY")
-    // Signing keys only exist on CI. Without this guard every sign* task fails with
-    // "no configured signatory", which blocks publishToMavenLocal for contributors.
-    isRequired = signingKey != null
-    if (signingKey != null) {
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    }
-    sign(publishing.publications)
 }

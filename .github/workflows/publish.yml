@@ -3,9 +3,12 @@ name: Publish
 on:
   push:
     tags: [ 'v*' ]
+  workflow_dispatch:
 
 jobs:
   publish:
+    # macOS is required: the iOS targets can only be built on an Apple host, and all five
+    # publications have to go up in one deployment.
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
@@ -19,6 +22,7 @@ jobs:
       # is unrecoverable because Maven Central is immutable, so refuse to start on a
       # mismatch rather than redeploying an already-released coordinate.
       - name: Check the tag matches VERSION_NAME
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           PROJECT_VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
@@ -28,11 +32,22 @@ jobs:
             exit 1
           fi
 
+      - name: Run tests
+        run: ./gradlew :colorpicker:allTests
+
+      - name: Check the public API matches the committed dump
+        run: ./gradlew apiCheck
+
+      # Uploads one deployment holding all five publications to the Central Portal and
+      # releases it. The previous OSSRH Staging API upload only *staged* a deployment;
+      # nothing closed or released it, so nothing ever reached Maven Central.
       - name: Publish to Maven Central
-        run: ./gradlew :colorpicker:publishAllPublicationsToSonatypeRepository
+        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          # Central Portal user tokens. An old OSSRH token returns 401 here.
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          # Armoured private key, its key id, and its passphrase.
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}

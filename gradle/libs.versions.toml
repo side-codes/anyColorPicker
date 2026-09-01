@@ -10,10 +10,13 @@ kotlinx-collections-immutable = "0.5.1"
 binary-compatibility-validator = "0.18.1"
 dokka = "2.2.0"
 
+maven-publish = "0.33.0"
+
 [libraries]
 compose-runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose-multiplatform" }
 compose-foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose-multiplatform" }
 compose-ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose-multiplatform" }
+compose-ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "compose-multiplatform" }
 compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "compose-material3" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -31,3 +34,4 @@ androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.r
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
