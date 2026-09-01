@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: '21'
@@ -24,6 +24,10 @@ jobs:
         run: ./gradlew :colorpicker:assemble
       - name: Run tests
         run: ./gradlew :colorpicker:allTests
+      # Fails when public API drifts from colorpicker/api/. Without this the
+      # binary-compatibility plugin is configured but never consulted.
+      - name: Check the public API matches the committed dump
+        run: ./gradlew apiCheck
       - name: Build sample APK
         run: ./gradlew :sample:androidApp:assembleDebug
       - name: Upload sample APK
@@ -36,7 +40,7 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: '21'
