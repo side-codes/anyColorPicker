@@ -52,6 +52,18 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v6
+      # macos-15 defaults to Xcode 16.4, whose iOS SDK predates UIViewLayoutRegion — a
+      # symbol Compose Multiplatform's ui-uikit references. Kotlin/Native static caches
+      # link whole modules rather than tree-shaking, so any iOS *test executable* fails to
+      # link without a 26.x SDK (the static framework link survives because an archive
+      # never resolves external symbols). The image ships several Xcodes; take the newest.
+      - name: Select the newest installed Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "Using $XCODE"
+          sudo xcode-select -s "$XCODE/Contents/Developer"
+          xcodebuild -version
+
       - name: Build iOS framework
         run: ./gradlew :colorpicker:linkDebugFrameworkIosSimulatorArm64
       - name: Run iOS simulator tests
