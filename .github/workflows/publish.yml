@@ -27,6 +27,11 @@ jobs:
     # publications have to go up in one deployment.
     runs-on: macos-15
     timeout-minutes: 60
+    # Widened from the workflow-level `contents: read` solely to create the GitHub
+    # Release below. Everything else here writes to Maven Central using its own
+    # credentials, not the GitHub token.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -93,3 +98,16 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+
+      # Only after Maven Central has accepted the release — a GitHub Release pointing at
+      # artifacts that never published would be worse than none. Skipped for snapshots,
+      # which are not releases and are overwritten freely.
+      #
+      # `gh` is preinstalled on the runner, so this adds no third-party action to the one
+      # job holding the signing key and the Portal token. `--verify-tag` refuses to invent
+      # a tag if the ref is somehow wrong.
+      - name: Create the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') && inputs.snapshot != true
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
