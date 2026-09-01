@@ -1,0 +1,523 @@
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/CmykSliders.kt
+  s_26c967e41aa9b7::t_1b1065931d7950 20,22-23
+  s_26c967e41aa9b7::t_ed9d1f01c2f3a4 70,72-73,129,131-132,188,190-191,247,249-250
+  s_26c967e41aa9b7::t_51a334eea36e60 21
+  s_26c967e41aa9b7::t_40b27ef420344d 64
+  s_26c967e41aa9b7::t_f64120c8a9addf 90
+  s_26c967e41aa9b7::t_c2ae19fc676177 39
+  s_26c967e41aa9b7::t_97e2af0582d875 71,130,189,248
+  s_26c967e41aa9b7::t_8511685921ff38 65,124,183,242
+  s_26c967e41aa9b7::t_14a88b0e3b0b36 28
+  s_26c967e41aa9b7::t_8c660c8d315f7a 75,134,193,252
+  s_26c967e41aa9b7::t_5704c6ce1fc6d4 97-98,157,216
+  s_26c967e41aa9b7::t_ff589df6ba912b 29,31,37-38
+  s_26c967e41aa9b7::t_26ddd3b3aac707 59,62-63,118,121-122,177,180-181,236,239-240
+  s_26c967e41aa9b7::t_bdec2bb4d8779a 79-88,138,140-141,144-147,197,199-200,203-206
+  s_26c967e41aa9b7::t_ca9d44cb64e482 40
+  s_26c967e41aa9b7::t_9fb6118675a537 96
+  s_26c967e41aa9b7::t_015078e10a97ae 24-27
+  s_26c967e41aa9b7::t_8e85372d43887b 11-13
+  s_26c967e41aa9b7::t_bf95ed1bd183f4 99,158,217
+  s_26c967e41aa9b7::t_22e80d58ccb399 123
+  s_26c967e41aa9b7::t_03d709d8ff677b 139
+  s_26c967e41aa9b7::t_9d978ea09d5a35 142-143
+  s_26c967e41aa9b7::t_5691dcba3f6a37 155-156
+  s_26c967e41aa9b7::t_efca461ba0c63d 182
+  s_26c967e41aa9b7::t_e9101ecacaa28e 198
+  s_26c967e41aa9b7::t_8018fb04f31973 201-202
+  s_26c967e41aa9b7::t_242189100307a5 214-215
+  s_26c967e41aa9b7::t_2a7ba57fb6d96a 241
+  s_751b1630ea9a5e::t_2efa5be4d9afd1 149,208
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/BlendArgbTest.kt
+  s_26c967e41aa9b7::t_4ebfc4afd3f753 27,29-31,40,46,48-50,56,58,63,81,86-106
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/ArgbInt.kt
+  s_26c967e41aa9b7::t_2df7ace13346dd 18-21
+  s_26c967e41aa9b7::t_ef4c2bd62ef1c1 10
+  s_26c967e41aa9b7::t_203b9b9391a020 6-9
+  s_26c967e41aa9b7::t_932b2c0a1531f3 46
+  s_26c967e41aa9b7::t_614df46d6b1637 29
+  s_26c967e41aa9b7::t_71c36b1e275808 30-33,36,38-45,47-53
+  s_26c967e41aa9b7::t_0903534b69e14c 22
+  s_26c967e41aa9b7::t_8e9cc95e653f5d 35
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/state/SaveableColorPickerState.kt
+  s_26c967e41aa9b7::t_cd6a26c7e35c57 12-20,22,24-29,33-35,37,39,41,46,51,56,62-72,74-79,81-87,89-100,102
+  s_26c967e41aa9b7::t_2fcdd86548bf45 109-115
+  s_26c967e41aa9b7::t_23e391bb3e7245 118
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/model/LabColor.kt
+  s_26c967e41aa9b7::t_fe97b013ba761e 35,37,39,43,45,47,49,52
+  s_26c967e41aa9b7::t_9c5f870f784c85 19
+  s_26c967e41aa9b7::t_9724461e628989 34,36,38,42,44,46,48,51
+  s_26c967e41aa9b7::t_c6bdab248afc77 79,81,83,90
+  s_26c967e41aa9b7::t_6fb11a78df44f4 6-17
+  s_26c967e41aa9b7::t_d1d653ca55cbe4 80,82,85-89
+  s_26c967e41aa9b7::t_56af5fcdcccdc4 20-23,33,40,53-77
+  s_26c967e41aa9b7::t_6d19a67e9fb99b 78
+  s_26c967e41aa9b7::t_b86e4f3c0ceeaf 84
+build.gradle.kts
+  s_26c967e41aa9b7::t_28d78807783fbc 1-2,9-21
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/ColorSlider.kt
+  s_26c967e41aa9b7::t_6928286e26a683 27-46
+  s_26c967e41aa9b7::t_1f4b8ed3d30801 17-19,22-24,58,60-63,84-91,98-100
+  s_26c967e41aa9b7::t_b2454ff33cb947 49
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/TransparencyCheckerboard.kt
+  s_26c967e41aa9b7::t_2092db004d7227 7-8,14-15,17-21,23
+  s_26c967e41aa9b7::t_94d6003fcc1c72 10
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/model/CmykColor.kt
+  s_26c967e41aa9b7::t_99c015383741bf 89,91,94-98
+  s_26c967e41aa9b7::t_4d03cb87d8f645 20-24,35,44,59-86
+  s_26c967e41aa9b7::t_33881f611ae3fb 88,90,92,99
+  s_26c967e41aa9b7::t_0b9458e2b4fa09 6-17
+  s_26c967e41aa9b7::t_a7a6150dbdf750 36,38,40,42,46,48,50,52,54,57
+  s_26c967e41aa9b7::t_2cf13f8cb3f824 19
+  s_26c967e41aa9b7::t_e7f164f21f2ab4 37,39,41,43,47,49,51,53,55,58
+  s_26c967e41aa9b7::t_7743f20859475b 87
+  s_26c967e41aa9b7::t_aea0a9a38ba3cd 93
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/theme/ColorPickerDefaults.kt
+  s_26c967e41aa9b7::t_3ccb89b7eb9267 11-17,25-29
+  s_26c967e41aa9b7::t_b9c95af0b32cb7 39-42
+  s_26c967e41aa9b7::t_3206e555a72a20 18,21,31
+  s_26c967e41aa9b7::t_5b0cf93c3d4dfb 3,20,22-24,32-33,35-36,45-46
+  s_26c967e41aa9b7::t_9ba23acd8805d8 44
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/HslSliders.kt
+  s_26c967e41aa9b7::t_7abbe2298b8be8 79-80,141-142,205-206
+  s_26c967e41aa9b7::t_afcc72558f1e37 87-89,149-151,213-215
+  s_26c967e41aa9b7::t_afd93ef9570aec 26
+  s_26c967e41aa9b7::t_43af119125afad 11-13
+  s_26c967e41aa9b7::t_b58959ba13bde3 27-29
+  s_26c967e41aa9b7::t_511cddb83d0b24 58
+  s_26c967e41aa9b7::t_85b32d42609b62 76,138,202
+  s_26c967e41aa9b7::t_3dce6608d131f0 40,90,96,152,158,216
+  s_26c967e41aa9b7::t_d2b838a24b2be5 51
+  s_26c967e41aa9b7::t_b929bc92e435f1 57,59-60,115-116,177-178
+  s_26c967e41aa9b7::t_98c52d9f668e45 81
+  s_26c967e41aa9b7::t_6b98f6d6a96445 18-25
+  s_26c967e41aa9b7::t_c4216a0b31d83b 82,144,208
+  s_26c967e41aa9b7::t_55edc266934bb0 41-49,98,102-103,105,161,164-165,167
+  s_26c967e41aa9b7::t_60a17a589b20cd 97
+  s_26c967e41aa9b7::t_86721e875cfae9 99-101
+  s_26c967e41aa9b7::t_97cde401e9fc55 104
+  s_26c967e41aa9b7::t_5aedf217db7014 113-114
+  s_26c967e41aa9b7::t_e40bfb2e159f2a 143
+  s_26c967e41aa9b7::t_9b31a9eaf1d0e6 159-160
+  s_26c967e41aa9b7::t_8dec6f3a0ae216 162-163
+  s_26c967e41aa9b7::t_de88fa3b350dc9 166
+  s_26c967e41aa9b7::t_5090dbfc420771 175-176
+  s_26c967e41aa9b7::t_462d6c9982b824 207
+  s_c75a61a1a85cf2::t_5e524f1a490c7c 92,107,154,169,218
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/util/RandomColors.kt
+  s_26c967e41aa9b7::t_9ca05af89b452f 7
+  s_26c967e41aa9b7::t_186241b1cd5b39 6
+  s_26c967e41aa9b7::t_3e0d5c7726d5bf 8-10
+  s_dba2fe17eb1b20::t_8e27fe19b812e4 11-12
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/ColorSwatch.kt
+  s_26c967e41aa9b7::t_44de595521f200 16-21,23
+  s_26c967e41aa9b7::t_abbf5957d46c87 41
+  s_26c967e41aa9b7::t_5c98486213c421 11,36-38
+  s_26c967e41aa9b7::t_789d8550ba7484 12,14,28-29,32-35,39-40
+  s_26c967e41aa9b7::t_904b5f330ed74d 25
+  s_26c967e41aa9b7::t_94221a0f779dc7 13,22,30
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/model/PickerColor.kt
+  s_26c967e41aa9b7::t_caf85fc23640c6 5-7,9
+  s_26c967e41aa9b7::t_16076caa04d145 8,10
+  s_26c967e41aa9b7::t_796e23fda56010 11
+  s_dba2fe17eb1b20::t_8ec4ddc36fbaa0 13-15
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/ComposeColorExt.kt
+  s_26c967e41aa9b7::t_b5b481c28a6eea 41,44,47
+  s_26c967e41aa9b7::t_65301032bc8b91 11,15,18,21,29
+  s_26c967e41aa9b7::t_a1ac8fe9bfdce7 10,14,17,20,23-28
+  s_26c967e41aa9b7::t_80b92ed5443fd7 4,30-39,42,45
+  s_26c967e41aa9b7::t_c32b35e0102fdf 40,43,46
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/HslConversions.kt
+  s_26c967e41aa9b7::t_cdad98b160a4e0 8
+  s_26c967e41aa9b7::t_7e8dc4eba26094 7
+  s_dba2fe17eb1b20::t_88a1e140a3f161 40-44,75-76,78-79
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/ComposeColorExtTest.kt
+  s_26c967e41aa9b7::t_36cabe4971b04f 1-108
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/LabColorPicker.kt
+  s_26c967e41aa9b7::t_d46fc5c5a6f207 10-12,29-30,36-38,40
+  s_26c967e41aa9b7::t_35a48b0bbf43e7 24
+  s_26c967e41aa9b7::t_578b099c269d1f 14-22
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/LabSliders.kt
+  s_26c967e41aa9b7::t_588a70948be888 30-38,88,90-91,94-95,147,149-150,153-154
+  s_26c967e41aa9b7::t_59a210d65824f4 41
+  s_26c967e41aa9b7::t_0ad4c79ca58d36 68,127,186
+  s_26c967e41aa9b7::t_6b376fab57375f 10-12
+  s_26c967e41aa9b7::t_89e291b4b4ce92 47-48
+  s_26c967e41aa9b7::t_ef94371e0bc18f 49-50,107-108,166-167
+  s_26c967e41aa9b7::t_132eadc3267817 71,130,189
+  s_26c967e41aa9b7::t_aa4c46b87b4835 72-73,131,190
+  s_26c967e41aa9b7::t_acf584a0cfb587 39,97,156
+  s_26c967e41aa9b7::t_dbe20961b25888 74,133,192
+  s_26c967e41aa9b7::t_c6548d0a9c1a45 89
+  s_26c967e41aa9b7::t_6ce61945a2f327 92-93
+  s_26c967e41aa9b7::t_756de526021a0f 96
+  s_26c967e41aa9b7::t_7c64df89937871 105-106
+  s_26c967e41aa9b7::t_29be614533a4ef 132
+  s_26c967e41aa9b7::t_1d3f027885f69e 148
+  s_26c967e41aa9b7::t_78e4203ab29945 151-152
+  s_26c967e41aa9b7::t_f19fb6aa1ae844 155
+  s_26c967e41aa9b7::t_28fa24f866c9ce 164-165
+  s_26c967e41aa9b7::t_1ad2d874a690a6 191
+  s_751b1630ea9a5e::t_73c86544497b2c 79-82,84,99,138-141,143,158,197-200,202
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/SliderInteractionGuard.kt
+  s_26c967e41aa9b7::t_d3fb1a34026eca 1-44
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/CmykConversions.kt
+  s_26c967e41aa9b7::t_13938c59db90b0 7
+  s_26c967e41aa9b7::t_d1afcb4395fd27 8
+  s_dba2fe17eb1b20::t_c22e785e913edc 21-25,45-46,48-49,51-52,54-55
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/RgbColorPicker.kt
+  s_26c967e41aa9b7::t_861b896e0be967 10-12,29-30,36-38,40
+  s_26c967e41aa9b7::t_206569722cfc2b 24
+  s_26c967e41aa9b7::t_33e35f4ea4f342 14-22
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/HslColorPicker.kt
+  s_26c967e41aa9b7::t_f597690f182d46 10-12,31-32,34-35,41-43,45
+  s_26c967e41aa9b7::t_ecb33e53a49c2c 14-25
+  s_26c967e41aa9b7::t_3e5cc9df514385 27
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/state/RememberColorPickerState.kt
+  s_26c967e41aa9b7::t_8be8d3590f8fe1 8-9
+  s_26c967e41aa9b7::t_d796d6b5e17123 10
+  s_26c967e41aa9b7::t_2d979a3c04f807 11-13
+  s_dba2fe17eb1b20::t_37bce72c6e3845 14-16,18
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/model/HslColor.kt
+  s_26c967e41aa9b7::t_2f57dc0b168c14 82,84,86,89-93
+  s_26c967e41aa9b7::t_61df88eac1c3cb 37,39,41,45,47,49,51,54
+  s_26c967e41aa9b7::t_8483920c1e998d 21-24,34-35,42,55-79
+  s_26c967e41aa9b7::t_9941528d040742 20
+  s_26c967e41aa9b7::t_2c8ad2f9b42775 6-18
+  s_26c967e41aa9b7::t_4064c4b642ef8b 36,38,40,44,46,48,50,53
+  s_26c967e41aa9b7::t_1e918b345f1ed9 81,83,85,87,94
+  s_26c967e41aa9b7::t_91ef055a6887ba 80
+  s_26c967e41aa9b7::t_42e143a1738e42 88
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/RgbConversions.kt
+  s_26c967e41aa9b7::t_4296748f762727 5-11
+  s_26c967e41aa9b7::t_fe2ad8f54f8869 13-17
+  s_26c967e41aa9b7::t_c7669b90d59fda 12
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/AlphaSlider.kt
+  s_26c967e41aa9b7::t_a7d421d17514b2 60
+  s_26c967e41aa9b7::t_32aa435402b2df 13-20
+  s_26c967e41aa9b7::t_27241af4774a77 22
+  s_26c967e41aa9b7::t_2423f9e4844d55 43,47
+  s_26c967e41aa9b7::t_afca70a5ed8c12 8-10,27-30,36-40,46,48-50,55-58
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/theme/ColorPickerShapes.kt
+  s_26c967e41aa9b7::t_1a3fcb17d4432b 9-11
+  s_26c967e41aa9b7::t_1e80236a0ed29c 14-16
+  s_26c967e41aa9b7::t_19240c7dd98458 6-8,12
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/ColorPickerDialog.kt
+  s_26c967e41aa9b7::t_e5f70c788a52e3 7-8,13,18-19,44-45,47-48,52-56,60,63-65,81,86
+  s_26c967e41aa9b7::t_f6ffa00fbf0612 41
+  s_26c967e41aa9b7::t_85abc850018ce3 23-35,39
+  s_26c967e41aa9b7::t_d2f7a25fd1e982 69,75
+  s_26c967e41aa9b7::t_c8f57ab6348d3e 20-21,36-38,50
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/state/ColorPickerState.kt
+  s_26c967e41aa9b7::t_73c36276323884 44
+  s_26c967e41aa9b7::t_416d9b2e9f34df 50-51,55
+  s_26c967e41aa9b7::t_2a22ee328cc4ba 56
+  s_26c967e41aa9b7::t_fc9fff8450c11f 100,103,106,109,112,115
+  s_26c967e41aa9b7::t_1afc950849fa99 24-41
+  s_26c967e41aa9b7::t_920178cce3145a 52-54
+  s_26c967e41aa9b7::t_3fb594e037e3d4 4,23,45-48,59-66,68,70-77,79-95,104,107,110,114,117-118,125-126,129,131-132,135,137-138,141,143-144,146,148,150-151,154,156-157,160,162-163,166,168,171-173,175-176,179,181-183,185,187-188,191,193-195,197,199,202,204,206-207,210,212-213,216,218-220,222,224-225,227,229,231-239,241,243,245-246
+  s_26c967e41aa9b7::t_0323143457bd3d 119-123
+  s_26c967e41aa9b7::t_1375c0358aec9b 124,130,136,142,149,155,161,167,174,180,186,192,198,205,211,217,223,230,244
+  s_26c967e41aa9b7::t_fa622bdb1fe056 99,102,105,108,111
+  s_26c967e41aa9b7::t_934b1c43cfe6f5 49
+  s_26c967e41aa9b7::t_a368e1db2fada0 57-58
+  s_26c967e41aa9b7::t_b864bf18d6529e 101
+  s_26c967e41aa9b7::t_482a538f002cf7 116
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/HexConversionsTest.kt
+  s_26c967e41aa9b7::t_ee1b30777216ef 1-155
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/model/HslColorTest.kt
+  s_26c967e41aa9b7::t_96e6330d1ddf7e 26,34,141
+  s_26c967e41aa9b7::t_f8a1781638ae0a 21,23,214
+  s_26c967e41aa9b7::t_30d5b5265c97d9 24-25,32,145
+  s_26c967e41aa9b7::t_a30fed9b33acb9 27-28
+  s_26c967e41aa9b7::t_1d98e0e31df1d4 29-31
+  s_26c967e41aa9b7::t_830ae19561d0bf 33
+  s_26c967e41aa9b7::t_9a1c93dc160f70 35-37
+  s_26c967e41aa9b7::t_926368569194bc 142-144
+  s_26c967e41aa9b7::t_b14f38e35aedd0 146
+  s_26c967e41aa9b7::t_5c8370d1f160f7 213
+  s_08480a502e1f0a::t_d219684e16d8fc 38-39,134,174
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/RgbConversionsTest.kt
+  s_26c967e41aa9b7::t_f3439538b68168 9,25,32,39,41,46,53,55,60,62,67,73-75,81-82
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/CmykColorPicker.kt
+  s_26c967e41aa9b7::t_16c70773bb0888 25
+  s_26c967e41aa9b7::t_179ef4e4b8c1fb 14-23
+  s_26c967e41aa9b7::t_a2f284d89524f0 10-12,30-31,37-40,42
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/ui/HueFractionMappingTest.kt
+  s_26c967e41aa9b7::t_ddf79f905c7dc6 1-63
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/ui/SliderInteractionGuardTest.kt
+  s_26c967e41aa9b7::t_d83c779c620a7d 1-72
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/CheckerboardBrush.kt
+  s_26c967e41aa9b7::t_9b54caf623df34 1-47
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/state/ColorPickerStateTest.kt
+  s_26c967e41aa9b7::t_26c9865422306a 81-82
+  s_26c967e41aa9b7::t_f19d987c00ecd3 16-17,19-24,328-342,344,348,350,355,357,359,364,366,368,373,375,377,382,386,388,404,409,414,425,429,431,450,454,461,463,465,468,472,474,477,479,481,486,488,490,493,497,499,508,512,514,521,525,527,533,544,550,552,558,560,566,568,574,578,580,589,591,600,602,612,614,623,625,628,630,634,636,639
+  s_26c967e41aa9b7::t_3ea7d7bc065d66 3-5
+  s_26c967e41aa9b7::t_18857489a599e2 14-15
+  s_26c967e41aa9b7::t_e795ee71c2c910 313-327
+  s_26c967e41aa9b7::t_e7df7d390d0dd9 343
+  s_26c967e41aa9b7::t_6be9e261e68439 345-347
+  s_26c967e41aa9b7::t_fbcf334d65fb00 349
+  s_26c967e41aa9b7::t_3eb7ad02eb4b7d 351-354
+  s_26c967e41aa9b7::t_4f2c885c285229 356
+  s_26c967e41aa9b7::t_7e75fba8b0f3d9 358
+  s_26c967e41aa9b7::t_54ce8a73ea7ba8 360-363
+  s_26c967e41aa9b7::t_22c5663494f2c2 365
+  s_26c967e41aa9b7::t_63fb89d77c501f 367
+  s_26c967e41aa9b7::t_91d2bfc54a4c25 369-372
+  s_26c967e41aa9b7::t_10e71ee4b8e6c4 374
+  s_26c967e41aa9b7::t_1fac76f28f8ddd 376
+  s_26c967e41aa9b7::t_1524cbfb4a37a6 378-381
+  s_26c967e41aa9b7::t_33f8c1a276fc12 383-385
+  s_26c967e41aa9b7::t_2341b0733ab081 387
+  s_26c967e41aa9b7::t_a42485028daa63 389-391,401-403
+  s_26c967e41aa9b7::t_a46fabc471de87 405-408
+  s_26c967e41aa9b7::t_c6d014592c7771 410-413
+  s_26c967e41aa9b7::t_ce7775f58b8cc0 415-417,422-424
+  s_26c967e41aa9b7::t_587bcf0b3b853c 426-428
+  s_26c967e41aa9b7::t_12656544d9de70 430
+  s_26c967e41aa9b7::t_df3f00a03a5054 432-434,447-449
+  s_26c967e41aa9b7::t_8fefe0b9f7cd0a 451-453
+  s_26c967e41aa9b7::t_72480c6ce8abd2 455-460
+  s_26c967e41aa9b7::t_4bd2789ad23060 462
+  s_26c967e41aa9b7::t_df4df3aaebcbd0 464
+  s_26c967e41aa9b7::t_75327afef6a694 466-467
+  s_26c967e41aa9b7::t_f70a8b40e7a9c5 469-471
+  s_26c967e41aa9b7::t_f615c4e027f7e0 473
+  s_26c967e41aa9b7::t_2488035b8ac87b 475-476
+  s_26c967e41aa9b7::t_ac9815df3166b7 478
+  s_26c967e41aa9b7::t_90e5a071181ddb 480
+  s_26c967e41aa9b7::t_fa13ff2f96d020 482-485
+  s_26c967e41aa9b7::t_5c90734d7519dd 487
+  s_26c967e41aa9b7::t_d7392f08594a11 489
+  s_26c967e41aa9b7::t_44be89fe7bf17f 491-492
+  s_26c967e41aa9b7::t_321bf0281fd4a5 494-496
+  s_26c967e41aa9b7::t_e282c97ec7a650 498
+  s_26c967e41aa9b7::t_7b8adb44a605fb 500-502,505-507
+  s_26c967e41aa9b7::t_3732c8d0f4be10 509-511
+  s_26c967e41aa9b7::t_35c2f3098f076c 513
+  s_26c967e41aa9b7::t_5dfc297c44c086 515-520
+  s_26c967e41aa9b7::t_07ef2e293ad559 522-524
+  s_26c967e41aa9b7::t_ea50e4499f4de0 526
+  s_26c967e41aa9b7::t_dd8bafcac7a1e9 528-532
+  s_26c967e41aa9b7::t_606f4a2826e578 534-536,541-543
+  s_26c967e41aa9b7::t_3d65cd75039513 545-549
+  s_26c967e41aa9b7::t_21702295609920 551
+  s_26c967e41aa9b7::t_86eabc6e761920 553-557
+  s_26c967e41aa9b7::t_54fc9746b9b0e2 559
+  s_26c967e41aa9b7::t_f64444a2442c39 561-565
+  s_26c967e41aa9b7::t_b717e05b90803b 567
+  s_26c967e41aa9b7::t_a0d0d28a6e0a4b 569-573
+  s_26c967e41aa9b7::t_fd1b9873118988 575-577
+  s_26c967e41aa9b7::t_4fe878cc135dec 579
+  s_26c967e41aa9b7::t_a3515fa3cb91e8 581-583,586-588
+  s_26c967e41aa9b7::t_4d145e9ecc7de5 590
+  s_26c967e41aa9b7::t_b96a2f000bdc96 592-594,597-599
+  s_26c967e41aa9b7::t_43d541eacceb99 601
+  s_26c967e41aa9b7::t_2423239f6b63e8 603-605,609-611
+  s_26c967e41aa9b7::t_5f98fb346139e3 613
+  s_26c967e41aa9b7::t_acdb21f434df10 615-617,620-622
+  s_26c967e41aa9b7::t_8f83077900536c 624
+  s_26c967e41aa9b7::t_9ae653484a08fd 626-627
+  s_26c967e41aa9b7::t_1764b344b17e97 629
+  s_26c967e41aa9b7::t_7e21ed24174c68 631-633
+  s_26c967e41aa9b7::t_22f8cfb9969ceb 635
+  s_26c967e41aa9b7::t_a72ec686bc7e79 637-638
+  s_1be02c3453e150::t_8bb32a193bd909 392-400,418-421,435-446,503-504,537-540,584-585,595-596,606-608,618-619
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/RgbSliders.kt
+  s_26c967e41aa9b7::t_2d5e1142337e6c 55,58-61,114,117-118,120,173,176-177,179
+  s_26c967e41aa9b7::t_14bbf79c5af508 20,22-23,81-82,140-141
+  s_26c967e41aa9b7::t_72c6ddc2b7877b 16-18
+  s_26c967e41aa9b7::t_220bdd1045787b 66-68,125-127,184-186
+  s_26c967e41aa9b7::t_8acc6b0d352105 19,21
+  s_26c967e41aa9b7::t_31c1b18b0df2cc 78,137
+  s_26c967e41aa9b7::t_5b050384d5981e 69,71,128,130,187,189
+  s_26c967e41aa9b7::t_22bf6807409236 33-36,94-95,153-154
+  s_26c967e41aa9b7::t_18e86745b61189 11-13
+  s_26c967e41aa9b7::t_f08f8934c136d1 75-77,134,136
+  s_26c967e41aa9b7::t_4625b1bb90aa35 24-25,27,83-84,142-143
+  s_26c967e41aa9b7::t_b7b187917e2fe1 79-80
+  s_26c967e41aa9b7::t_6b8414b12c0742 92-93
+  s_26c967e41aa9b7::t_cafb375a4b660c 119
+  s_26c967e41aa9b7::t_d918d3ae77b801 135
+  s_26c967e41aa9b7::t_405189e349d7eb 138-139
+  s_26c967e41aa9b7::t_88ceaae958b9e8 151-152
+  s_26c967e41aa9b7::t_73629fbf67d4e5 178
+  s_751b1630ea9a5e::t_1344d17c095495 86,145
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/theme/ColorPickerColors.kt
+  s_26c967e41aa9b7::t_385f08644e2fa8 9-11
+  s_26c967e41aa9b7::t_13196a45c835c4 14-16
+  s_26c967e41aa9b7::t_08b81536fe9e88 6-8,12
+README.md
+  s_26c967e41aa9b7::t_a1e5fbae69a1f9 312,314
+  h_176e0fdf87e129 339
+  s_26c967e41aa9b7::t_6ba5aab818fe1f 3,7-8,11,13,15,24-37,110,119,121-141,146-148,160-161,164-165,168-169,171,175-176,180-205,210-211,216,222-223,226,228-231,233-252,263,269,271,274-288,293-295,298-300,327-338,340-349
+  s_26c967e41aa9b7::t_536868a27653bb 232
+  s_26c967e41aa9b7::t_348ac7152ea437 350
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/HexConversions.kt
+  s_26c967e41aa9b7::t_37de478c889436 46
+  s_26c967e41aa9b7::t_980535441c9c05 29
+  s_26c967e41aa9b7::t_1681002653cace 1-15,17-28,30-45,47-70,72
+  s_26c967e41aa9b7::t_47c5e9b02c694c 16
+  s_26c967e41aa9b7::t_ca2ec1db868b64 71
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/model/RgbColor.kt
+  s_26c967e41aa9b7::t_09c25c5ea9cf1f 79,81,83,85,87,89,95
+  s_26c967e41aa9b7::t_6a024247514cb9 80,82,84,86,88,91-94
+  s_26c967e41aa9b7::t_e1440c3c495017 6-17
+  s_26c967e41aa9b7::t_88dc583474179e 34,36,38,42,44,46,48,51
+  s_26c967e41aa9b7::t_2e46ead7f11033 35,37,39,43,45,47,49,52
+  s_26c967e41aa9b7::t_6ee375c6d47928 19
+  s_26c967e41aa9b7::t_e772da24c3dc2a 20-23,33,40,53-77
+  s_26c967e41aa9b7::t_f9861e91ef8abd 78
+  s_26c967e41aa9b7::t_75601753c2c9f5 90
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/GradientTrack.kt
+  s_26c967e41aa9b7::t_119a663929442b 13,22,24-25,39-41,51-53,74-89,91,94-101,106-108,111,117-118,126,134-135,140-142,144
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/conversion/LabConversions.kt
+  s_26c967e41aa9b7::t_adf6383d2ec5e4 90,93,96,99
+  s_26c967e41aa9b7::t_5edaa00683b886 22
+  s_26c967e41aa9b7::t_21094dbde01ae7 54
+  s_26c967e41aa9b7::t_58ca657b9a6dde 9-10,12,14-17,31-36,81,83
+  s_26c967e41aa9b7::t_31908ed0386f5e 55
+  s_26c967e41aa9b7::t_8aa12800e35204 89,91-92,94-95,97-98
+  s_26c967e41aa9b7::t_56d491a5c65e54 18-21
+docs/index.md
+  h_176e0fdf87e129 212
+  s_26c967e41aa9b7::t_c28e15c49531b8 133
+  s_26c967e41aa9b7::t_2474c467781fbd 1,3,7-9,11-15,19-21,24,26-34,36,38,40-45,47-54,57-61,64,66-70,74-75,77-104,107,109,111,113-119,121,123,125-132,134-135,137,139,141-153,155,157,159-181,183,185,187-197,200,202-206,209-211,213-222
+  s_26c967e41aa9b7::t_eaea3b348d457b 72
+  s_26c967e41aa9b7::t_4777182daeedf2 223
+CONTRIBUTING.md
+  s_26c967e41aa9b7::t_46680764917324 15,17-19,21,23
+  s_08480a502e1f0a::t_10e9d3166e16c3 26-43
+colorpicker/build.gradle.kts
+  s_26c967e41aa9b7::t_d9ec00b27b6271 9,18
+  s_26c967e41aa9b7::t_a06009a1aa30aa 19
+  s_748495d9549e2c::t_7b82ffa21f24ba 27-28,49-61,75-76,79-81
+.github/ISSUE_TEMPLATE/bug_report.md
+  s_d72e21050c418a::t_f4a9d11b3c27ab 30-35
+.github/workflows/build.yml
+  s_748495d9549e2c::t_916ebb664c0ea2 46-47
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/state/ColoringMode.kt
+  s_7b0e855a8ac1cc::t_e5e9ffc450fc0c 14-15,17-18
+colorpicker/src/commonMain/kotlin/codes/side/colorpicker/ui/SliderLabelDefaults.kt
+  s_748495d9549e2c::t_aedf9949124290 16,29
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/ArgbIntTest.kt
+  s_08480a502e1f0a::t_1d527f3dc9812a 87-99,130-136,145-148
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/HslConversionsTest.kt
+  s_08480a502e1f0a::t_837bf5be21167e 29-38
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/conversion/LabConversionsTest.kt
+  s_08480a502e1f0a::t_a0ec265304a0b5 55,58-76,83-85
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/model/CmykColorTest.kt
+  s_08480a502e1f0a::t_321cb5d65f84be 61-70
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/model/LabColorTest.kt
+  s_b1f0f07c2df9ba::t_ba2eed1aa4a007 50-59
+colorpicker/src/commonTest/kotlin/codes/side/colorpicker/model/RgbColorTest.kt
+  s_b1f0f07c2df9ba::t_0154a6f6c98bee 147,157-171
+gradle.properties
+  s_748495d9549e2c::t_548d3e28312265 7-8
+gradle/libs.versions.toml
+  s_748495d9549e2c::t_180170c3c2de22 10-11,32-33
+sample/shared/src/commonMain/kotlin/codes/side/colorpicker/sample/SampleApp.kt
+  s_07ddc81a676b01::t_343587b5996f27 210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "511f25482db0c35edb9dd594fdc04a183f3ca660",
+  "prompts": {},
+  "humans": {
+    "h_176e0fdf87e129": {
+      "author": "Illia Achour <ilyaachour@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_07ddc81a676b01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a79e3041ae6c3f699",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_08480a502e1f0a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a55f77de7e0877634",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_1be02c3453e150": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a623b4cfe387c13be",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_26c967e41aa9b7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c9262801-ab04-40e3-bac4-467a0506b4e3",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_748495d9549e2c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aae6a75fdd90f7dbe",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_751b1630ea9a5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a8daee1a986d33ab0",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_7b0e855a8ac1cc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a2d5ef6f0367930cf",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_b1f0f07c2df9ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a9dd085c236e2dfae",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_c75a61a1a85cf2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ab93d5e702b28ba05",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_d72e21050c418a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aec047ce085de8484",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    },
+    "s_dba2fe17eb1b20": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aab3da3a75dbb82ee",
+        "model": "unknown"
+      },
+      "human_author": "Illia Achour <ilyaachour@gmail.com>"
+    }
+  }
+}
