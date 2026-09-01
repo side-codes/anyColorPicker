@@ -4,6 +4,11 @@ on:
   push:
     tags: [ 'v*' ]
   workflow_dispatch:
+    inputs:
+      snapshot:
+        description: "Publish a snapshot instead of a release (leaves the release coordinate untouched)"
+        type: boolean
+        default: true
 
 # Least privilege: publishing reads the repo and pushes to Maven Central, which uses
 # its own credentials — the GitHub token needs nothing beyond read.
@@ -66,8 +71,20 @@ jobs:
       # Uploads one deployment holding all five publications to the Central Portal and
       # releases it. The previous OSSRH Staging API upload only *staged* a deployment;
       # nothing closed or released it, so nothing ever reached Maven Central.
+      # A snapshot is the safe rehearsal: it exercises the Portal token, the signing key
+      # and the whole upload path, but goes to the snapshot repository rather than
+      # consuming an immutable release coordinate. The version is overridden on the
+      # command line so gradle.properties is never edited just to test.
       - name: Publish to Maven Central
-        run: ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+        run: |
+          VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          if [ "${{ inputs.snapshot }}" = "true" ]; then
+            echo "Publishing snapshot ${VERSION}-SNAPSHOT"
+            ./gradlew publishToMavenCentral -PVERSION_NAME="${VERSION}-SNAPSHOT" --no-configuration-cache
+          else
+            echo "Publishing and releasing ${VERSION}"
+            ./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+          fi
         env:
           # Central Portal user tokens. An old OSSRH token returns 401 here.
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
