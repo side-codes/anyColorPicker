@@ -219,10 +219,14 @@ public fun LightnessSlider(
     )
 }
 
-private fun buildHueGradient(saturation: Float, lightness: Float): ImmutableList<Color> {
-    val steps = 7
-    return (0..steps).map { i ->
-        val hue = (i * 360f / steps).coerceAtMost(360f)
+// HSL to RGB is piecewise linear in hue, with breakpoints every 60 degrees. Six segments
+// put a stop on every breakpoint, so linear interpolation between them reproduces the
+// curve exactly; any other count cuts the corners and the track stops matching the color
+// its own thumb previews (7 segments is off by up to 55/255 at hue 180).
+private const val HUE_SEGMENTS = 6
+
+internal fun buildHueGradient(saturation: Float, lightness: Float): ImmutableList<Color> =
+    (0..HUE_SEGMENTS).map { i ->
+        val hue = (i * 360f / HUE_SEGMENTS).coerceAtMost(360f)
         HslColor(hue = hue, saturation = saturation, lightness = lightness).toComposeColor()
     }.toImmutableList()
-}

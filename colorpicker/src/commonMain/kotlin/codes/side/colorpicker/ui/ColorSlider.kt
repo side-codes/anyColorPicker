@@ -105,10 +105,17 @@ public fun ColorSlider(
                 )
             },
             colors = SliderDefaults.colors(
-                thumbColor = thumbColor,
+                thumbColor = thumbColor.asOpaqueThumb(),
                 activeTrackColor = Color.Transparent,
                 inactiveTrackColor = Color.Transparent,
             ),
         )
     }
 }
+
+/**
+ * A thumb is always painted opaque. One that inherited the color's alpha would vanish
+ * exactly when the color became transparent, leaving nothing to grab — and on the alpha
+ * slider that is the thumb you need in order to drag back.
+ */
+private fun Color.asOpaqueThumb(): Color = if (alpha == 1f) this else copy(alpha = 1f)

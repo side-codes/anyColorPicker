@@ -2,7 +2,7 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +20,11 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
  * @param contentDescription optional accessibility description of the shown color;
  * when `null` the swatch is decorative.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
+ *
+ * Falls back to [ColorPickerDefaults.SwatchSize] when [modifier] specifies no size. The
+ * children use `matchParentSize` rather than `fillMaxSize` so they follow the swatch
+ * instead of collapsing it to nothing when the incoming constraints are unbounded — as
+ * they are inside a scrolling column or a lazy list.
  */
 @Composable
 public fun ColorSwatch(
@@ -31,6 +36,10 @@ public fun ColorSwatch(
 ) {
     Box(
         modifier = modifier
+            .defaultMinSize(
+                minWidth = ColorPickerDefaults.SwatchSize,
+                minHeight = ColorPickerDefaults.SwatchSize,
+            )
             .clip(shape)
             .semantics {
                 if (contentDescription != null) {
@@ -38,7 +47,7 @@ public fun ColorSwatch(
                 }
             },
     ) {
-        TransparencyCheckerboard(Modifier.fillMaxSize(), colors = colors)
-        Box(Modifier.fillMaxSize().background(color))
+        TransparencyCheckerboard(Modifier.matchParentSize(), colors = colors)
+        Box(Modifier.matchParentSize().background(color))
     }
 }

@@ -20,6 +20,9 @@ public object ColorPickerDefaults {
     /** Default height of a color slider's gradient track. */
     public val TrackHeight: Dp = 16.dp
 
+    /** Size a [codes.side.colorpicker.ui.ColorSwatch] falls back to when given none. */
+    public val SwatchSize: Dp = 48.dp
+
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
     /**

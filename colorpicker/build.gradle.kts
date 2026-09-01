@@ -65,6 +65,12 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+        }
+        jvmTest.dependencies {
+            // runComposeUiTest needs a real renderer on the JVM target.
+            implementation(compose.desktop.currentOs)
         }
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
