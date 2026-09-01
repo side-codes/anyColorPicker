@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -11,6 +12,9 @@ plugins {
 kotlin {
     // Consumed by the desktop sample; the library already publishes a jvm target.
     jvm()
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs { browser() }
 
     android {
         namespace = "codes.side.colorpicker.sample.shared"
