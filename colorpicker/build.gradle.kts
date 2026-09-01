@@ -107,10 +107,10 @@ mavenPublishing {
     }
 
     pom {
-        name.set("andColorPicker")
+        name.set("anyColorPicker")
         description.set("Multiplatform color picker library for Android & iOS")
         inceptionYear.set("2020")
-        url.set("https://github.com/side-codes/andColorPicker")
+        url.set("https://github.com/side-codes/anyColorPicker")
         licenses {
             license {
                 name.set("The Apache License, Version 2.0")
@@ -131,9 +131,9 @@ mavenPublishing {
             }
         }
         scm {
-            connection.set("scm:git:git://github.com/side-codes/andColorPicker.git")
-            developerConnection.set("scm:git:ssh://git@github.com/side-codes/andColorPicker.git")
-            url.set("https://github.com/side-codes/andColorPicker")
+            connection.set("scm:git:git://github.com/side-codes/anyColorPicker.git")
+            developerConnection.set("scm:git:ssh://git@github.com/side-codes/anyColorPicker.git")
+            url.set("https://github.com/side-codes/anyColorPicker")
         }
     }
 }

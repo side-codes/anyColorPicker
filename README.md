@@ -1,4 +1,4 @@
-# andColorPicker
+# anyColorPicker
 
 Multiplatform color picker library for Android, iOS, and Desktop (JVM), built with Compose Multiplatform and Material 3.
 

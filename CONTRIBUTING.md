@@ -1,8 +1,8 @@
-# Contributing to andColorPicker
+# Contributing to anyColorPicker
 
 Contributions of all types are welcome. We use GitHub to host code, track issues, enhancements, and perform project management.
 
-**andColorPicker** is released under the **Apache 2.0 license**. 
+**anyColorPicker** is released under the **Apache 2.0 license**. 
 
 This document should help you get started.
 

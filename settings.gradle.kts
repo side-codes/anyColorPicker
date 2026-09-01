@@ -29,7 +29,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "andColorPicker"
+rootProject.name = "anyColorPicker"
 
 include(":colorpicker")
 include(":sample:shared")

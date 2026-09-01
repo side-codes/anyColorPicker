@@ -1,4 +1,4 @@
-# andColorPicker — Compose Multiplatform Color Picker
+# anyColorPicker — Compose Multiplatform Color Picker
 
 :avocado: Handy, :snake: flexible, and :zap: lightning-fast color picker components for Compose Multiplatform — Android, iOS, and Desktop (JVM).
 
