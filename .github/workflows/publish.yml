@@ -5,11 +5,23 @@ on:
     tags: [ 'v*' ]
   workflow_dispatch:
 
+# Least privilege: publishing reads the repo and pushes to Maven Central, which uses
+# its own credentials — the GitHub token needs nothing beyond read.
+permissions:
+  contents: read
+
+# Never let two releases race. Maven Central is immutable, so a duplicate in-flight
+# deployment is not something that can be undone.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     # macOS is required: the iOS targets can only be built on an Apple host, and all five
     # publications have to go up in one deployment.
     runs-on: macos-15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
