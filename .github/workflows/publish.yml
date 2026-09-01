@@ -14,6 +14,20 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v6
+
+      # The version lives in gradle.properties, not in the tag. Publishing the wrong one
+      # is unrecoverable because Maven Central is immutable, so refuse to start on a
+      # mismatch rather than redeploying an already-released coordinate.
+      - name: Check the tag matches VERSION_NAME
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PROJECT_VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          echo "tag=$TAG_VERSION gradle.properties=$PROJECT_VERSION"
+          if [ "$TAG_VERSION" != "$PROJECT_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION_NAME=$PROJECT_VERSION. Bump VERSION_NAME and retag."
+            exit 1
+          fi
+
       - name: Publish to Maven Central
         run: ./gradlew :colorpicker:publishAllPublicationsToSonatypeRepository
         env:

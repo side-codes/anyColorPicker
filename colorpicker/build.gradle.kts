@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "codes.side"
-version = "1.0.0"
+version = providers.gradleProperty("VERSION_NAME").get()
 
 kotlin {
     explicitApi()
@@ -142,6 +142,9 @@ signing {
     val signingKeyId = findProperty("signing.keyId") as String? ?: System.getenv("SIGNING_KEY_ID")
     val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_PASSWORD")
     val signingKey = findProperty("signing.key") as String? ?: System.getenv("SIGNING_KEY")
+    // Signing keys only exist on CI. Without this guard every sign* task fails with
+    // "no configured signatory", which blocks publishToMavenLocal for contributors.
+    isRequired = signingKey != null
     if (signingKey != null) {
         useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     }
