@@ -32,7 +32,7 @@ public object ColorPickerDefaults {
     /** Clearance left between the thumb and each end of the track. */
     public val ThumbTrackGap: Dp = 6.dp
 
-    /** Size a [codes.side.colorpicker.ui.SaturationLightnessPlane] falls back to. */
+    /** Size a [codes.side.colorpicker.ui.HslPlane] falls back to. */
     public val PlaneMinSize: Dp = 200.dp
 
     /** Diameter of the plane's position indicator. */

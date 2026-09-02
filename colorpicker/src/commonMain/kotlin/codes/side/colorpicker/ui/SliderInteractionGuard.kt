@@ -5,7 +5,7 @@ import codes.side.colorpicker.state.ColorPickerState
 
 /**
  * Manages [ColorPickerState.isInteracting] for one component's drag gesture — a
- * [ColorSlider] or the [SaturationLightnessPlane].
+ * [ColorSlider] or the [HslPlane].
  *
  * Neither reports the end of a gesture when its node is removed from composition mid-drag:
  * M3 Slider does not invoke `onValueChangeFinished`, and a raw pointer-input coroutine is

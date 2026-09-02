@@ -53,6 +53,7 @@ import codes.side.colorpicker.ui.ColorPickerDialog
 import codes.side.colorpicker.ui.ColorSwatch
 import codes.side.colorpicker.ui.CyanSlider
 import codes.side.colorpicker.ui.GreenSlider
+import codes.side.colorpicker.ui.HslPlane
 import codes.side.colorpicker.ui.HueSlider
 import codes.side.colorpicker.ui.KeySlider
 import codes.side.colorpicker.ui.LabASlider
@@ -67,7 +68,6 @@ import codes.side.colorpicker.ui.OkhsvHueSlider
 import codes.side.colorpicker.ui.OkhsvSaturationSlider
 import codes.side.colorpicker.ui.OkhsvValueSlider
 import codes.side.colorpicker.ui.RedSlider
-import codes.side.colorpicker.ui.SaturationLightnessPlane
 import codes.side.colorpicker.ui.SaturationSlider
 import codes.side.colorpicker.ui.YellowSlider
 import codes.side.colorpicker.util.randomHslColor
@@ -194,7 +194,7 @@ fun SampleApp() {
                 // Saturation / lightness plane, driven by the same state as everything else
                 item { SectionHeader("Saturation / Lightness") }
                 item {
-                    SaturationLightnessPlane(
+                    HslPlane(
                         state = state,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )

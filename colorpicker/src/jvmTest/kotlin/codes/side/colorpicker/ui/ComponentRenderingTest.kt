@@ -152,7 +152,7 @@ class ComponentRenderingTest {
         // Hue 0 with the thumb parked at the top right, so no sample point sits under it.
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                SaturationLightnessPlane(
+                HslPlane(
                     state = ColorPickerState(
                         HslColor(hue = 0f, saturation = 1f, lightness = 1f)
                     ),
@@ -213,7 +213,7 @@ class ComponentRenderingTest {
             runComposeUiTest {
                 setContent {
                     CompositionLocalProvider(LocalLayoutDirection provides direction) {
-                        SaturationLightnessPlane(
+                        HslPlane(
                             state = ColorPickerState(
                                 HslColor(hue = 240f, saturation = 0.9f, lightness = 0.5f)
                             ),
@@ -237,7 +237,7 @@ class ComponentRenderingTest {
         // Bigger than PlaneThumbSize: a plane that squeezed the slot into its own default
         // diameter would report 24dp here.
         setContent {
-            SaturationLightnessPlane(
+            HslPlane(
                 state = ColorPickerState(HslColor(hue = 0f, saturation = 0.5f, lightness = 0.5f)),
                 modifier = Modifier.size(200.dp).testTag("plane"),
                 thumb = { Box(Modifier.size(48.dp).testTag("thumb")) },
@@ -254,7 +254,7 @@ class ComponentRenderingTest {
     @Test
     fun aSmallCustomPlaneThumbIsCentredOnItsValue() = runComposeUiTest {
         setContent {
-            SaturationLightnessPlane(
+            HslPlane(
                 state = ColorPickerState(HslColor(hue = 0f, saturation = 0.5f, lightness = 0.5f)),
                 modifier = Modifier.size(200.dp).testTag("plane"),
                 thumb = { Box(Modifier.size(8.dp).testTag("thumb")) },
@@ -277,7 +277,7 @@ class ComponentRenderingTest {
                 // The tag goes before the padding, so the captured node is the whole
                 // frame and not just the content inside it.
                 Box(Modifier.testTag("frame").background(Color.White).padding(24.dp)) {
-                    SaturationLightnessPlane(
+                    HslPlane(
                         state = ColorPickerState(HslColor(hue = 0f, saturation = 0f, lightness = 1f)),
                         modifier = Modifier.size(200.dp),
                         thumb = { Box(Modifier.size(24.dp).background(Color.Magenta)) },

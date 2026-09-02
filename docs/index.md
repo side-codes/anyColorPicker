@@ -271,7 +271,7 @@ OkhsvColorPicker(state = state, showAlpha = true)
 
 ### Saturation / Lightness Plane
 
-`SaturationLightnessPlane` picks both channels at once for the hue currently in `state`,
+`HslPlane` picks both channels at once for the hue currently in `state`,
 leaving hue and alpha untouched, so it composes with a `HueSlider` into a full picker.
 
 ![Saturation and lightness plane](images/saturation-lightness-plane.png)
@@ -279,7 +279,7 @@ leaving hue and alpha untouched, so it composes with a `HueSlider` into a full p
 ```kotlin
 val state = rememberColorPickerState(HslColor(hue = 68f, saturation = 0.72f, lightness = 0.62f))
 
-SaturationLightnessPlane(state = state, modifier = Modifier.fillMaxWidth().height(220.dp))
+HslPlane(state = state, modifier = Modifier.fillMaxWidth().height(220.dp))
 HueSlider(state = state)
 ```
 
@@ -299,7 +299,7 @@ sliders remain the accessible path to the same channels.
 `thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
 
 ```kotlin
-SaturationLightnessPlane(
+HslPlane(
     state = state,
     thumb = { source -> MyIndicator(source) },
 )

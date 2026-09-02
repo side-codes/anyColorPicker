@@ -456,6 +456,10 @@ public final class codes/side/colorpicker/ui/ColorPickerDialogKt {
 	public static final fun ColorPickerDialog (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/model/HslColor;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLcodes/side/colorpicker/theme/ColorPickerColors;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class codes/side/colorpicker/ui/ColorPlaneKt {
+	public static final fun ColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
 public final class codes/side/colorpicker/ui/ColorSliderKt {
 	public static final fun ColorSlider-pxA9Vh4 (FLkotlin/jvm/functions/Function1;Lkotlinx/collections/immutable/ImmutableList;JLandroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;FZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 }
@@ -523,6 +527,10 @@ public final class codes/side/colorpicker/ui/HslColorPickerKt {
 	public static final fun HslColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class codes/side/colorpicker/ui/HslPlaneKt {
+	public static final fun HslPlane (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
 public final class codes/side/colorpicker/ui/HslSlidersKt {
 	public static final fun HueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun LightnessSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
@@ -567,10 +575,6 @@ public final class codes/side/colorpicker/ui/RgbSlidersKt {
 	public static final fun BlueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun GreenSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun RedSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
-}
-
-public final class codes/side/colorpicker/ui/SaturationLightnessPlaneKt {
-	public static final fun SaturationLightnessPlane (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/ui/SliderLabelDefaultsKt {

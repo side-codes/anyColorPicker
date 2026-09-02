@@ -11,14 +11,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -27,34 +28,32 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import codes.side.colorpicker.conversion.toComposeColor
-import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-/** Saturation for a pointer at [x] across a plane [width] pixels wide. */
-internal fun saturationAt(x: Float, width: Int): Float =
+/** The fraction across a plane [width] pixels wide that a pointer at [x] sits at. */
+internal fun planeXFraction(x: Float, width: Int): Float =
     if (width <= 0) 0f else (x / width).coerceIn(0f, 1f)
 
-/** Lightness for a pointer at [y] down a plane [height] pixels tall; the top is white. */
-internal fun lightnessAt(y: Float, height: Int): Float =
+/** The fraction up a plane [height] pixels tall that a pointer at [y] sits at. */
+internal fun planeYFraction(y: Float, height: Int): Float =
     if (height <= 0) 0.5f else (1f - y / height).coerceIn(0f, 1f)
 
 /**
- * Two-dimensional saturation and lightness picker for the hue currently held by [state].
+ * Two-dimensional picker over a pair of colour channels, both in `0..1`.
  *
- * Saturation runs left to right and lightness bottom to top, so the surface reads as white
- * along the top edge, black along the bottom, grey down the left, and the pure hue at the
- * right of the middle row. Dragging writes both channels at once; hue and alpha are left
- * alone, so a [HueSlider] and an [AlphaSlider] compose with this to make a full picker.
+ * [xValue] runs left to right and [yValue] bottom to top, so `yValue = 1f` is the top edge.
+ * Dragging reports both at once, which is what lets a caller write two channels in a single
+ * update and leave the rest of the colour alone.
  *
  * Unlike the sliders, the surface is not mirrored in right-to-left layouts. It is a map of a
- * colour space rather than a progress control, and mirroring it would make saturation grow
+ * colour space rather than a progress control, and mirroring it would make the x channel grow
  * leftwards here while it still grows rightwards on the hue slider beside it.
  *
+ * @param surface paints the field, filling the whole drawing area. It is drawn under the
+ * position indicator and clipped to [ColorPickerShapes.planeShape].
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
@@ -65,31 +64,25 @@ internal fun lightnessAt(y: Float, height: Int): Float =
  * only has to draw itself.
  */
 @Composable
-public fun SaturationLightnessPlane(
-    state: ColorPickerState,
+public fun ColorPlane(
+    xValue: Float,
+    yValue: Float,
+    onValueChange: (x: Float, y: Float) -> Unit,
+    surface: DrawScope.() -> Unit,
     modifier: Modifier = Modifier,
-    semanticLabel: String? = "Saturation and lightness",
-    semanticValueText: String? =
-        "${state.hslColor.intSaturation}% saturation, ${state.hslColor.intLightness}% lightness",
+    onValueChangeFinished: (() -> Unit)? = null,
+    semanticLabel: String? = null,
+    semanticValueText: String? = null,
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
-    val hsl = state.hslColor
     val interactionSource = remember { MutableInteractionSource() }
-    val guard = remember(state) { SliderInteractionGuard(state) }
     val scope = rememberCoroutineScope()
-
-    // The horizontal ramp is the hue at mid lightness, from fully desaturated to pure. The
-    // vertical overlay then takes it to white and to black. That pair reproduces HSL
-    // exactly rather than approximately: for any hue and saturation, the colour at
-    // lightness L is the mid-lightness colour blended with white by 2L-1 above the middle
-    // and with black by 1-2L below it, which is what alpha compositing the overlay does.
-    val desaturated = remember(hsl.hue) {
-        HslColor(hue = hsl.hue, saturation = 0f, lightness = 0.5f).toComposeColor()
-    }
-    val pure = remember(hsl.hue) {
-        HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor()
-    }
+    // The gesture handler outlives any one composition, so it reads the callbacks and the
+    // painter through these rather than capturing the values it was built with.
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
+    val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
+    val currentSurface by rememberUpdatedState(surface)
 
     Layout(
         content = {
@@ -99,14 +92,7 @@ public fun SaturationLightnessPlane(
             Box(
                 modifier = Modifier
                     .clip(shapes.planeShape)
-                    .drawBehind {
-                        drawRect(Brush.horizontalGradient(listOf(desaturated, pure)))
-                        drawRect(
-                            Brush.verticalGradient(
-                                listOf(Color.White, Color.Transparent, Color.Black),
-                            ),
-                        )
-                    },
+                    .drawBehind { currentSurface() },
             )
             // A bare Box, so the indicator measures to its own size. Giving the wrapper a
             // size instead squeezes a larger custom thumb into the default diameter and
@@ -119,21 +105,26 @@ public fun SaturationLightnessPlane(
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
             }
-            .pointerInput(state) {
+            .pointerInput(Unit) {
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     val press = DragInteraction.Start()
                     scope.launch { interactionSource.emit(press) }
-                    guard.begin()
-                    state.commitPlane(down.position, size.width, size.height)
+                    currentOnValueChange(
+                        planeXFraction(down.position.x, size.width),
+                        planeYFraction(down.position.y, size.height),
+                    )
                     down.consume()
 
                     val completed = drag(down.id) { change ->
-                        state.commitPlane(change.position, size.width, size.height)
+                        currentOnValueChange(
+                            planeXFraction(change.position.x, size.width),
+                            planeYFraction(change.position.y, size.height),
+                        )
                         change.consume()
                     }
 
-                    guard.end()
+                    currentOnFinished?.invoke()
                     scope.launch {
                         interactionSource.emit(
                             if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press),
@@ -147,17 +138,17 @@ public fun SaturationLightnessPlane(
         // fallback when the parent passes unbounded space down.
         val width = constraints.minWidth
         val height = constraints.minHeight
-        val surface = measurables[0].measure(Constraints.fixed(width, height))
+        val surfacePlaceable = measurables[0].measure(Constraints.fixed(width, height))
         val indicator = measurables[1].measure(Constraints(maxWidth = width, maxHeight = height))
 
         layout(width, height) {
-            surface.place(0, 0)
-            // place, not placeRelative: the surface, the gradient and the pointer mapping
-            // are all unmirrored, so an indicator that flipped in right-to-left layouts
-            // would sit on the opposite colour from the one it points at.
+            surfacePlaceable.place(0, 0)
+            // place, not placeRelative: the surface, the field and the pointer mapping are
+            // all unmirrored, so an indicator that flipped in right-to-left layouts would
+            // sit on the opposite colour from the one it points at.
             indicator.place(
-                x = (hsl.saturation * width - indicator.width / 2f).roundToInt(),
-                y = ((1f - hsl.lightness) * height - indicator.height / 2f).roundToInt(),
+                x = (xValue * width - indicator.width / 2f).roundToInt(),
+                y = ((1f - yValue) * height - indicator.height / 2f).roundToInt(),
             )
         }
     }
@@ -181,14 +172,4 @@ private fun PlaneThumb() {
             style = Stroke(width = 2.dp.toPx()),
         )
     }
-}
-
-/** Writes both channels in one update, so hue and alpha survive the gesture untouched. */
-private fun ColorPickerState.commitPlane(position: Offset, width: Int, height: Int) {
-    updateFromHsl(
-        hslColor.copy(
-            saturation = saturationAt(position.x, width),
-            lightness = lightnessAt(position.y, height),
-        ),
-    )
 }

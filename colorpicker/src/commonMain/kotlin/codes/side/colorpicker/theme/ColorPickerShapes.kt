@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Shape
  *
  * @property trackShape outer shape of a slider's gradient track.
  * @property swatchShape shape of a [codes.side.colorpicker.ui.ColorSwatch].
- * @property planeShape shape of a [codes.side.colorpicker.ui.SaturationLightnessPlane]'s
+ * @property planeShape shape of a [codes.side.colorpicker.ui.HslPlane]'s
  * surface. The position indicator is drawn outside it, so it stays whole at the edges.
  */
 @Immutable

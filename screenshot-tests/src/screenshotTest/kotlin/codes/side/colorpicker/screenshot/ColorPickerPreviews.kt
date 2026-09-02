@@ -34,12 +34,12 @@ import codes.side.colorpicker.ui.AlphaSlider
 import codes.side.colorpicker.ui.CmykColorPicker
 import codes.side.colorpicker.ui.ColorSwatch
 import codes.side.colorpicker.ui.HslColorPicker
+import codes.side.colorpicker.ui.HslPlane
 import codes.side.colorpicker.ui.HueSlider
 import codes.side.colorpicker.ui.LabColorPicker
 import codes.side.colorpicker.ui.OkhslColorPicker
 import codes.side.colorpicker.ui.OkhsvColorPicker
 import codes.side.colorpicker.ui.RgbColorPicker
-import codes.side.colorpicker.ui.SaturationLightnessPlane
 import com.android.tools.screenshot.PreviewTest
 
 /**
@@ -212,9 +212,9 @@ fun CustomThumbPreview() = Frame {
 @PreviewTest
 @Preview(name = "Saturation lightness plane", widthDp = 440, heightDp = 420)
 @Composable
-fun PlanePreview() = Frame {
+fun HslPlanePreview() = Frame {
     val state = state()
-    SaturationLightnessPlane(
+    HslPlane(
         state = state,
         modifier = Modifier.fillMaxWidth().height(260.dp),
     )
