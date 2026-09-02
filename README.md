@@ -1,3 +1,5 @@
+![anyColorPicker — color picker components for Compose Multiplatform](docs/images/social-preview.png)
+
 # anyColorPicker
 
 Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
