@@ -396,7 +396,7 @@ This means:
 
 For more details, see:
 - [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/) -- the W3C spec mandates the same approach
-- [Sass Color Spaces](https://css.oddbird.net/sass/color-spaces/proposal/) -- stores colors in their original space
+- [Sass Color Spaces](https://sass-lang.com/documentation/values/colors/) -- stores colors in their original space
 
 ## ▶️ Running the samples
 
