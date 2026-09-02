@@ -1,0 +1,32 @@
+# Every text file is stored with LF in the repository and checked out with LF, whatever
+# operating system the contributor is on. Without this, a Windows checkout can commit CRLF
+# and the next Linux contributor sees a whole-file diff that changes nothing.
+* text=auto eol=lf
+
+# Windows batch files are the exception: cmd.exe expects CRLF, so these are checked out
+# with CRLF while still being stored as LF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Marked binary so no line-ending normalisation is ever attempted on them. This matters:
+# a CRLF pass that treats a jar or a PNG as text rewrites bytes inside the compressed
+# stream and silently corrupts the file.
+*.jar      binary
+*.klib     binary
+*.zip      binary
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.gif      binary
+*.webp     binary
+*.ico      binary
+*.ttf      binary
+*.otf      binary
+*.woff     binary
+*.woff2    binary
+*.keystore binary
+*.jks      binary
+
+# Generated, and noisy in review.
+kotlin-js-store/** linguist-generated=true
+colorpicker/api/** linguist-generated=true
