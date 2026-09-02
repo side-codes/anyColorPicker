@@ -17,7 +17,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 /**
- * Saturation the Independent hue track is drawn at, rather than the 1.0 the HSL picker
+ * Saturation every Independent Ok* track is drawn at, rather than the 1.0 the HSL picker
  * uses.
  *
  * At saturation 1 an Okhsl hue sweep runs along the sRGB gamut surface, which turns a
@@ -25,18 +25,20 @@ import kotlinx.collections.immutable.toImmutableList
  * to zero as blue starts to rise. A gradient interpolates straight through such a corner,
  * and no practical number of stops fixes it: the error stalls near 9 of 255 even at 256
  * stops. Backing off the boundary makes the sweep smooth, and 0.85 is the most colorful
- * setting that stays under one perceptible step at [OK_HUE_STOPS].
+ * setting that stays under two steps of 255 at [OK_HUE_STOPS]. The lightness and value
+ * tracks hold hue fixed and cross no corner, but take the same saturation so a picker's
+ * tracks agree with one another.
  */
-private const val HUE_TRACK_SATURATION = 0.85f
+internal const val INDEPENDENT_TRACK_SATURATION = 0.85f
 
 // Stops for the hue track. Okhsl hue is not piecewise linear in sRGB the way HSL's is,
 // so there are no breakpoints to land on; 32 measures 1.9 of 255 against the true sweep,
 // and doubling it buys nothing.
-private const val OK_HUE_STOPS = 32
+internal const val OK_HUE_STOPS = 32
 
-// The saturation, lightness and value tracks are smooth, and 16 holds them under half a
-// step of 255.
-private const val OK_CHANNEL_STOPS = 16
+// The saturation, lightness and value tracks curve hardest near the gamut edge, where a
+// 16-stop strip drifts 13 of 255 from the true sweep. 64 holds it under 3.5.
+internal const val OK_CHANNEL_STOPS = 64
 
 internal inline fun buildOkGradient(stops: Int, color: (Float) -> Color): ImmutableList<Color> =
     (0..stops).map { color(it.toFloat() / stops) }.toImmutableList()
@@ -70,7 +72,7 @@ public fun OkhslHueSlider(
     // The two coloring modes differ only in which saturation and lightness the strip is
     // drawn at, so they pick the pair rather than each building a gradient of its own.
     val trackSaturation = when (coloringMode) {
-        ColoringMode.Independent -> HUE_TRACK_SATURATION
+        ColoringMode.Independent -> INDEPENDENT_TRACK_SATURATION
         ColoringMode.Contextual -> okhsl.saturation
     }
     val trackLightness = when (coloringMode) {
@@ -196,8 +198,9 @@ public fun OkhslSaturationSlider(
  * track looks equally light at every hue, which is the whole reason to prefer Okhsl over
  * HSL.
  *
- * @param coloringMode with [ColoringMode.Independent] (the default) the track is drawn at
- * full saturation; with [ColoringMode.Contextual] it is drawn at the current saturation.
+ * @param coloringMode with [ColoringMode.Independent] (the default) the track is drawn
+ * just off the gamut boundary, at saturation 0.85; with [ColoringMode.Contextual] it is
+ * drawn at the current saturation.
  * @param semanticLabel accessibility description of the slider; pass a localized string
  * to replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current value in percent.
@@ -219,7 +222,7 @@ public fun OkhslLightnessSlider(
 ) {
     val okhsl = state.okhslColor
     val trackSaturation = when (coloringMode) {
-        ColoringMode.Independent -> HUE_TRACK_SATURATION
+        ColoringMode.Independent -> INDEPENDENT_TRACK_SATURATION
         ColoringMode.Contextual -> okhsl.saturation
     }
     val gradientColors = remember(okhsl.hue, trackSaturation) {

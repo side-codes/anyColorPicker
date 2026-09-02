@@ -13,13 +13,6 @@ import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 
-// Okhsv's hue track meets the same gamut corners as Okhsl's, so it is drawn just off the
-// boundary for the same reason; see HUE_TRACK_SATURATION in OkhslSliders.kt.
-private const val HUE_TRACK_SATURATION = 0.85f
-
-private const val OK_HUE_STOPS = 32
-private const val OK_CHANNEL_STOPS = 16
-
 /**
  * Slider for the Okhsv hue channel of [state], in degrees `0..360`.
  *
@@ -49,7 +42,7 @@ public fun OkhsvHueSlider(
     // The two coloring modes differ only in which saturation and value the strip is drawn
     // at, so they pick the pair rather than each building a gradient of its own.
     val trackSaturation = when (coloringMode) {
-        ColoringMode.Independent -> HUE_TRACK_SATURATION
+        ColoringMode.Independent -> INDEPENDENT_TRACK_SATURATION
         ColoringMode.Contextual -> okhsv.saturation
     }
     val trackValue = when (coloringMode) {
@@ -164,11 +157,12 @@ public fun OkhsvSaturationSlider(
 }
 
 /**
- * Slider for the Okhsv value channel of [state], in `0..1`, from black to the full
- * brightness of the current hue.
+ * Slider for the Okhsv value channel of [state], in `0..1`, from black to the current
+ * hue at full value.
  *
- * @param coloringMode with [ColoringMode.Independent] (the default) the track is drawn at
- * full saturation; with [ColoringMode.Contextual] it is drawn at the current saturation.
+ * @param coloringMode with [ColoringMode.Independent] (the default) the track is drawn
+ * just off the gamut boundary, at saturation 0.85; with [ColoringMode.Contextual] it is
+ * drawn at the current saturation.
  * @param semanticLabel accessibility description of the slider; pass a localized string
  * to replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current value in percent.
@@ -190,7 +184,7 @@ public fun OkhsvValueSlider(
 ) {
     val okhsv = state.okhsvColor
     val trackSaturation = when (coloringMode) {
-        ColoringMode.Independent -> HUE_TRACK_SATURATION
+        ColoringMode.Independent -> INDEPENDENT_TRACK_SATURATION
         ColoringMode.Contextual -> okhsv.saturation
     }
     val gradientColors = remember(okhsv.hue, trackSaturation) {
