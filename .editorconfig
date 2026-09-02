@@ -1,0 +1,28 @@
+# Read by IntelliJ, Android Studio, VS Code and ktlint alike, which is what makes this
+# the file that actually governs formatting.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{kt,kts}]
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+# Trailing commas keep the diff for a new parameter to a single added line, instead of
+# also touching the line before it.
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+[*.{yml,yaml,json}]
+indent_size = 2
+
+[*.md]
+# Two trailing spaces are a hard line break in Markdown, so they must survive.
+trim_trailing_whitespace = false
+
+[*.bat]
+end_of_line = crlf

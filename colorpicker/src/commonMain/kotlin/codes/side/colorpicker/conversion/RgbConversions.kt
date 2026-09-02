@@ -12,7 +12,7 @@ import codes.side.colorpicker.model.RgbColor
 internal fun RgbColor.contrastColor(): RgbColor {
     // WCAG relative luminance on linearized sRGB channels.
     val luminance = 0.2126 * linearize(red.toDouble()) +
-        0.7152 * linearize(green.toDouble()) +
-        0.0722 * linearize(blue.toDouble())
+            0.7152 * linearize(green.toDouble()) +
+            0.0722 * linearize(blue.toDouble())
     return if (luminance > 0.179) RgbColor.Black else RgbColor.White
 }

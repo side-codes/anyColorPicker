@@ -14,7 +14,12 @@ class ChainConversionsTest {
     private val eps = 2e-5f
     private val labEps = 0.5f // LAB uses transcendental functions, needs wider tolerance
 
-    private fun assertNear(expected: Float, actual: Float, tolerance: Float = eps, msg: String = "") {
+    private fun assertNear(
+        expected: Float,
+        actual: Float,
+        tolerance: Float = eps,
+        msg: String = "",
+    ) {
         assertTrue(
             abs(expected - actual) <= tolerance,
             "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}"
@@ -111,7 +116,12 @@ class ChainConversionsTest {
         val original = HslColor(hue = 210.5f, saturation = 0.47f, lightness = 0.63f)
         val roundTripped = original.toRgb().toHsl()
         assertNear(original.hue, roundTripped.hue, tolerance = eps, msg = "hue")
-        assertNear(original.saturation, roundTripped.saturation, tolerance = eps, msg = "saturation")
+        assertNear(
+            original.saturation,
+            roundTripped.saturation,
+            tolerance = eps,
+            msg = "saturation",
+        )
         assertNear(original.lightness, roundTripped.lightness, tolerance = eps, msg = "lightness")
     }
 
@@ -120,7 +130,12 @@ class ChainConversionsTest {
         val original = HslColor(hue = 33.7f, saturation = 0.22f, lightness = 0.77f)
         val roundTripped = original.toRgb().toHsl()
         assertNear(original.hue, roundTripped.hue, tolerance = eps, msg = "hue")
-        assertNear(original.saturation, roundTripped.saturation, tolerance = eps, msg = "saturation")
+        assertNear(
+            original.saturation,
+            roundTripped.saturation,
+            tolerance = eps,
+            msg = "saturation",
+        )
         assertNear(original.lightness, roundTripped.lightness, tolerance = eps, msg = "lightness")
     }
 
@@ -129,7 +144,12 @@ class ChainConversionsTest {
         val original = HslColor(hue = 275.3f, saturation = 0.85f, lightness = 0.31f)
         val roundTripped = original.toRgb().toHsl()
         assertNear(original.hue, roundTripped.hue, tolerance = eps, msg = "hue")
-        assertNear(original.saturation, roundTripped.saturation, tolerance = eps, msg = "saturation")
+        assertNear(
+            original.saturation,
+            roundTripped.saturation,
+            tolerance = eps,
+            msg = "saturation",
+        )
         assertNear(original.lightness, roundTripped.lightness, tolerance = eps, msg = "lightness")
     }
 
@@ -138,7 +158,12 @@ class ChainConversionsTest {
         val original = HslColor(hue = 5.5f, saturation = 0.91f, lightness = 0.44f)
         val roundTripped = original.toRgb().toHsl()
         assertNear(original.hue, roundTripped.hue, tolerance = eps, msg = "hue")
-        assertNear(original.saturation, roundTripped.saturation, tolerance = eps, msg = "saturation")
+        assertNear(
+            original.saturation,
+            roundTripped.saturation,
+            tolerance = eps,
+            msg = "saturation",
+        )
         assertNear(original.lightness, roundTripped.lightness, tolerance = eps, msg = "lightness")
     }
 
@@ -147,7 +172,12 @@ class ChainConversionsTest {
         val original = HslColor(hue = 185.2f, saturation = 0.63f, lightness = 0.52f)
         val roundTripped = original.toRgb().toHsl()
         assertNear(original.hue, roundTripped.hue, tolerance = eps, msg = "hue")
-        assertNear(original.saturation, roundTripped.saturation, tolerance = eps, msg = "saturation")
+        assertNear(
+            original.saturation,
+            roundTripped.saturation,
+            tolerance = eps,
+            msg = "saturation",
+        )
         assertNear(original.lightness, roundTripped.lightness, tolerance = eps, msg = "lightness")
     }
 

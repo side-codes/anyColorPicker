@@ -72,7 +72,8 @@ class CmykColorTest {
 
     @Test
     fun intAccessorsMidValues() {
-        val c = CmykColor(cyan = 0.5f, magenta = 0.25f, yellow = 0.75f, key = 0.1f, alpha = 128f / 255f)
+        val c =
+            CmykColor(cyan = 0.5f, magenta = 0.25f, yellow = 0.75f, key = 0.1f, alpha = 128f / 255f)
         assertEquals(50, c.intCyan)
         assertEquals(25, c.intMagenta)
         assertEquals(75, c.intYellow)

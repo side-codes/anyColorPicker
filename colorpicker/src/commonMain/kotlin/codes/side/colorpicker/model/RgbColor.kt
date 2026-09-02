@@ -33,18 +33,23 @@ public class RgbColor(
     // "+ 0f" normalizes -0.0f to 0.0f so equality can't split on signed zero.
     /** Red channel in `0..1`. */
     public val red: Float = red + 0f
+
     /** Green channel in `0..1`. */
     public val green: Float = green + 0f
+
     /** Blue channel in `0..1`. */
     public val blue: Float = blue + 0f
     override val alpha: Float = alpha + 0f
 
     /** [red] scaled to `0..255` and rounded to the nearest integer. */
     public val intRed: Int get() = (red * 255f).roundToInt()
+
     /** [green] scaled to `0..255` and rounded to the nearest integer. */
     public val intGreen: Int get() = (green * 255f).roundToInt()
+
     /** [blue] scaled to `0..255` and rounded to the nearest integer. */
     public val intBlue: Int get() = (blue * 255f).roundToInt()
+
     /** [alpha] scaled to `0..255` and rounded to the nearest integer. */
     public val intAlpha: Int get() = (alpha * 255f).roundToInt()
 
@@ -60,9 +65,9 @@ public class RgbColor(
         if (this === other) return true
         if (other !is RgbColor) return false
         return red == other.red &&
-            green == other.green &&
-            blue == other.blue &&
-            alpha == other.alpha
+                green == other.green &&
+                blue == other.blue &&
+                alpha == other.alpha
     }
 
     override fun hashCode(): Int {
@@ -79,12 +84,16 @@ public class RgbColor(
     public companion object {
         /** Opaque black. */
         public val Black: RgbColor = RgbColor(0f, 0f, 0f)
+
         /** Opaque white. */
         public val White: RgbColor = RgbColor(1f, 1f, 1f)
+
         /** Opaque pure red. */
         public val Red: RgbColor = RgbColor(1f, 0f, 0f)
+
         /** Opaque pure green. */
         public val Green: RgbColor = RgbColor(0f, 1f, 0f)
+
         /** Opaque pure blue. */
         public val Blue: RgbColor = RgbColor(0f, 0f, 1f)
 

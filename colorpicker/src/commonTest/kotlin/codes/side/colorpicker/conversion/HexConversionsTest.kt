@@ -135,7 +135,10 @@ class HexConversionsTest {
     @Test
     fun strictParseThrowsWithOffendingString() {
         val exception = assertFailsWith<IllegalArgumentException> { "nope".toRgbColor() }
-        assertTrue(exception.message!!.contains("nope"), "message should contain the input: ${exception.message}")
+        assertTrue(
+            exception.message!!.contains("nope"),
+            "message should contain the input: ${exception.message}",
+        )
     }
 
     // ---- Round-trips ----

@@ -53,7 +53,8 @@ class RgbColorTest {
 
     @Test
     fun intAccessors() {
-        val rgb = RgbColor(red = 128f / 255f, green = 64f / 255f, blue = 32f / 255f, alpha = 200f / 255f)
+        val rgb =
+            RgbColor(red = 128f / 255f, green = 64f / 255f, blue = 32f / 255f, alpha = 200f / 255f)
         assertEquals(128, rgb.intRed)
         assertEquals(64, rgb.intGreen)
         assertEquals(32, rgb.intBlue)

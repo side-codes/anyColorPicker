@@ -11,8 +11,16 @@ class HslConversionsTest {
 
     private val eps = 5e-5f
 
-    private fun assertNear(expected: Float, actual: Float, tolerance: Float = eps, msg: String = "") {
-        assertTrue(abs(expected - actual) <= tolerance, "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}")
+    private fun assertNear(
+        expected: Float,
+        actual: Float,
+        tolerance: Float = eps,
+        msg: String = "",
+    ) {
+        assertTrue(
+            abs(expected - actual) <= tolerance,
+            "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}",
+        )
     }
 
     // ---- HSL -> RGB primary colors ----
@@ -207,10 +215,22 @@ class HslConversionsTest {
         val hsl = HslColor(hue = 180f, saturation = 0.5f, lightness = 0.4f, alpha = 200f / 255f)
         val restored = hsl.toArgbInt().toHslColor()
         // ARGB int round-trip quantizes to 8-bit, so allow +-1 int unit tolerance
-        assertTrue(abs(hsl.intHue - restored.intHue) <= 1, "hue: ${hsl.intHue} vs ${restored.intHue}")
-        assertTrue(abs(hsl.intSaturation - restored.intSaturation) <= 1, "sat: ${hsl.intSaturation} vs ${restored.intSaturation}")
-        assertTrue(abs(hsl.intLightness - restored.intLightness) <= 1, "light: ${hsl.intLightness} vs ${restored.intLightness}")
-        assertTrue(abs(hsl.intAlpha - restored.intAlpha) <= 1, "alpha: ${hsl.intAlpha} vs ${restored.intAlpha}")
+        assertTrue(
+            abs(hsl.intHue - restored.intHue) <= 1,
+            "hue: ${hsl.intHue} vs ${restored.intHue}",
+        )
+        assertTrue(
+            abs(hsl.intSaturation - restored.intSaturation) <= 1,
+            "sat: ${hsl.intSaturation} vs ${restored.intSaturation}",
+        )
+        assertTrue(
+            abs(hsl.intLightness - restored.intLightness) <= 1,
+            "light: ${hsl.intLightness} vs ${restored.intLightness}",
+        )
+        assertTrue(
+            abs(hsl.intAlpha - restored.intAlpha) <= 1,
+            "alpha: ${hsl.intAlpha} vs ${restored.intAlpha}",
+        )
     }
 
     @Test

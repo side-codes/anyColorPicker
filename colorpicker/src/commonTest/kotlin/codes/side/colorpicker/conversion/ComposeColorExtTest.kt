@@ -13,7 +13,10 @@ import kotlin.test.assertTrue
 class ComposeColorExtTest {
 
     private fun assertNear(expected: Float, actual: Float, tolerance: Float, msg: String = "") {
-        assertTrue(abs(expected - actual) <= tolerance, "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}")
+        assertTrue(
+            abs(expected - actual) <= tolerance,
+            "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}",
+        )
     }
 
     // ---- sRGB round-trips ----
@@ -55,7 +58,10 @@ class ComposeColorExtTest {
         val rgb = p3.toRgbColor()
         // The raw P3 channel values must have gone through a real sRGB conversion
         assertTrue(abs(rgb.red - 0.5f) > 0.001f, "red should differ from raw P3 value: ${rgb.red}")
-        assertTrue(rgb.blue > rgb.green, "hue ordering preserved: blue=${rgb.blue} green=${rgb.green}")
+        assertTrue(
+            rgb.blue > rgb.green,
+            "hue ordering preserved: blue=${rgb.blue} green=${rgb.green}",
+        )
         assertEquals(1f, rgb.alpha)
     }
 

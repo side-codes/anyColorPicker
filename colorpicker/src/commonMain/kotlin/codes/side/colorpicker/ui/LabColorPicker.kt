@@ -33,7 +33,12 @@ public fun LabColorPicker(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        LightnessLabSlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
+        LightnessLabSlider(
+            state = state,
+            coloringMode = coloringMode,
+            colors = colors,
+            shapes = shapes,
+        )
         LabASlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
         LabBSlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
         if (showAlpha) {

@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlinx.collections.immutable.ImmutableList
@@ -125,7 +125,7 @@ internal fun GradientTrack(
                     bottomLeft = CornerRadius.Zero,
                     topRight = CornerRadius(insideCornerSize),
                     bottomRight = CornerRadius(insideCornerSize),
-                )
+                ),
             )
         }
 
@@ -140,7 +140,7 @@ internal fun GradientTrack(
                     bottomLeft = CornerRadius(insideCornerSize),
                     topRight = CornerRadius.Zero,
                     bottomRight = CornerRadius.Zero,
-                )
+                ),
             )
         }
 

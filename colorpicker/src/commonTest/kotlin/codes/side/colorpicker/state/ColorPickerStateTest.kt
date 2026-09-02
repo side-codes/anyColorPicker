@@ -7,6 +7,12 @@ import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
 import codes.side.colorpicker.model.RgbColor
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -16,18 +22,17 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
 
 class ColorPickerStateTest {
 
     private val eps = 1e-5f
 
-    private fun assertNear(expected: Float, actual: Float, tolerance: Float = eps, msg: String = "") {
+    private fun assertNear(
+        expected: Float,
+        actual: Float,
+        tolerance: Float = eps,
+        msg: String = "",
+    ) {
         assertTrue(
             abs(expected - actual) <= tolerance,
             "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}"
@@ -278,7 +283,8 @@ class ColorPickerStateTest {
 
     @Test
     fun updateHuePreservesSaturationAndLightness() {
-        val state = createState(HslColor(hue = 0f, saturation = 0.8f, lightness = 0.6f, alpha = 0.784f))
+        val state =
+            createState(HslColor(hue = 0f, saturation = 0.8f, lightness = 0.6f, alpha = 0.784f))
         state.updateHue(120f)
         assertEquals(0.8f, state.hslColor.saturation)
         assertEquals(0.6f, state.hslColor.lightness)
@@ -296,7 +302,8 @@ class ColorPickerStateTest {
 
     @Test
     fun updateSaturationPreservesHueAndLightness() {
-        val state = createState(HslColor(hue = 200f, saturation = 0.5f, lightness = 0.6f, alpha = 0.9f))
+        val state =
+            createState(HslColor(hue = 200f, saturation = 0.5f, lightness = 0.6f, alpha = 0.9f))
         state.updateSaturation(0.3f)
         assertEquals(200f, state.hslColor.hue)
         assertEquals(0.6f, state.hslColor.lightness)
@@ -366,7 +373,8 @@ class ColorPickerStateTest {
     @Test
     fun updateFromCmykReadsBackTheExactInstance() {
         val state = createState()
-        val cmyk = CmykColor(cyan = 0.1f, magenta = 1f / 3f, yellow = 0.7f, key = 0.9f, alpha = 0.3f)
+        val cmyk =
+            CmykColor(cyan = 0.1f, magenta = 1f / 3f, yellow = 0.7f, key = 0.9f, alpha = 0.3f)
         state.updateFromCmyk(cmyk)
         assertSame(cmyk, state.cmykColor)
         assertSame(cmyk, state.pickerColor)
@@ -543,7 +551,14 @@ class ColorPickerStateTest {
 
     @Test
     fun saverRoundTripHsl() {
-        val original = ColorPickerState(HslColor(hue = 210f, saturation = 0.4f, lightness = 0.6f, alpha = 0.5f))
+        val original = ColorPickerState(
+            HslColor(
+                hue = 210f,
+                saturation = 0.4f,
+                lightness = 0.6f,
+                alpha = 0.5f,
+            ),
+        )
         val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(original)))
         assertIs<HslColor>(restored.pickerColor)
         assertEquals(original.pickerColor, restored.pickerColor)
@@ -551,7 +566,8 @@ class ColorPickerStateTest {
 
     @Test
     fun saverRoundTripRgb() {
-        val original = ColorPickerState(RgbColor(red = 0.1f, green = 0.2f, blue = 0.3f, alpha = 0.4f))
+        val original =
+            ColorPickerState(RgbColor(red = 0.1f, green = 0.2f, blue = 0.3f, alpha = 0.4f))
         val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(original)))
         assertIs<RgbColor>(restored.pickerColor)
         assertEquals(original.pickerColor, restored.pickerColor)
@@ -559,7 +575,15 @@ class ColorPickerStateTest {
 
     @Test
     fun saverRoundTripCmyk() {
-        val original = ColorPickerState(CmykColor(cyan = 0.1f, magenta = 0.2f, yellow = 0.3f, key = 0.4f, alpha = 0.5f))
+        val original = ColorPickerState(
+            CmykColor(
+                cyan = 0.1f,
+                magenta = 0.2f,
+                yellow = 0.3f,
+                key = 0.4f,
+                alpha = 0.5f,
+            ),
+        )
         val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(original)))
         assertIs<CmykColor>(restored.pickerColor)
         assertEquals(original.pickerColor, restored.pickerColor)
@@ -574,13 +598,18 @@ class ColorPickerStateTest {
     }
 
     private fun assertBitIdentical(expected: Float, actual: Float, msg: String) {
-        assertEquals(expected.toRawBits(), actual.toRawBits(), "$msg expected=$expected actual=$actual")
+        assertEquals(
+            expected.toRawBits(),
+            actual.toRawBits(),
+            "$msg expected=$expected actual=$actual",
+        )
     }
 
     @Test
     fun saverRoundTripPreservesExactBitsHsl() {
         val hsl = HslColor(hue = 123.456f, saturation = 0.1f, lightness = 1f / 3f, alpha = 0.7f)
-        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(hsl))))
+        val restored =
+            assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(hsl))))
         val color = assertIs<HslColor>(restored.pickerColor)
         assertBitIdentical(hsl.hue, color.hue, "hue")
         assertBitIdentical(hsl.saturation, color.saturation, "saturation")
@@ -591,7 +620,8 @@ class ColorPickerStateTest {
     @Test
     fun saverRoundTripPreservesExactBitsRgb() {
         val rgb = RgbColor(red = 0.1f, green = 1f / 3f, blue = 0.7f, alpha = 0.9f)
-        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(rgb))))
+        val restored =
+            assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(rgb))))
         val color = assertIs<RgbColor>(restored.pickerColor)
         assertBitIdentical(rgb.red, color.red, "red")
         assertBitIdentical(rgb.green, color.green, "green")
@@ -601,8 +631,10 @@ class ColorPickerStateTest {
 
     @Test
     fun saverRoundTripPreservesExactBitsCmyk() {
-        val cmyk = CmykColor(cyan = 0.1f, magenta = 1f / 3f, yellow = 0.7f, key = 0.9f, alpha = 0.3f)
-        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(cmyk))))
+        val cmyk =
+            CmykColor(cyan = 0.1f, magenta = 1f / 3f, yellow = 0.7f, key = 0.9f, alpha = 0.3f)
+        val restored =
+            assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(cmyk))))
         val color = assertIs<CmykColor>(restored.pickerColor)
         assertBitIdentical(cmyk.cyan, color.cyan, "cyan")
         assertBitIdentical(cmyk.magenta, color.magenta, "magenta")
@@ -614,7 +646,8 @@ class ColorPickerStateTest {
     @Test
     fun saverRoundTripPreservesExactBitsLab() {
         val lab = LabColor(l = 33.333f, a = -12.7f, b = 64.1f, alpha = 0.6f)
-        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(lab))))
+        val restored =
+            assertNotNull(ColorPickerStateSaver.restore(saveToArray(ColorPickerState(lab))))
         val color = assertIs<LabColor>(restored.pickerColor)
         assertBitIdentical(lab.l, color.l, "l")
         assertBitIdentical(lab.a, color.a, "a")

@@ -21,12 +21,29 @@ public fun HslColor.toRgb(): RgbColor {
     val b: Float
 
     when (hueSegment) {
-        0 -> { r = c + m; g = x + m; b = m }
-        1 -> { r = x + m; g = c + m; b = m }
-        2 -> { r = m; g = c + m; b = x + m }
-        3 -> { r = m; g = x + m; b = c + m }
-        4 -> { r = x + m; g = m; b = c + m }
-        else -> { r = c + m; g = m; b = x + m }
+        0 -> {
+            r = c + m; g = x + m; b = m
+        }
+
+        1 -> {
+            r = x + m; g = c + m; b = m
+        }
+
+        2 -> {
+            r = m; g = c + m; b = x + m
+        }
+
+        3 -> {
+            r = m; g = x + m; b = c + m
+        }
+
+        4 -> {
+            r = x + m; g = m; b = c + m
+        }
+
+        else -> {
+            r = c + m; g = m; b = x + m
+        }
     }
 
     return RgbColor(

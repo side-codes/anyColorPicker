@@ -35,22 +35,29 @@ public class CmykColor(
     // "+ 0f" normalizes -0.0f to 0.0f so equality can't split on signed zero.
     /** Cyan channel in `0..1`. */
     public val cyan: Float = cyan + 0f
+
     /** Magenta channel in `0..1`. */
     public val magenta: Float = magenta + 0f
+
     /** Yellow channel in `0..1`. */
     public val yellow: Float = yellow + 0f
+
     /** Key (black) channel in `0..1`. */
     public val key: Float = key + 0f
     override val alpha: Float = alpha + 0f
 
     /** [cyan] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intCyan: Int get() = (cyan * 100f).roundToInt()
+
     /** [magenta] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intMagenta: Int get() = (magenta * 100f).roundToInt()
+
     /** [yellow] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intYellow: Int get() = (yellow * 100f).roundToInt()
+
     /** [key] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intKey: Int get() = (key * 100f).roundToInt()
+
     /** [alpha] scaled to `0..255` and rounded to the nearest integer. */
     public val intAlpha: Int get() = (alpha * 255f).roundToInt()
 
@@ -61,16 +68,17 @@ public class CmykColor(
         yellow: Float = this.yellow,
         key: Float = this.key,
         alpha: Float = this.alpha,
-    ): CmykColor = CmykColor(cyan = cyan, magenta = magenta, yellow = yellow, key = key, alpha = alpha)
+    ): CmykColor =
+        CmykColor(cyan = cyan, magenta = magenta, yellow = yellow, key = key, alpha = alpha)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CmykColor) return false
         return cyan == other.cyan &&
-            magenta == other.magenta &&
-            yellow == other.yellow &&
-            key == other.key &&
-            alpha == other.alpha
+                magenta == other.magenta &&
+                yellow == other.yellow &&
+                key == other.key &&
+                alpha == other.alpha
     }
 
     override fun hashCode(): Int {
@@ -88,6 +96,7 @@ public class CmykColor(
     public companion object {
         /** Opaque black. */
         public val Black: CmykColor = CmykColor(0f, 0f, 0f, 1f)
+
         /** Opaque white. */
         public val White: CmykColor = CmykColor(0f, 0f, 0f, 0f)
 
@@ -96,7 +105,13 @@ public class CmykColor(
          * [key] in `0..100` percent, [alpha] in `0..255`. Unlike the constructor,
          * out-of-range values are clamped instead of throwing.
          */
-        public fun fromInt(cyan: Int, magenta: Int, yellow: Int, key: Int, alpha: Int = 255): CmykColor = CmykColor(
+        public fun fromInt(
+            cyan: Int,
+            magenta: Int,
+            yellow: Int,
+            key: Int,
+            alpha: Int = 255,
+        ): CmykColor = CmykColor(
             cyan = (cyan / 100f).coerceIn(0f, 1f),
             magenta = (magenta / 100f).coerceIn(0f, 1f),
             yellow = (yellow / 100f).coerceIn(0f, 1f),

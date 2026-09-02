@@ -35,18 +35,23 @@ public class HslColor(
     // "+ 0f" normalizes -0.0f to 0.0f so equality can't split on signed zero.
     /** Hue in degrees, in `0..360` (exclusive) after normalization. */
     public val hue: Float = if (hue == 360f) 0f else hue + 0f
+
     /** Saturation in `0..1`. */
     public val saturation: Float = saturation + 0f
+
     /** Lightness in `0..1`. */
     public val lightness: Float = lightness + 0f
     override val alpha: Float = alpha + 0f
 
     /** [hue] in degrees, rounded to the nearest integer. */
     public val intHue: Int get() = hue.roundToInt()
+
     /** [saturation] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intSaturation: Int get() = (saturation * 100f).roundToInt()
+
     /** [lightness] scaled to `0..100` percent and rounded to the nearest integer. */
     public val intLightness: Int get() = (lightness * 100f).roundToInt()
+
     /** [alpha] scaled to `0..255` and rounded to the nearest integer. */
     public val intAlpha: Int get() = (alpha * 255f).roundToInt()
 
@@ -62,9 +67,9 @@ public class HslColor(
         if (this === other) return true
         if (other !is HslColor) return false
         return hue == other.hue &&
-            saturation == other.saturation &&
-            lightness == other.lightness &&
-            alpha == other.alpha
+                saturation == other.saturation &&
+                lightness == other.lightness &&
+                alpha == other.alpha
     }
 
     override fun hashCode(): Int {
@@ -81,8 +86,10 @@ public class HslColor(
     public companion object {
         /** Opaque black. */
         public val Black: HslColor = HslColor(hue = 0f, saturation = 0f, lightness = 0f)
+
         /** Opaque white. */
         public val White: HslColor = HslColor(hue = 0f, saturation = 0f, lightness = 1f)
+
         /** Opaque pure red. */
         public val Red: HslColor = HslColor(hue = 0f, saturation = 1f, lightness = 0.5f)
 
@@ -91,11 +98,12 @@ public class HslColor(
          * [saturation] and [lightness] in `0..100` percent, [alpha] in `0..255`.
          * Unlike the constructor, out-of-range values are clamped instead of throwing.
          */
-        public fun fromInt(hue: Int, saturation: Int, lightness: Int, alpha: Int = 255): HslColor = HslColor(
-            hue = hue.toFloat().coerceIn(0f, 360f),
-            saturation = (saturation / 100f).coerceIn(0f, 1f),
-            lightness = (lightness / 100f).coerceIn(0f, 1f),
-            alpha = (alpha / 255f).coerceIn(0f, 1f),
-        )
+        public fun fromInt(hue: Int, saturation: Int, lightness: Int, alpha: Int = 255): HslColor =
+            HslColor(
+                hue = hue.toFloat().coerceIn(0f, 360f),
+                saturation = (saturation / 100f).coerceIn(0f, 1f),
+                lightness = (lightness / 100f).coerceIn(0f, 1f),
+                alpha = (alpha / 255f).coerceIn(0f, 1f),
+            )
     }
 }
