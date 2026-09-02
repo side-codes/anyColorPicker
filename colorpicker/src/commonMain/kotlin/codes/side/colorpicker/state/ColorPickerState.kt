@@ -1,6 +1,7 @@
 package codes.side.colorpicker.state
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,46 +67,27 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
         internal set
 
     // ---- Derived spaces (pure computation, no writes on read) ----
-    //
-    // Each space is itself when authoritative and a conversion otherwise. The
-    // conversions route through RGB; see PickerColor.toRgbColor.
 
-    private val hslDerived = derivedStateOf {
-        val c = authoritative
-        if (c is HslColor) c else c.toRgbColor().toHsl()
+    /**
+     * A view of the authoritative color in one space: itself when that space is the
+     * origin, and [convert] applied to its RGB form otherwise. Routing every pair through
+     * RGB is what keeps this from being sixty-four hand-written conversions.
+     */
+    private inline fun <reified T : PickerColor> derivedSpace(
+        crossinline convert: (RgbColor) -> T,
+    ): State<T> = derivedStateOf {
+        val color = authoritative
+        color as? T ?: convert(color.toRgbColor())
     }
 
+    private val hslDerived = derivedSpace { it.toHsl() }
     private val rgbDerived = derivedStateOf { authoritative.toRgbColor() }
-
-    private val cmykDerived = derivedStateOf {
-        val c = authoritative
-        if (c is CmykColor) c else c.toRgbColor().toCmyk()
-    }
-
-    private val labDerived = derivedStateOf {
-        val c = authoritative
-        if (c is LabColor) c else c.toRgbColor().toLab()
-    }
-
-    private val oklabDerived = derivedStateOf {
-        val c = authoritative
-        if (c is OklabColor) c else c.toRgbColor().toOklab()
-    }
-
-    private val oklchDerived = derivedStateOf {
-        val c = authoritative
-        if (c is OklchColor) c else c.toRgbColor().toOklch()
-    }
-
-    private val okhslDerived = derivedStateOf {
-        val c = authoritative
-        if (c is OkhslColor) c else c.toRgbColor().toOkhsl()
-    }
-
-    private val okhsvDerived = derivedStateOf {
-        val c = authoritative
-        if (c is OkhsvColor) c else c.toRgbColor().toOkhsv()
-    }
+    private val cmykDerived = derivedSpace { it.toCmyk() }
+    private val labDerived = derivedSpace { it.toLab() }
+    private val oklabDerived = derivedSpace { it.toOklab() }
+    private val oklchDerived = derivedSpace { it.toOklch() }
+    private val okhslDerived = derivedSpace { it.toOkhsl() }
+    private val okhsvDerived = derivedSpace { it.toOkhsv() }
 
     // ---- Public read access ----
 
