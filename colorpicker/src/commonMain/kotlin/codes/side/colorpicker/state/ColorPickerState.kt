@@ -48,10 +48,11 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
     private var authoritative by mutableStateOf<PickerColor>(initialColor)
 
     /**
-     * True while the user is actively dragging one of the library's sliders (set on the
-     * first value change, cleared when the gesture finishes or the interacting slider
-     * leaves composition mid-drag). Useful for deferring expensive work until the
-     * interaction ends. Programmatic `update*` calls do not affect this flag.
+     * True while the user is actively dragging one of the library's sliders or the
+     * [codes.side.colorpicker.ui.SaturationLightnessPlane] (set on the first value change,
+     * cleared when the gesture finishes or the interacting component leaves composition
+     * mid-drag). Useful for deferring expensive work until the interaction ends.
+     * Programmatic `update*` calls do not affect this flag.
      */
     public var isInteracting: Boolean by mutableStateOf(false)
         internal set

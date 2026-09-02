@@ -14,7 +14,8 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Unidirectional data flow with `ColorPickerState`
 - Hex string parsing and formatting
 - Color picker dialog
-- Accessibility semantics and RTL layout support
+- Two-dimensional saturation / lightness plane alongside the single-channel sliders
+- Accessibility semantics, and RTL layout support everywhere but the plane, which maps a color space rather than showing progress
 
 ## 📦 Setup
 
