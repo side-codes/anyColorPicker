@@ -9,14 +9,10 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -25,12 +21,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.HslColor
@@ -64,8 +59,10 @@ internal fun lightnessAt(y: Float, height: Int): Float =
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
  * @param thumb optional replacement for the position indicator, receiving the surface's
- * [InteractionSource] so it can react to being dragged. The plane positions whatever it is
- * given; the composable only has to draw itself.
+ * [InteractionSource] so it can react to being dragged. The plane centres whatever it is
+ * given on the current pair of values at whatever size that composable measures to, and
+ * draws it outside the clipped surface so that it stays whole at the edges; the composable
+ * only has to draw itself.
  */
 @Composable
 public fun SaturationLightnessPlane(
@@ -81,7 +78,6 @@ public fun SaturationLightnessPlane(
     val interactionSource = remember { MutableInteractionSource() }
     val guard = remember(state) { SliderInteractionGuard(state) }
     val scope = rememberCoroutineScope()
-    var planeSize by remember { mutableStateOf(IntSize.Zero) }
 
     // The horizontal ramp is the hue at mid lightness, from fully desaturated to pure. The
     // vertical overlay then takes it to white and to black. That pair reproduces HSL
@@ -95,22 +91,33 @@ public fun SaturationLightnessPlane(
         HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor()
     }
 
-    Box(
+    Layout(
+        content = {
+            // The shape clips the surface alone. Clipping the whole plane would take the
+            // indicator with it, and at a corner the rounding leaves almost none of the
+            // ring behind — the one place a picker has to show where the colour came from.
+            Box(
+                modifier = Modifier
+                    .clip(shapes.planeShape)
+                    .drawBehind {
+                        drawRect(Brush.horizontalGradient(listOf(desaturated, pure)))
+                        drawRect(
+                            Brush.verticalGradient(
+                                listOf(Color.White, Color.Transparent, Color.Black),
+                            ),
+                        )
+                    },
+            )
+            // A bare Box, so the indicator measures to its own size. Giving the wrapper a
+            // size instead squeezes a larger custom thumb into the default diameter and
+            // strands a smaller one in the corner of it, off the value it marks.
+            Box { if (thumb != null) thumb(interactionSource) else PlaneThumb() }
+        },
         modifier = modifier
             .defaultMinSize(ColorPickerDefaults.PlaneMinSize, ColorPickerDefaults.PlaneMinSize)
-            .clip(shapes.planeShape)
-            .onSizeChanged { planeSize = it }
             .semantics {
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
-            }
-            .drawBehind {
-                drawRect(Brush.horizontalGradient(listOf(desaturated, pure)))
-                drawRect(
-                    Brush.verticalGradient(
-                        listOf(Color.White, Color.Transparent, Color.Black),
-                    ),
-                )
             }
             .pointerInput(state) {
                 awaitEachGesture {
@@ -134,39 +141,45 @@ public fun SaturationLightnessPlane(
                     }
                 }
             },
-    ) {
-        val diameter = ColorPickerDefaults.PlaneThumbSize
-        Box(
-            modifier = Modifier
-                .offset {
-                    val radius = diameter.toPx() / 2f
-                    IntOffset(
-                        x = (hsl.saturation * planeSize.width - radius).roundToInt(),
-                        y = ((1f - hsl.lightness) * planeSize.height - radius).roundToInt(),
-                    )
-                }
-                .size(diameter),
-        ) {
-            if (thumb != null) {
-                thumb(interactionSource)
-            } else {
-                Canvas(Modifier.size(diameter)) {
-                    val radius = size.minDimension / 2f - 2.dp.toPx()
-                    // A dark halo under a white ring keeps the indicator readable at both
-                    // ends of the surface, where a single-colour ring vanishes.
-                    drawCircle(
-                        color = Color.Black.copy(alpha = 0.35f),
-                        radius = radius,
-                        style = Stroke(width = 4.dp.toPx()),
-                    )
-                    drawCircle(
-                        color = Color.White,
-                        radius = radius,
-                        style = Stroke(width = 2.dp.toPx()),
-                    )
-                }
-            }
+    ) { measurables, constraints ->
+        // defaultMinSize has already raised a loose minimum to PlaneMinSize, so the minimum
+        // is the surface's size either way: the exact size a caller asked for, or the
+        // fallback when the parent passes unbounded space down.
+        val width = constraints.minWidth
+        val height = constraints.minHeight
+        val surface = measurables[0].measure(Constraints.fixed(width, height))
+        val indicator = measurables[1].measure(Constraints(maxWidth = width, maxHeight = height))
+
+        layout(width, height) {
+            surface.place(0, 0)
+            // place, not placeRelative: the surface, the gradient and the pointer mapping
+            // are all unmirrored, so an indicator that flipped in right-to-left layouts
+            // would sit on the opposite colour from the one it points at.
+            indicator.place(
+                x = (hsl.saturation * width - indicator.width / 2f).roundToInt(),
+                y = ((1f - hsl.lightness) * height - indicator.height / 2f).roundToInt(),
+            )
         }
+    }
+}
+
+/** Default position indicator, sized [ColorPickerDefaults.PlaneThumbSize]. */
+@Composable
+private fun PlaneThumb() {
+    Canvas(Modifier.size(ColorPickerDefaults.PlaneThumbSize)) {
+        val radius = size.minDimension / 2f - 2.dp.toPx()
+        // A dark halo under a white ring keeps the indicator readable at both
+        // ends of the surface, where a single-colour ring vanishes.
+        drawCircle(
+            color = Color.Black.copy(alpha = 0.35f),
+            radius = radius,
+            style = Stroke(width = 4.dp.toPx()),
+        )
+        drawCircle(
+            color = Color.White,
+            radius = radius,
+            style = Stroke(width = 2.dp.toPx()),
+        )
     }
 }
 
