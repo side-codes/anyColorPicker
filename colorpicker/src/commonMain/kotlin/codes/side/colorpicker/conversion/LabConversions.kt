@@ -83,7 +83,7 @@ private fun labF(t: Double): Double =
 internal fun linearize(c: Double): Double =
     if (c <= 0.04045) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
 
-private fun delinearize(c: Double): Double =
+internal fun delinearize(c: Double): Double =
     if (c <= 0.0031308) c * 12.92 else 1.055 * c.pow(1.0 / 2.4) - 0.055
 
 /** Converts this CIELAB color to HSL by way of RGB. Alpha is carried over unchanged. */
