@@ -41,12 +41,12 @@ Every picker takes a `ColoringMode`. `Independent` shows each channel's full ran
 `Contextual` previews the resulting color at every slider position. `HslColorPicker`
 defaults to `Independent`; the others default to `Contextual`.
 
-| Model | Independent | Contextual |
-|---|---|---|
-| **HSL**<br>`HslColorPicker` | ![HSL independent](docs/images/hsl-independent.png) | ![HSL contextual](docs/images/hsl-contextual.png) |
-| **RGB**<br>`RgbColorPicker` | ![RGB independent](docs/images/rgb-independent.png) | ![RGB contextual](docs/images/rgb-contextual.png) |
+| Model                         | Independent                                           | Contextual                                          |
+|-------------------------------|-------------------------------------------------------|-----------------------------------------------------|
+| **HSL**<br>`HslColorPicker`   | ![HSL independent](docs/images/hsl-independent.png)   | ![HSL contextual](docs/images/hsl-contextual.png)   |
+| **RGB**<br>`RgbColorPicker`   | ![RGB independent](docs/images/rgb-independent.png)   | ![RGB contextual](docs/images/rgb-contextual.png)   |
 | **CMYK**<br>`CmykColorPicker` | ![CMYK independent](docs/images/cmyk-independent.png) | ![CMYK contextual](docs/images/cmyk-contextual.png) |
-| **LAB**<br>`LabColorPicker` | ![LAB independent](docs/images/lab-independent.png) | ![LAB contextual](docs/images/lab-contextual.png) |
+| **LAB**<br>`LabColorPicker`   | ![LAB independent](docs/images/lab-independent.png)   | ![LAB contextual](docs/images/lab-contextual.png)   |
 
 `ColorSwatch` draws the color over a transparency checkerboard, so alpha reads correctly:
 
