@@ -18,7 +18,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 
 ```kotlin
 // build.gradle.kts
-implementation("codes.side:colorpicker:1.1.0")
+implementation("codes.side:colorpicker:1.1.1")
 ```
 
 In a Kotlin Multiplatform project, add it to `commonMain`:
@@ -27,7 +27,7 @@ In a Kotlin Multiplatform project, add it to `commonMain`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("codes.side:colorpicker:1.1.0")
+            implementation("codes.side:colorpicker:1.1.1")
         }
     }
 }
@@ -418,7 +418,7 @@ The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar`
 
 ```diff
 - implementation("codes.side:andcolorpicker:0.6.2")
-+ implementation("codes.side:colorpicker:1.1.0")
++ implementation("codes.side:colorpicker:1.1.1")
 ```
 
 There is no 1:1 API mapping — migrate by concept:
