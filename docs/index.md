@@ -1,6 +1,6 @@
 # anyColorPicker — Compose Multiplatform Color Picker
 
-Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
+Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
 
 ## ✨ Features
 

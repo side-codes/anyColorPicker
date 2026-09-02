@@ -121,7 +121,7 @@ mavenPublishing {
 
     pom {
         name.set("anyColorPicker")
-        description.set("Multiplatform color picker library for Android & iOS")
+        description.set("Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3")
         inceptionYear.set("2020")
         url.set("https://github.com/side-codes/anyColorPicker")
         licenses {
