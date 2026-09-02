@@ -41,11 +41,14 @@ dependencies {
 // parameters change — pointing the README straight at them would break each image link
 // on the next tweak. Copy them out under stable names keyed on the function name.
 val readmeGoldens = mapOf(
-    "HslIndependentPreview" to "hsl-picker",
-    "HslContextualPreview" to "hsl-picker-contextual",
-    "RgbPreview" to "rgb-picker",
-    "CmykPreview" to "cmyk-picker",
-    "LabPreview" to "lab-picker",
+    "HslIndependentPreview" to "hsl-independent",
+    "HslContextualPreview" to "hsl-contextual",
+    "RgbIndependentPreview" to "rgb-independent",
+    "RgbContextualPreview" to "rgb-contextual",
+    "CmykIndependentPreview" to "cmyk-independent",
+    "CmykContextualPreview" to "cmyk-contextual",
+    "LabIndependentPreview" to "lab-independent",
+    "LabContextualPreview" to "lab-contextual",
     "SwatchPreview" to "color-swatch",
 )
 
