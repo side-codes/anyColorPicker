@@ -32,6 +32,7 @@ dependencyResolutionManagement {
 rootProject.name = "anyColorPicker"
 
 include(":colorpicker")
+include(":screenshot-tests")
 include(":sample:shared")
 include(":sample:androidApp")
 include(":sample:desktopApp")

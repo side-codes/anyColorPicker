@@ -1,10 +1,10 @@
 # anyColorPicker
 
-Multiplatform color picker library for Android, iOS, and Desktop (JVM), built with Compose Multiplatform and Material 3.
+Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
 
-## Features
+## ✨ Features
 
-- Compose Multiplatform (Android, iOS, Desktop/JVM)
+- Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm)
 - Material 3 theming via `ColorPickerDefaults`
 - HSL, RGB, CMYK, and LAB color models
 - Alpha channel support
@@ -14,7 +14,7 @@ Multiplatform color picker library for Android, iOS, and Desktop (JVM), built wi
 - Color picker dialog
 - Accessibility semantics and RTL layout support
 
-## Setup
+## 📦 Setup
 
 ```kotlin
 // build.gradle.kts
@@ -33,9 +33,31 @@ kotlin {
 }
 ```
 
-Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`.
+Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 
-## Quick Start
+## 🎨 Gallery
+
+Every picker takes a `ColoringMode`. `Independent` shows each channel's full range;
+`Contextual` previews the resulting color at every slider position. `HslColorPicker`
+defaults to `Independent`; the others default to `Contextual`.
+
+| Model                         | Independent                                           | Contextual                                          |
+|-------------------------------|-------------------------------------------------------|-----------------------------------------------------|
+| **HSL**<br>`HslColorPicker`   | ![HSL independent](docs/images/hsl-independent.png)   | ![HSL contextual](docs/images/hsl-contextual.png)   |
+| **RGB**<br>`RgbColorPicker`   | ![RGB independent](docs/images/rgb-independent.png)   | ![RGB contextual](docs/images/rgb-contextual.png)   |
+| **CMYK**<br>`CmykColorPicker` | ![CMYK independent](docs/images/cmyk-independent.png) | ![CMYK contextual](docs/images/cmyk-contextual.png) |
+| **LAB**<br>`LabColorPicker`   | ![LAB independent](docs/images/lab-independent.png)   | ![LAB contextual](docs/images/lab-contextual.png)   |
+
+`ColorSwatch` draws the color over a transparency checkerboard, so alpha reads correctly:
+
+![Color swatch](docs/images/color-swatch.png)
+
+These images are the Compose Preview Screenshot Testing references, rendered from the
+library's own components and re-checked on every CI run, so they cannot drift from what
+the code actually draws. Regenerate them with
+`./gradlew :screenshot-tests:updateDebugScreenshotTest`.
+
+## 🚀 Quick Start
 
 ```kotlin
 @Composable
@@ -54,7 +76,7 @@ fun MyScreen() {
 }
 ```
 
-## Color Models
+## 🌈 Color Models
 
 All color models use **Float** for full precision. Integer accessors and factories are provided for convenience.
 
@@ -105,7 +127,7 @@ val color = LabColor(l = 53.23f, a = 80.11f, b = 67.22f)
 LabColor.fromInt(l = 53, a = 80, b = 67)
 ```
 
-## Conversions
+## 🔄 Conversions
 
 Conversions are extension functions. They operate on floats end to end — nothing is quantized to integers until you explicitly ask for an ARGB `Int` or a hex string. Like any color space conversion, a cross-space round trip is not guaranteed to be bit-exact; the zero-drift guarantee comes from `ColorPickerState`'s origin tracking (see [Architecture](#architecture-zero-drift-color-conversions)).
 
@@ -141,7 +163,7 @@ rgb.toHexString(includeAlpha = false)      // "#3380CC"
 "#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
 ```
 
-## Color Picker Components
+## 🧩 Color Picker Components
 
 ### Full Pickers
 
@@ -253,7 +275,7 @@ HslColorPicker(
 )
 ```
 
-## State Management
+## 🔗 State Management
 
 `ColorPickerState` is the single source of truth. It reads and writes each color space natively, with no round-trip conversions.
 
@@ -299,7 +321,7 @@ state.isInteracting
 
 Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color.
 
-## Architecture: Zero-Drift Color Conversions
+## 🏗️ Architecture: Zero-Drift Color Conversions
 
 Color space conversions are inherently lossy when values are quantized to integers, and even with floats, transcendental functions (used in LAB) introduce IEEE 754 rounding errors. Industry-standard tools (Photoshop, CSS Color Level 4, Sass) solve this the same way we do:
 
@@ -324,7 +346,21 @@ For more details, see:
 - [CSS Color Module Level 4](https://www.w3.org/TR/css-color-4/) -- the W3C spec mandates the same approach
 - [Sass Color Spaces](https://css.oddbird.net/sass/color-spaces/proposal/) -- stores colors in their original space
 
-## Migrating from andcolorpicker (0.6.x)
+## ▶️ Running the samples
+
+The same sample app runs on every supported platform:
+
+```sh
+./gradlew :sample:desktopApp:run             # desktop window
+./gradlew :sample:androidApp:installDebug    # device or emulator
+```
+
+`sample/iosApp` holds the SwiftUI entry points. The Xcode project is not checked in, so
+it needs creating once on a Mac against the `ComposeApp` framework that `:sample:shared`
+produces.
+
+
+## 🚚 Migrating from andcolorpicker (0.6.x)
 
 The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar` and friends) is discontinued. This library is a full Compose Multiplatform rewrite published under new coordinates:
 
@@ -348,7 +384,7 @@ There is no 1:1 API mapping — migrate by concept:
 | `IntegerHSLColor` and friends                                  | `HslColor`, `RgbColor`, `CmykColor`, `LabColor` (float-based, with `fromInt` factories)                                                                    |
 | `hslColoringMode` = `pure` / `output`                          | `ColoringMode.Independent` / `ColoringMode.Contextual`                                                                                                     |
 
-## License
+## 📄 License
 
 ```
 Copyright 2020 Illia Achour

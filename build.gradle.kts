@@ -6,12 +6,14 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.androidKmpLibrary) apply false
     alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.screenshot) apply false
     alias(libs.plugins.binaryCompatibilityValidator)
 }
 
 apiValidation {
     // Sample modules are not published; only the library's API surface is tracked.
-    ignoredProjects += listOf("androidApp", "desktopApp", "shared", "webApp")
+    ignoredProjects += listOf("androidApp", "desktopApp", "screenshot-tests", "shared", "webApp")
 
     @OptIn(ExperimentalBCVApi::class)
     klib {

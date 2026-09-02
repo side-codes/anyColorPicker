@@ -1,10 +1,10 @@
 # anyColorPicker — Compose Multiplatform Color Picker
 
-:avocado: Handy, :snake: flexible, and :zap: lightning-fast color picker components for Compose Multiplatform — Android, iOS, and Desktop (JVM).
+:avocado: Handy, :snake: flexible, and :zap: lightning-fast color picker components for Compose Multiplatform — Android, iOS, Desktop (JVM), and Web (Wasm).
 
 ## :pill: Features
 
-- Compose Multiplatform (Android, iOS, Desktop/JVM)
+- Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm)
 - Material 3 theming via `ColorPickerDefaults`
 - HSL, RGB, CMYK, and LAB color models
 - Alpha channel support
@@ -33,7 +33,7 @@ kotlin {
 }
 ```
 
-Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`.
+Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 
 ## :rocket: Quick Start
 
