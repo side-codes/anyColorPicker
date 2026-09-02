@@ -52,7 +52,12 @@ public fun RedSlider(
     }
     val thumbColor = remember(rgb, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> RgbColor(red = rgb.red, green = 0f, blue = 0f).toComposeColor()
+            ColoringMode.Independent -> RgbColor(
+                red = rgb.red,
+                green = 0f,
+                blue = 0f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> rgb.toComposeColor()
         }
     }
@@ -117,7 +122,12 @@ public fun GreenSlider(
     }
     val thumbColor = remember(rgb, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> RgbColor(red = 0f, green = rgb.green, blue = 0f).toComposeColor()
+            ColoringMode.Independent -> RgbColor(
+                red = 0f,
+                green = rgb.green,
+                blue = 0f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> rgb.toComposeColor()
         }
     }
@@ -182,7 +192,12 @@ public fun BlueSlider(
     }
     val thumbColor = remember(rgb, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> RgbColor(red = 0f, green = 0f, blue = rgb.blue).toComposeColor()
+            ColoringMode.Independent -> RgbColor(
+                red = 0f,
+                green = 0f,
+                blue = rgb.blue,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> rgb.toComposeColor()
         }
     }

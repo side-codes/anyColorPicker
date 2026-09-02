@@ -56,6 +56,7 @@ public fun String.toRgbColorOrNull(): RgbColor? {
                 append(char)
             }
         }
+
         6 -> "FF$hex"
         8 -> hex
         else -> return null

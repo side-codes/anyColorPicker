@@ -1,10 +1,10 @@
 package codes.side.colorpicker.screenshot
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,7 +64,9 @@ private fun Frame(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
             ) { content() }
         }
@@ -152,7 +154,7 @@ private fun SquareThumb(color: Color, interaction: InteractionSource) {
             .shadow(elevation, shape)
             .background(ring, shape)
             .padding(5.dp)
-            .background(fill, RoundedCornerShape(11.dp))
+            .background(fill, RoundedCornerShape(11.dp)),
     )
 }
 
@@ -182,6 +184,8 @@ fun CustomThumbPreview() = Frame {
 fun SwatchPreview() = Frame {
     ColorSwatch(
         color = Seed.copy(alpha = 0.55f).toComposeColor(),
-        modifier = Modifier.fillMaxWidth().height(80.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp),
     )
 }

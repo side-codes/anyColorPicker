@@ -39,8 +39,18 @@ public fun HslColorPicker(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         HueSlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
-        SaturationSlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
-        LightnessSlider(state = state, coloringMode = coloringMode, colors = colors, shapes = shapes)
+        SaturationSlider(
+            state = state,
+            coloringMode = coloringMode,
+            colors = colors,
+            shapes = shapes,
+        )
+        LightnessSlider(
+            state = state,
+            coloringMode = coloringMode,
+            colors = colors,
+            shapes = shapes,
+        )
         if (showAlpha) {
             AlphaSlider(state = state, colors = colors, shapes = shapes)
         }

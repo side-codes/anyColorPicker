@@ -10,9 +10,21 @@ class ArgbIntTest {
 
     private fun assertIntRgbEqual(expected: RgbColor, actual: RgbColor) {
         assertEquals(expected.intRed, actual.intRed, "red: ${expected.intRed} vs ${actual.intRed}")
-        assertEquals(expected.intGreen, actual.intGreen, "green: ${expected.intGreen} vs ${actual.intGreen}")
-        assertEquals(expected.intBlue, actual.intBlue, "blue: ${expected.intBlue} vs ${actual.intBlue}")
-        assertEquals(expected.intAlpha, actual.intAlpha, "alpha: ${expected.intAlpha} vs ${actual.intAlpha}")
+        assertEquals(
+            expected.intGreen,
+            actual.intGreen,
+            "green: ${expected.intGreen} vs ${actual.intGreen}",
+        )
+        assertEquals(
+            expected.intBlue,
+            actual.intBlue,
+            "blue: ${expected.intBlue} vs ${actual.intBlue}",
+        )
+        assertEquals(
+            expected.intAlpha,
+            actual.intAlpha,
+            "alpha: ${expected.intAlpha} vs ${actual.intAlpha}",
+        )
     }
 
     // ---- Pack & unpack ----

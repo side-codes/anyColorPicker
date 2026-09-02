@@ -28,9 +28,9 @@ public fun Int.toRgbColor(): RgbColor = RgbColor(
 
 internal fun argb(alpha: Int, red: Int, green: Int, blue: Int): Int =
     ((alpha.coerceIn(0, 255) and 0xFF) shl 24) or
-        ((red.coerceIn(0, 255) and 0xFF) shl 16) or
-        ((green.coerceIn(0, 255) and 0xFF) shl 8) or
-        (blue.coerceIn(0, 255) and 0xFF)
+            ((red.coerceIn(0, 255) and 0xFF) shl 16) or
+            ((green.coerceIn(0, 255) and 0xFF) shl 8) or
+            (blue.coerceIn(0, 255) and 0xFF)
 
 internal fun setAlphaComponent(color: Int, alpha: Int): Int =
     (color and 0x00FFFFFF) or ((alpha.coerceIn(0, 255) and 0xFF) shl 24)

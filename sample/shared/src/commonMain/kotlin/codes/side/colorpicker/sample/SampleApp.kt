@@ -1,10 +1,10 @@
 package codes.side.colorpicker.sample
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -266,7 +266,7 @@ private fun SquareThumb(color: Color, interaction: InteractionSource) {
             .shadow(elevation, shape)
             .background(ring, shape)
             .padding(5.dp)
-            .background(fill, RoundedCornerShape(11.dp))
+            .background(fill, RoundedCornerShape(11.dp)),
     )
 }
 

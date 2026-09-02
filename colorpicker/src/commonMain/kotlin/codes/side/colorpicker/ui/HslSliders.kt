@@ -73,7 +73,12 @@ public fun HueSlider(
     }
     val thumbColor = remember(hsl, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor()
+            ColoringMode.Independent -> HslColor(
+                hue = hsl.hue,
+                saturation = 1f,
+                lightness = 0.5f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> hsl.toComposeColor()
         }
     }
@@ -133,15 +138,29 @@ public fun SaturationSlider(
                 Color.Gray,
                 HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor(),
             )
+
             ColoringMode.Contextual -> persistentListOf(
-                HslColor(hue = hsl.hue, saturation = 0f, lightness = hsl.lightness).toComposeColor(),
-                HslColor(hue = hsl.hue, saturation = 1f, lightness = hsl.lightness).toComposeColor(),
+                HslColor(
+                    hue = hsl.hue,
+                    saturation = 0f,
+                    lightness = hsl.lightness,
+                ).toComposeColor(),
+                HslColor(
+                    hue = hsl.hue,
+                    saturation = 1f,
+                    lightness = hsl.lightness,
+                ).toComposeColor(),
             )
         }
     }
     val thumbColor = remember(hsl, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> HslColor(hue = hsl.hue, saturation = hsl.saturation, lightness = 0.5f).toComposeColor()
+            ColoringMode.Independent -> HslColor(
+                hue = hsl.hue,
+                saturation = hsl.saturation,
+                lightness = 0.5f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> hsl.toComposeColor()
         }
     }
@@ -202,16 +221,26 @@ public fun LightnessSlider(
                 HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor(),
                 Color.White,
             )
+
             ColoringMode.Contextual -> persistentListOf(
                 Color.Black,
-                HslColor(hue = hsl.hue, saturation = hsl.saturation, lightness = 0.5f).toComposeColor(),
+                HslColor(
+                    hue = hsl.hue,
+                    saturation = hsl.saturation,
+                    lightness = 0.5f,
+                ).toComposeColor(),
                 Color.White,
             )
         }
     }
     val thumbColor = remember(hsl, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> HslColor(hue = hsl.hue, saturation = 1f, lightness = hsl.lightness).toComposeColor()
+            ColoringMode.Independent -> HslColor(
+                hue = hsl.hue,
+                saturation = 1f,
+                lightness = hsl.lightness,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> hsl.toComposeColor()
         }
     }

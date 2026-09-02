@@ -100,7 +100,7 @@ internal val ColorPickerStateSaver = Saver<ColorPickerState, FloatArray>(
             }
         }
         color?.let { ColorPickerState(it) }
-    }
+    },
 )
 
 /**

@@ -33,18 +33,23 @@ public class LabColor(
     // "+ 0f" normalizes -0.0f to 0.0f so equality can't split on signed zero.
     /** Lightness (L*) in `0..100`. */
     public val l: Float = l + 0f
+
     /** Green-red axis (a*) in `-128..127`; negative is green, positive is red. */
     public val a: Float = a + 0f
+
     /** Blue-yellow axis (b*) in `-128..127`; negative is blue, positive is yellow. */
     public val b: Float = b + 0f
     override val alpha: Float = alpha + 0f
 
     /** [l] rounded to the nearest integer. */
     public val intL: Int get() = l.roundToInt()
+
     /** [a] rounded to the nearest integer. */
     public val intA: Int get() = a.roundToInt()
+
     /** [b] rounded to the nearest integer. */
     public val intB: Int get() = b.roundToInt()
+
     /** [alpha] scaled to `0..255` and rounded to the nearest integer. */
     public val intAlpha: Int get() = (alpha * 255f).roundToInt()
 
@@ -60,9 +65,9 @@ public class LabColor(
         if (this === other) return true
         if (other !is LabColor) return false
         return l == other.l &&
-            a == other.a &&
-            b == other.b &&
-            alpha == other.alpha
+                a == other.a &&
+                b == other.b &&
+                alpha == other.alpha
     }
 
     override fun hashCode(): Int {
@@ -79,6 +84,7 @@ public class LabColor(
     public companion object {
         /** Opaque black. */
         public val Black: LabColor = LabColor(l = 0f, a = 0f, b = 0f)
+
         /** Opaque white. */
         public val White: LabColor = LabColor(l = 100f, a = 0f, b = 0f)
 

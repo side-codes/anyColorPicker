@@ -52,7 +52,7 @@ class ComponentRenderingTest {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 AlphaSlider(
                     state = ColorPickerState(
-                        HslColor(hue = 0f, saturation = 1f, lightness = 0.5f, alpha = 0f)
+                        HslColor(hue = 0f, saturation = 1f, lightness = 0.5f, alpha = 0f),
                     ),
                     modifier = Modifier.size(width = 300.dp, height = 80.dp).testTag("alpha"),
                 )
@@ -78,7 +78,13 @@ class ComponentRenderingTest {
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 HueSlider(
-                    state = ColorPickerState(HslColor(hue = 180f, saturation = 1f, lightness = 0.5f)),
+                    state = ColorPickerState(
+                        HslColor(
+                            hue = 180f,
+                            saturation = 1f,
+                            lightness = 0.5f,
+                        ),
+                    ),
                     coloringMode = ColoringMode.Contextual,
                     modifier = Modifier.size(width = 300.dp, height = 60.dp).testTag("hue"),
                 )
@@ -105,7 +111,13 @@ class ComponentRenderingTest {
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 HueSlider(
-                    state = ColorPickerState(HslColor(hue = 180f, saturation = 1f, lightness = 0.5f)),
+                    state = ColorPickerState(
+                        HslColor(
+                            hue = 180f,
+                            saturation = 1f,
+                            lightness = 0.5f,
+                        ),
+                    ),
                     modifier = Modifier.size(width = 300.dp, height = 60.dp).testTag("hue"),
                     thumb = { source ->
                         received = source

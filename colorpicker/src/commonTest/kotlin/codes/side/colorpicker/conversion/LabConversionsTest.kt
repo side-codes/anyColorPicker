@@ -10,11 +10,20 @@ import kotlin.test.assertTrue
 class LabConversionsTest {
 
     private val eps = 1e-5f
+
     // LAB uses transcendental functions so needs a slightly wider tolerance
     private val labEps = 0.5f
 
-    private fun assertNear(expected: Float, actual: Float, tolerance: Float = eps, msg: String = "") {
-        assertTrue(abs(expected - actual) <= tolerance, "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}")
+    private fun assertNear(
+        expected: Float,
+        actual: Float,
+        tolerance: Float = eps,
+        msg: String = "",
+    ) {
+        assertTrue(
+            abs(expected - actual) <= tolerance,
+            "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}",
+        )
     }
 
     // ---- LAB -> RGB known colors ----

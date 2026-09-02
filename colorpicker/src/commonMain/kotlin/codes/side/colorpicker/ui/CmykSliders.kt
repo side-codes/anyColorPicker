@@ -49,14 +49,30 @@ public fun CyanSlider(
         when (coloringMode) {
             ColoringMode.Independent -> persistentListOf(Color.White, PureCyan)
             ColoringMode.Contextual -> persistentListOf(
-                CmykColor(cyan = 0f, magenta = cmyk.magenta, yellow = cmyk.yellow, key = cmyk.key).toComposeColor(),
-                CmykColor(cyan = 1f, magenta = cmyk.magenta, yellow = cmyk.yellow, key = cmyk.key).toComposeColor(),
+                CmykColor(
+                    cyan = 0f,
+                    magenta = cmyk.magenta,
+                    yellow = cmyk.yellow,
+                    key = cmyk.key,
+                ).toComposeColor(),
+                CmykColor(
+                    cyan = 1f,
+                    magenta = cmyk.magenta,
+                    yellow = cmyk.yellow,
+                    key = cmyk.key,
+                ).toComposeColor(),
             )
         }
     }
     val thumbColor = remember(cmyk, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> CmykColor(cyan = cmyk.cyan, magenta = 0f, yellow = 0f, key = 0f).toComposeColor()
+            ColoringMode.Independent -> CmykColor(
+                cyan = cmyk.cyan,
+                magenta = 0f,
+                yellow = 0f,
+                key = 0f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> cmyk.toComposeColor()
         }
     }
@@ -114,14 +130,30 @@ public fun MagentaSlider(
         when (coloringMode) {
             ColoringMode.Independent -> persistentListOf(Color.White, PureMagenta)
             ColoringMode.Contextual -> persistentListOf(
-                CmykColor(cyan = cmyk.cyan, magenta = 0f, yellow = cmyk.yellow, key = cmyk.key).toComposeColor(),
-                CmykColor(cyan = cmyk.cyan, magenta = 1f, yellow = cmyk.yellow, key = cmyk.key).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = 0f,
+                    yellow = cmyk.yellow,
+                    key = cmyk.key,
+                ).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = 1f,
+                    yellow = cmyk.yellow,
+                    key = cmyk.key,
+                ).toComposeColor(),
             )
         }
     }
     val thumbColor = remember(cmyk, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> CmykColor(cyan = 0f, magenta = cmyk.magenta, yellow = 0f, key = 0f).toComposeColor()
+            ColoringMode.Independent -> CmykColor(
+                cyan = 0f,
+                magenta = cmyk.magenta,
+                yellow = 0f,
+                key = 0f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> cmyk.toComposeColor()
         }
     }
@@ -179,14 +211,30 @@ public fun YellowSlider(
         when (coloringMode) {
             ColoringMode.Independent -> persistentListOf(Color.White, PureYellow)
             ColoringMode.Contextual -> persistentListOf(
-                CmykColor(cyan = cmyk.cyan, magenta = cmyk.magenta, yellow = 0f, key = cmyk.key).toComposeColor(),
-                CmykColor(cyan = cmyk.cyan, magenta = cmyk.magenta, yellow = 1f, key = cmyk.key).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = cmyk.magenta,
+                    yellow = 0f,
+                    key = cmyk.key,
+                ).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = cmyk.magenta,
+                    yellow = 1f,
+                    key = cmyk.key,
+                ).toComposeColor(),
             )
         }
     }
     val thumbColor = remember(cmyk, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> CmykColor(cyan = 0f, magenta = 0f, yellow = cmyk.yellow, key = 0f).toComposeColor()
+            ColoringMode.Independent -> CmykColor(
+                cyan = 0f,
+                magenta = 0f,
+                yellow = cmyk.yellow,
+                key = 0f,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> cmyk.toComposeColor()
         }
     }
@@ -244,14 +292,30 @@ public fun KeySlider(
         when (coloringMode) {
             ColoringMode.Independent -> persistentListOf(Color.White, Color.Black)
             ColoringMode.Contextual -> persistentListOf(
-                CmykColor(cyan = cmyk.cyan, magenta = cmyk.magenta, yellow = cmyk.yellow, key = 0f).toComposeColor(),
-                CmykColor(cyan = cmyk.cyan, magenta = cmyk.magenta, yellow = cmyk.yellow, key = 1f).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = cmyk.magenta,
+                    yellow = cmyk.yellow,
+                    key = 0f,
+                ).toComposeColor(),
+                CmykColor(
+                    cyan = cmyk.cyan,
+                    magenta = cmyk.magenta,
+                    yellow = cmyk.yellow,
+                    key = 1f,
+                ).toComposeColor(),
             )
         }
     }
     val thumbColor = remember(cmyk, coloringMode) {
         when (coloringMode) {
-            ColoringMode.Independent -> CmykColor(cyan = 0f, magenta = 0f, yellow = 0f, key = cmyk.key).toComposeColor()
+            ColoringMode.Independent -> CmykColor(
+                cyan = 0f,
+                magenta = 0f,
+                yellow = 0f,
+                key = cmyk.key,
+            ).toComposeColor()
+
             ColoringMode.Contextual -> cmyk.toComposeColor()
         }
     }

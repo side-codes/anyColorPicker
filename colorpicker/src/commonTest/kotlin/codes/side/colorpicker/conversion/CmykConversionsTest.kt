@@ -11,8 +11,16 @@ class CmykConversionsTest {
 
     private val eps = 1e-5f
 
-    private fun assertNear(expected: Float, actual: Float, tolerance: Float = eps, msg: String = "") {
-        assertTrue(abs(expected - actual) <= tolerance, "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}")
+    private fun assertNear(
+        expected: Float,
+        actual: Float,
+        tolerance: Float = eps,
+        msg: String = "",
+    ) {
+        assertTrue(
+            abs(expected - actual) <= tolerance,
+            "$msg expected=$expected actual=$actual diff=${abs(expected - actual)}",
+        )
     }
 
     // ---- CMYK -> RGB known colors ----

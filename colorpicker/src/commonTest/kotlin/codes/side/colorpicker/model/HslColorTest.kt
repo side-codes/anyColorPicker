@@ -147,7 +147,10 @@ class HslColorTest {
     @Test
     fun intHueRoundsCorrectly() {
         val hsl = HslColor(hue = 210.5f)
-        assertEquals(211, hsl.intHue) // roundToInt rounds 210.5 -> 211 (banker's toward even on .5, but 210.5 -> 211 is nearest)
+        assertEquals(
+            211,
+            hsl.intHue,
+        ) // roundToInt rounds 210.5 -> 211 (banker's toward even on .5, but 210.5 -> 211 is nearest)
     }
 
     // ---- Companion constants ----
