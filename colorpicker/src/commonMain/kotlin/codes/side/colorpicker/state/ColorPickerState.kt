@@ -103,10 +103,20 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
     /** The current color as CIELAB; a derived conversion unless LAB is the origin space. */
     public val labColor: LabColor get() = labDerived.value
 
-    /** The current color as Oklab; a derived conversion unless Oklab is the origin space. */
+    /**
+     * The current color as Oklab; a derived conversion unless Oklab is the origin space.
+     *
+     * Derived views route through sRGB, so an origin the display cannot show arrives
+     * gamut-mapped. Oklab and OkLCh are the one pair where that costs something — they
+     * describe the same color exactly — and reading either from the other reports the
+     * mapped chroma rather than the origin's.
+     */
     public val oklabColor: OklabColor get() = oklabDerived.value
 
-    /** The current color as OkLCh; a derived conversion unless OkLCh is the origin space. */
+    /**
+     * The current color as OkLCh; a derived conversion unless OkLCh is the origin space.
+     * Out-of-gamut origins arrive gamut-mapped, as for [oklabColor].
+     */
     public val oklchColor: OklchColor get() = oklchDerived.value
 
     /** The current color as Okhsl; a derived conversion unless Okhsl is the origin space. */

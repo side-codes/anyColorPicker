@@ -19,16 +19,17 @@ import kotlin.math.roundToInt
  * [OkhslColor] centres lightness so that `0.5` is a mid tone.
  *
  * The normalization follows Ottosson's reference implementation, which approximates the
- * gamut below the cusp with a straight line to black. About 4% of sRGB — the most
+ * gamut below the cusp with a straight line to black. About 1.5% of sRGB — the most
  * saturated blues and violets — sits marginally outside that line, and converting such a
- * color in and back out again loses up to 4 steps of 255. Reproducing the reference
+ * color in and back out again loses up to 5 steps of 255. Reproducing the reference
  * exactly is the deliberate trade: these coordinates mean the same thing here as they do
  * anywhere else that implements the space.
  *
- * The no-argument constructor `OkhsvColor()` is opaque red (hue 0, full saturation, full
- * value). Note that each model's default is intentionally its space's most natural
- * origin, so defaults differ per model: `RgbColor()` = black, `HslColor()` = red,
- * `CmykColor()` = white, `LabColor()` = mid-gray.
+ * The no-argument constructor `OkhsvColor()` is hue 0 at full saturation and full value —
+ * a hot pink, not red: [hue] is Oklab's hue angle, where sRGB red sits at 29.2°. Note
+ * that each model's default is intentionally its space's most natural origin, so defaults
+ * differ per model: `RgbColor()` = black, `HslColor()` = red, `CmykColor()` = white,
+ * `LabColor()` = mid-gray.
  */
 @Immutable
 public class OkhsvColor(

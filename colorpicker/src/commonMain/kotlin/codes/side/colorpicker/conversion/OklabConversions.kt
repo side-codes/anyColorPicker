@@ -49,6 +49,10 @@ public fun OklabColor.toRgb(): RgbColor {
 /**
  * Converts this Oklab color to its cylindrical form. A neutral color has no meaningful
  * hue angle and reports `0`. Alpha is carried over unchanged.
+ *
+ * Chroma is clamped to `0.4`. [OklabColor]'s a and b are bounded individually, so their
+ * square reaches `0.566` at the corners, which [OklchColor]'s radius cannot hold; those
+ * colors are far outside sRGB and render the same either way.
  */
 public fun OklabColor.toOklch(): OklchColor {
     val chroma = hypot(a.toDouble(), b.toDouble())

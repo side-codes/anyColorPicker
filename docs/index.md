@@ -42,8 +42,9 @@ Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 ## 🎨 Gallery
 
 Every picker takes a `ColoringMode`. `Independent` shows each channel's full range;
-`Contextual` previews the resulting color at every slider position. `HslColorPicker`
-defaults to `Independent`; the others default to `Contextual`.
+`Contextual` previews the resulting color at every slider position. `HslColorPicker`,
+`OkhslColorPicker` and `OkhsvColorPicker` default to `Independent`; the RGB, CMYK and LAB
+pickers default to `Contextual`.
 
 | Model                           | Independent                                        | Contextual                                       |
 |---------------------------------|----------------------------------------------------|--------------------------------------------------|

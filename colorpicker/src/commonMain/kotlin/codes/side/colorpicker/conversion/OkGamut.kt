@@ -79,11 +79,6 @@ internal fun toe(x: Double): Double {
 internal fun toeInv(x: Double): Double = (x * x + TOE_K1 * x) / (TOE_K3 * (x + TOE_K2))
 
 /**
- * The saturation at which the hue `(aNorm, bNorm)` leaves the sRGB gamut, for the
- * channel that goes out first. A polynomial approximation refined by one Halley step,
- * which lands within a rounding error of the true boundary.
- */
-/**
  * Per-channel coefficients for [computeMaxSaturation]: `k0`..`k4` fit the saturation at
  * which that channel clips, and `wl`/`wm`/`ws` are its row of the Oklab-to-linear matrix.
  */
@@ -113,6 +108,11 @@ private val BlueClipsFirst = MaxSaturationFit(
     wl = -0.0041960863, wm = -0.7034186147, ws = 1.7076147010,
 )
 
+/**
+ * The saturation at which the hue `(aNorm, bNorm)` leaves the sRGB gamut, for the
+ * channel that goes out first. A polynomial approximation refined by one Halley step,
+ * which lands within a rounding error of the true boundary.
+ */
 internal fun computeMaxSaturation(aNorm: Double, bNorm: Double): Double {
     val fit = when {
         -1.88170328 * aNorm - 0.80936493 * bNorm > 1.0 -> RedClipsFirst
@@ -297,7 +297,7 @@ internal fun getChromaAnchors(l: Double, aNorm: Double, bNorm: Double): ChromaAn
  */
 internal const val ACHROMATIC_CHROMA = 1e-6
 
-/** True when every channel of [rgb] is within `0..1`, allowing for float slop. */
+/** True when every channel is within `0..1`, allowing for float slop. */
 internal fun LinearRgb.isInGamut(epsilon: Double = 1e-6): Boolean =
     r >= -epsilon && r <= 1.0 + epsilon &&
         g >= -epsilon && g <= 1.0 + epsilon &&
