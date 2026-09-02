@@ -1,8 +1,5 @@
 package codes.side.colorpicker.conversion
 
-import codes.side.colorpicker.model.CmykColor
-import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.model.LabColor
 import codes.side.colorpicker.model.PickerColor
 import codes.side.colorpicker.model.RgbColor
 
@@ -13,12 +10,8 @@ import codes.side.colorpicker.model.RgbColor
  * alpha channel comes first: the result is `#AARRGGBB` when [includeAlpha] is `true`
  * (the default) and `#RRGGBB` otherwise.
  */
-public fun PickerColor.toHexString(includeAlpha: Boolean = true): String = when (this) {
-    is RgbColor -> toArgbInt()
-    is HslColor -> toArgbInt()
-    is CmykColor -> toArgbInt()
-    is LabColor -> toArgbInt()
-}.toHexColorString(includeAlpha = includeAlpha)
+public fun PickerColor.toHexString(includeAlpha: Boolean = true): String =
+    toRgbColor().toArgbInt().toHexColorString(includeAlpha = includeAlpha)
 
 /**
  * Formats this packed ARGB [Int] as an uppercase hex string with a leading `#`.

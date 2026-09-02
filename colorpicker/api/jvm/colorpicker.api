@@ -17,9 +17,17 @@ public final class codes/side/colorpicker/conversion/ComposeColorExtKt {
 	public static final fun toComposeColor (Lcodes/side/colorpicker/model/CmykColor;)J
 	public static final fun toComposeColor (Lcodes/side/colorpicker/model/HslColor;)J
 	public static final fun toComposeColor (Lcodes/side/colorpicker/model/LabColor;)J
+	public static final fun toComposeColor (Lcodes/side/colorpicker/model/OkhslColor;)J
+	public static final fun toComposeColor (Lcodes/side/colorpicker/model/OkhsvColor;)J
+	public static final fun toComposeColor (Lcodes/side/colorpicker/model/OklabColor;)J
+	public static final fun toComposeColor (Lcodes/side/colorpicker/model/OklchColor;)J
 	public static final fun toComposeColor (Lcodes/side/colorpicker/model/RgbColor;)J
 	public static final fun toHslColor-8_81llA (J)Lcodes/side/colorpicker/model/HslColor;
 	public static final fun toLabColor-8_81llA (J)Lcodes/side/colorpicker/model/LabColor;
+	public static final fun toOkhslColor-8_81llA (J)Lcodes/side/colorpicker/model/OkhslColor;
+	public static final fun toOkhsvColor-8_81llA (J)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static final fun toOklabColor-8_81llA (J)Lcodes/side/colorpicker/model/OklabColor;
+	public static final fun toOklchColor-8_81llA (J)Lcodes/side/colorpicker/model/OklchColor;
 	public static final fun toRgbColor-8_81llA (J)Lcodes/side/colorpicker/model/RgbColor;
 }
 
@@ -46,6 +54,41 @@ public final class codes/side/colorpicker/conversion/LabConversionsKt {
 	public static final fun toLab (Lcodes/side/colorpicker/model/RgbColor;)Lcodes/side/colorpicker/model/LabColor;
 	public static final fun toLabColor (I)Lcodes/side/colorpicker/model/LabColor;
 	public static final fun toRgb (Lcodes/side/colorpicker/model/LabColor;)Lcodes/side/colorpicker/model/RgbColor;
+}
+
+public final class codes/side/colorpicker/conversion/OkhslConversionsKt {
+	public static final fun toArgbInt (Lcodes/side/colorpicker/model/OkhslColor;)I
+	public static final fun toHsl (Lcodes/side/colorpicker/model/OkhslColor;)Lcodes/side/colorpicker/model/HslColor;
+	public static final fun toOkhsl (Lcodes/side/colorpicker/model/HslColor;)Lcodes/side/colorpicker/model/OkhslColor;
+	public static final fun toOkhsl (Lcodes/side/colorpicker/model/RgbColor;)Lcodes/side/colorpicker/model/OkhslColor;
+	public static final fun toOkhslColor (I)Lcodes/side/colorpicker/model/OkhslColor;
+	public static final fun toRgb (Lcodes/side/colorpicker/model/OkhslColor;)Lcodes/side/colorpicker/model/RgbColor;
+}
+
+public final class codes/side/colorpicker/conversion/OkhsvConversionsKt {
+	public static final fun toArgbInt (Lcodes/side/colorpicker/model/OkhsvColor;)I
+	public static final fun toHsl (Lcodes/side/colorpicker/model/OkhsvColor;)Lcodes/side/colorpicker/model/HslColor;
+	public static final fun toOkhsv (Lcodes/side/colorpicker/model/HslColor;)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static final fun toOkhsv (Lcodes/side/colorpicker/model/RgbColor;)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static final fun toOkhsvColor (I)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static final fun toRgb (Lcodes/side/colorpicker/model/OkhsvColor;)Lcodes/side/colorpicker/model/RgbColor;
+}
+
+public final class codes/side/colorpicker/conversion/OklabConversionsKt {
+	public static final fun toArgbInt (Lcodes/side/colorpicker/model/OklabColor;)I
+	public static final fun toArgbInt (Lcodes/side/colorpicker/model/OklchColor;)I
+	public static final fun toHsl (Lcodes/side/colorpicker/model/OklabColor;)Lcodes/side/colorpicker/model/HslColor;
+	public static final fun toHsl (Lcodes/side/colorpicker/model/OklchColor;)Lcodes/side/colorpicker/model/HslColor;
+	public static final fun toOklab (Lcodes/side/colorpicker/model/HslColor;)Lcodes/side/colorpicker/model/OklabColor;
+	public static final fun toOklab (Lcodes/side/colorpicker/model/OklchColor;)Lcodes/side/colorpicker/model/OklabColor;
+	public static final fun toOklab (Lcodes/side/colorpicker/model/RgbColor;)Lcodes/side/colorpicker/model/OklabColor;
+	public static final fun toOklabColor (I)Lcodes/side/colorpicker/model/OklabColor;
+	public static final fun toOklch (Lcodes/side/colorpicker/model/HslColor;)Lcodes/side/colorpicker/model/OklchColor;
+	public static final fun toOklch (Lcodes/side/colorpicker/model/OklabColor;)Lcodes/side/colorpicker/model/OklchColor;
+	public static final fun toOklch (Lcodes/side/colorpicker/model/RgbColor;)Lcodes/side/colorpicker/model/OklchColor;
+	public static final fun toOklchColor (I)Lcodes/side/colorpicker/model/OklchColor;
+	public static final fun toRgb (Lcodes/side/colorpicker/model/OklabColor;)Lcodes/side/colorpicker/model/RgbColor;
+	public static final fun toRgb (Lcodes/side/colorpicker/model/OklchColor;)Lcodes/side/colorpicker/model/RgbColor;
 }
 
 public final class codes/side/colorpicker/model/CmykColor : codes/side/colorpicker/model/PickerColor {
@@ -135,6 +178,118 @@ public final class codes/side/colorpicker/model/LabColor$Companion {
 	public final fun getWhite ()Lcodes/side/colorpicker/model/LabColor;
 }
 
+public final class codes/side/colorpicker/model/OkhslColor : codes/side/colorpicker/model/PickerColor {
+	public static final field $stable I
+	public static final field Companion Lcodes/side/colorpicker/model/OkhslColor$Companion;
+	public fun <init> ()V
+	public fun <init> (FFFF)V
+	public synthetic fun <init> (FFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy (FFFF)Lcodes/side/colorpicker/model/OkhslColor;
+	public static synthetic fun copy$default (Lcodes/side/colorpicker/model/OkhslColor;FFFFILjava/lang/Object;)Lcodes/side/colorpicker/model/OkhslColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAlpha ()F
+	public final fun getHue ()F
+	public final fun getIntAlpha ()I
+	public final fun getIntHue ()I
+	public final fun getIntLightness ()I
+	public final fun getIntSaturation ()I
+	public final fun getLightness ()F
+	public final fun getSaturation ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/model/OkhslColor$Companion {
+	public final fun fromInt (IIII)Lcodes/side/colorpicker/model/OkhslColor;
+	public static synthetic fun fromInt$default (Lcodes/side/colorpicker/model/OkhslColor$Companion;IIIIILjava/lang/Object;)Lcodes/side/colorpicker/model/OkhslColor;
+	public final fun getBlack ()Lcodes/side/colorpicker/model/OkhslColor;
+	public final fun getWhite ()Lcodes/side/colorpicker/model/OkhslColor;
+}
+
+public final class codes/side/colorpicker/model/OkhsvColor : codes/side/colorpicker/model/PickerColor {
+	public static final field $stable I
+	public static final field Companion Lcodes/side/colorpicker/model/OkhsvColor$Companion;
+	public fun <init> ()V
+	public fun <init> (FFFF)V
+	public synthetic fun <init> (FFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy (FFFF)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static synthetic fun copy$default (Lcodes/side/colorpicker/model/OkhsvColor;FFFFILjava/lang/Object;)Lcodes/side/colorpicker/model/OkhsvColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAlpha ()F
+	public final fun getHue ()F
+	public final fun getIntAlpha ()I
+	public final fun getIntHue ()I
+	public final fun getIntSaturation ()I
+	public final fun getIntValue ()I
+	public final fun getSaturation ()F
+	public final fun getValue ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/model/OkhsvColor$Companion {
+	public final fun fromInt (IIII)Lcodes/side/colorpicker/model/OkhsvColor;
+	public static synthetic fun fromInt$default (Lcodes/side/colorpicker/model/OkhsvColor$Companion;IIIIILjava/lang/Object;)Lcodes/side/colorpicker/model/OkhsvColor;
+	public final fun getBlack ()Lcodes/side/colorpicker/model/OkhsvColor;
+	public final fun getWhite ()Lcodes/side/colorpicker/model/OkhsvColor;
+}
+
+public final class codes/side/colorpicker/model/OklabColor : codes/side/colorpicker/model/PickerColor {
+	public static final field $stable I
+	public static final field Companion Lcodes/side/colorpicker/model/OklabColor$Companion;
+	public fun <init> ()V
+	public fun <init> (FFFF)V
+	public synthetic fun <init> (FFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy (FFFF)Lcodes/side/colorpicker/model/OklabColor;
+	public static synthetic fun copy$default (Lcodes/side/colorpicker/model/OklabColor;FFFFILjava/lang/Object;)Lcodes/side/colorpicker/model/OklabColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getA ()F
+	public fun getAlpha ()F
+	public final fun getB ()F
+	public final fun getIntA ()I
+	public final fun getIntAlpha ()I
+	public final fun getIntB ()I
+	public final fun getIntL ()I
+	public final fun getL ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/model/OklabColor$Companion {
+	public final fun fromInt (IIII)Lcodes/side/colorpicker/model/OklabColor;
+	public static synthetic fun fromInt$default (Lcodes/side/colorpicker/model/OklabColor$Companion;IIIIILjava/lang/Object;)Lcodes/side/colorpicker/model/OklabColor;
+	public final fun getBlack ()Lcodes/side/colorpicker/model/OklabColor;
+	public final fun getWhite ()Lcodes/side/colorpicker/model/OklabColor;
+}
+
+public final class codes/side/colorpicker/model/OklchColor : codes/side/colorpicker/model/PickerColor {
+	public static final field $stable I
+	public static final field Companion Lcodes/side/colorpicker/model/OklchColor$Companion;
+	public fun <init> ()V
+	public fun <init> (FFFF)V
+	public synthetic fun <init> (FFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun copy (FFFF)Lcodes/side/colorpicker/model/OklchColor;
+	public static synthetic fun copy$default (Lcodes/side/colorpicker/model/OklchColor;FFFFILjava/lang/Object;)Lcodes/side/colorpicker/model/OklchColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getAlpha ()F
+	public final fun getChroma ()F
+	public final fun getHue ()F
+	public final fun getIntAlpha ()I
+	public final fun getIntChroma ()I
+	public final fun getIntHue ()I
+	public final fun getIntL ()I
+	public final fun getL ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/model/OklchColor$Companion {
+	public final fun fromInt (IIII)Lcodes/side/colorpicker/model/OklchColor;
+	public static synthetic fun fromInt$default (Lcodes/side/colorpicker/model/OklchColor$Companion;IIIIILjava/lang/Object;)Lcodes/side/colorpicker/model/OklchColor;
+	public final fun getBlack ()Lcodes/side/colorpicker/model/OklchColor;
+	public final fun getWhite ()Lcodes/side/colorpicker/model/OklchColor;
+}
+
 public abstract interface class codes/side/colorpicker/model/PickerColor {
 	public abstract fun getAlpha ()F
 }
@@ -179,6 +334,10 @@ public final class codes/side/colorpicker/state/ColorPickerState {
 	public final fun getCmykColor ()Lcodes/side/colorpicker/model/CmykColor;
 	public final fun getHslColor ()Lcodes/side/colorpicker/model/HslColor;
 	public final fun getLabColor ()Lcodes/side/colorpicker/model/LabColor;
+	public final fun getOkhslColor ()Lcodes/side/colorpicker/model/OkhslColor;
+	public final fun getOkhsvColor ()Lcodes/side/colorpicker/model/OkhsvColor;
+	public final fun getOklabColor ()Lcodes/side/colorpicker/model/OklabColor;
+	public final fun getOklchColor ()Lcodes/side/colorpicker/model/OklchColor;
 	public final fun getPickerColor ()Lcodes/side/colorpicker/model/PickerColor;
 	public final fun getRgbColor ()Lcodes/side/colorpicker/model/RgbColor;
 	public final fun isInteracting ()Z
@@ -189,6 +348,10 @@ public final class codes/side/colorpicker/state/ColorPickerState {
 	public final fun updateFromCmyk (Lcodes/side/colorpicker/model/CmykColor;)V
 	public final fun updateFromHsl (Lcodes/side/colorpicker/model/HslColor;)V
 	public final fun updateFromLab (Lcodes/side/colorpicker/model/LabColor;)V
+	public final fun updateFromOkhsl (Lcodes/side/colorpicker/model/OkhslColor;)V
+	public final fun updateFromOkhsv (Lcodes/side/colorpicker/model/OkhsvColor;)V
+	public final fun updateFromOklab (Lcodes/side/colorpicker/model/OklabColor;)V
+	public final fun updateFromOklch (Lcodes/side/colorpicker/model/OklchColor;)V
 	public final fun updateFromRgb (Lcodes/side/colorpicker/model/RgbColor;)V
 	public final fun updateGreen (F)V
 	public final fun updateHue (F)V
@@ -198,6 +361,18 @@ public final class codes/side/colorpicker/state/ColorPickerState {
 	public final fun updateLabLightness (F)V
 	public final fun updateLightness (F)V
 	public final fun updateMagenta (F)V
+	public final fun updateOkhslHue (F)V
+	public final fun updateOkhslLightness (F)V
+	public final fun updateOkhslSaturation (F)V
+	public final fun updateOkhsvHue (F)V
+	public final fun updateOkhsvSaturation (F)V
+	public final fun updateOkhsvValue (F)V
+	public final fun updateOklabA (F)V
+	public final fun updateOklabB (F)V
+	public final fun updateOklabLightness (F)V
+	public final fun updateOklchChroma (F)V
+	public final fun updateOklchHue (F)V
+	public final fun updateOklchLightness (F)V
 	public final fun updateRed (F)V
 	public final fun updateSaturation (F)V
 	public final fun updateYellow (F)V
@@ -316,6 +491,22 @@ public final class codes/side/colorpicker/ui/ComposableSingletons$LabSlidersKt {
 	public final fun getLambda$1980484084$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
 }
 
+public final class codes/side/colorpicker/ui/ComposableSingletons$OkhslSlidersKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OkhslSlidersKt;
+	public fun <init> ()V
+	public final fun getLambda$1151294969$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$501007118$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$879958294$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$OkhsvSlidersKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OkhsvSlidersKt;
+	public fun <init> ()V
+	public final fun getLambda$-2089135351$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-378521514$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-702366814$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+}
+
 public final class codes/side/colorpicker/ui/ComposableSingletons$RgbSlidersKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$RgbSlidersKt;
 	public fun <init> ()V
@@ -342,6 +533,26 @@ public final class codes/side/colorpicker/ui/LabSlidersKt {
 	public static final fun LabASlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun LabBSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun LightnessLabSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+}
+
+public final class codes/side/colorpicker/ui/OkhslColorPickerKt {
+	public static final fun OkhslColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class codes/side/colorpicker/ui/OkhslSlidersKt {
+	public static final fun OkhslHueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun OkhslLightnessSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun OkhslSaturationSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+}
+
+public final class codes/side/colorpicker/ui/OkhsvColorPickerKt {
+	public static final fun OkhsvColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class codes/side/colorpicker/ui/OkhsvSlidersKt {
+	public static final fun OkhsvHueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun OkhsvSaturationSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun OkhsvValueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/RgbColorPickerKt {

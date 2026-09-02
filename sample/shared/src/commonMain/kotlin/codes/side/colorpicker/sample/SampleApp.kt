@@ -60,6 +60,12 @@ import codes.side.colorpicker.ui.LabBSlider
 import codes.side.colorpicker.ui.LightnessLabSlider
 import codes.side.colorpicker.ui.LightnessSlider
 import codes.side.colorpicker.ui.MagentaSlider
+import codes.side.colorpicker.ui.OkhslHueSlider
+import codes.side.colorpicker.ui.OkhslLightnessSlider
+import codes.side.colorpicker.ui.OkhslSaturationSlider
+import codes.side.colorpicker.ui.OkhsvHueSlider
+import codes.side.colorpicker.ui.OkhsvSaturationSlider
+import codes.side.colorpicker.ui.OkhsvValueSlider
 import codes.side.colorpicker.ui.RedSlider
 import codes.side.colorpicker.ui.SaturationSlider
 import codes.side.colorpicker.ui.YellowSlider
@@ -166,10 +172,22 @@ fun SampleApp() {
                     val ll = lab.intL.pad(3)
                     val la = lab.intA.pad(3)
                     val lb = lab.intB.pad(3)
-                    Readout("HSL  H:$h  S:$s  L:$l  A:$ha")
-                    Readout("RGB  R:$r  G:$g  B:$b  A:$ra")
-                    Readout("CMYK C:$c  M:$m  Y:$y  K:$k")
-                    Readout("LAB  L:$ll  a:$la  b:$lb")
+                    val okhsl = state.okhslColor
+                    val okhsv = state.okhsvColor
+                    val oklch = state.oklchColor
+                    Readout("HSL   H:$h  S:$s  L:$l  A:$ha")
+                    Readout("RGB   R:$r  G:$g  B:$b  A:$ra")
+                    Readout("CMYK  C:$c  M:$m  Y:$y  K:$k")
+                    Readout("LAB   L:$ll  a:$la  b:$lb")
+                    Readout(
+                        "OKHSL H:${okhsl.intHue.pad(3)}  S:${okhsl.intSaturation.pad(3)}  L:${okhsl.intLightness.pad(3)}",
+                    )
+                    Readout(
+                        "OKHSV H:${okhsv.intHue.pad(3)}  S:${okhsv.intSaturation.pad(3)}  V:${okhsv.intValue.pad(3)}",
+                    )
+                    Readout(
+                        "OKLCH L:${oklch.intL.pad(3)}  C:${oklch.intChroma.pad(3)}  H:${oklch.intHue.pad(3)}",
+                    )
                 }
 
                 // HSL section
@@ -202,6 +220,23 @@ fun SampleApp() {
                 item { LightnessLabSlider(state = state, coloringMode = coloringMode) }
                 item { LabASlider(state = state, coloringMode = coloringMode) }
                 item { LabBSlider(state = state, coloringMode = coloringMode) }
+
+                item { HorizontalDivider() }
+
+                // Okhsl section. Drag the lightness slider here and then the HSL one
+                // above at the same hue: only this one holds its apparent brightness.
+                item { SectionHeader("Okhsl") }
+                item { OkhslHueSlider(state = state, coloringMode = coloringMode) }
+                item { OkhslSaturationSlider(state = state, coloringMode = coloringMode) }
+                item { OkhslLightnessSlider(state = state, coloringMode = coloringMode) }
+
+                item { HorizontalDivider() }
+
+                // Okhsv section
+                item { SectionHeader("Okhsv") }
+                item { OkhsvHueSlider(state = state, coloringMode = coloringMode) }
+                item { OkhsvSaturationSlider(state = state, coloringMode = coloringMode) }
+                item { OkhsvValueSlider(state = state, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 

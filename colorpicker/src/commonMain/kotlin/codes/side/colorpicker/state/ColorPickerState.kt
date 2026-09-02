@@ -9,11 +9,20 @@ import codes.side.colorpicker.conversion.toArgbInt
 import codes.side.colorpicker.conversion.toCmyk
 import codes.side.colorpicker.conversion.toHsl
 import codes.side.colorpicker.conversion.toLab
-import codes.side.colorpicker.conversion.toRgb
+import codes.side.colorpicker.conversion.toOkhsl
+import codes.side.colorpicker.conversion.toOkhsv
+import codes.side.colorpicker.conversion.toOklab
+import codes.side.colorpicker.conversion.toOklch
 import codes.side.colorpicker.conversion.toRgbColor
+import codes.side.colorpicker.conversion.withAlpha
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
+import codes.side.colorpicker.model.OKLAB_AB_RANGE
+import codes.side.colorpicker.model.OkhslColor
+import codes.side.colorpicker.model.OkhsvColor
+import codes.side.colorpicker.model.OklabColor
+import codes.side.colorpicker.model.OklchColor
 import codes.side.colorpicker.model.PickerColor
 import codes.side.colorpicker.model.RgbColor
 
@@ -57,41 +66,45 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
         internal set
 
     // ---- Derived spaces (pure computation, no writes on read) ----
+    //
+    // Each space is itself when authoritative and a conversion otherwise. The
+    // conversions route through RGB; see PickerColor.toRgbColor.
 
     private val hslDerived = derivedStateOf {
-        when (val c = authoritative) {
-            is HslColor -> c
-            is RgbColor -> c.toHsl().copy(alpha = c.alpha)
-            is CmykColor -> c.toRgb().toHsl().copy(alpha = c.alpha)
-            is LabColor -> c.toRgb().toHsl().copy(alpha = c.alpha)
-        }
+        val c = authoritative
+        if (c is HslColor) c else c.toRgbColor().toHsl()
     }
 
-    private val rgbDerived = derivedStateOf {
-        when (val c = authoritative) {
-            is HslColor -> c.toRgb()
-            is RgbColor -> c
-            is CmykColor -> c.toRgb()
-            is LabColor -> c.toRgb()
-        }
-    }
+    private val rgbDerived = derivedStateOf { authoritative.toRgbColor() }
 
     private val cmykDerived = derivedStateOf {
-        when (val c = authoritative) {
-            is HslColor -> c.toRgb().toCmyk()
-            is RgbColor -> c.toCmyk()
-            is CmykColor -> c
-            is LabColor -> c.toRgb().toCmyk()
-        }
+        val c = authoritative
+        if (c is CmykColor) c else c.toRgbColor().toCmyk()
     }
 
     private val labDerived = derivedStateOf {
-        when (val c = authoritative) {
-            is HslColor -> c.toRgb().toLab()
-            is RgbColor -> c.toLab()
-            is CmykColor -> c.toRgb().toLab()
-            is LabColor -> c
-        }
+        val c = authoritative
+        if (c is LabColor) c else c.toRgbColor().toLab()
+    }
+
+    private val oklabDerived = derivedStateOf {
+        val c = authoritative
+        if (c is OklabColor) c else c.toRgbColor().toOklab()
+    }
+
+    private val oklchDerived = derivedStateOf {
+        val c = authoritative
+        if (c is OklchColor) c else c.toRgbColor().toOklch()
+    }
+
+    private val okhslDerived = derivedStateOf {
+        val c = authoritative
+        if (c is OkhslColor) c else c.toRgbColor().toOkhsl()
+    }
+
+    private val okhsvDerived = derivedStateOf {
+        val c = authoritative
+        if (c is OkhsvColor) c else c.toRgbColor().toOkhsv()
     }
 
     // ---- Public read access ----
@@ -107,6 +120,18 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
 
     /** The current color as CIELAB; a derived conversion unless LAB is the origin space. */
     public val labColor: LabColor get() = labDerived.value
+
+    /** The current color as Oklab; a derived conversion unless Oklab is the origin space. */
+    public val oklabColor: OklabColor get() = oklabDerived.value
+
+    /** The current color as OkLCh; a derived conversion unless OkLCh is the origin space. */
+    public val oklchColor: OklchColor get() = oklchDerived.value
+
+    /** The current color as Okhsl; a derived conversion unless Okhsl is the origin space. */
+    public val okhslColor: OkhslColor get() = okhslDerived.value
+
+    /** The current color as Okhsv; a derived conversion unless Okhsv is the origin space. */
+    public val okhsvColor: OkhsvColor get() = okhsvDerived.value
 
     /** The current color as a packed ARGB [Int] (`0xAARRGGBB`). */
     public val argbInt: Int get() = rgbColor.toArgbInt()
@@ -224,18 +249,124 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
         authoritative = lab
     }
 
+    // ---- Oklab updates ----
+
+    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOklabLightness(l: Float) {
+        if (l.isNaN()) return
+        authoritative = oklabColor.copy(l = l.coerceIn(0f, 1f))
+    }
+
+    /** Updates the a axis. NaN is ignored; values are clamped to -0.4..0.4. */
+    public fun updateOklabA(a: Float) {
+        if (a.isNaN()) return
+        authoritative = oklabColor.copy(a = a.coerceIn(-OKLAB_AB_RANGE, OKLAB_AB_RANGE))
+    }
+
+    /** Updates the b axis. NaN is ignored; values are clamped to -0.4..0.4. */
+    public fun updateOklabB(b: Float) {
+        if (b.isNaN()) return
+        authoritative = oklabColor.copy(b = b.coerceIn(-OKLAB_AB_RANGE, OKLAB_AB_RANGE))
+    }
+
+    /** Sets [oklab] as the authoritative color; Oklab becomes the origin space. */
+    public fun updateFromOklab(oklab: OklabColor) {
+        authoritative = oklab
+    }
+
+    // ---- OkLCh updates ----
+
+    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOklchLightness(l: Float) {
+        if (l.isNaN()) return
+        authoritative = oklchColor.copy(l = l.coerceIn(0f, 1f))
+    }
+
+    /** Updates the chroma channel. NaN is ignored; values are clamped to 0..0.4. */
+    public fun updateOklchChroma(chroma: Float) {
+        if (chroma.isNaN()) return
+        authoritative = oklchColor.copy(chroma = chroma.coerceIn(0f, OKLAB_AB_RANGE))
+    }
+
+    /**
+     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
+     * stored as the equivalent 0 (see [OklchColor]), so the observable range is 0..360
+     * (exclusive).
+     */
+    public fun updateOklchHue(hue: Float) {
+        if (hue.isNaN()) return
+        authoritative = oklchColor.copy(hue = hue.coerceIn(0f, 360f))
+    }
+
+    /** Sets [oklch] as the authoritative color; OkLCh becomes the origin space. */
+    public fun updateFromOklch(oklch: OklchColor) {
+        authoritative = oklch
+    }
+
+    // ---- Okhsl updates ----
+
+    /**
+     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
+     * stored as the equivalent 0 (see [OkhslColor]), so the observable range is 0..360
+     * (exclusive).
+     */
+    public fun updateOkhslHue(hue: Float) {
+        if (hue.isNaN()) return
+        authoritative = okhslColor.copy(hue = hue.coerceIn(0f, 360f))
+    }
+
+    /** Updates the saturation channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOkhslSaturation(saturation: Float) {
+        if (saturation.isNaN()) return
+        authoritative = okhslColor.copy(saturation = saturation.coerceIn(0f, 1f))
+    }
+
+    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOkhslLightness(lightness: Float) {
+        if (lightness.isNaN()) return
+        authoritative = okhslColor.copy(lightness = lightness.coerceIn(0f, 1f))
+    }
+
+    /** Sets [okhsl] as the authoritative color; Okhsl becomes the origin space. */
+    public fun updateFromOkhsl(okhsl: OkhslColor) {
+        authoritative = okhsl
+    }
+
+    // ---- Okhsv updates ----
+
+    /**
+     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
+     * stored as the equivalent 0 (see [OkhsvColor]), so the observable range is 0..360
+     * (exclusive).
+     */
+    public fun updateOkhsvHue(hue: Float) {
+        if (hue.isNaN()) return
+        authoritative = okhsvColor.copy(hue = hue.coerceIn(0f, 360f))
+    }
+
+    /** Updates the saturation channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOkhsvSaturation(saturation: Float) {
+        if (saturation.isNaN()) return
+        authoritative = okhsvColor.copy(saturation = saturation.coerceIn(0f, 1f))
+    }
+
+    /** Updates the value channel. NaN is ignored; values are clamped to 0..1. */
+    public fun updateOkhsvValue(value: Float) {
+        if (value.isNaN()) return
+        authoritative = okhsvColor.copy(value = value.coerceIn(0f, 1f))
+    }
+
+    /** Sets [okhsv] as the authoritative color; Okhsv becomes the origin space. */
+    public fun updateFromOkhsv(okhsv: OkhsvColor) {
+        authoritative = okhsv
+    }
+
     // ---- Alpha update (origin space unchanged) ----
 
     /** Updates the alpha channel of the authoritative color. NaN is ignored; values are clamped to 0..1. */
     public fun updateAlpha(alpha: Float) {
         if (alpha.isNaN()) return
-        val clamped = alpha.coerceIn(0f, 1f)
-        authoritative = when (val c = authoritative) {
-            is HslColor -> c.copy(alpha = clamped)
-            is RgbColor -> c.copy(alpha = clamped)
-            is CmykColor -> c.copy(alpha = clamped)
-            is LabColor -> c.copy(alpha = clamped)
-        }
+        authoritative = authoritative.withAlpha(alpha.coerceIn(0f, 1f))
     }
 
     // ---- ARGB Int update ----
