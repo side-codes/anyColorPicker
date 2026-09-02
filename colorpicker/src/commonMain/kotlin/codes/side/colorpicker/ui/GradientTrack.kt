@@ -21,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlinx.collections.immutable.ImmutableList
+import kotlin.math.ceil
 
 // M3 token defaults (from SliderTokens). The handle narrows by this much while pressed;
 // the same shrink is applied to a custom thumb so the track keeps its M3 feel.
@@ -146,7 +148,21 @@ internal fun GradientTrack(
 
         clipPath(segmentsPath) {
             if (checkerboardBrush != null) {
-                drawRect(brush = checkerboardBrush)
+                // The shader tiles from the Canvas origin, so a track whose height is not
+                // a whole number of cells shows a full cell along the top edge and a stub
+                // along the bottom — at 16dp over 6dp cells that is 6dp against 4dp, on a
+                // pattern only three rows tall. Shifting the fill up by half the overshoot
+                // splits the remainder evenly, so both edges show the same sliver. The
+                // fill is grown by the same amount at each end so it still covers the
+                // track, and the clip above trims it.
+                val cell = CheckerboardCellSize.toPx()
+                val overshoot = ceil(size.height / cell) * cell - size.height
+                translate(top = -overshoot / 2f) {
+                    drawRect(
+                        brush = checkerboardBrush,
+                        size = Size(size.width, size.height + overshoot),
+                    )
+                }
             }
             drawRect(brush = brush)
         }
