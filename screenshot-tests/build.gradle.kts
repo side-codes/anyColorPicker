@@ -50,6 +50,7 @@ val readmeGoldens = mapOf(
     "LabIndependentPreview" to "lab-independent",
     "LabContextualPreview" to "lab-contextual",
     "CustomThumbPreview" to "custom-thumb",
+    "PlanePreview" to "saturation-lightness-plane",
     "SwatchPreview" to "color-swatch",
 )
 
