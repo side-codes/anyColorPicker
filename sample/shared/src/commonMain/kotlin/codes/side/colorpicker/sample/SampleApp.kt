@@ -1,7 +1,13 @@
 package codes.side.colorpicker.sample
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +38,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.conversion.toComposeColor
@@ -197,6 +208,20 @@ fun SampleApp() {
                 // Alpha section
                 item { SectionHeader("Alpha") }
                 item { AlphaSlider(state = state) }
+
+                item { HorizontalDivider() }
+
+                // Every slider takes a `thumb` slot. The composable is free to read the
+                // picker state, so the thumb here restyles itself as the color changes.
+                item { SectionHeader("Custom thumb") }
+                item {
+                    HueSlider(
+                        state = state,
+                        coloringMode = coloringMode,
+                        thumb = { source -> SquareThumb(state.hslColor.toComposeColor(), source) },
+                        thumbWidth = SquareThumbSize,
+                    )
+                }
             }
         }
 
@@ -212,6 +237,41 @@ fun SampleApp() {
         }
     }
 }
+
+/**
+ * A rounded square filled with the picked color, ringed in a neutral picked from the
+ * color's own luminance and lifted off the track by a shadow, so it stays legible against
+ * a track that is, by definition, the same color.
+ */
+@Composable
+private fun SquareThumb(color: Color, interaction: InteractionSource) {
+    val fill = color.copy(alpha = 1f)
+    val shape = RoundedCornerShape(16.dp)
+    // The ring is the fill lifted most of the way to white, so it tracks the color
+    // continuously instead of flipping between two neutrals at a luminance threshold —
+    // that flip is visible as a snap the moment you drag across it.
+    val ring = lerp(fill, Color.White, 0.6f)
+
+    // The slot is handed the slider's InteractionSource precisely so a thumb can do this.
+    val dragged by interaction.collectIsDraggedAsState()
+    val pressed by interaction.collectIsPressedAsState()
+    val elevation by animateDpAsState(
+        targetValue = if (dragged || pressed) 4.dp else 0.dp,
+        label = "thumbElevation",
+    )
+
+    Box(
+        Modifier
+            .size(SquareThumbSize)
+            .shadow(elevation, shape)
+            .background(ring, shape)
+            .padding(5.dp)
+            .background(fill, RoundedCornerShape(11.dp))
+    )
+}
+
+// Material 3's minimum interactive size (LocalMinimumInteractiveComponentSize).
+private val SquareThumbSize = 48.dp
 
 @Composable
 private fun SectionHeader(title: String) {
