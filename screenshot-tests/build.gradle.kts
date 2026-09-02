@@ -55,7 +55,7 @@ val readmeGoldens = mapOf(
 
 val docsImageDir = rootProject.layout.projectDirectory.dir("docs/images")
 
-val copyGoldensToDocs by tasks.registering(Copy::class) {
+val copyGoldensToDocs = tasks.register<Copy>("copyGoldensToDocs") {
     description = "Copies screenshot-test references into docs/images under README-stable names."
     from(layout.projectDirectory.dir("src/screenshotTestDebug/reference"))
     include("**/*.png")
