@@ -1,6 +1,7 @@
 package codes.side.colorpicker.state
 
 import androidx.compose.runtime.saveable.SaverScope
+import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
 import codes.side.colorpicker.model.OkhslColor
@@ -207,6 +208,7 @@ class OkColorPickerStateTest {
         val cases = listOf(
             0f to HslColor(200f, 0.5f, 0.5f),
             1f to RgbColor(0.1f, 0.2f, 0.3f),
+            2f to CmykColor(0.1f, 0.2f, 0.3f, 0.4f),
             3f to LabColor(50f, 10f, -10f),
         )
         for ((key, color) in cases) {
@@ -214,6 +216,9 @@ class OkColorPickerStateTest {
                 AlwaysSaveable.save(ColorPickerState(color))
             }
             assertEquals(key, saved!![0], "space key for $color")
+            // CMYK spends c4 on alpha where the others leave it unused, so the key alone
+            // is not enough: the channel layout behind it has to be unchanged too.
+            assertEquals(color, ColorPickerStateSaver.restore(saved)?.pickerColor, "restored $color")
         }
     }
 }

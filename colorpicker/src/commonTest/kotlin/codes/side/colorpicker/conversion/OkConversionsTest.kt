@@ -1,5 +1,6 @@
 package codes.side.colorpicker.conversion
 
+import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.model.OkhsvColor
 import codes.side.colorpicker.model.OklchColor
@@ -116,13 +117,13 @@ class OkConversionsTest {
     }
 
     // Okhsl and Okhsv are looser than Oklab on purpose. Below the cusp the reference
-    // implementation approximates the gamut with a straight line to black, and about 4%
+    // implementation approximates the gamut with a straight line to black, and about 1.5%
     // of sRGB — the most saturated blues and violets — lies just outside it, by at most
     // 2.6% of the boundary chroma. Ottosson lets saturation exceed 1 there; a 0..1
     // channel cannot, so those colours come back with slightly less chroma. Measured
-    // worst case over the full cube is 4 steps of 255. Matching the reference matters
-    // more than closing that gap: an Okhsl value has to mean the same here as it does
-    // in colorjs or a browser.
+    // worst case over the cube is 3.8 steps of 255 for Okhsl and 4.3 for Okhsv. Matching
+    // the reference matters more than closing that gap: an Okhsl value has to mean the
+    // same here as it does in colorjs or a browser.
 
     @Test
     fun okhslRoundTrip() {
@@ -194,8 +195,8 @@ class OkConversionsTest {
     @Test
     fun hslLightnessIsNotPerceptual() {
         // The contrast case for the test above, pinning why Okhsl is worth having.
-        val blue = codes.side.colorpicker.model.HslColor(240f, 1f, 0.5f).toRgb().toOklab()
-        val yellow = codes.side.colorpicker.model.HslColor(60f, 1f, 0.5f).toRgb().toOklab()
+        val blue = HslColor(240f, 1f, 0.5f).toRgb().toOklab()
+        val yellow = HslColor(60f, 1f, 0.5f).toRgb().toOklab()
         assertTrue(
             abs(blue.l - yellow.l) > 0.3f,
             "HSL blue and yellow should differ widely in perceived lightness, got ${blue.l} and ${yellow.l}",
