@@ -13,7 +13,7 @@ plugins {
 
 apiValidation {
     // Sample modules are not published; only the library's API surface is tracked.
-    ignoredProjects += listOf("androidApp", "desktopApp", "screenshot-tests", "shared")
+    ignoredProjects += listOf("androidApp", "desktopApp", "screenshot-tests", "shared", "webApp")
 
     @OptIn(ExperimentalBCVApi::class)
     klib {
