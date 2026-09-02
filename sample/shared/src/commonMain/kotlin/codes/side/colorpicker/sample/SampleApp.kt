@@ -61,6 +61,7 @@ import codes.side.colorpicker.ui.LightnessLabSlider
 import codes.side.colorpicker.ui.LightnessSlider
 import codes.side.colorpicker.ui.MagentaSlider
 import codes.side.colorpicker.ui.RedSlider
+import codes.side.colorpicker.ui.SaturationLightnessPlane
 import codes.side.colorpicker.ui.SaturationSlider
 import codes.side.colorpicker.ui.YellowSlider
 import codes.side.colorpicker.util.randomHslColor
@@ -171,6 +172,17 @@ fun SampleApp() {
                     Readout("CMYK C:$c  M:$m  Y:$y  K:$k")
                     Readout("LAB  L:$ll  a:$la  b:$lb")
                 }
+
+                // Saturation / lightness plane, driven by the same state as everything else
+                item { SectionHeader("Saturation / Lightness") }
+                item {
+                    SaturationLightnessPlane(
+                        state = state,
+                        modifier = Modifier.fillMaxWidth().height(220.dp),
+                    )
+                }
+
+                item { HorizontalDivider() }
 
                 // HSL section
                 item { SectionHeader("HSL") }

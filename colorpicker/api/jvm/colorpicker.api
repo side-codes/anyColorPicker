@@ -237,21 +237,25 @@ public final class codes/side/colorpicker/theme/ColorPickerDefaults {
 	public static final field $stable I
 	public static final field INSTANCE Lcodes/side/colorpicker/theme/ColorPickerDefaults;
 	public final fun colors-dgg9oW8 (JJLandroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/theme/ColorPickerColors;
+	public final fun getPlaneMinSize-D9Ej5fM ()F
+	public final fun getPlaneThumbSize-D9Ej5fM ()F
 	public final fun getSwatchSize-D9Ej5fM ()F
 	public final fun getThumbTrackGap-D9Ej5fM ()F
 	public final fun getThumbWidth-D9Ej5fM ()F
 	public final fun getTrackHeight-D9Ej5fM ()F
-	public final fun shapes (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/theme/ColorPickerShapes;
+	public final fun shapes (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/theme/ColorPickerShapes;
 }
 
 public final class codes/side/colorpicker/theme/ColorPickerShapes {
 	public static final field $stable I
-	public fun <init> (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;)V
+	public fun <init> (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;)V
 	public final fun component1 ()Landroidx/compose/ui/graphics/Shape;
 	public final fun component2 ()Landroidx/compose/ui/graphics/Shape;
-	public final fun copy (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;)Lcodes/side/colorpicker/theme/ColorPickerShapes;
-	public static synthetic fun copy$default (Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;ILjava/lang/Object;)Lcodes/side/colorpicker/theme/ColorPickerShapes;
+	public final fun component3 ()Landroidx/compose/ui/graphics/Shape;
+	public final fun copy (Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;)Lcodes/side/colorpicker/theme/ColorPickerShapes;
+	public static synthetic fun copy$default (Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;Landroidx/compose/ui/graphics/Shape;ILjava/lang/Object;)Lcodes/side/colorpicker/theme/ColorPickerShapes;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPlaneShape ()Landroidx/compose/ui/graphics/Shape;
 	public final fun getSwatchShape ()Landroidx/compose/ui/graphics/Shape;
 	public final fun getTrackShape ()Landroidx/compose/ui/graphics/Shape;
 	public fun hashCode ()I
@@ -352,6 +356,10 @@ public final class codes/side/colorpicker/ui/RgbSlidersKt {
 	public static final fun BlueSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun GreenSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 	public static final fun RedSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+}
+
+public final class codes/side/colorpicker/ui/SaturationLightnessPlaneKt {
+	public static final fun SaturationLightnessPlane (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/ui/SliderLabelDefaultsKt {

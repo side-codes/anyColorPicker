@@ -14,7 +14,8 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Unidirectional data flow with `ColorPickerState`
 - Hex string parsing and formatting
 - Color picker dialog
-- Accessibility semantics and RTL layout support
+- Two-dimensional saturation / lightness plane alongside the single-channel sliders
+- Accessibility semantics, and RTL layout support everywhere but the plane, which maps a color space rather than showing progress
 
 ## 📦 Setup
 
@@ -186,6 +187,42 @@ LabColorPicker(state = state, showAlpha = true)
 ```
 
 `ColoringMode` controls the slider gradients: `Independent` shows each channel's full range regardless of the other channels, `Contextual` previews the actual resulting color at each position.
+
+### Saturation / Lightness Plane
+
+`SaturationLightnessPlane` picks both channels at once for the hue currently in `state`,
+leaving hue and alpha untouched, so it composes with a `HueSlider` into a full picker.
+
+![Saturation and lightness plane](images/saturation-lightness-plane.png)
+
+```kotlin
+val state = rememberColorPickerState(HslColor(hue = 68f, saturation = 0.72f, lightness = 0.62f))
+
+SaturationLightnessPlane(state = state, modifier = Modifier.fillMaxWidth().height(220.dp))
+HueSlider(state = state)
+```
+
+Saturation runs left to right and lightness bottom to top: white along the top edge, black
+along the bottom, grey down the left, the pure hue at the right of the middle row. That
+surface is a horizontal grey-to-hue ramp under a white / transparent / black overlay, which
+reproduces HSL exactly rather than approximately — the colour at lightness L is the
+mid-lightness colour blended toward white by `2L-1` above the middle and toward black by
+`1-2L` below it, which is what compositing the overlay computes.
+
+The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
+colour space rather than showing progress, and mirroring it would have saturation growing
+leftwards here while it still grows rightwards on the hue slider beside it. Screen readers
+get a label and both values, but a two-dimensional drag has no linear equivalent, so the
+sliders remain the accessible path to the same channels.
+
+`thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
+
+```kotlin
+SaturationLightnessPlane(
+    state = state,
+    thumb = { source -> MyIndicator(source) },
+)
+```
 
 ### Individual Sliders
 
