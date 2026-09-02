@@ -83,31 +83,46 @@ internal fun toeInv(x: Double): Double = (x * x + TOE_K1 * x) / (TOE_K3 * (x + T
  * channel that goes out first. A polynomial approximation refined by one Halley step,
  * which lands within a rounding error of the true boundary.
  */
-internal fun computeMaxSaturation(aNorm: Double, bNorm: Double): Double {
-    val k0: Double
-    val k1: Double
-    val k2: Double
-    val k3: Double
-    val k4: Double
-    val wl: Double
-    val wm: Double
-    val ws: Double
+/**
+ * Per-channel coefficients for [computeMaxSaturation]: `k0`..`k4` fit the saturation at
+ * which that channel clips, and `wl`/`wm`/`ws` are its row of the Oklab-to-linear matrix.
+ */
+private class MaxSaturationFit(
+    val k0: Double,
+    val k1: Double,
+    val k2: Double,
+    val k3: Double,
+    val k4: Double,
+    val wl: Double,
+    val wm: Double,
+    val ws: Double,
+)
 
-    if (-1.88170328 * aNorm - 0.80936493 * bNorm > 1.0) {
-        // Red channel leaves the gamut first.
-        k0 = 1.19086277; k1 = 1.76576728; k2 = 0.59662641; k3 = 0.75515197; k4 = 0.56771245
-        wl = 4.0767416621; wm = -3.3077115913; ws = 0.2309699292
-    } else if (1.81444104 * aNorm - 1.19445276 * bNorm > 1.0) {
-        // Green channel leaves the gamut first.
-        k0 = 0.73956515; k1 = -0.45954404; k2 = 0.08285427; k3 = 0.12541070; k4 = 0.14503204
-        wl = -1.2684380046; wm = 2.6097574011; ws = -0.3413193965
-    } else {
-        // Blue channel leaves the gamut first.
-        k0 = 1.35733652; k1 = -0.00915799; k2 = -1.15130210; k3 = -0.50559606; k4 = 0.00692167
-        wl = -0.0041960863; wm = -0.7034186147; ws = 1.7076147010
+private val RedClipsFirst = MaxSaturationFit(
+    k0 = 1.19086277, k1 = 1.76576728, k2 = 0.59662641, k3 = 0.75515197, k4 = 0.56771245,
+    wl = 4.0767416621, wm = -3.3077115913, ws = 0.2309699292,
+)
+
+private val GreenClipsFirst = MaxSaturationFit(
+    k0 = 0.73956515, k1 = -0.45954404, k2 = 0.08285427, k3 = 0.12541070, k4 = 0.14503204,
+    wl = -1.2684380046, wm = 2.6097574011, ws = -0.3413193965,
+)
+
+private val BlueClipsFirst = MaxSaturationFit(
+    k0 = 1.35733652, k1 = -0.00915799, k2 = -1.15130210, k3 = -0.50559606, k4 = 0.00692167,
+    wl = -0.0041960863, wm = -0.7034186147, ws = 1.7076147010,
+)
+
+internal fun computeMaxSaturation(aNorm: Double, bNorm: Double): Double {
+    val fit = when {
+        -1.88170328 * aNorm - 0.80936493 * bNorm > 1.0 -> RedClipsFirst
+        1.81444104 * aNorm - 1.19445276 * bNorm > 1.0 -> GreenClipsFirst
+        else -> BlueClipsFirst
     }
 
-    val approx = k0 + k1 * aNorm + k2 * bNorm + k3 * aNorm * aNorm + k4 * aNorm * bNorm
+    val approx = with(fit) {
+        k0 + k1 * aNorm + k2 * bNorm + k3 * aNorm * aNorm + k4 * aNorm * bNorm
+    }
 
     val kL = 0.3963377774 * aNorm + 0.2158037573 * bNorm
     val kM = -0.1055613458 * aNorm - 0.0638541728 * bNorm
@@ -129,9 +144,9 @@ internal fun computeMaxSaturation(aNorm: Double, bNorm: Double): Double {
     val mds2 = 6.0 * kM * kM * mRoot
     val sds2 = 6.0 * kS * kS * sRoot
 
-    val f = wl * l + wm * m + ws * s
-    val f1 = wl * lds + wm * mds + ws * sds
-    val f2 = wl * lds2 + wm * mds2 + ws * sds2
+    val f = fit.wl * l + fit.wm * m + fit.ws * s
+    val f1 = fit.wl * lds + fit.wm * mds + fit.ws * sds
+    val f2 = fit.wl * lds2 + fit.wm * mds2 + fit.ws * sds2
 
     return approx - f * f1 / (f1 * f1 - 0.5 * f * f2)
 }

@@ -59,15 +59,15 @@ internal fun gamutMapToSrgb(origin: OkLab): LinearRgb {
         clipped = currentRgb.clipToUnit()
         val error = deltaEOk(linearSrgbToOklab(clipped), current)
 
-        if (error >= JND) {
-            max = chroma
-        } else if (JND - error < EPSILON) {
-            return clipped
-        } else {
-            // Close enough that clipping is nearly free, but there is still chroma to
-            // recover; keep searching upward with clipping now allowed.
-            minInGamut = false
-            min = chroma
+        when {
+            error >= JND -> max = chroma
+            JND - error < EPSILON -> return clipped
+            else -> {
+                // Close enough that clipping is nearly free, but there is still chroma to
+                // recover; keep searching upward with clipping now allowed.
+                minInGamut = false
+                min = chroma
+            }
         }
     }
 

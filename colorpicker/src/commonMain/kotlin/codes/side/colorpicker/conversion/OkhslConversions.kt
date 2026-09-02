@@ -57,12 +57,11 @@ public fun RgbColor.toOkhsl(): OkhslColor {
 
     val chroma = hypot(lab.a, lab.b)
     val lightness = toe(lab.l).toFloat().coerceIn(0f, 1f)
+    val gray = OkhslColor(hue = 0f, saturation = 0f, lightness = lightness, alpha = alpha)
 
     // At the black and white poles the chroma anchors below collapse to zero and the
     // interpolation divides by them, so grays are answered before that can happen.
-    if (chroma < ACHROMATIC_CHROMA || lab.l <= 0.0 || lab.l >= 1.0) {
-        return OkhslColor(hue = 0f, saturation = 0f, lightness = lightness, alpha = alpha)
-    }
+    if (chroma < ACHROMATIC_CHROMA || lab.l <= 0.0 || lab.l >= 1.0) return gray
 
     val aUnit = lab.a / chroma
     val bUnit = lab.b / chroma
@@ -71,9 +70,7 @@ public fun RgbColor.toOkhsl(): OkhslColor {
     val anchors = getChromaAnchors(lab.l, aUnit, bUnit)
     val saturation = saturationForChroma(chroma, anchors)
 
-    if (!saturation.isFinite()) {
-        return OkhslColor(hue = 0f, saturation = 0f, lightness = lightness, alpha = alpha)
-    }
+    if (!saturation.isFinite()) return gray
 
     return OkhslColor(
         hue = ((degrees % 360.0 + 360.0) % 360.0).toFloat().coerceIn(0f, 360f),

@@ -46,35 +46,32 @@ public fun OkhsvHueSlider(
     thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val okhsv = state.okhsvColor
-    val gradientColors = remember(okhsv.saturation, okhsv.value, coloringMode) {
-        when (coloringMode) {
-            ColoringMode.Independent -> buildOkGradient(OK_HUE_STOPS) { fraction ->
-                OkhsvColor(
-                    hue = hueFromFraction(fraction),
-                    saturation = HUE_TRACK_SATURATION,
-                    value = 1f,
-                ).toComposeColor()
-            }
-
-            ColoringMode.Contextual -> buildOkGradient(OK_HUE_STOPS) { fraction ->
-                OkhsvColor(
-                    hue = hueFromFraction(fraction),
-                    saturation = okhsv.saturation,
-                    value = okhsv.value,
-                ).toComposeColor()
-            }
+    // The two coloring modes differ only in which saturation and value the strip is drawn
+    // at, so they pick the pair rather than each building a gradient of its own.
+    val trackSaturation = when (coloringMode) {
+        ColoringMode.Independent -> HUE_TRACK_SATURATION
+        ColoringMode.Contextual -> okhsv.saturation
+    }
+    val trackValue = when (coloringMode) {
+        ColoringMode.Independent -> 1f
+        ColoringMode.Contextual -> okhsv.value
+    }
+    val gradientColors = remember(trackSaturation, trackValue) {
+        buildOkGradient(OK_HUE_STOPS) { fraction ->
+            OkhsvColor(
+                hue = hueFromFraction(fraction),
+                saturation = trackSaturation,
+                value = trackValue,
+            ).toComposeColor()
         }
     }
-    val thumbColor = remember(okhsv, coloringMode) {
-        when (coloringMode) {
-            ColoringMode.Independent -> OkhsvColor(
-                hue = okhsv.hue,
-                saturation = HUE_TRACK_SATURATION,
-                value = 1f,
-            ).toComposeColor()
-
-            ColoringMode.Contextual -> okhsv.toComposeColor()
-        }
+    // Matches the track so the thumb never disagrees with the strip under it.
+    val thumbColor = remember(okhsv.hue, trackSaturation, trackValue) {
+        OkhsvColor(
+            hue = okhsv.hue,
+            saturation = trackSaturation,
+            value = trackValue,
+        ).toComposeColor()
     }
 
     val interaction = remember(state) { SliderInteractionGuard(state) }
