@@ -36,6 +36,8 @@ import codes.side.colorpicker.ui.ColorSwatch
 import codes.side.colorpicker.ui.HslColorPicker
 import codes.side.colorpicker.ui.HueSlider
 import codes.side.colorpicker.ui.LabColorPicker
+import codes.side.colorpicker.ui.OkhslColorPicker
+import codes.side.colorpicker.ui.OkhsvColorPicker
 import codes.side.colorpicker.ui.RgbColorPicker
 import com.android.tools.screenshot.PreviewTest
 
@@ -127,6 +129,34 @@ fun LabIndependentPreview() = Frame {
 @Composable
 fun LabContextualPreview() = Frame {
     LabColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
+}
+
+@PreviewTest
+@Preview(name = "Okhsl independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhslIndependentPreview() = Frame {
+    OkhslColorPicker(state = state(), coloringMode = ColoringMode.Independent)
+}
+
+@PreviewTest
+@Preview(name = "Okhsl contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhslContextualPreview() = Frame {
+    OkhslColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhsvIndependentPreview() = Frame {
+    OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Independent)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhsvContextualPreview() = Frame {
+    OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
 }
 
 // Kept character-for-character identical to SquareThumb in the sample app, so the image

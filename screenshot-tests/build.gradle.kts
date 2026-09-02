@@ -49,6 +49,10 @@ val readmeGoldens = mapOf(
     "CmykContextualPreview" to "cmyk-contextual",
     "LabIndependentPreview" to "lab-independent",
     "LabContextualPreview" to "lab-contextual",
+    "OkhslIndependentPreview" to "okhsl-independent",
+    "OkhslContextualPreview" to "okhsl-contextual",
+    "OkhsvIndependentPreview" to "okhsv-independent",
+    "OkhsvContextualPreview" to "okhsv-contextual",
     "CustomThumbPreview" to "custom-thumb",
     "SwatchPreview" to "color-swatch",
 )
