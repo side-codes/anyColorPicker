@@ -1,9 +1,11 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -58,6 +60,9 @@ public fun HueSlider(
     semanticValueText: String? = "${state.hslColor.intHue}°",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val hsl = state.hslColor
     val gradientColors = remember(hsl.saturation, hsl.lightness, coloringMode) {
@@ -90,6 +95,9 @@ public fun HueSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -114,6 +122,9 @@ public fun SaturationSlider(
     semanticValueText: String? = "${state.hslColor.intSaturation}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val hsl = state.hslColor
     val gradientColors = remember(hsl.hue, hsl.lightness, coloringMode) {
@@ -152,6 +163,9 @@ public fun SaturationSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -176,6 +190,9 @@ public fun LightnessSlider(
     semanticValueText: String? = "${state.hslColor.intLightness}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val hsl = state.hslColor
     val gradientColors = remember(hsl.hue, hsl.saturation, coloringMode) {
@@ -216,6 +233,9 @@ public fun LightnessSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 

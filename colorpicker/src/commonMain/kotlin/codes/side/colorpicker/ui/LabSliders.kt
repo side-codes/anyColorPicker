@@ -1,8 +1,10 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.LabColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -48,6 +50,9 @@ public fun LightnessLabSlider(
     semanticValueText: String? = "${state.labColor.intL}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.a, lab.b, coloringMode) {
@@ -82,6 +87,9 @@ public fun LightnessLabSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -106,6 +114,9 @@ public fun LabASlider(
     semanticValueText: String? = "${state.labColor.intA}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.l, lab.b, coloringMode) {
@@ -141,6 +152,9 @@ public fun LabASlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -165,6 +179,9 @@ public fun LabBSlider(
     semanticValueText: String? = "${state.labColor.intB}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.l, lab.a, coloringMode) {
@@ -200,5 +217,8 @@ public fun LabBSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }

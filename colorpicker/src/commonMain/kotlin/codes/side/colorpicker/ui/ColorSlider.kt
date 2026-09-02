@@ -1,5 +1,6 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,15 @@ import kotlinx.collections.immutable.ImmutableList
  * announcing the channel's native units instead of a raw fraction.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param shapes track shape; see [ColorPickerDefaults.shapes].
+ * @param thumb optional replacement for the slider thumb. `null` keeps the Material 3
+ * default thumb tinted with [thumbColor]; pass a composable to control its size, shape
+ * and stroke entirely. It receives the slider's [InteractionSource], so a thumb can react
+ * to press and drag; the current value and color need no parameter, since the caller
+ * already passed them as [value] and [thumbColor].
+ * @param thumbWidth how much room the track leaves for the thumb. A custom [thumb] wider
+ * than [ColorPickerDefaults.ThumbWidth] must declare its width here, or the track's gap
+ * closes and the thumb sits flush against the gradient.
+ * @param thumbTrackGap clearance between the thumb and each track end.
  */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +71,16 @@ public fun ColorSlider(
     semanticValueText: String? = null,
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val sliderColors = SliderDefaults.colors(
+        thumbColor = thumbColor.asOpaqueThumb(),
+        activeTrackColor = Color.Transparent,
+        inactiveTrackColor = Color.Transparent,
+    )
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (label != null || valueLabel != null) {
@@ -99,16 +117,24 @@ public fun ColorSlider(
                     checkerboardDark = colors.checkerboardDark,
                     trackShape = shapes.trackShape,
                     showCheckerboard = showCheckerboard,
+                    thumbWidth = thumbWidth,
+                    thumbTrackGap = thumbTrackGap,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(trackHeight),
                 )
             },
-            colors = SliderDefaults.colors(
-                thumbColor = thumbColor.asOpaqueThumb(),
-                activeTrackColor = Color.Transparent,
-                inactiveTrackColor = Color.Transparent,
-            ),
+            // The slot takes the InteractionSource rather than M3's SliderState. Two
+            // reasons: SliderState is experimental, so naming it here would force an
+            // opt-in on everyone calling ColorSlider, and it is not what a thumb is
+            // missing. Value and color are already in scope at the call site, captured
+            // by the lambda; press and drag state is the only thing a caller cannot
+            // reach, because this source is created here.
+            thumb = {
+                if (thumb != null) thumb(interactionSource)
+                else SliderDefaults.Thumb(interactionSource, colors = sliderColors)
+            },
+            colors = sliderColors,
         )
     }
 }

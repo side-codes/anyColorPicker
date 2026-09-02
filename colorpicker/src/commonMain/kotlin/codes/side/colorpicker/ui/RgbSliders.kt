@@ -1,9 +1,11 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.RgbColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -34,6 +36,9 @@ public fun RedSlider(
     semanticValueText: String? = "${state.rgbColor.intRed}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.green, rgb.blue, coloringMode) {
@@ -69,6 +74,9 @@ public fun RedSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -93,6 +101,9 @@ public fun GreenSlider(
     semanticValueText: String? = "${state.rgbColor.intGreen}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.red, rgb.blue, coloringMode) {
@@ -128,6 +139,9 @@ public fun GreenSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -152,6 +166,9 @@ public fun BlueSlider(
     semanticValueText: String? = "${state.rgbColor.intBlue}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.red, rgb.green, coloringMode) {
@@ -187,5 +204,8 @@ public fun BlueSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }

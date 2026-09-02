@@ -23,13 +23,14 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlinx.collections.immutable.ImmutableList
 
-// M3 token defaults (from SliderTokens)
-private val HandleWidth = 4.dp
-private val PressedHandleWidth = 2.dp
-private val ThumbTrackGapSize = 6.dp
+// M3 token defaults (from SliderTokens). The handle narrows by this much while pressed;
+// the same shrink is applied to a custom thumb so the track keeps its M3 feel.
+private val PressedWidthReduction = 2.dp
 private val TrackInsideCornerSize = 2.dp
 
 /**
@@ -53,6 +54,8 @@ internal fun GradientTrack(
     trackShape: Shape,
     modifier: Modifier = Modifier,
     showCheckerboard: Boolean = false,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val interactions = remember { mutableStateListOf<Interaction>() }
     LaunchedEffect(interactionSource) {
@@ -69,7 +72,11 @@ internal fun GradientTrack(
     }
 
     val isActive = interactions.isNotEmpty()
-    val currentThumbWidth = if (isActive) PressedHandleWidth else HandleWidth
+    val currentThumbWidth = if (isActive) {
+        (thumbWidth - PressedWidthReduction).coerceAtLeast(0.dp)
+    } else {
+        thumbWidth
+    }
 
     val layoutDirection = LocalLayoutDirection.current
     val brush = remember(colors, layoutDirection) {
@@ -90,7 +97,7 @@ internal fun GradientTrack(
 
     Canvas(modifier = modifier.clip(trackShape)) {
         val insideCornerSize = TrackInsideCornerSize.toPx()
-        val gap = currentThumbWidth.toPx() / 2f + ThumbTrackGapSize.toPx()
+        val gap = currentThumbWidth.toPx() / 2f + thumbTrackGap.toPx()
         val fractionCenter = thumbFraction.coerceIn(0f, 1f) * size.width
         // M3 Slider mirrors the thumb position in RTL, so the gap must mirror
         // to stay underneath the thumb.

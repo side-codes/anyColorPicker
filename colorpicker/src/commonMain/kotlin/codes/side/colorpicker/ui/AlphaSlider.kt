@@ -1,8 +1,10 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -28,6 +30,9 @@ public fun AlphaSlider(
     semanticValueText: String? = "${state.hslColor.intAlpha}",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val hsl = state.hslColor
     val opaqueColor = remember(hsl.hue, hsl.saturation, hsl.lightness) {
@@ -58,5 +63,8 @@ public fun AlphaSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }

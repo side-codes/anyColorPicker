@@ -23,6 +23,15 @@ public object ColorPickerDefaults {
     /** Size a [codes.side.colorpicker.ui.ColorSwatch] falls back to when given none. */
     public val SwatchSize: Dp = 48.dp
 
+    /**
+     * Width the track reserves for the thumb, matching the Material 3 handle. A custom
+     * thumb wider than this must say so, or the track's gap closes underneath it.
+     */
+    public val ThumbWidth: Dp = 4.dp
+
+    /** Clearance left between the thumb and each end of the track. */
+    public val ThumbTrackGap: Dp = 6.dp
+
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
     /**

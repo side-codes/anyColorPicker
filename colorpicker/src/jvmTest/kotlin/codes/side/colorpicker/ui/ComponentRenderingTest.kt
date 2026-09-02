@@ -1,5 +1,8 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +24,7 @@ import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import kotlin.test.Test
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -89,5 +93,40 @@ class ComponentRenderingTest {
             yellow.red > 0.7f && yellow.green > 0.7f && yellow.blue < 0.3f,
             "expected yellow 1/6 from the right in RTL, got $yellow",
         )
+    }
+
+    @Test
+    fun aCustomThumbReplacesTheDefaultAndReceivesTheInteractionSource() = runComposeUiTest {
+        // Mid grey cannot occur anywhere in a fully saturated hue track, so finding it
+        // proves the caller's thumb was painted rather than the Material 3 default.
+        val marker = Color(0xFF7F7F7F)
+        var received: InteractionSource? = null
+
+        setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                HueSlider(
+                    state = ColorPickerState(HslColor(hue = 180f, saturation = 1f, lightness = 0.5f)),
+                    modifier = Modifier.size(width = 300.dp, height = 60.dp).testTag("hue"),
+                    thumb = { source ->
+                        received = source
+                        Box(Modifier.size(24.dp).background(marker))
+                    },
+                )
+            }
+        }
+
+        assertNotNull(received, "the thumb slot was never given an InteractionSource")
+
+        val pixels = onNodeWithTag("hue").captureToImage().toPixelMap()
+        var sawMarker = false
+        for (x in 0 until pixels.width) {
+            for (y in 0 until pixels.height) {
+                val p = pixels[x, y]
+                if (p.red in 0.45f..0.55f && p.green in 0.45f..0.55f && p.blue in 0.45f..0.55f) {
+                    sawMarker = true
+                }
+            }
+        }
+        assertTrue(sawMarker, "the custom thumb was not painted — the slot is ignored")
     }
 }

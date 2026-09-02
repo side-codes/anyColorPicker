@@ -1,9 +1,11 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -38,6 +40,9 @@ public fun CyanSlider(
     semanticValueText: String? = "${state.cmykColor.intCyan}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val cmyk = state.cmykColor
     val gradientColors = remember(cmyk.magenta, cmyk.yellow, cmyk.key, coloringMode) {
@@ -73,6 +78,9 @@ public fun CyanSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -97,6 +105,9 @@ public fun MagentaSlider(
     semanticValueText: String? = "${state.cmykColor.intMagenta}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val cmyk = state.cmykColor
     val gradientColors = remember(cmyk.cyan, cmyk.yellow, cmyk.key, coloringMode) {
@@ -132,6 +143,9 @@ public fun MagentaSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -156,6 +170,9 @@ public fun YellowSlider(
     semanticValueText: String? = "${state.cmykColor.intYellow}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val cmyk = state.cmykColor
     val gradientColors = remember(cmyk.cyan, cmyk.magenta, cmyk.key, coloringMode) {
@@ -191,6 +208,9 @@ public fun YellowSlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
 
@@ -215,6 +235,9 @@ public fun KeySlider(
     semanticValueText: String? = "${state.cmykColor.intKey}%",
     colors: ColorPickerColors = ColorPickerDefaults.colors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
 ) {
     val cmyk = state.cmykColor
     val gradientColors = remember(cmyk.cyan, cmyk.magenta, cmyk.yellow, coloringMode) {
@@ -250,5 +273,8 @@ public fun KeySlider(
         shapes = shapes,
         modifier = modifier,
         onValueChangeFinished = { interaction.end() },
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
     )
 }
