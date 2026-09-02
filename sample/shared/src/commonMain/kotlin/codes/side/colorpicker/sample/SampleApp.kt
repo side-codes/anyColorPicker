@@ -67,6 +67,7 @@ import codes.side.colorpicker.ui.OkhsvHueSlider
 import codes.side.colorpicker.ui.OkhsvSaturationSlider
 import codes.side.colorpicker.ui.OkhsvValueSlider
 import codes.side.colorpicker.ui.RedSlider
+import codes.side.colorpicker.ui.SaturationLightnessPlane
 import codes.side.colorpicker.ui.SaturationSlider
 import codes.side.colorpicker.ui.YellowSlider
 import codes.side.colorpicker.util.randomHslColor
@@ -189,6 +190,17 @@ fun SampleApp() {
                         "OKLCH L:${oklch.intL.pad(3)}  C:${oklch.intChroma.pad(3)}  H:${oklch.intHue.pad(3)}",
                     )
                 }
+
+                // Saturation / lightness plane, driven by the same state as everything else
+                item { SectionHeader("Saturation / Lightness") }
+                item {
+                    SaturationLightnessPlane(
+                        state = state,
+                        modifier = Modifier.fillMaxWidth().height(220.dp),
+                    )
+                }
+
+                item { HorizontalDivider() }
 
                 // HSL section
                 item { SectionHeader("HSL") }

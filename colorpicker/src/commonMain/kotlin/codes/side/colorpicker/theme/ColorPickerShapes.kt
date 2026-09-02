@@ -14,4 +14,5 @@ import androidx.compose.ui.graphics.Shape
 public data class ColorPickerShapes(
     public val trackShape: Shape,
     public val swatchShape: Shape,
+    public val planeShape: Shape,
 )

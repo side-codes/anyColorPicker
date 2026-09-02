@@ -32,6 +32,12 @@ public object ColorPickerDefaults {
     /** Clearance left between the thumb and each end of the track. */
     public val ThumbTrackGap: Dp = 6.dp
 
+    /** Size a [codes.side.colorpicker.ui.SaturationLightnessPlane] falls back to. */
+    public val PlaneMinSize: Dp = 200.dp
+
+    /** Diameter of the plane's position indicator. */
+    public val PlaneThumbSize: Dp = 24.dp
+
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
     /**
@@ -56,8 +62,10 @@ public object ColorPickerDefaults {
     public fun shapes(
         trackShape: Shape = CircleShape,
         swatchShape: Shape = MaterialTheme.shapes.small,
+        planeShape: Shape = MaterialTheme.shapes.medium,
     ): ColorPickerShapes = ColorPickerShapes(
         trackShape = trackShape,
         swatchShape = swatchShape,
+        planeShape = planeShape,
     )
 }

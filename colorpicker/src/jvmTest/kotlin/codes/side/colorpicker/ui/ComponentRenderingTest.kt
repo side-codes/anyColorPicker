@@ -141,4 +141,48 @@ class ComponentRenderingTest {
         }
         assertTrue(sawMarker, "the custom thumb was not painted — the slot is ignored")
     }
+
+    @Test
+    fun thePlaneRendersHslExactlyAtItsCorners() = runComposeUiTest {
+        // Hue 0 with the thumb parked at the top right, so no sample point sits under it.
+        setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                SaturationLightnessPlane(
+                    state = ColorPickerState(
+                        HslColor(hue = 0f, saturation = 1f, lightness = 1f)
+                    ),
+                    modifier = Modifier.size(200.dp).testTag("plane"),
+                )
+            }
+        }
+
+        val px = onNodeWithTag("plane").captureToImage().toPixelMap()
+        fun at(fx: Float, fy: Float) = px[
+            (fx * (px.width - 1)).toInt(),
+            (fy * (px.height - 1)).toInt(),
+        ]
+
+        // A horizontal grey-to-hue ramp under a white-to-transparent-to-black overlay
+        // reproduces HSL only if every one of these lands.
+        val topRight = at(0.75f, 0.02f)
+        assertTrue(
+            topRight.red > 0.9f && topRight.green > 0.9f && topRight.blue > 0.9f,
+            "top edge should be white, was $topRight",
+        )
+        val bottomRight = at(0.75f, 0.98f)
+        assertTrue(
+            bottomRight.red < 0.1f && bottomRight.green < 0.1f && bottomRight.blue < 0.1f,
+            "bottom edge should be black, was $bottomRight",
+        )
+        val midRight = at(0.98f, 0.5f)
+        assertTrue(
+            midRight.red > 0.9f && midRight.green < 0.1f && midRight.blue < 0.1f,
+            "the pure hue belongs at full saturation, mid lightness, was $midRight",
+        )
+        val midLeft = at(0.02f, 0.5f)
+        assertTrue(
+            midLeft.red in 0.4f..0.6f && midLeft.green in 0.4f..0.6f && midLeft.blue in 0.4f..0.6f,
+            "zero saturation at mid lightness is grey, was $midLeft",
+        )
+    }
 }
