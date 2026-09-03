@@ -63,6 +63,7 @@ import codes.side.colorpicker.ui.LightnessSlider
 import codes.side.colorpicker.ui.MagentaSlider
 import codes.side.colorpicker.ui.OkhslHueSlider
 import codes.side.colorpicker.ui.OkhslLightnessSlider
+import codes.side.colorpicker.ui.OkhslPlane
 import codes.side.colorpicker.ui.OkhslSaturationSlider
 import codes.side.colorpicker.ui.OkhsvHueSlider
 import codes.side.colorpicker.ui.OkhsvSaturationSlider
@@ -195,6 +196,16 @@ fun SampleApp() {
                 item { SectionHeader("Saturation / Lightness") }
                 item {
                     HslPlane(
+                        state = state,
+                        modifier = Modifier.fillMaxWidth().height(220.dp),
+                    )
+                }
+
+                item { HorizontalDivider() }
+
+                item { SectionHeader("Okhsl plane") }
+                item {
+                    OkhslPlane(
                         state = state,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )

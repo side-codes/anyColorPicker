@@ -273,8 +273,12 @@ OkhsvColorPicker(state = state, showAlpha = true)
 
 `HslPlane` picks both channels at once for the hue currently in `state`,
 leaving hue and alpha untouched, so it composes with a `HueSlider` into a full picker.
+`OkhslPlane` is the same idea over Okhsl, composing with an `OkhslHueSlider` instead.
 
-![Saturation and lightness plane](docs/images/saturation-lightness-plane.png)
+| Model                     | Preview                                                                       |
+|---------------------------|-------------------------------------------------------------------------------|
+| **HSL**<br>`HslPlane`     | ![Saturation and lightness plane](docs/images/saturation-lightness-plane.png) |
+| **Okhsl**<br>`OkhslPlane` | ![Okhsl plane](docs/images/okhsl-plane.png)                                   |
 
 ```kotlin
 val state = rememberColorPickerState(HslColor(hue = 68f, saturation = 0.72f, lightness = 0.62f))

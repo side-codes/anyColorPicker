@@ -55,6 +55,7 @@ val readmeGoldens = mapOf(
     "OkhsvContextualPreview" to "okhsv-contextual",
     "CustomThumbPreview" to "custom-thumb",
     "HslPlanePreview" to "saturation-lightness-plane",
+    "OkhslPlanePreview" to "okhsl-plane",
     "SwatchPreview" to "color-swatch",
 )
 

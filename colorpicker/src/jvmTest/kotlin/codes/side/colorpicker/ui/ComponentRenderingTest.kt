@@ -25,8 +25,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.width
 import codes.side.colorpicker.model.HslColor
+import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -297,5 +299,51 @@ class ComponentRenderingTest {
         // 24dp square, so 576px whole. Clipped to the surface it would be the quarter
         // inside the corner, and the shape's rounding takes a bite out of even that.
         assertTrue(marker > 500, "the indicator is clipped away in the corner, $marker px")
+    }
+
+    @Test
+    fun theOkhslPlaneRendersItsCorners() = runComposeUiTest {
+        // Lightness 1 parks the indicator on the top edge, clear of the sample points below.
+        setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                OkhslPlane(
+                    state = ColorPickerState(
+                        OkhslColor(hue = 29.2f, saturation = 1f, lightness = 1f),
+                    ),
+                    modifier = Modifier.size(200.dp).testTag("okhslPlane"),
+                )
+            }
+        }
+
+        val px = onNodeWithTag("okhslPlane").captureToImage().toPixelMap()
+        fun at(fx: Float, fy: Float) = px[
+            (fx * (px.width - 1)).toInt(),
+            (fy * (px.height - 1)).toInt(),
+        ]
+
+        val bottom = at(0.5f, 0.99f)
+        assertTrue(
+            bottom.red < 0.06f && bottom.green < 0.06f && bottom.blue < 0.06f,
+            "lightness 0 is black at every saturation, was $bottom",
+        )
+        // Not literally the corner: the default plane shape clips a true (0.01, 0.01)
+        // sample away. Lightness 1 is white regardless of saturation by construction, so
+        // mid saturation clears the clip and exercises the same code path.
+        val top = at(0.5f, 0.01f)
+        assertTrue(
+            top.red > 0.94f && top.green > 0.94f && top.blue > 0.94f,
+            "lightness 1 is white at every saturation, was $top",
+        )
+        val midLeft = at(0.01f, 0.5f)
+        assertTrue(
+            abs(midLeft.red - midLeft.green) < 0.02f && abs(midLeft.green - midLeft.blue) < 0.02f,
+            "zero saturation is grey at every lightness, was $midLeft",
+        )
+        // Hue 29.2 at full saturation is where sRGB red lives.
+        val midRight = at(0.99f, 0.44f)
+        assertTrue(
+            midRight.red > midRight.green && midRight.green > midRight.blue,
+            "the right edge should be the most colourful the hue reaches, was $midRight",
+        )
     }
 }
