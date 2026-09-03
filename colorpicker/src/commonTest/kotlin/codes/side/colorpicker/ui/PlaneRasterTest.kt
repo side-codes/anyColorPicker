@@ -61,7 +61,14 @@ class PlaneRasterTest {
         Array(columns) { column -> color(planeSample(column, columns), y) }
     }
 
-    /** Worst error at one hue; [color] has that hue already bound. */
+    /**
+     * Worst error at one hue; [color] has that hue already bound.
+     *
+     * 121x121 points, because the error peaks in a narrow needle near the gamut cusp rather
+     * than across a broad region. A coarser grid steps over the needle entirely and reports
+     * a worst error a fraction of the true one, so this density is what makes the budget
+     * assertions mean anything.
+     */
     private fun worstError(
         columns: Int,
         rows: Int,
@@ -69,10 +76,10 @@ class PlaneRasterTest {
     ): Double {
         val g = grid(columns, rows, color)
         var worst = 0.0
-        for (i in 0..60) {
-            for (j in 0..60) {
-                val x = i / 60f
-                val y = j / 60f
+        for (i in 0..120) {
+            for (j in 0..120) {
+                val x = i / 120f
+                val y = j / 120f
                 val truth = color(x, y)
                 val drawn = readGrid(g, columns, rows, x, y)
                 val d = maxOf(
@@ -101,7 +108,7 @@ class PlaneRasterTest {
                     OkhslColor(hue = h, saturation = x, lightness = y).toRgb()
                 },
             )
-            hue += 60f
+            hue += 20f
         }
         assertTrue(worst <= 12.0, "Okhsl plane grid drifted by $worst of 255")
     }
@@ -120,7 +127,7 @@ class PlaneRasterTest {
                     OkhsvColor(hue = h, saturation = x, value = y).toRgb()
                 },
             )
-            hue += 60f
+            hue += 20f
         }
         assertTrue(worst <= 3.0, "Okhsv plane grid drifted by $worst of 255")
     }
