@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.width
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.OkhslColor
+import codes.side.colorpicker.model.OkhsvColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import kotlin.math.abs
@@ -344,6 +345,48 @@ class ComponentRenderingTest {
         assertTrue(
             midRight.red > midRight.green && midRight.green > midRight.blue,
             "the right edge should be the most colourful the hue reaches, was $midRight",
+        )
+    }
+
+    @Test
+    fun theOkhsvPlaneRendersItsCorners() = runComposeUiTest {
+        // Value 1, saturation 0 parks the indicator in the top left, clear of the samples.
+        setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                OkhsvPlane(
+                    state = ColorPickerState(
+                        OkhsvColor(hue = 29.2f, saturation = 0f, value = 1f),
+                    ),
+                    modifier = Modifier.size(200.dp).testTag("okhsvPlane"),
+                )
+            }
+        }
+
+        val px = onNodeWithTag("okhsvPlane").captureToImage().toPixelMap()
+        fun at(fx: Float, fy: Float) = px[
+            (fx * (px.width - 1)).toInt(),
+            (fy * (px.height - 1)).toInt(),
+        ]
+
+        val bottom = at(0.5f, 0.99f)
+        assertTrue(
+            bottom.red < 0.06f && bottom.green < 0.06f && bottom.blue < 0.06f,
+            "value 0 is black at every saturation, was $bottom",
+        )
+        // Not literally the corner: the default plane shape clips a true (0.99, 0.01)
+        // sample away. This point is still high in both saturation and value, clear of
+        // the clip. Unlike Okhsl, the top row runs grey to vivid rather than white to
+        // white, so it should read as a clearly dominant, saturated red rather than a
+        // pale tint.
+        val topRight = at(0.92f, 0.08f)
+        assertTrue(
+            topRight.red > 0.85f && topRight.red - topRight.green > 0.4f && topRight.blue < 0.3f,
+            "high saturation and value is the most vivid form of the hue, was $topRight",
+        )
+        val midLeft = at(0.01f, 0.5f)
+        assertTrue(
+            abs(midLeft.red - midLeft.green) < 0.02f && abs(midLeft.green - midLeft.blue) < 0.02f,
+            "zero saturation is grey at every value, was $midLeft",
         )
     }
 }

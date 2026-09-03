@@ -279,6 +279,7 @@ leaving hue and alpha untouched, so it composes with a `HueSlider` into a full p
 |---------------------------|--------------------------------------------------------------------------|
 | **HSL**<br>`HslPlane`     | ![Saturation and lightness plane](images/saturation-lightness-plane.png) |
 | **Okhsl**<br>`OkhslPlane` | ![Okhsl plane](images/okhsl-plane.png)                                   |
+| **Okhsv**<br>`OkhsvPlane` | ![Okhsv plane](images/okhsv-plane.png)                                   |
 
 ```kotlin
 val state = rememberColorPickerState(HslColor(hue = 68f, saturation = 0.72f, lightness = 0.62f))
@@ -344,6 +345,11 @@ OkhslLightnessSlider(state = state)
 OkhsvHueSlider(state = state)
 OkhsvSaturationSlider(state = state)
 OkhsvValueSlider(state = state)
+
+// Planes — two channels at once, to compose with a hue slider
+HslPlane(state = state)
+OkhslPlane(state = state)
+OkhsvPlane(state = state)
 
 // Alpha (works with any origin space)
 AlphaSlider(state = state)

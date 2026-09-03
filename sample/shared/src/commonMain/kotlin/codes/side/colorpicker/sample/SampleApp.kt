@@ -66,6 +66,7 @@ import codes.side.colorpicker.ui.OkhslLightnessSlider
 import codes.side.colorpicker.ui.OkhslPlane
 import codes.side.colorpicker.ui.OkhslSaturationSlider
 import codes.side.colorpicker.ui.OkhsvHueSlider
+import codes.side.colorpicker.ui.OkhsvPlane
 import codes.side.colorpicker.ui.OkhsvSaturationSlider
 import codes.side.colorpicker.ui.OkhsvValueSlider
 import codes.side.colorpicker.ui.RedSlider
@@ -206,6 +207,16 @@ fun SampleApp() {
                 item { SectionHeader("Okhsl plane") }
                 item {
                     OkhslPlane(
+                        state = state,
+                        modifier = Modifier.fillMaxWidth().height(220.dp),
+                    )
+                }
+
+                item { HorizontalDivider() }
+
+                item { SectionHeader("Okhsv plane") }
+                item {
+                    OkhsvPlane(
                         state = state,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )

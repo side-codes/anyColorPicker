@@ -41,6 +41,8 @@ import codes.side.colorpicker.ui.OkhslColorPicker
 import codes.side.colorpicker.ui.OkhslHueSlider
 import codes.side.colorpicker.ui.OkhslPlane
 import codes.side.colorpicker.ui.OkhsvColorPicker
+import codes.side.colorpicker.ui.OkhsvHueSlider
+import codes.side.colorpicker.ui.OkhsvPlane
 import codes.side.colorpicker.ui.RgbColorPicker
 import com.android.tools.screenshot.PreviewTest
 
@@ -233,6 +235,18 @@ fun OkhslPlanePreview() = Frame {
         modifier = Modifier.fillMaxWidth().height(260.dp),
     )
     OkhslHueSlider(state = state)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv plane", widthDp = 440, heightDp = 420)
+@Composable
+fun OkhsvPlanePreview() = Frame {
+    val state = state()
+    OkhsvPlane(
+        state = state,
+        modifier = Modifier.fillMaxWidth().height(260.dp),
+    )
+    OkhsvHueSlider(state = state)
 }
 
 @PreviewTest
