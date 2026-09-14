@@ -8,7 +8,7 @@ androidx-lifecycle = "2.11.0"
 androidx-compose-ui = "1.12.0"
 kotlinx-coroutines = "1.11.0"
 kotlinx-collections-immutable = "0.5.2"
-binary-compatibility-validator = "0.18.1"
+binary-compatibility-validator = "0.18.2"
 dokka = "2.2.0"
 screenshot = "0.0.1-alpha16"
 
