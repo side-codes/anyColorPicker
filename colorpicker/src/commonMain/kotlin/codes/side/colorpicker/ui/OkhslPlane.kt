@@ -23,10 +23,10 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  *
  * The field is sampled rather than interpolated from a pair of gradients, because Okhsl is
  * linear in neither axis. What survives sampling is a seam along the lightness where the
- * gamut turns its corner, worst about 9 of 255 over well under a tenth of a percent of the
- * surface; see the row count this plane is rasterized at. The hue slider makes the same trade
- * for the same reason: its independent track is drawn at a fixed saturation, off the gamut
- * boundary.
+ * gamut turns its corner, worst about 35 of 255 over roughly an eighth of a percent of the
+ * surface; see the row count this plane is rasterized at. The hue slider makes a related
+ * trade for the same reason: its independent track is drawn at a fixed saturation, off the
+ * gamut boundary.
  *
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.

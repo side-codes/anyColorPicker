@@ -15,22 +15,25 @@ import androidx.compose.ui.unit.IntSize
  * Columns every Ok* plane is rasterized at.
  *
  * The error a scaled bitmap leaves behind is a crease along the cusp lightness, where the
- * sRGB gamut turns a corner. It runs along the x axis, so columns do not move it: 128 of
- * them measure the same 15.57 of 255 as 64 do, at twice the cost.
+ * sRGB gamut turns a corner. It runs along the x axis, so columns do not move it: at the
+ * 256 rows [OkhslPlane] ships at, 64, 128 and 256 columns all measure the same worst error,
+ * 35.10 of 255 — extra columns cost up to four times as much to rasterize for no accuracy
+ * gain.
  */
 internal const val OK_PLANE_COLUMNS = 64
 
 /**
- * Rows an [OkhslPlane] is rasterized at. Rows are what cross the crease, and they buy about
- * 1.5x per doubling rather than the 4x a smooth surface would give: 64 rows measure 23.47
- * of 255, 128 measure 15.57 and 256 measure 9.19.
+ * Rows an [OkhslPlane] is rasterized at. Rows are what cross the crease: 64 of them measure
+ * 78.30 of 255 at worst, 128 measure 39.23 — nearly halving it — and 256 measure 35.10, a
+ * much smaller further gain. Averaged over the full range that is still roughly 1.5x per
+ * doubling, well short of the 4x a smooth surface would give.
  */
 internal const val OKHSL_PLANE_ROWS = 256
 
 /**
  * Rows an [OkhsvPlane] is rasterized at. Okhsv puts its cusp on the corner of the square
  * instead of running it through the middle, so there is no crease to resolve and 64 rows
- * already measure 1.94 of 255.
+ * already measure 2.28 of 255.
  */
 internal const val OKHSV_PLANE_ROWS = 64
 

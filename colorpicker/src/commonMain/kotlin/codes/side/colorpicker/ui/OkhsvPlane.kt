@@ -23,8 +23,8 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  *
  * The field is sampled rather than interpolated from a pair of gradients, because Okhsv is
  * linear in neither axis. Okhsv puts its cusp on the corner of the square instead of running
- * it through the middle, so it needs a quarter of the rows [OkhslPlane] does and lands inside
- * two of 255; see the row count this plane is rasterized at.
+ * it through the middle, so it needs a quarter of the rows [OkhslPlane] does and lands at
+ * about 2.3 of 255; see the row count this plane is rasterized at.
  *
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.

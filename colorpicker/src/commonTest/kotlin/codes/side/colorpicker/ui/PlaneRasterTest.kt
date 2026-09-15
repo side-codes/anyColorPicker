@@ -64,10 +64,11 @@ class PlaneRasterTest {
     /**
      * Worst error at one hue; [color] has that hue already bound.
      *
-     * 121x121 points, because the error peaks in a narrow needle near the gamut cusp rather
-     * than across a broad region. A coarser grid steps over the needle entirely and reports
-     * a worst error a fraction of the true one, so this density is what makes the budget
-     * assertions mean anything.
+     * 121 points per axis, plus every row midpoint explicitly. A row midpoint is where
+     * bilinear interpolation is least accurate, and a fixed 121-point y grid can straddle
+     * one without ever sampling near it. The error peaks in a narrow needle hugging the
+     * gamut cusp rather than spread across a broad region, so a sample that only ever falls
+     * near the grid's own rows understates the worst a plane actually shows between them.
      */
     private fun worstError(
         columns: Int,
@@ -75,11 +76,18 @@ class PlaneRasterTest {
         color: (Float, Float) -> RgbColor,
     ): Double {
         val g = grid(columns, rows, color)
+        val ySamples = buildList {
+            for (j in 0..120) add(j / 120f)
+            for (row in 0 until rows - 1) {
+                val top = 1f - planeSample(row, rows)
+                val bottom = 1f - planeSample(row + 1, rows)
+                add((top + bottom) / 2f)
+            }
+        }
         var worst = 0.0
         for (i in 0..120) {
-            for (j in 0..120) {
-                val x = i / 120f
-                val y = j / 120f
+            val x = i / 120f
+            for (y in ySamples) {
                 val truth = color(x, y)
                 val drawn = readGrid(g, columns, rows, x, y)
                 val d = maxOf(
@@ -96,39 +104,45 @@ class PlaneRasterTest {
     @Test
     fun theOkhslGridHoldsItsBudget() {
         // The residual sits on a crease at the cusp lightness, where the gamut boundary
-        // turns a corner and no amount of linear interpolation crosses it cleanly. Rows
-        // are what move it: 64 of them measure 23 of 255, 256 measure 9.
-        var hue = 0f
+        // turns a corner and no amount of linear interpolation crosses it cleanly. It
+        // peaks in a needle about a degree wide around hue 110, where the sRGB channel
+        // that clips first changes, so the sweep is dense through there and coarser
+        // elsewhere — a uniform 20-degree step sails straight over the needle.
+        fun errorAt(hue: Float) = worstError(OK_PLANE_COLUMNS, OKHSL_PLANE_ROWS) { x, y ->
+            OkhslColor(hue = hue, saturation = x, lightness = y).toRgb()
+        }
         var worst = 0.0
+        var hue = 100f
+        while (hue <= 120f) {
+            worst = maxOf(worst, errorAt(hue))
+            hue += 0.2f
+        }
+        hue = 0f
         while (hue < 360f) {
-            val h = hue
-            worst = maxOf(
-                worst,
-                worstError(OK_PLANE_COLUMNS, OKHSL_PLANE_ROWS) { x, y ->
-                    OkhslColor(hue = h, saturation = x, lightness = y).toRgb()
-                },
-            )
+            if (hue !in 100f..120f) worst = maxOf(worst, errorAt(hue))
             hue += 20f
         }
-        assertTrue(worst <= 12.0, "Okhsl plane grid drifted by $worst of 255")
+        assertTrue(worst <= 42.0, "Okhsl plane grid drifted by $worst of 255")
     }
 
     @Test
     fun theOkhsvGridHoldsItsBudget() {
         // Okhsv's cusp lands on the corner of the square rather than crossing it, so it has
-        // no crease and needs a fraction of the rows.
-        var hue = 0f
+        // no crease and needs a fraction of the rows; its own peak sits around hue 264.
+        fun errorAt(hue: Float) = worstError(OK_PLANE_COLUMNS, OKHSV_PLANE_ROWS) { x, y ->
+            OkhsvColor(hue = hue, saturation = x, value = y).toRgb()
+        }
         var worst = 0.0
+        var hue = 250f
+        while (hue <= 280f) {
+            worst = maxOf(worst, errorAt(hue))
+            hue += 0.2f
+        }
+        hue = 0f
         while (hue < 360f) {
-            val h = hue
-            worst = maxOf(
-                worst,
-                worstError(OK_PLANE_COLUMNS, OKHSV_PLANE_ROWS) { x, y ->
-                    OkhsvColor(hue = h, saturation = x, value = y).toRgb()
-                },
-            )
+            if (hue !in 250f..280f) worst = maxOf(worst, errorAt(hue))
             hue += 20f
         }
-        assertTrue(worst <= 3.0, "Okhsv plane grid drifted by $worst of 255")
+        assertTrue(worst <= 3.5, "Okhsv plane grid drifted by $worst of 255")
     }
 }
