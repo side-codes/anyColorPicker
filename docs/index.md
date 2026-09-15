@@ -16,8 +16,8 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Unidirectional data flow with `ColorPickerState`
 - Hex string parsing and formatting
 - Color picker dialog
-- Two-dimensional saturation / lightness plane alongside the single-channel sliders
-- Accessibility semantics, and RTL layout support everywhere but the plane, which maps a color space rather than showing progress
+- Two-dimensional color planes — saturation paired with lightness or value — alongside the single-channel sliders
+- Accessibility semantics, and RTL layout support everywhere but the planes, which map a color space rather than showing progress
 
 ## 📦 Setup
 
@@ -281,11 +281,12 @@ OkhsvColorPicker(state = state, showAlpha = true)
 
 `ColoringMode` controls the slider gradients: `Independent` shows each channel's full range regardless of the other channels, `Contextual` previews the actual resulting color at each position.
 
-### Saturation / Lightness Plane
+### Color Planes
 
 `HslPlane` picks both channels at once for the hue currently in `state`,
 leaving hue and alpha untouched, so it composes with a `HueSlider` into a full picker.
-`OkhslPlane` is the same idea over Okhsl, composing with an `OkhslHueSlider` instead.
+`OkhslPlane` and `OkhsvPlane` are the same idea over Okhsl and Okhsv, composing with an
+`OkhslHueSlider` or `OkhsvHueSlider` instead.
 
 | Model                     | Preview                                                                  |
 |---------------------------|--------------------------------------------------------------------------|
@@ -300,12 +301,19 @@ HslPlane(state = state, modifier = Modifier.fillMaxWidth().height(220.dp))
 HueSlider(state = state)
 ```
 
-Saturation runs left to right and lightness bottom to top: white along the top edge, black
-along the bottom, grey down the left, the pure hue at the right of the middle row. That
-surface is a horizontal grey-to-hue ramp under a white / transparent / black overlay, which
-reproduces HSL exactly rather than approximately — the colour at lightness L is the
-mid-lightness colour blended toward white by `2L-1` above the middle and toward black by
-`1-2L` below it, which is what compositing the overlay computes.
+Saturation always runs left to right, so the left edge is grey and the right edge the most
+colorful the hue can be. The vertical axis runs from black at the bottom in every plane, but
+reads differently at the top: lightness for `HslPlane` and `OkhslPlane`, so the top edge is
+white, and value for `OkhsvPlane`, so the top edge is each column's own hue at full
+brightness — the arrangement artists expect from a color picker, and the one Okhsv was
+designed for.
+
+`HslPlane`'s surface is a horizontal grey-to-hue ramp under a white / transparent / black
+overlay, which reproduces HSL exactly rather than approximately — the colour at lightness L
+is the mid-lightness colour blended toward white by `2L-1` above the middle and toward black
+by `1-2L` below it, which is what compositing the overlay computes. Okhsl and Okhsv have no
+such identity, so `OkhslPlane` and `OkhsvPlane` sample their surface on a grid fine enough
+that the difference is invisible instead.
 
 The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
 colour space rather than showing progress, and mirroring it would have saturation growing

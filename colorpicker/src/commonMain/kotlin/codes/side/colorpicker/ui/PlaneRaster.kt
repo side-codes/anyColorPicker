@@ -51,9 +51,10 @@ internal fun planeSample(index: Int, count: Int): Float =
 /**
  * Rasterizes a plane's field. Row `0` is the top of the surface, where the y axis reads `1`.
  *
- * Only the cheap tail of an Ok* conversion runs per pixel: the cusp depends on hue alone and
- * the chroma anchors on lightness, so both are hoisted out by the caller's [color] closure
- * being called row by row.
+ * [color] is called once per pixel, over the full `width * height` grid, and runs whatever
+ * conversion the caller gives it from scratch every time — for the Ok* planes, that is the
+ * complete Okhsl or Okhsv conversion, cusp finding and its Halley refinement included, even
+ * though hue is fixed for the whole bitmap and lightness or value repeats down every row.
  */
 internal fun buildPlaneBitmap(
     width: Int,

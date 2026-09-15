@@ -32,10 +32,10 @@ public object ColorPickerDefaults {
     /** Clearance left between the thumb and each end of the track. */
     public val ThumbTrackGap: Dp = 6.dp
 
-    /** Size a [codes.side.colorpicker.ui.HslPlane] falls back to. */
+    /** Size a [codes.side.colorpicker.ui.ColorPlane] falls back to. */
     public val PlaneMinSize: Dp = 200.dp
 
-    /** Diameter of the plane's position indicator. */
+    /** Diameter of a [codes.side.colorpicker.ui.ColorPlane]'s position indicator. */
     public val PlaneThumbSize: Dp = 24.dp
 
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
