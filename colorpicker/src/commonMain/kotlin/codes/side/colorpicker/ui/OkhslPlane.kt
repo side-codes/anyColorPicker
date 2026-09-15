@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import codes.side.colorpicker.conversion.okhslAtHue
+import codes.side.colorpicker.conversion.okhslRowFiller
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -46,12 +46,12 @@ public fun OkhslPlane(
 ) {
     val okhsl = state.okhslColor
     val interaction = remember(state) { SliderInteractionGuard(state) }
-    val field = remember(okhsl.hue) { okhslPlaneField(okhsl.hue) }
+    val field = remember(okhsl.hue) { okhslRowFiller(okhsl.hue) }
     val bitmap = rememberPlaneBitmap(
         key = okhsl.hue,
         width = OK_PLANE_COLUMNS,
         height = OKHSL_PLANE_ROWS,
-        rowAt = field,
+        fillRow = field,
     )
 
     ColorPlane(
@@ -69,18 +69,4 @@ public fun OkhslPlane(
         shapes = shapes,
         thumb = thumb,
     )
-}
-
-/**
- * The plane's surface at one hue, split the way [buildPlaneBitmap] walks it: this function
- * runs once per bitmap, the function it returns once per row, and that one's result once per
- * pixel. Whatever an Okhsl conversion works out from the hue alone therefore costs one call
- * rather than one per pixel.
- */
-internal fun okhslPlaneField(hue: Float): (y: Float) -> (x: Float) -> Color {
-    val atLightness = okhslAtHue(hue)
-    return { y ->
-        val atSaturation = atLightness(y)
-        ({ x -> atSaturation(x).toComposeColor() })
-    }
 }

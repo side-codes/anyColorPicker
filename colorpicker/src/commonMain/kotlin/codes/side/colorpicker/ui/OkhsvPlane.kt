@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import codes.side.colorpicker.conversion.okhsvAtHue
+import codes.side.colorpicker.conversion.okhsvRowFiller
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -44,12 +44,12 @@ public fun OkhsvPlane(
 ) {
     val okhsv = state.okhsvColor
     val interaction = remember(state) { SliderInteractionGuard(state) }
-    val field = remember(okhsv.hue) { okhsvPlaneField(okhsv.hue) }
+    val field = remember(okhsv.hue) { okhsvRowFiller(okhsv.hue) }
     val bitmap = rememberPlaneBitmap(
         key = okhsv.hue,
         width = OK_PLANE_COLUMNS,
         height = OKHSV_PLANE_ROWS,
-        rowAt = field,
+        fillRow = field,
     )
 
     ColorPlane(
@@ -67,13 +67,4 @@ public fun OkhsvPlane(
         shapes = shapes,
         thumb = thumb,
     )
-}
-
-/** The plane's surface at one hue; see [okhslPlaneField] for how the levels are walked. */
-internal fun okhsvPlaneField(hue: Float): (y: Float) -> (x: Float) -> Color {
-    val atValue = okhsvAtHue(hue)
-    return { y ->
-        val atSaturation = atValue(y)
-        ({ x -> atSaturation(x).toComposeColor() })
-    }
 }

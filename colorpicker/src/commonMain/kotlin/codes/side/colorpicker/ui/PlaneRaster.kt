@@ -49,34 +49,26 @@ internal fun planeSample(index: Int, count: Int): Float =
 /**
  * Rasterizes a plane's field. Row `0` is the top of the surface, where the y axis reads `1`.
  *
- * [rowAt] is called once per row and returns the function for the pixels along it, which is
- * what lets a caller lift the part of its conversion that only depends on y out of the inner
- * loop. An Ok* cusp costs a polynomial fit and a Halley step, so a field that recomputes one
- * per pixel spends most of its time on an answer that does not vary.
+ * [fillRow] writes a whole row at a time rather than returning a colour per pixel. Handing
+ * back one value per pixel means an object and a call for each, and on Android that pair
+ * cost 9.6 ms of a 17.8 ms plane — more than the arithmetic they carried. A row also holds
+ * the hue and the lightness still, so whatever an Ok* conversion settles from those, cusp
+ * and chroma anchors included, is settled once for the row instead of 64 times.
+ *
+ * The x samples are the same for every row, so they are worked out once and passed in.
  */
 internal fun buildPlaneBitmap(
     width: Int,
     height: Int,
-    rowAt: (y: Float) -> (x: Float) -> Color,
+    fillRow: (y: Float, xs: FloatArray, pixels: IntArray, offset: Int) -> Unit,
 ): ImageBitmap {
+    val xs = FloatArray(width) { planeSample(it, width) }
     val pixels = IntArray(width * height)
     for (row in 0 until height) {
-        val colorAt = rowAt(1f - planeSample(row, height))
-        val offset = row * width
-        for (column in 0 until width) {
-            val color = colorAt(planeSample(column, width))
-            pixels[offset + column] =
-                (0xFF shl 24) or
-                    (channel(color.red) shl 16) or
-                    (channel(color.green) shl 8) or
-                    channel(color.blue)
-        }
+        fillRow(1f - planeSample(row, height), xs, pixels, row * width)
     }
     return imageBitmapFromPixels(pixels, width, height)
 }
-
-/** A `0..1` channel as the `0..255` byte a packed pixel holds, rounded rather than truncated. */
-private fun channel(value: Float): Int = (value * 255f + 0.5f).toInt().coerceIn(0, 255)
 
 /**
  * Draws [bitmap] stretched over the whole drawing area.
@@ -106,5 +98,5 @@ internal fun rememberPlaneBitmap(
     key: Any?,
     width: Int,
     height: Int,
-    rowAt: (y: Float) -> (x: Float) -> Color,
-): ImageBitmap = remember(key, width, height) { buildPlaneBitmap(width, height, rowAt) }
+    fillRow: (y: Float, xs: FloatArray, pixels: IntArray, offset: Int) -> Unit,
+): ImageBitmap = remember(key, width, height) { buildPlaneBitmap(width, height, fillRow) }

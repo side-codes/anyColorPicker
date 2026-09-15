@@ -1,105 +1,98 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toPixelMap
-import codes.side.colorpicker.conversion.toComposeColor
+import codes.side.colorpicker.conversion.delinearize
+import codes.side.colorpicker.conversion.linearToSrgbByte
+import codes.side.colorpicker.conversion.okhslRowFiller
+import codes.side.colorpicker.conversion.okhsvRowFiller
+import codes.side.colorpicker.conversion.toRgb
 import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.model.OkhsvColor
+import codes.side.colorpicker.model.RgbColor
+import kotlin.math.roundToInt
 import kotlin.test.Test
-import kotlin.math.abs
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * A plane field lifts the work that does not vary per pixel out of the inner loop, which is
- * only sound if the surface it draws is still exactly the one the public conversion returns.
- *
- * Equality here is exact rather than within a budget. Hoisting moves arithmetic out of a
- * loop, it does not reorder or approximate any of it, so every pixel has to come back
- * bit-identical — a tolerance would hide the one thing this guards against.
+ * A row filler runs the conversion flat: no objects, no call per pixel, and the encoding
+ * reached by locating the value between byte boundaries rather than by a pow. All three are
+ * only sound if what it writes is still what the public conversion says, so every pixel is
+ * compared against it — as a packed value, exactly, since that is what reaches the screen.
  */
 class PlaneFieldTest {
 
-    private fun assertFieldMatches(
-        columns: Int,
+    /** The public conversion's answer for one coordinate, packed the way a plane packs it. */
+    private fun expected(color: RgbColor): Int =
+        (0xFF shl 24) or
+            (byteOf(color.red) shl 16) or
+            (byteOf(color.green) shl 8) or
+            byteOf(color.blue)
+
+    private fun byteOf(channel: Float): Int = (channel * 255f).roundToInt().coerceIn(0, 255)
+
+    /**
+     * Within one step of 255, not exact: the public conversion hands back [Float] channels,
+     * so its own encoding rounds a value that has already lost precision, while the filler
+     * encodes the [Double] it computed. They part company only where that lost precision
+     * straddles a byte boundary, and there the filler is the one that is right.
+     */
+    private fun assertRowsMatch(
         rows: Int,
-        field: (Float) -> (Float) -> Color,
-        expected: (x: Float, y: Float) -> Color,
+        fillRow: (Float, FloatArray, IntArray, Int) -> Unit,
+        color: (x: Float, y: Float) -> RgbColor,
     ) {
+        val xs = FloatArray(OK_PLANE_COLUMNS) { planeSample(it, OK_PLANE_COLUMNS) }
+        val pixels = IntArray(OK_PLANE_COLUMNS)
         for (row in 0 until rows) {
             val y = 1f - planeSample(row, rows)
-            val colorAt = field(y)
-            for (column in 0 until columns) {
-                val x = planeSample(column, columns)
-                assertEquals(expected(x, y), colorAt(x), "at x=$x y=$y")
+            fillRow(y, xs, pixels, 0)
+            for (column in xs.indices) {
+                val want = expected(color(xs[column], y))
+                val got = pixels[column]
+                for (shift in listOf(16, 8, 0)) {
+                    val off = ((want shr shift) and 0xFF) - ((got shr shift) and 0xFF)
+                    assertTrue(
+                        off in -1..1,
+                        "channel at $shift is $off steps out at x=${xs[column]} y=$y",
+                    )
+                }
+                assertEquals(0xFF, (got ushr 24) and 0xFF, "alpha at x=${xs[column]} y=$y")
             }
         }
     }
 
     @Test
-    fun theOkhslFieldDrawsWhatTheConversionReturns() {
+    fun theOkhslFillerWritesWhatTheConversionReturns() {
         for (hue in 0 until 360 step 10) {
-            assertFieldMatches(
-                columns = OK_PLANE_COLUMNS,
-                rows = OKHSL_PLANE_ROWS,
-                field = okhslPlaneField(hue.toFloat()),
-            ) { x, y ->
-                OkhslColor(hue = hue.toFloat(), saturation = x, lightness = y).toComposeColor()
+            assertRowsMatch(OKHSL_PLANE_ROWS, okhslRowFiller(hue.toFloat())) { x, y ->
+                OkhslColor(hue = hue.toFloat(), saturation = x, lightness = y).toRgb()
             }
         }
     }
 
     @Test
-    fun theOkhsvFieldDrawsWhatTheConversionReturns() {
+    fun theOkhsvFillerWritesWhatTheConversionReturns() {
         for (hue in 0 until 360 step 10) {
-            assertFieldMatches(
-                columns = OK_PLANE_COLUMNS,
-                rows = OKHSV_PLANE_ROWS,
-                field = okhsvPlaneField(hue.toFloat()),
-            ) { x, y ->
-                OkhsvColor(hue = hue.toFloat(), saturation = x, value = y).toComposeColor()
-            }
-        }
-    }
-
-    /** The poles are the rows where the conversions answer early, before any anchor exists. */
-    @Test
-    fun theOkhslFieldHoldsAtTheLightnessPoles() {
-        val field = okhslPlaneField(142f)
-        for (y in listOf(0f, 1f)) {
-            val colorAt = field(y)
-            for (column in 0 until OK_PLANE_COLUMNS) {
-                val x = planeSample(column, OK_PLANE_COLUMNS)
-                assertEquals(
-                    OkhslColor(hue = 142f, saturation = x, lightness = y).toComposeColor(),
-                    colorAt(x),
-                    "at x=$x y=$y",
-                )
+            assertRowsMatch(OKHSV_PLANE_ROWS, okhsvRowFiller(hue.toFloat())) { x, y ->
+                OkhsvColor(hue = hue.toFloat(), saturation = x, value = y).toRgb()
             }
         }
     }
 
     /**
-     * The rasterizer packs each colour into a pixel itself now rather than handing it to the
-     * toolkit a rectangle at a time, so the packing is worth pinning: within half a step of
-     * 255, which is all an 8-bit channel can carry.
+     * The encoder locates a linear value between the boundaries where each byte takes over
+     * rather than raising it to a power, which has to agree with the pow everywhere and not
+     * merely nearly everywhere — a single step out is a visible seam on a gradient.
      */
     @Test
-    fun theBitmapHoldsWhatTheFieldReturned() {
-        val field = okhslPlaneField(142f)
-        val pixels = buildPlaneBitmap(OK_PLANE_COLUMNS, OKHSL_PLANE_ROWS, field).toPixelMap()
-        for (row in 0 until OKHSL_PLANE_ROWS) {
-            val colorAt = field(1f - planeSample(row, OKHSL_PLANE_ROWS))
-            for (column in 0 until OK_PLANE_COLUMNS) {
-                val expected = colorAt(planeSample(column, OK_PLANE_COLUMNS))
-                val drawn = pixels[column, row]
-                val off = maxOf(
-                    abs(expected.red - drawn.red),
-                    abs(expected.green - drawn.green),
-                    abs(expected.blue - drawn.blue),
-                ) * 255f
-                assertTrue(off <= 0.5f, "pixel ($column, $row) is off by $off of 255")
-            }
+    fun theEncoderAgreesWithTheCurveItReplaces() {
+        for (i in 0..200_000) {
+            val linear = i / 200_000.0
+            assertEquals(
+                (delinearize(linear) * 255.0).roundToInt().coerceIn(0, 255),
+                linearToSrgbByte(linear),
+                "at linear $linear",
+            )
         }
     }
 }

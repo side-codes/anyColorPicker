@@ -80,7 +80,7 @@ public fun RgbColor.toOkhsl(): OkhslColor {
     )
 }
 
-private fun chromaForSaturation(saturation: Double, anchors: ChromaAnchors): Double {
+internal fun chromaForSaturation(saturation: Double, anchors: ChromaAnchors): Double {
     if (saturation < SATURATION_SPLIT) {
         val t = SATURATION_SPLIT_INV * saturation
         val k1 = SATURATION_SPLIT * anchors.c0
@@ -125,36 +125,36 @@ public fun OkhslColor.toArgbInt(): Int = toRgb().toArgbInt()
 public fun Int.toOkhslColor(): OkhslColor = toRgbColor().toOkhsl()
 
 /**
- * [OkhslColor.toRgb] with its per-hue and per-lightness work lifted out of the inner loop:
- * this returns a function of lightness, which returns a function of saturation.
+ * Fills one row of a plane's pixels at a fixed hue: [saturations] across, one packed
+ * `0xFFRRGGBB` per entry, written into [pixels] from [offset].
  *
- * The arithmetic is the one above, in the same order, so a colour taken this way is
- * bit-identical to converting the coordinate on its own — what changes is that the cusp and
- * the chroma anchors are found once per hue and once per lightness instead of once per
- * colour. Alpha is always opaque; a caller wanting one holds it itself.
+ * The arithmetic is [OkhslColor.toRgb]'s, in its order, so a pixel matches converting that
+ * coordinate on its own — [codes.side.colorpicker.ui.PlaneFieldTest] holds it to that. What
+ * differs is that nothing here allocates and nothing is reached through a per-pixel lambda,
+ * which together were 9.6 ms of a 17.8 ms plane on Android, and that the encoding skips the
+ * pow that cost another 5.1 ms.
  */
-internal fun okhslAtHue(hue: Float): (lightness: Float) -> (saturation: Float) -> RgbColor {
+internal fun okhslRowFiller(hue: Float): (lightness: Float, saturations: FloatArray, pixels: IntArray, offset: Int) -> Unit {
     val radians = hue.toDouble() / DEGREES_PER_RADIAN
     val aUnit = cos(radians)
     val bUnit = sin(radians)
     val okHue = OkHue(aUnit, bUnit)
 
-    return { lightness ->
-        when {
-            lightness >= 1f -> { _ -> RgbColor(1f, 1f, 1f) }
-            lightness <= 0f -> { _ -> RgbColor(0f, 0f, 0f) }
-            else -> {
-                val okLightness = toeInv(lightness.toDouble())
-                val anchors = okHue.chromaAnchorsAt(okLightness)
-                ({ saturation ->
-                    val chroma = chromaForSaturation(saturation.toDouble(), anchors)
-                    val linear = oklabToLinearSrgb(OkLab(okLightness, chroma * aUnit, chroma * bUnit))
-                    RgbColor(
-                        red = delinearize(linear.r).toFloat().coerceIn(0f, 1f),
-                        green = delinearize(linear.g).toFloat().coerceIn(0f, 1f),
-                        blue = delinearize(linear.b).toFloat().coerceIn(0f, 1f),
-                    )
-                })
+    return { lightness, saturations, pixels, offset ->
+        if (lightness >= 1f) {
+            for (i in saturations.indices) pixels[offset + i] = OPAQUE_WHITE
+        } else if (lightness <= 0f) {
+            for (i in saturations.indices) pixels[offset + i] = OPAQUE_BLACK
+        } else {
+            val okLightness = toeInv(lightness.toDouble())
+            val anchors = okHue.chromaAnchorsAt(okLightness)
+            for (i in saturations.indices) {
+                val chroma = chromaForSaturation(saturations[i].toDouble(), anchors)
+                pixels[offset + i] = oklabToLinearSrgb(
+                    okLightness,
+                    chroma * aUnit,
+                    chroma * bUnit,
+                ) { r, g, b -> packOpaque(r, g, b) }
             }
         }
     }
