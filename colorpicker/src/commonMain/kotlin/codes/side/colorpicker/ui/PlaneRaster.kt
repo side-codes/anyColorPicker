@@ -2,11 +2,9 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -61,18 +59,24 @@ internal fun buildPlaneBitmap(
     height: Int,
     rowAt: (y: Float) -> (x: Float) -> Color,
 ): ImageBitmap {
-    val bitmap = ImageBitmap(width, height)
-    val canvas = Canvas(bitmap)
-    val paint = Paint()
+    val pixels = IntArray(width * height)
     for (row in 0 until height) {
         val colorAt = rowAt(1f - planeSample(row, height))
+        val offset = row * width
         for (column in 0 until width) {
-            paint.color = colorAt(planeSample(column, width))
-            canvas.drawRect(column.toFloat(), row.toFloat(), column + 1f, row + 1f, paint)
+            val color = colorAt(planeSample(column, width))
+            pixels[offset + column] =
+                (0xFF shl 24) or
+                    (channel(color.red) shl 16) or
+                    (channel(color.green) shl 8) or
+                    channel(color.blue)
         }
     }
-    return bitmap
+    return imageBitmapFromPixels(pixels, width, height)
 }
+
+/** A `0..1` channel as the `0..255` byte a packed pixel holds, rounded rather than truncated. */
+private fun channel(value: Float): Int = (value * 255f + 0.5f).toInt().coerceIn(0, 255)
 
 /**
  * Draws [bitmap] stretched over the whole drawing area.

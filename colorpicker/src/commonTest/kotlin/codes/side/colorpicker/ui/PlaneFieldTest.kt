@@ -1,11 +1,14 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toPixelMap
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.model.OkhsvColor
 import kotlin.test.Test
+import kotlin.math.abs
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * A plane field lifts the work that does not vary per pixel out of the inner loop, which is
@@ -72,6 +75,30 @@ class PlaneFieldTest {
                     colorAt(x),
                     "at x=$x y=$y",
                 )
+            }
+        }
+    }
+
+    /**
+     * The rasterizer packs each colour into a pixel itself now rather than handing it to the
+     * toolkit a rectangle at a time, so the packing is worth pinning: within half a step of
+     * 255, which is all an 8-bit channel can carry.
+     */
+    @Test
+    fun theBitmapHoldsWhatTheFieldReturned() {
+        val field = okhslPlaneField(142f)
+        val pixels = buildPlaneBitmap(OK_PLANE_COLUMNS, OKHSL_PLANE_ROWS, field).toPixelMap()
+        for (row in 0 until OKHSL_PLANE_ROWS) {
+            val colorAt = field(1f - planeSample(row, OKHSL_PLANE_ROWS))
+            for (column in 0 until OK_PLANE_COLUMNS) {
+                val expected = colorAt(planeSample(column, OK_PLANE_COLUMNS))
+                val drawn = pixels[column, row]
+                val off = maxOf(
+                    abs(expected.red - drawn.red),
+                    abs(expected.green - drawn.green),
+                    abs(expected.blue - drawn.blue),
+                ) * 255f
+                assertTrue(off <= 0.5f, "pixel ($column, $row) is off by $off of 255")
             }
         }
     }
