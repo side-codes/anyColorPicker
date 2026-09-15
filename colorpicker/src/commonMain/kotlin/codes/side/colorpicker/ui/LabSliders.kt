@@ -4,6 +4,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.LabColor
@@ -12,22 +13,47 @@ import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
+/**
+ * Stops for the L*, a* and b* tracks.
+ *
+ * HSL's hue track has breakpoints to land on and the Ok* tracks stay inside the gamut,
+ * but a LAB track has neither going for it: over half of an a* or b* sweep is outside
+ * sRGB, and out there the mapped color runs along the gamut surface, turning a corner at
+ * every edge of the RGB cube it crosses. Stops cannot follow a corner, so the error
+ * flattens out instead of falling — the Independent a* track measures 36 of 255 at 10
+ * stops, 7.4 at 64 and still 5.5 at 128. 64 is where the return goes flat, and it is what
+ * the Ok* tracks already use.
+ */
+internal const val LAB_CHANNEL_STOPS = 64
+
+/** The a* or b* value a track reaches at [fraction] of its travel; both run `-128..127`. */
+internal fun labAxisFromFraction(fraction: Float): Float =
+    (-128f + fraction * 255f).coerceIn(-128f, 127f)
+
+internal fun buildLabLightnessGradient(a: Float, b: Float): ImmutableList<Color> =
+    (0..LAB_CHANNEL_STOPS).map { i ->
+        LabColor(l = i * 100f / LAB_CHANNEL_STOPS, a = a, b = b).toComposeColor()
+    }.toImmutableList()
+
+internal fun buildLabAGradient(l: Float, b: Float): ImmutableList<Color> =
+    (0..LAB_CHANNEL_STOPS).map { i ->
+        LabColor(l = l, a = labAxisFromFraction(i.toFloat() / LAB_CHANNEL_STOPS), b = b).toComposeColor()
+    }.toImmutableList()
+
+internal fun buildLabBGradient(l: Float, a: Float): ImmutableList<Color> =
+    (0..LAB_CHANNEL_STOPS).map { i ->
+        LabColor(l = l, a = a, b = labAxisFromFraction(i.toFloat() / LAB_CHANNEL_STOPS)).toComposeColor()
+    }.toImmutableList()
+
 // Pre-computed independent (a=0, b=0) gradients
-private val LightnessIndependentGradient = (0..10).map { i ->
-    LabColor(l = i * 10f, a = 0f, b = 0f).toComposeColor()
-}.toImmutableList()
+private val LightnessIndependentGradient = buildLabLightnessGradient(a = 0f, b = 0f)
 
-private val AAxisIndependentGradient = (0..10).map { i ->
-    val a = -128f + (i * 255f / 10f)
-    LabColor(l = 50f, a = a.coerceIn(-128f, 127f), b = 0f).toComposeColor()
-}.toImmutableList()
+private val AAxisIndependentGradient = buildLabAGradient(l = 50f, b = 0f)
 
-private val BAxisIndependentGradient = (0..10).map { i ->
-    val b = -128f + (i * 255f / 10f)
-    LabColor(l = 50f, a = 0f, b = b.coerceIn(-128f, 127f)).toComposeColor()
-}.toImmutableList()
+private val BAxisIndependentGradient = buildLabBGradient(l = 50f, a = 0f)
 
 /**
  * Slider for the CIELAB lightness (L*) channel of [state], in `0..100`.
@@ -58,9 +84,7 @@ public fun LightnessLabSlider(
     val gradientColors = remember(lab.a, lab.b, coloringMode) {
         when (coloringMode) {
             ColoringMode.Independent -> LightnessIndependentGradient
-            ColoringMode.Contextual -> (0..10).map { i ->
-                LabColor(l = i * 10f, a = lab.a, b = lab.b).toComposeColor()
-            }.toImmutableList()
+            ColoringMode.Contextual -> buildLabLightnessGradient(a = lab.a, b = lab.b)
         }
     }
     val thumbColor = remember(lab, coloringMode) {
@@ -122,10 +146,7 @@ public fun LabASlider(
     val gradientColors = remember(lab.l, lab.b, coloringMode) {
         when (coloringMode) {
             ColoringMode.Independent -> AAxisIndependentGradient
-            ColoringMode.Contextual -> (0..10).map { i ->
-                val a = -128f + (i * 255f / 10f)
-                LabColor(l = lab.l, a = a.coerceIn(-128f, 127f), b = lab.b).toComposeColor()
-            }.toImmutableList()
+            ColoringMode.Contextual -> buildLabAGradient(l = lab.l, b = lab.b)
         }
     }
     val thumbColor = remember(lab, coloringMode) {
@@ -187,10 +208,7 @@ public fun LabBSlider(
     val gradientColors = remember(lab.l, lab.a, coloringMode) {
         when (coloringMode) {
             ColoringMode.Independent -> BAxisIndependentGradient
-            ColoringMode.Contextual -> (0..10).map { i ->
-                val b = -128f + (i * 255f / 10f)
-                LabColor(l = lab.l, a = lab.a, b = b.coerceIn(-128f, 127f)).toComposeColor()
-            }.toImmutableList()
+            ColoringMode.Contextual -> buildLabBGradient(l = lab.l, a = lab.a)
         }
     }
     val thumbColor = remember(lab, coloringMode) {

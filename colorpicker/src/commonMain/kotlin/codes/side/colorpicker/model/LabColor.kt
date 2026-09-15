@@ -4,11 +4,17 @@ import androidx.compose.runtime.Immutable
 import kotlin.math.roundToInt
 
 /**
- * An immutable color in the CIELAB (L*a*b*) color space, D65 reference white.
+ * An immutable color in the CIELAB (L*a*b*) color space, D50 reference white — the one
+ * CSS `lab()`, Photoshop and Compose's `ColorSpaces.CieLab` all quote, so values copied
+ * from any of them mean here what they meant there.
  *
  * [l] (lightness) is in `0..100`; [a] (green-red axis) and [b] (blue-yellow axis) are
  * in `-128..127`; [alpha] is in `0..1`. The constructor throws [IllegalArgumentException]
  * for out-of-range or NaN values; use [fromInt] for a clamping alternative.
+ *
+ * Roughly an eighth of that box is inside sRGB. The rest is still a valid color and is
+ * held exactly here, but a display can only show the nearest one it has — see
+ * [codes.side.colorpicker.conversion.toRgb].
  *
  * The no-argument constructor `LabColor()` is opaque mid-gray (L = 50 on the neutral
  * axis). Note that each model's default is intentionally its space's most natural

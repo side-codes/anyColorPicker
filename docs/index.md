@@ -10,7 +10,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Material 3 theming via `ColorPickerDefaults`
 - HSL, RGB, CMYK, and LAB color models
 - Perceptual color: Okhsl and Okhsv pickers, with Oklab and OkLCh for interchange and manipulation
-- CSS Color 4 gamut mapping, so an out-of-gamut Oklab or OkLCh color keeps its lightness and hue
+- CSS Color 4 gamut mapping, so an out-of-gamut LAB, Oklab or OkLCh color keeps its lightness and hue
 - Alpha channel support
 - Zero-drift editing: `ColorPickerState` keeps the authoritative color in the space you edited, so edit-in-X-read-X is always exact (conversions themselves are float-based)
 - Unidirectional data flow with `ColorPickerState`
@@ -129,11 +129,16 @@ CmykColor.fromInt(cyan = 30, magenta = 60, yellow = 10, key = 20)
 ### LAB
 
 ```kotlin
-val color = LabColor(l = 53.23f, a = 80.11f, b = 67.22f)
+val color = LabColor(l = 54.29f, a = 80.81f, b = 69.89f)
 // l: [0, 100], a: [-128, 127], b: [-128, 127], alpha: [0, 1]
 
-LabColor.fromInt(l = 53, a = 80, b = 67)
+LabColor.fromInt(l = 54, a = 81, b = 70)
 ```
+
+CIELAB with a D50 reference white, which is what CSS `lab()`, Photoshop and Compose's
+`ColorSpaces.CieLab` all quote, so a value copied from any of them means here what it
+meant there. About an eighth of the `a`/`b` box is inside sRGB: over half the travel on
+either slider is outside it and renders as the nearest color the display can show.
 
 ### Okhsl
 
@@ -192,12 +197,19 @@ others.
 
 ### Gamut mapping
 
-Oklab and OkLCh can describe colors sRGB cannot show. Converting one to RGB does not clamp
-each channel independently, which would shift lightness and hue as a side effect. It runs
-the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping): binary
+LAB, Oklab and OkLCh can describe colors sRGB cannot show. Converting one to RGB does not
+clamp each channel independently, which would shift lightness and hue as a side effect. It
+runs the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping): binary
 search down the chroma axis, comparing each candidate against its clipped form, and stop
 once the two are within a just-noticeable difference. Lightness and hue survive, chroma
 pays, and the result matches what a browser would render.
+
+The search runs in Oklab whatever space the color came from, as CSS specifies, so what
+survives is Oklab's lightness and hue, not CIELAB's. L* lands within about 3 where clipping
+each channel moved it by 7.6. CIELAB's own hue angle can still swing, and swings worst where
+the two spaces disagree most: `lab(50% 0 -128)` sits at 270° in CIELAB but 221° in Oklab, so
+holding the latter moves the former by 38°. That is CIELAB's blue axis being non-uniform
+rather than the mapping misbehaving — Oklab's hue is the one that tracks what you see.
 
 Okhsl and Okhsv never need this — their coordinates are normalized against the gamut, so
 they are inside it by construction.
