@@ -299,9 +299,9 @@ internal const val ACHROMATIC_CHROMA = 1e-6
 
 /** True when every channel is within `0..1`, allowing for float slop. */
 internal fun LinearRgb.isInGamut(epsilon: Double = 1e-6): Boolean =
-    r >= -epsilon && r <= 1.0 + epsilon &&
-        g >= -epsilon && g <= 1.0 + epsilon &&
-        b >= -epsilon && b <= 1.0 + epsilon
+    r in -epsilon..1.0 + epsilon &&
+        g in -epsilon..1.0 + epsilon &&
+        b in -epsilon..1.0 + epsilon
 
 /** Perceptual distance between two Oklab colors, the ΔE the CSS gamut mapping uses. */
 internal fun deltaEOk(first: OkLab, second: OkLab): Double {
