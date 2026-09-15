@@ -1,0 +1,175 @@
+package codes.side.colorpicker.ui
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerShapes
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+
+/** The fraction across a plane [width] pixels wide that a pointer at [x] sits at. */
+internal fun planeXFraction(x: Float, width: Int): Float =
+    if (width <= 0) 0f else (x / width).coerceIn(0f, 1f)
+
+/** The fraction up a plane [height] pixels tall that a pointer at [y] sits at. */
+internal fun planeYFraction(y: Float, height: Int): Float =
+    if (height <= 0) 0.5f else (1f - y / height).coerceIn(0f, 1f)
+
+/**
+ * Two-dimensional picker over a pair of colour channels, both in `0..1`.
+ *
+ * [xValue] runs left to right and [yValue] bottom to top, so `yValue = 1f` is the top edge.
+ * Dragging reports both at once, which is what lets a caller write two channels in a single
+ * update and leave the rest of the colour alone.
+ *
+ * Unlike the sliders, the surface is not mirrored in right-to-left layouts. It is a map of a
+ * colour space rather than a progress control, and mirroring it would make the x channel grow
+ * leftwards here while it still grows rightwards on the hue slider beside it.
+ *
+ * @param surface paints the field, filling the whole drawing area. It is drawn under the
+ * position indicator and clipped to [ColorPickerShapes.planeShape].
+ * @param semanticLabel accessibility description of the surface; pass a localized string to
+ * replace the English default, or `null` to omit.
+ * @param semanticValueText accessibility announcement of the current pair of values.
+ * @param thumb optional replacement for the position indicator, receiving the surface's
+ * [InteractionSource] so it can react to being dragged. The plane centres whatever it is
+ * given on the current pair of values at whatever size that composable measures to, and
+ * draws it outside the clipped surface so that it stays whole at the edges; the composable
+ * only has to draw itself.
+ */
+@Composable
+public fun ColorPlane(
+    xValue: Float,
+    yValue: Float,
+    onValueChange: (x: Float, y: Float) -> Unit,
+    surface: DrawScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    onValueChangeFinished: (() -> Unit)? = null,
+    semanticLabel: String? = null,
+    semanticValueText: String? = null,
+    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val scope = rememberCoroutineScope()
+    // The gesture handler outlives any one composition, so it reads the callbacks and the
+    // painter through these rather than capturing the values it was built with.
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
+    val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
+    val currentSurface by rememberUpdatedState(surface)
+
+    Layout(
+        content = {
+            // The shape clips the surface alone. Clipping the whole plane would take the
+            // indicator with it, and at a corner the rounding leaves almost none of the
+            // ring behind — the one place a picker has to show where the colour came from.
+            Box(
+                modifier = Modifier
+                    .clip(shapes.planeShape)
+                    .drawBehind { currentSurface() },
+            )
+            // A bare Box, so the indicator measures to its own size. Giving the wrapper a
+            // size instead squeezes a larger custom thumb into the default diameter and
+            // strands a smaller one in the corner of it, off the value it marks.
+            Box { if (thumb != null) thumb(interactionSource) else PlaneThumb() }
+        },
+        modifier = modifier
+            .defaultMinSize(ColorPickerDefaults.PlaneMinSize, ColorPickerDefaults.PlaneMinSize)
+            .semantics {
+                semanticLabel?.let { contentDescription = it }
+                semanticValueText?.let { stateDescription = it }
+            }
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val press = DragInteraction.Start()
+                    scope.launch { interactionSource.emit(press) }
+                    currentOnValueChange(
+                        planeXFraction(down.position.x, size.width),
+                        planeYFraction(down.position.y, size.height),
+                    )
+                    down.consume()
+
+                    val completed = drag(down.id) { change ->
+                        currentOnValueChange(
+                            planeXFraction(change.position.x, size.width),
+                            planeYFraction(change.position.y, size.height),
+                        )
+                        change.consume()
+                    }
+
+                    currentOnFinished?.invoke()
+                    scope.launch {
+                        interactionSource.emit(
+                            if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press),
+                        )
+                    }
+                }
+            },
+    ) { measurables, constraints ->
+        // defaultMinSize has already raised a loose minimum to PlaneMinSize, so the minimum
+        // is the surface's size either way: the exact size a caller asked for, or the
+        // fallback when the parent passes unbounded space down.
+        val width = constraints.minWidth
+        val height = constraints.minHeight
+        val surfacePlaceable = measurables[0].measure(Constraints.fixed(width, height))
+        val indicator = measurables[1].measure(Constraints(maxWidth = width, maxHeight = height))
+
+        layout(width, height) {
+            surfacePlaceable.place(0, 0)
+            // place, not placeRelative: the surface, the field and the pointer mapping are
+            // all unmirrored, so an indicator that flipped in right-to-left layouts would
+            // sit on the opposite colour from the one it points at.
+            indicator.place(
+                x = (xValue * width - indicator.width / 2f).roundToInt(),
+                y = ((1f - yValue) * height - indicator.height / 2f).roundToInt(),
+            )
+        }
+    }
+}
+
+/** Default position indicator, sized [ColorPickerDefaults.PlaneThumbSize]. */
+@Composable
+private fun PlaneThumb() {
+    Canvas(Modifier.size(ColorPickerDefaults.PlaneThumbSize)) {
+        val radius = size.minDimension / 2f - 2.dp.toPx()
+        // A dark halo under a white ring keeps the indicator readable at both
+        // ends of the surface, where a single-colour ring vanishes.
+        drawCircle(
+            color = Color.Black.copy(alpha = 0.35f),
+            radius = radius,
+            style = Stroke(width = 4.dp.toPx()),
+        )
+        drawCircle(
+            color = Color.White,
+            radius = radius,
+            style = Stroke(width = 2.dp.toPx()),
+        )
+    }
+}

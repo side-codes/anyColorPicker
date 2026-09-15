@@ -2,3 +2,7 @@ plugins:
   - jemoji
 
 theme: jekyll-theme-minimal
+
+# Internal design docs live in the repo, not on the site.
+exclude:
+  - superpowers

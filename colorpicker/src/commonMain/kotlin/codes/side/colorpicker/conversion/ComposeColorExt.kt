@@ -5,6 +5,10 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
+import codes.side.colorpicker.model.OkhslColor
+import codes.side.colorpicker.model.OkhsvColor
+import codes.side.colorpicker.model.OklabColor
+import codes.side.colorpicker.model.OklchColor
 import codes.side.colorpicker.model.RgbColor
 
 /** Converts this color to a Compose [Color] in the sRGB color space, preserving alpha. */
@@ -19,6 +23,24 @@ public fun CmykColor.toComposeColor(): Color = toRgb().toComposeColor()
 
 /** Converts this color to a Compose [Color] in the sRGB color space, preserving alpha. */
 public fun LabColor.toComposeColor(): Color = toRgb().toComposeColor()
+
+/**
+ * Converts this color to a Compose [Color] in the sRGB color space, preserving alpha.
+ * Colors outside the display gamut are mapped, not clipped; see [OklabColor.toRgb].
+ */
+public fun OklabColor.toComposeColor(): Color = toRgb().toComposeColor()
+
+/**
+ * Converts this color to a Compose [Color] in the sRGB color space, preserving alpha.
+ * Colors outside the display gamut are mapped, not clipped; see [OklchColor.toRgb].
+ */
+public fun OklchColor.toComposeColor(): Color = toRgb().toComposeColor()
+
+/** Converts this color to a Compose [Color] in the sRGB color space, preserving alpha. */
+public fun OkhslColor.toComposeColor(): Color = toRgb().toComposeColor()
+
+/** Converts this color to a Compose [Color] in the sRGB color space, preserving alpha. */
+public fun OkhsvColor.toComposeColor(): Color = toRgb().toComposeColor()
 
 /**
  * Converts this Compose [Color] to an [RgbColor], converting to the sRGB color space
@@ -45,3 +67,15 @@ public fun Color.toCmykColor(): CmykColor = toRgbColor().toCmyk()
 
 /** Converts this Compose [Color] to a [LabColor]; see [Color.toRgbColor] for sRGB handling. */
 public fun Color.toLabColor(): LabColor = toRgbColor().toLab()
+
+/** Converts this Compose [Color] to an [OklabColor]; see [Color.toRgbColor] for sRGB handling. */
+public fun Color.toOklabColor(): OklabColor = toRgbColor().toOklab()
+
+/** Converts this Compose [Color] to an [OklchColor]; see [Color.toRgbColor] for sRGB handling. */
+public fun Color.toOklchColor(): OklchColor = toRgbColor().toOklch()
+
+/** Converts this Compose [Color] to an [OkhslColor]; see [Color.toRgbColor] for sRGB handling. */
+public fun Color.toOkhslColor(): OkhslColor = toRgbColor().toOkhsl()
+
+/** Converts this Compose [Color] to an [OkhsvColor]; see [Color.toRgbColor] for sRGB handling. */
+public fun Color.toOkhsvColor(): OkhsvColor = toRgbColor().toOkhsv()

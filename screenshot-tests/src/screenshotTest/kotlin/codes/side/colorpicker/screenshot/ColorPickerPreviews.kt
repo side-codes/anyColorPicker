@@ -34,8 +34,15 @@ import codes.side.colorpicker.ui.AlphaSlider
 import codes.side.colorpicker.ui.CmykColorPicker
 import codes.side.colorpicker.ui.ColorSwatch
 import codes.side.colorpicker.ui.HslColorPicker
+import codes.side.colorpicker.ui.HslPlane
 import codes.side.colorpicker.ui.HueSlider
 import codes.side.colorpicker.ui.LabColorPicker
+import codes.side.colorpicker.ui.OkhslColorPicker
+import codes.side.colorpicker.ui.OkhslHueSlider
+import codes.side.colorpicker.ui.OkhslPlane
+import codes.side.colorpicker.ui.OkhsvColorPicker
+import codes.side.colorpicker.ui.OkhsvHueSlider
+import codes.side.colorpicker.ui.OkhsvPlane
 import codes.side.colorpicker.ui.RgbColorPicker
 import com.android.tools.screenshot.PreviewTest
 
@@ -129,6 +136,34 @@ fun LabContextualPreview() = Frame {
     LabColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
 }
 
+@PreviewTest
+@Preview(name = "Okhsl independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhslIndependentPreview() = Frame {
+    OkhslColorPicker(state = state(), coloringMode = ColoringMode.Independent)
+}
+
+@PreviewTest
+@Preview(name = "Okhsl contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhslContextualPreview() = Frame {
+    OkhslColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhsvIndependentPreview() = Frame {
+    OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Independent)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun OkhsvContextualPreview() = Frame {
+    OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Contextual)
+}
+
 // Kept character-for-character identical to SquareThumb in the sample app, so the image
 // in the README is the thing the sample actually runs.
 @Composable
@@ -176,6 +211,42 @@ fun CustomThumbPreview() = Frame {
         thumb = { source -> SquareThumb(state.hslColor.toComposeColor(), source) },
         thumbWidth = SquareThumbSize,
     )
+}
+
+@PreviewTest
+@Preview(name = "Saturation lightness plane", widthDp = 440, heightDp = 420)
+@Composable
+fun HslPlanePreview() = Frame {
+    val state = state()
+    HslPlane(
+        state = state,
+        modifier = Modifier.fillMaxWidth().height(260.dp),
+    )
+    HueSlider(state = state)
+}
+
+@PreviewTest
+@Preview(name = "Okhsl plane", widthDp = 440, heightDp = 420)
+@Composable
+fun OkhslPlanePreview() = Frame {
+    val state = state()
+    OkhslPlane(
+        state = state,
+        modifier = Modifier.fillMaxWidth().height(260.dp),
+    )
+    OkhslHueSlider(state = state)
+}
+
+@PreviewTest
+@Preview(name = "Okhsv plane", widthDp = 440, heightDp = 420)
+@Composable
+fun OkhsvPlanePreview() = Frame {
+    val state = state()
+    OkhsvPlane(
+        state = state,
+        modifier = Modifier.fillMaxWidth().height(260.dp),
+    )
+    OkhsvHueSlider(state = state)
 }
 
 @PreviewTest

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 
 /**
  * An immutable color in one of the supported color spaces: [RgbColor], [HslColor],
- * [CmykColor], or [LabColor].
+ * [CmykColor], [LabColor], [OklabColor], [OklchColor], [OkhslColor], or [OkhsvColor].
  *
  * All implementations validate their channels on construction (the constructor throws
  * [IllegalArgumentException] for out-of-range or NaN values) and share an [alpha] channel.

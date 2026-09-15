@@ -61,7 +61,8 @@ class LabConversionsTest {
 
     @Test
     fun rgbWhiteToLab() {
-        // With XN/ZN matching the sRGB matrices' D65 white point, white maps to a*=0, b*=0
+        // Each sRGB matrix row sums to its component of the D50 white, so white lands on
+        // the neutral axis exactly rather than near it.
         val rgb = RgbColor(1f, 1f, 1f)
         val lab = rgb.toLab()
         assertNear(100f, lab.l, tolerance = 0.01f, msg = "L")
@@ -98,10 +99,52 @@ class LabConversionsTest {
     fun rgbRedToLab() {
         val rgb = RgbColor(1f, 0f, 0f)
         val lab = rgb.toLab()
-        // Red in Lab is approximately L=53.23, a=80.11, b=67.22
         assertTrue(lab.l > 50f && lab.l < 56f, "L for red: ${lab.l}")
         assertTrue(lab.a > 75f, "a for red: ${lab.a}")
         assertTrue(lab.b > 60f, "b for red: ${lab.b}")
+    }
+
+    // ---- Interchange with other tools ----
+
+    @Test
+    fun redMatchesTheLabValueOtherToolsReport() {
+        val lab = RgbColor(1f, 0f, 0f).toLab()
+        assertNear(54.29f, lab.l, tolerance = 0.05f, msg = "L")
+        assertNear(80.81f, lab.a, tolerance = 0.05f, msg = "a")
+        assertNear(69.89f, lab.b, tolerance = 0.05f, msg = "b")
+    }
+
+    @Test
+    fun blueMatchesTheLabValueOtherToolsReport() {
+        val lab = RgbColor(0f, 0f, 1f).toLab()
+        assertNear(29.56f, lab.l, tolerance = 0.05f, msg = "L")
+        assertNear(68.28f, lab.a, tolerance = 0.05f, msg = "a")
+        assertNear(-112.02f, lab.b, tolerance = 0.05f, msg = "b")
+    }
+
+    // ---- Colors sRGB cannot show ----
+
+    // The mapping holds Oklab's lightness, not CIELAB's, so L* arrives close rather than
+    // unchanged. Clipping each channel on its own moves it by 7.6 over the same rows.
+    private val mappedLightnessEps = 3.5f
+
+    @Test
+    fun outOfGamutBlueKeepsItsLightness() {
+        // Every b* here is past the sRGB boundary at L* 50, and the further out it goes the
+        // more lightness channel-wise clipping invents. Giving up chroma instead is what
+        // keeps the swatch near the lightness the numbers claim.
+        for (b in -128..-80 step 4) {
+            val shown = LabColor(l = 50f, a = 0f, b = b.toFloat()).toRgb().toLab()
+            assertNear(50f, shown.l, tolerance = mappedLightnessEps, msg = "L* at b*=$b")
+        }
+    }
+
+    @Test
+    fun outOfGamutGreenKeepsItsLightness() {
+        for (a in -128..-90 step 4) {
+            val shown = LabColor(l = 50f, a = a.toFloat(), b = 0f).toRgb().toLab()
+            assertNear(50f, shown.l, tolerance = mappedLightnessEps, msg = "L* at a*=$a")
+        }
     }
 
     // ---- Round-trip ----

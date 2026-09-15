@@ -9,12 +9,15 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm)
 - Material 3 theming via `ColorPickerDefaults`
 - HSL, RGB, CMYK, and LAB color models
+- Perceptual color: Okhsl and Okhsv pickers, with Oklab and OkLCh for interchange and manipulation
+- CSS Color 4 gamut mapping, so an out-of-gamut LAB, Oklab or OkLCh color keeps its lightness and hue
 - Alpha channel support
 - Zero-drift editing: `ColorPickerState` keeps the authoritative color in the space you edited, so edit-in-X-read-X is always exact (conversions themselves are float-based)
 - Unidirectional data flow with `ColorPickerState`
 - Hex string parsing and formatting
 - Color picker dialog
-- Accessibility semantics and RTL layout support
+- Two-dimensional color planes — saturation paired with lightness or value — alongside the single-channel sliders
+- Accessibility semantics, and RTL layout support everywhere but the planes, which map a color space rather than showing progress
 
 ## 📦 Setup
 
@@ -40,15 +43,18 @@ Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 ## 🎨 Gallery
 
 Every picker takes a `ColoringMode`. `Independent` shows each channel's full range;
-`Contextual` previews the resulting color at every slider position. `HslColorPicker`
-defaults to `Independent`; the others default to `Contextual`.
+`Contextual` previews the resulting color at every slider position. `HslColorPicker`,
+`OkhslColorPicker` and `OkhsvColorPicker` default to `Independent`; the RGB, CMYK and LAB
+pickers default to `Contextual`.
 
-| Model                         | Independent                                           | Contextual                                          |
-|-------------------------------|-------------------------------------------------------|-----------------------------------------------------|
-| **HSL**<br>`HslColorPicker`   | ![HSL independent](images/hsl-independent.png)   | ![HSL contextual](images/hsl-contextual.png)   |
-| **RGB**<br>`RgbColorPicker`   | ![RGB independent](images/rgb-independent.png)   | ![RGB contextual](images/rgb-contextual.png)   |
-| **CMYK**<br>`CmykColorPicker` | ![CMYK independent](images/cmyk-independent.png) | ![CMYK contextual](images/cmyk-contextual.png) |
-| **LAB**<br>`LabColorPicker`   | ![LAB independent](images/lab-independent.png)   | ![LAB contextual](images/lab-contextual.png)   |
+| Model                           | Independent                                        | Contextual                                       |
+|---------------------------------|----------------------------------------------------|--------------------------------------------------|
+| **HSL**<br>`HslColorPicker`     | ![HSL independent](images/hsl-independent.png)     | ![HSL contextual](images/hsl-contextual.png)     |
+| **RGB**<br>`RgbColorPicker`     | ![RGB independent](images/rgb-independent.png)     | ![RGB contextual](images/rgb-contextual.png)     |
+| **CMYK**<br>`CmykColorPicker`   | ![CMYK independent](images/cmyk-independent.png)   | ![CMYK contextual](images/cmyk-contextual.png)   |
+| **LAB**<br>`LabColorPicker`     | ![LAB independent](images/lab-independent.png)     | ![LAB contextual](images/lab-contextual.png)     |
+| **Okhsl**<br>`OkhslColorPicker` | ![Okhsl independent](images/okhsl-independent.png) | ![Okhsl contextual](images/okhsl-contextual.png) |
+| **Okhsv**<br>`OkhsvColorPicker` | ![Okhsv independent](images/okhsv-independent.png) | ![Okhsv contextual](images/okhsv-contextual.png) |
 
 `ColorSwatch` draws the color over a transparency checkerboard, so alpha reads correctly:
 
@@ -123,11 +129,90 @@ CmykColor.fromInt(cyan = 30, magenta = 60, yellow = 10, key = 20)
 ### LAB
 
 ```kotlin
-val color = LabColor(l = 53.23f, a = 80.11f, b = 67.22f)
+val color = LabColor(l = 54.29f, a = 80.81f, b = 69.89f)
 // l: [0, 100], a: [-128, 127], b: [-128, 127], alpha: [0, 1]
 
-LabColor.fromInt(l = 53, a = 80, b = 67)
+LabColor.fromInt(l = 54, a = 81, b = 70)
 ```
+
+CIELAB with a D50 reference white, which is what CSS `lab()`, Photoshop and Compose's
+`ColorSpaces.CieLab` all quote, so a value copied from any of them means here what it
+meant there. About an eighth of the `a`/`b` box is inside sRGB: over half the travel on
+either slider is outside it and renders as the nearest color the display can show.
+
+### Okhsl
+
+```kotlin
+val color = OkhslColor(hue = 29.2f, saturation = 1f, lightness = 0.57f)
+// hue: [0, 360), saturation: [0, 1], lightness: [0, 1], alpha: [0, 1]
+
+OkhslColor.fromInt(hue = 29, saturation = 100, lightness = 57)
+```
+
+Björn Ottosson's perceptual replacement for HSL, and the one to reach for if you are
+choosing between the two. `lightness` is perceived lightness, so a blue and a yellow at
+`0.5` look equally light; in HSL they differ by more than half the scale. `saturation` is
+measured against the sRGB gamut, so `1` is as colorful as the display can go at that hue
+and lightness — every coordinate is a real color and no part of a slider is dead travel.
+
+### Okhsv
+
+```kotlin
+val color = OkhsvColor(hue = 29.2f, saturation = 1f, value = 1f)
+// hue: [0, 360), saturation: [0, 1], value: [0, 1], alpha: [0, 1]
+
+OkhsvColor.fromInt(hue = 29, saturation = 100, value = 100)
+```
+
+Okhsl's perceptual hue and gamut-relative saturation in the HSV arrangement artists
+expect: full saturation at full value is the most vivid form of a hue, and pulling value
+down darkens toward black. Prefer Okhsl when the middle of the lightness track should be a
+mid tone.
+
+### Oklab
+
+```kotlin
+val color = OklabColor(l = 0.63f, a = 0.22f, b = 0.13f)
+// l: [0, 1], a: [-0.4, 0.4], b: [-0.4, 0.4], alpha: [0, 1]
+```
+
+The perceptual space the two above are built on, and the one to interpolate, compare or
+blend in — equal numeric steps are close to equal perceived steps, and moving `l` does not
+drag the perceived hue with it. Note `l` runs `0..1`, not CIELAB's `0..100`, and the `a`
+and `b` bounds are the reference range CSS Color 4 gives `oklab()`.
+
+Oklab is not a space to put sliders on: `a` and `b` are not bounded by the display gamut,
+so most of their range is unreachable, exactly as with LAB. Use Okhsl or Okhsv for that.
+
+### OkLCh
+
+```kotlin
+val color = OklchColor(l = 0.63f, chroma = 0.26f, hue = 29.2f)
+// l: [0, 1], chroma: [0, 0.4], hue: [0, 360), alpha: [0, 1]
+```
+
+Oklab in cylindrical form, and the space CSS exposes as `oklch()` — use it to move values
+in and out of stylesheets, or to change one of lightness, chroma and hue while holding the
+others.
+
+### Gamut mapping
+
+LAB, Oklab and OkLCh can describe colors sRGB cannot show. Converting one to RGB does not
+clamp each channel independently, which would shift lightness and hue as a side effect. It
+runs the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping): binary
+search down the chroma axis, comparing each candidate against its clipped form, and stop
+once the two are within a just-noticeable difference. Lightness and hue survive, chroma
+pays, and the result matches what a browser would render.
+
+The search runs in Oklab whatever space the color came from, as CSS specifies, so what
+survives is Oklab's lightness and hue, not CIELAB's. L* lands within about 3 where clipping
+each channel moved it by 7.6. CIELAB's own hue angle can still swing, and swings worst where
+the two spaces disagree most: `lab(50% 0 -128)` sits at 270° in CIELAB but 221° in Oklab, so
+holding the latter moves the former by 38°. That is CIELAB's blue axis being non-uniform
+rather than the mapping misbehaving — Oklab's hue is the one that tracks what you see.
+
+Okhsl and Okhsv never need this — their coordinates are normalized against the gamut, so
+they are inside it by construction.
 
 ## 🔄 Conversions
 
@@ -140,12 +225,19 @@ val cmyk = rgb.toCmyk()
 val lab = rgb.toLab()
 val argb = rgb.toArgbInt()
 
+// Perceptual spaces
+val oklab = rgb.toOklab()
+val oklch = rgb.toOklch()
+val okhsl = rgb.toOkhsl()
+val okhsv = rgb.toOkhsv()
+
 // Compose interop, both ways
 val composeColor: Color = hsl.toComposeColor()
 val backToHsl: HslColor = composeColor.toHslColor()
 val backToRgb: RgbColor = composeColor.toRgbColor()
 val backToCmyk: CmykColor = composeColor.toCmykColor()
 val backToLab: LabColor = composeColor.toLabColor()
+val backToOkhsl: OkhslColor = composeColor.toOkhslColor()
 ```
 
 ### Hex strings
@@ -183,9 +275,60 @@ HslColorPicker(
 RgbColorPicker(state = state, showAlpha = true)
 CmykColorPicker(state = state, showAlpha = true)
 LabColorPicker(state = state, showAlpha = true)
+OkhslColorPicker(state = state, showAlpha = true)
+OkhsvColorPicker(state = state, showAlpha = true)
 ```
 
 `ColoringMode` controls the slider gradients: `Independent` shows each channel's full range regardless of the other channels, `Contextual` previews the actual resulting color at each position.
+
+### Color Planes
+
+`HslPlane` picks both channels at once for the hue currently in `state`,
+leaving hue and alpha untouched, so it composes with a `HueSlider` into a full picker.
+`OkhslPlane` and `OkhsvPlane` are the same idea over Okhsl and Okhsv, composing with an
+`OkhslHueSlider` or `OkhsvHueSlider` instead.
+
+| Model                     | Preview                                                                  |
+|---------------------------|--------------------------------------------------------------------------|
+| **HSL**<br>`HslPlane`     | ![Saturation and lightness plane](images/saturation-lightness-plane.png) |
+| **Okhsl**<br>`OkhslPlane` | ![Okhsl plane](images/okhsl-plane.png)                                   |
+| **Okhsv**<br>`OkhsvPlane` | ![Okhsv plane](images/okhsv-plane.png)                                   |
+
+```kotlin
+val state = rememberColorPickerState(HslColor(hue = 68f, saturation = 0.72f, lightness = 0.62f))
+
+HslPlane(state = state, modifier = Modifier.fillMaxWidth().height(220.dp))
+HueSlider(state = state)
+```
+
+Saturation always runs left to right, so the left edge is grey and the right edge the most
+colorful the hue can be. The vertical axis runs from black at the bottom in every plane, but
+reads differently at the top: lightness for `HslPlane` and `OkhslPlane`, so the top edge is
+white, and value for `OkhsvPlane`, so the top edge is each column's own hue at full
+brightness — the arrangement artists expect from a color picker, and the one Okhsv was
+designed for.
+
+`HslPlane`'s surface is a horizontal grey-to-hue ramp under a white / transparent / black
+overlay, which reproduces HSL exactly rather than approximately — the colour at lightness L
+is the mid-lightness colour blended toward white by `2L-1` above the middle and toward black
+by `1-2L` below it, which is what compositing the overlay computes. Okhsl and Okhsv have no
+such identity, so `OkhslPlane` and `OkhsvPlane` sample their surface on a grid fine enough
+that the difference is invisible instead.
+
+The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
+colour space rather than showing progress, and mirroring it would have saturation growing
+leftwards here while it still grows rightwards on the hue slider beside it. Screen readers
+get a label and both values, but a two-dimensional drag has no linear equivalent, so the
+sliders remain the accessible path to the same channels.
+
+`thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
+
+```kotlin
+HslPlane(
+    state = state,
+    thumb = { source -> MyIndicator(source) },
+)
+```
 
 ### Individual Sliders
 
@@ -212,6 +355,21 @@ KeySlider(state = state)
 LightnessLabSlider(state = state)
 LabASlider(state = state)
 LabBSlider(state = state)
+
+// Okhsl
+OkhslHueSlider(state = state)
+OkhslSaturationSlider(state = state)
+OkhslLightnessSlider(state = state)
+
+// Okhsv
+OkhsvHueSlider(state = state)
+OkhsvSaturationSlider(state = state)
+OkhsvValueSlider(state = state)
+
+// Planes — two channels at once, to compose with a hue slider
+HslPlane(state = state)
+OkhslPlane(state = state)
+OkhsvPlane(state = state)
 
 // Alpha (works with any origin space)
 AlphaSlider(state = state)
