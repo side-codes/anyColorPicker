@@ -137,3 +137,60 @@ public fun OkhsvColor.toArgbInt(): Int = toRgb().toArgbInt()
 
 /** Unpacks this ARGB [Int] (`0xAARRGGBB`) into an [OkhsvColor]; see [Int.toRgbColor]. */
 public fun Int.toOkhsvColor(): OkhsvColor = toRgbColor().toOkhsv()
+
+/**
+ * [OkhsvColor.toRgb] with its per-hue work lifted out; see [okhslAtHue] for the shape.
+ *
+ * Only the cusp lifts here. Okhsv's lightness and chroma both fall out of saturation and
+ * value together, so there is no per-value step to hoist into the middle level, and the
+ * function of value the caller gets back does nothing but carry it.
+ */
+internal fun okhsvAtHue(hue: Float): (value: Float) -> (saturation: Float) -> RgbColor {
+    val radians = hue.toDouble() / DEGREES_PER_RADIAN
+    val aUnit = cos(radians)
+    val bUnit = sin(radians)
+    val st = findCusp(aUnit, bUnit).toSaturationTint()
+    val k = 1.0 - S0 / st.s
+
+    return { value ->
+        if (value <= 0f) {
+            { _ -> RgbColor(0f, 0f, 0f) }
+        } else {
+            val v = value.toDouble()
+            ({ saturation ->
+                val s = saturation.toDouble()
+
+                // Lightness and chroma at full value, treating the gamut as a triangle.
+                val denominator = S0 + st.t - st.t * k * s
+                val lAtFullValue = 1.0 - s * S0 / denominator
+                val chromaAtFullValue = s * st.t * S0 / denominator
+
+                var lightness = v * lAtFullValue
+                var chroma = v * chromaAtFullValue
+
+                // Undo the toe, then rescale so the triangle meets the gamut's actual curved top.
+                val lToed = toeInv(lAtFullValue)
+                val chromaToed = chromaAtFullValue * lToed / lAtFullValue
+
+                val lightnessToed = toeInv(lightness)
+                chroma *= lightnessToed / lightness
+                lightness = lightnessToed
+
+                val scaleRgb = oklabToLinearSrgb(OkLab(lToed, aUnit * chromaToed, bUnit * chromaToed))
+                val scale = cbrt(1.0 / max(max(scaleRgb.r, scaleRgb.g), max(scaleRgb.b, 0.0)))
+
+                lightness *= scale
+                chroma *= scale
+
+                val linear = oklabToLinearSrgb(OkLab(lightness, chroma * aUnit, chroma * bUnit))
+
+                RgbColor(
+                    red = delinearize(linear.r).toFloat().coerceIn(0f, 1f),
+                    green = delinearize(linear.g).toFloat().coerceIn(0f, 1f),
+                    blue = delinearize(linear.b).toFloat().coerceIn(0f, 1f),
+                )
+            })
+        }
+    }
+}
+

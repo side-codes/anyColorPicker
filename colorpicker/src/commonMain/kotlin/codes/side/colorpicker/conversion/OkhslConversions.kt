@@ -123,3 +123,40 @@ public fun OkhslColor.toArgbInt(): Int = toRgb().toArgbInt()
 
 /** Unpacks this ARGB [Int] (`0xAARRGGBB`) into an [OkhslColor]; see [Int.toRgbColor]. */
 public fun Int.toOkhslColor(): OkhslColor = toRgbColor().toOkhsl()
+
+/**
+ * [OkhslColor.toRgb] with its per-hue and per-lightness work lifted out of the inner loop:
+ * this returns a function of lightness, which returns a function of saturation.
+ *
+ * The arithmetic is the one above, in the same order, so a colour taken this way is
+ * bit-identical to converting the coordinate on its own — what changes is that the cusp and
+ * the chroma anchors are found once per hue and once per lightness instead of once per
+ * colour. Alpha is always opaque; a caller wanting one holds it itself.
+ */
+internal fun okhslAtHue(hue: Float): (lightness: Float) -> (saturation: Float) -> RgbColor {
+    val radians = hue.toDouble() / DEGREES_PER_RADIAN
+    val aUnit = cos(radians)
+    val bUnit = sin(radians)
+    val okHue = OkHue(aUnit, bUnit)
+
+    return { lightness ->
+        when {
+            lightness >= 1f -> { _ -> RgbColor(1f, 1f, 1f) }
+            lightness <= 0f -> { _ -> RgbColor(0f, 0f, 0f) }
+            else -> {
+                val okLightness = toeInv(lightness.toDouble())
+                val anchors = okHue.chromaAnchorsAt(okLightness)
+                ({ saturation ->
+                    val chroma = chromaForSaturation(saturation.toDouble(), anchors)
+                    val linear = oklabToLinearSrgb(OkLab(okLightness, chroma * aUnit, chroma * bUnit))
+                    RgbColor(
+                        red = delinearize(linear.r).toFloat().coerceIn(0f, 1f),
+                        green = delinearize(linear.g).toFloat().coerceIn(0f, 1f),
+                        blue = delinearize(linear.b).toFloat().coerceIn(0f, 1f),
+                    )
+                })
+            }
+        }
+    }
+}
+

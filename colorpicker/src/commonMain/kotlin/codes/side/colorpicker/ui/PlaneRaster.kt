@@ -51,23 +51,23 @@ internal fun planeSample(index: Int, count: Int): Float =
 /**
  * Rasterizes a plane's field. Row `0` is the top of the surface, where the y axis reads `1`.
  *
- * [color] is called once per pixel, over the full `width * height` grid, and runs whatever
- * conversion the caller gives it from scratch every time — for the Ok* planes, that is the
- * complete Okhsl or Okhsv conversion, cusp finding and its Halley refinement included, even
- * though hue is fixed for the whole bitmap and lightness or value repeats down every row.
+ * [rowAt] is called once per row and returns the function for the pixels along it, which is
+ * what lets a caller lift the part of its conversion that only depends on y out of the inner
+ * loop. An Ok* cusp costs a polynomial fit and a Halley step, so a field that recomputes one
+ * per pixel spends most of its time on an answer that does not vary.
  */
 internal fun buildPlaneBitmap(
     width: Int,
     height: Int,
-    color: (x: Float, y: Float) -> Color,
+    rowAt: (y: Float) -> (x: Float) -> Color,
 ): ImageBitmap {
     val bitmap = ImageBitmap(width, height)
     val canvas = Canvas(bitmap)
     val paint = Paint()
     for (row in 0 until height) {
-        val y = 1f - planeSample(row, height)
+        val colorAt = rowAt(1f - planeSample(row, height))
         for (column in 0 until width) {
-            paint.color = color(planeSample(column, width), y)
+            paint.color = colorAt(planeSample(column, width))
             canvas.drawRect(column.toFloat(), row.toFloat(), column + 1f, row + 1f, paint)
         }
     }
@@ -102,5 +102,5 @@ internal fun rememberPlaneBitmap(
     key: Any?,
     width: Int,
     height: Int,
-    color: (x: Float, y: Float) -> Color,
-): ImageBitmap = remember(key, width, height) { buildPlaneBitmap(width, height, color) }
+    rowAt: (y: Float) -> (x: Float) -> Color,
+): ImageBitmap = remember(key, width, height) { buildPlaneBitmap(width, height, rowAt) }

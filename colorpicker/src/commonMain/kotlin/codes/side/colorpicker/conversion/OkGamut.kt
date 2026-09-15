@@ -264,31 +264,46 @@ internal fun getSaturationTintMid(aNorm: Double, bNorm: Double): SaturationTint 
 }
 
 /**
- * The chroma at three reference saturations for a given lightness and hue: neutral-ish
- * `c0`, the smooth midpoint `cMid`, and the gamut boundary `cMax`. Okhsl's saturation is
- * a two-piece interpolation between them.
+ * A hue, with everything an Ok* conversion can settle from the hue alone already settled.
+ *
+ * The cusp costs a polynomial fit and a Halley step, and the mid tint a second pair of
+ * polynomials. A caller that holds one hue across many colors — a plane, whose whole surface
+ * is one hue — pays for them once by keeping this rather than calling [getChromaAnchors].
  */
-internal fun getChromaAnchors(l: Double, aNorm: Double, bNorm: Double): ChromaAnchors {
-    val cusp = findCusp(aNorm, bNorm)
-    val cMax = findGamutIntersection(aNorm, bNorm, l, 1.0, l, cusp)
-    val stMax = cusp.toSaturationTint()
+internal class OkHue(private val aNorm: Double, private val bNorm: Double) {
 
-    // Compensates for the curvature of the gamut surface, which the triangle below ignores.
-    val k = cMax / min(l * stMax.s, (1.0 - l) * stMax.t)
+    private val cusp: Cusp = findCusp(aNorm, bNorm)
+    private val saturationTint: SaturationTint = cusp.toSaturationTint()
+    private val saturationTintMid: SaturationTint = getSaturationTintMid(aNorm, bNorm)
 
-    val stMid = getSaturationTintMid(aNorm, bNorm)
-    val midA = l * stMid.s
-    val midB = (1.0 - l) * stMid.t
-    // A soft minimum rather than a sharp triangle corner, so chroma varies smoothly.
-    val cMid = 0.9 * k * sqrt(sqrt(1.0 / (1.0 / (midA * midA * midA * midA) + 1.0 / (midB * midB * midB * midB))))
+    /**
+     * The chroma at three reference saturations for a given lightness: neutral-ish `c0`, the
+     * smooth midpoint `cMid`, and the gamut boundary `cMax`. Okhsl's saturation is a two-piece
+     * interpolation between them.
+     */
+    fun chromaAnchorsAt(l: Double): ChromaAnchors {
+        val cMax = findGamutIntersection(aNorm, bNorm, l, 1.0, l, cusp)
 
-    // The c0 shape is hue-independent, so these stand in for the average S and T.
-    val zeroA = l * 0.4
-    val zeroB = (1.0 - l) * 0.8
-    val c0 = sqrt(1.0 / (1.0 / (zeroA * zeroA) + 1.0 / (zeroB * zeroB)))
+        // Compensates for the curvature of the gamut surface, which the triangle below ignores.
+        val k = cMax / min(l * saturationTint.s, (1.0 - l) * saturationTint.t)
 
-    return ChromaAnchors(c0 = c0, cMid = cMid, cMax = cMax)
+        val midA = l * saturationTintMid.s
+        val midB = (1.0 - l) * saturationTintMid.t
+        // A soft minimum rather than a sharp triangle corner, so chroma varies smoothly.
+        val cMid = 0.9 * k * sqrt(sqrt(1.0 / (1.0 / (midA * midA * midA * midA) + 1.0 / (midB * midB * midB * midB))))
+
+        // The c0 shape is hue-independent, so these stand in for the average S and T.
+        val zeroA = l * 0.4
+        val zeroB = (1.0 - l) * 0.8
+        val c0 = sqrt(1.0 / (1.0 / (zeroA * zeroA) + 1.0 / (zeroB * zeroB)))
+
+        return ChromaAnchors(c0 = c0, cMid = cMid, cMax = cMax)
+    }
 }
+
+/** [OkHue.chromaAnchorsAt] for a caller converting one color and keeping nothing. */
+internal fun getChromaAnchors(l: Double, aNorm: Double, bNorm: Double): ChromaAnchors =
+    OkHue(aNorm, bNorm).chromaAnchorsAt(l)
 
 /**
  * Below this chroma a color is a gray for every purpose that matters: it is five orders
