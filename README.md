@@ -247,15 +247,29 @@ val rgb = RgbColor(red = 0.2f, green = 0.5f, blue = 0.8f)
 
 // Formatting: any PickerColor or packed ARGB Int
 rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha first)
-rgb.toHexString(includeAlpha = false)      // "#3380CC"
+rgb.toHexString(HexAlpha.None)             // "#3380CC"
 0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
 
-// Parsing: accepts #RGB, #RRGGBB, and #AARRGGBB; the '#' is optional
+// Parsing: accepts #RGB, #ARGB, #RRGGBB and #AARRGGBB; the '#' is optional
 "#3380CC".toRgbColorOrNull()               // RgbColor, alpha defaults to FF
 "#ABC".toRgbColorOrNull()                  // shorthand, expands to #AABBCC
 "not a color".toRgbColorOrNull()           // null, never throws
 "#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
 ```
+
+Alpha comes first by default, the way `android.graphics.Color` writes and reads it. CSS puts
+it last, and eight hex digits cannot tell you which you have — `#FF000080` is a
+half-transparent red to a stylesheet and an opaque navy to Android. Say which you mean when
+the string came from somewhere else:
+
+```kotlin
+rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
+"#3380CCFF".toRgbColorOrNull(HexAlpha.Last)      // the opaque blue it means
+"#F00F".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, opaque red
+```
+
+Three and six digits carry no alpha, so they mean the same thing either way. `HexAlpha.None`
+formats without it and, when parsing, accepts only the forms that carry none.
 
 ## 🧩 Color Picker Components
 

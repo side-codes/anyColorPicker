@@ -31,13 +31,24 @@ public final class codes/side/colorpicker/conversion/ComposeColorExtKt {
 	public static final fun toRgbColor-8_81llA (J)Lcodes/side/colorpicker/model/RgbColor;
 }
 
+public final class codes/side/colorpicker/conversion/HexAlpha : java/lang/Enum {
+	public static final field First Lcodes/side/colorpicker/conversion/HexAlpha;
+	public static final field Last Lcodes/side/colorpicker/conversion/HexAlpha;
+	public static final field None Lcodes/side/colorpicker/conversion/HexAlpha;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/conversion/HexAlpha;
+	public static fun values ()[Lcodes/side/colorpicker/conversion/HexAlpha;
+}
+
 public final class codes/side/colorpicker/conversion/HexConversionsKt {
-	public static final fun toHexColorString (IZ)Ljava/lang/String;
-	public static synthetic fun toHexColorString$default (IZILjava/lang/Object;)Ljava/lang/String;
-	public static final fun toHexString (Lcodes/side/colorpicker/model/PickerColor;Z)Ljava/lang/String;
-	public static synthetic fun toHexString$default (Lcodes/side/colorpicker/model/PickerColor;ZILjava/lang/Object;)Ljava/lang/String;
-	public static final fun toRgbColor (Ljava/lang/String;)Lcodes/side/colorpicker/model/RgbColor;
-	public static final fun toRgbColorOrNull (Ljava/lang/String;)Lcodes/side/colorpicker/model/RgbColor;
+	public static final fun toHexColorString (ILcodes/side/colorpicker/conversion/HexAlpha;)Ljava/lang/String;
+	public static synthetic fun toHexColorString$default (ILcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Ljava/lang/String;
+	public static final fun toHexString (Lcodes/side/colorpicker/model/PickerColor;Lcodes/side/colorpicker/conversion/HexAlpha;)Ljava/lang/String;
+	public static synthetic fun toHexString$default (Lcodes/side/colorpicker/model/PickerColor;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Ljava/lang/String;
+	public static final fun toRgbColor (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;)Lcodes/side/colorpicker/model/RgbColor;
+	public static synthetic fun toRgbColor$default (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Lcodes/side/colorpicker/model/RgbColor;
+	public static final fun toRgbColorOrNull (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;)Lcodes/side/colorpicker/model/RgbColor;
+	public static synthetic fun toRgbColorOrNull$default (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Lcodes/side/colorpicker/model/RgbColor;
 }
 
 public final class codes/side/colorpicker/conversion/HslConversionsKt {
