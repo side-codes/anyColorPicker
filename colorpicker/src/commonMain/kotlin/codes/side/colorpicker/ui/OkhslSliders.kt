@@ -57,16 +57,17 @@ internal inline fun buildOkGradient(stops: Int, color: (Float) -> Color): Immuta
 public fun OkhslHueSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Hue") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhslColor.intHue}°") },
     semanticLabel: String? = "Hue",
     semanticValueText: String? = "${state.okhslColor.intHue}°",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsl = state.okhslColor
     // The two coloring modes differ only in which saturation and lightness the strip is
@@ -113,6 +114,7 @@ public fun OkhslHueSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -134,16 +136,17 @@ public fun OkhslHueSlider(
 public fun OkhslSaturationSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Saturation") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhslColor.intSaturation}%") },
     semanticLabel: String? = "Saturation",
     semanticValueText: String? = "${state.okhslColor.intSaturation}%",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsl = state.okhslColor
     val trackLightness = when (coloringMode) {
@@ -183,6 +186,7 @@ public fun OkhslSaturationSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -209,16 +213,17 @@ public fun OkhslSaturationSlider(
 public fun OkhslLightnessSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Lightness") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhslColor.intLightness}%") },
     semanticLabel: String? = "Lightness",
     semanticValueText: String? = "${state.okhslColor.intLightness}%",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsl = state.okhslColor
     val trackSaturation = when (coloringMode) {
@@ -258,6 +263,7 @@ public fun OkhslLightnessSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,

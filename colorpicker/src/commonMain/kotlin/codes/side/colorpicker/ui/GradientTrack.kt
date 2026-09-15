@@ -56,8 +56,8 @@ internal fun GradientTrack(
     trackShape: Shape,
     modifier: Modifier = Modifier,
     showCheckerboard: Boolean = false,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val interactions = remember { mutableStateListOf<Interaction>() }
     LaunchedEffect(interactionSource) {

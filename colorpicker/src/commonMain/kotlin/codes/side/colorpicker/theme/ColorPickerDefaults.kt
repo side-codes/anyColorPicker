@@ -38,6 +38,9 @@ public object ColorPickerDefaults {
     /** Diameter of a [codes.side.colorpicker.ui.ColorPlane]'s position indicator. */
     public val PlaneThumbSize: Dp = 24.dp
 
+    /** Opacity a disabled component draws at, the Material 3 disabled content value. */
+    public val DisabledAlpha: Float = 0.38f
+
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
     /**
@@ -49,9 +52,47 @@ public object ColorPickerDefaults {
     public fun colors(
         checkerboardLight: Color = MaterialTheme.colorScheme.surfaceBright,
         checkerboardDark: Color = MaterialTheme.colorScheme.surfaceDim,
+        disabledAlpha: Float = DisabledAlpha,
     ): ColorPickerColors = ColorPickerColors(
         checkerboardLight = checkerboardLight,
         checkerboardDark = checkerboardDark,
+        disabledAlpha = disabledAlpha,
+    )
+
+    /**
+     * The colors in force here: whatever an enclosing [ColorPickerTheme] provided, or [colors]
+     * when nothing did.
+     *
+     * Every component reads this in a parameter default rather than in its body, so an explicit
+     * argument still wins and a component composed inside a picker inherits the picker's theme
+     * without the call site forwarding it.
+     */
+    @Composable
+    public fun currentColors(): ColorPickerColors = LocalColorPickerColors.current ?: colors()
+
+    /** The shapes in force here; see [currentColors]. */
+    @Composable
+    public fun currentShapes(): ColorPickerShapes = LocalColorPickerShapes.current ?: shapes()
+
+    /** The dimensions in force here; see [currentColors]. */
+    @Composable
+    public fun currentDimensions(): ColorPickerDimensions =
+        LocalColorPickerDimensions.current ?: dimensions()
+
+    /** Creates a [ColorPickerDimensions] from the constants above. */
+    @Composable
+    public fun dimensions(
+        trackHeight: Dp = TrackHeight,
+        thumbWidth: Dp = ThumbWidth,
+        thumbTrackGap: Dp = ThumbTrackGap,
+        planeMinSize: Dp = PlaneMinSize,
+        planeThumbSize: Dp = PlaneThumbSize,
+    ): ColorPickerDimensions = ColorPickerDimensions(
+        trackHeight = trackHeight,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
+        planeMinSize = planeMinSize,
+        planeThumbSize = planeThumbSize,
     )
 
     /**

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -24,14 +25,17 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 /** The fraction across a plane [width] pixels wide that a pointer at [x] sits at. */
 internal fun planeXFraction(x: Float, width: Int): Float =
@@ -71,13 +75,16 @@ public fun ColorPlane(
     surface: DrawScope.() -> Unit,
     modifier: Modifier = Modifier,
     onValueChangeFinished: (() -> Unit)? = null,
+    enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val scope = rememberCoroutineScope()
+    val dimensions = ColorPickerDefaults.currentDimensions()
     // The gesture handler outlives any one composition, so it reads the callbacks and the
     // painter through these rather than capturing the values it was built with.
     val currentOnValueChange by rememberUpdatedState(onValueChange)
@@ -97,15 +104,20 @@ public fun ColorPlane(
             // A bare Box, so the indicator measures to its own size. Giving the wrapper a
             // size instead squeezes a larger custom thumb into the default diameter and
             // strands a smaller one in the corner of it, off the value it marks.
-            Box { if (thumb != null) thumb(interactionSource) else PlaneThumb() }
+            Box { if (thumb != null) thumb(interactionSource) else PlaneThumb(dimensions.planeThumbSize) }
         },
         modifier = modifier
-            .defaultMinSize(ColorPickerDefaults.PlaneMinSize, ColorPickerDefaults.PlaneMinSize)
+            .defaultMinSize(dimensions.planeMinSize, dimensions.planeMinSize)
+            .alpha(if (enabled) 1f else colors.disabledAlpha)
             .semantics {
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
+                if (!enabled) disabled()
             }
-            .pointerInput(Unit) {
+            // Keyed on enabled so the handler is torn down rather than left running with a
+            // flag it checks: a gesture in flight when the plane is disabled ends there.
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     val press = DragInteraction.Start()
@@ -154,10 +166,10 @@ public fun ColorPlane(
     }
 }
 
-/** Default position indicator, sized [ColorPickerDefaults.PlaneThumbSize]. */
+/** Default position indicator, sized from [ColorPickerDefaults.currentDimensions]. */
 @Composable
-private fun PlaneThumb() {
-    Canvas(Modifier.size(ColorPickerDefaults.PlaneThumbSize)) {
+private fun PlaneThumb(diameter: Dp) {
+    Canvas(Modifier.size(diameter)) {
         val radius = size.minDimension / 2f - 2.dp.toPx()
         // A dark halo under a white ring keeps the indicator readable at both
         // ends of the surface, where a single-colour ring vanishes.

@@ -29,16 +29,17 @@ import kotlinx.collections.immutable.persistentListOf
 public fun RedSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("Red") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.rgbColor.intRed}") },
     semanticLabel: String? = "Red",
     semanticValueText: String? = "${state.rgbColor.intRed}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.green, rgb.blue, coloringMode) {
@@ -78,6 +79,7 @@ public fun RedSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -99,16 +101,17 @@ public fun RedSlider(
 public fun GreenSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("Green") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.rgbColor.intGreen}") },
     semanticLabel: String? = "Green",
     semanticValueText: String? = "${state.rgbColor.intGreen}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.red, rgb.blue, coloringMode) {
@@ -148,6 +151,7 @@ public fun GreenSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -169,16 +173,17 @@ public fun GreenSlider(
 public fun BlueSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("Blue") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.rgbColor.intBlue}") },
     semanticLabel: String? = "Blue",
     semanticValueText: String? = "${state.rgbColor.intBlue}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val rgb = state.rgbColor
     val gradientColors = remember(rgb.red, rgb.green, coloringMode) {
@@ -218,6 +223,7 @@ public fun BlueSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,

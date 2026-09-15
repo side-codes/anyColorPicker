@@ -24,15 +24,16 @@ import kotlinx.collections.immutable.persistentListOf
 public fun AlphaSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     label: (@Composable () -> Unit)? = { SliderLabel("Alpha") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.hslColor.intAlpha}") },
     semanticLabel: String? = "Alpha",
     semanticValueText: String? = "${state.hslColor.intAlpha}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val hsl = state.hslColor
     val opaqueColor = remember(hsl.hue, hsl.saturation, hsl.lightness) {
@@ -62,6 +63,7 @@ public fun AlphaSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,

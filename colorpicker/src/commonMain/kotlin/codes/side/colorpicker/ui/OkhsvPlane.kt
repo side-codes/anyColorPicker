@@ -36,10 +36,11 @@ import codes.side.colorpicker.theme.ColorPickerShapes
 public fun OkhsvPlane(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     semanticLabel: String? = "Saturation and value",
     semanticValueText: String? =
         "${state.okhsvColor.intSaturation}% saturation, ${state.okhsvColor.intValue}% value",
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     val okhsv = state.okhsvColor
@@ -61,6 +62,7 @@ public fun OkhsvPlane(
         },
         surface = { drawPlaneBitmap(bitmap) },
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,

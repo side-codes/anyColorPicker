@@ -295,6 +295,27 @@ OkhsvColorPicker(state = state, showAlpha = true)
 
 `ColoringMode` controls the slider gradients: `Independent` shows each channel's full range regardless of the other channels, `Contextual` previews the actual resulting color at each position.
 
+Every slider in a picker is a slot, defaulted to the channel slider it names. Replace one to
+relabel it — which is how a picker is localized, since the library ships no strings of its own:
+
+```kotlin
+HslColorPicker(
+    state = state,
+    hueSlider = { HueSlider(state, label = { Text(stringResource(Res.string.hue)) }) },
+)
+```
+
+A replacement inherits the picker's colors, shapes and dimensions through the theme, so only
+what you actually want to change has to be named. `enabled` is the exception — forward it if
+you want your slider dimmed, though the picker refuses input to a disabled slot either way:
+
+```kotlin
+HslColorPicker(state = state, enabled = false)   // dimmed, inert, and disabled to a screen reader
+```
+
+`thumb` reaches every slider in the picker, so [the custom thumb below](#custom-thumb) works
+here too rather than only on a slider built by hand.
+
 ### Color Planes
 
 `HslPlane` picks both channels at once for the hue currently in `state`,
@@ -485,7 +506,7 @@ In-progress edits inside the dialog survive configuration changes; passing a new
 
 ### Theming
 
-All pickers and sliders accept `colors` and `shapes` built with `ColorPickerDefaults`, which derive from `MaterialTheme` by default:
+All pickers and sliders accept `colors`, `shapes` and dimensions built with `ColorPickerDefaults`, which derive from `MaterialTheme` by default:
 
 ```kotlin
 HslColorPicker(
@@ -501,6 +522,20 @@ HslColorPicker(
 )
 ```
 
+`ColorPickerTheme` sets them for everything inside it instead, which is how a track height
+reaches all twenty-one channel sliders without being a parameter on any of them:
+
+```kotlin
+ColorPickerTheme(
+    dimensions = ColorPickerDefaults.dimensions(trackHeight = 24.dp),
+) {
+    HslColorPicker(state = state)
+    OkhslPlane(state = state)
+}
+```
+
+A component reads the theme in its parameter defaults, so an explicit argument still wins over
+whatever an enclosing `ColorPickerTheme` provided.
 ## 🔗 State Management
 
 `ColorPickerState` is the single source of truth. It reads and writes each color space natively, with no round-trip conversions.
