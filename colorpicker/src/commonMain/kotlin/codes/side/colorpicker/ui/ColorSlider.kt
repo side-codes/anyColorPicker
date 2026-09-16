@@ -65,15 +65,16 @@ public fun ColorSlider(
     label: (@Composable () -> Unit)? = null,
     valueLabel: (@Composable () -> Unit)? = null,
     onValueChangeFinished: (() -> Unit)? = null,
-    trackHeight: Dp = ColorPickerDefaults.TrackHeight,
+    enabled: Boolean = true,
+    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
     showCheckerboard: Boolean = false,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val sliderColors = SliderDefaults.colors(
@@ -82,7 +83,7 @@ public fun ColorSlider(
         inactiveTrackColor = Color.Transparent,
     )
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().disabledAppearance(enabled, colors)) {
         if (label != null || valueLabel != null) {
             Row(
                 modifier = Modifier
@@ -99,6 +100,7 @@ public fun ColorSlider(
             value = value,
             onValueChange = onValueChange,
             onValueChangeFinished = onValueChangeFinished,
+            enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
                 // Merged semantics only — M3 Slider's own progress semantics

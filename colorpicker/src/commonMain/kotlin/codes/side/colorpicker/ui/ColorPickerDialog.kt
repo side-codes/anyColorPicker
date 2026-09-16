@@ -1,5 +1,6 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColorPickerStateSaver
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerShapes
 
 /**
  * [AlertDialog] hosting an [HslColorPicker] with a preview swatch and
@@ -34,8 +36,16 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
  * @param title dialog title text; [confirmText] and [dismissText] label the buttons —
  * pass localized strings to replace the English defaults.
  * @param showAlpha whether to include the alpha slider.
+ * @param enabled when `false` the picker inside the dialog is dimmed and refuses input. The
+ * buttons stay live, so the dialog can still be dismissed.
  * @param colors checkerboard colors used by both the swatch and the picker's alpha
  * slider; see [ColorPickerDefaults.colors].
+ * @param shapes track and swatch shapes; see [ColorPickerDefaults.shapes].
+ * @param thumb optional replacement for every slider's thumb; see [ColorSlider].
+ * @param hueSlider slot for the hue channel; `null` keeps [HueSlider].
+ * @param saturationSlider slot for the saturation channel; `null` keeps [SaturationSlider].
+ * @param lightnessSlider slot for the lightness channel; `null` keeps [LightnessSlider].
+ * @param alphaSlider slot for the alpha channel; `null` keeps [AlphaSlider].
  */
 @Composable
 public fun ColorPickerDialog(
@@ -47,7 +57,14 @@ public fun ColorPickerDialog(
     confirmText: String = "Select",
     dismissText: String = "Cancel",
     showAlpha: Boolean = true,
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
+    enabled: Boolean = true,
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    hueSlider: (@Composable () -> Unit)? = null,
+    saturationSlider: (@Composable () -> Unit)? = null,
+    lightnessSlider: (@Composable () -> Unit)? = null,
+    alphaSlider: (@Composable () -> Unit)? = null,
 ) {
     // initialColor is a reset key: a new initial color re-creates the state,
     // while configuration changes restore in-progress edits via the saver.
@@ -69,10 +86,20 @@ public fun ColorPickerDialog(
                     colors = colors,
                 )
                 Spacer(Modifier.height(16.dp))
+                // The slots are nullable here rather than defaulted to the sliders: the
+                // dialog owns the state, so a default would have to name a state the caller
+                // never sees. Null means whatever the picker would have drawn.
                 HslColorPicker(
                     state = state,
                     showAlpha = showAlpha,
+                    enabled = enabled,
                     colors = colors,
+                    shapes = shapes,
+                    thumb = thumb,
+                    hueSlider = hueSlider ?: { HueSlider(state, enabled = enabled, thumb = thumb) },
+                    saturationSlider = saturationSlider ?: { SaturationSlider(state, enabled = enabled, thumb = thumb) },
+                    lightnessSlider = lightnessSlider ?: { LightnessSlider(state, enabled = enabled, thumb = thumb) },
+                    alphaSlider = alphaSlider ?: { AlphaSlider(state, enabled = enabled, thumb = thumb) },
                 )
             }
         },

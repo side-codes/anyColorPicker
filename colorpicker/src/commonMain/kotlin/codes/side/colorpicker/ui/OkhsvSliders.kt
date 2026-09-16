@@ -27,16 +27,17 @@ import codes.side.colorpicker.theme.ColorPickerShapes
 public fun OkhsvHueSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Hue") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhsvColor.intHue}°") },
     semanticLabel: String? = "Hue",
     semanticValueText: String? = "${state.okhsvColor.intHue}°",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsv = state.okhsvColor
     // The two coloring modes differ only in which saturation and value the strip is drawn
@@ -83,6 +84,7 @@ public fun OkhsvHueSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -104,16 +106,17 @@ public fun OkhsvHueSlider(
 public fun OkhsvSaturationSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Saturation") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhsvColor.intSaturation}%") },
     semanticLabel: String? = "Saturation",
     semanticValueText: String? = "${state.okhsvColor.intSaturation}%",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsv = state.okhsvColor
     val trackValue = when (coloringMode) {
@@ -149,6 +152,7 @@ public fun OkhsvSaturationSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -171,16 +175,17 @@ public fun OkhsvSaturationSlider(
 public fun OkhsvValueSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Independent,
     label: (@Composable () -> Unit)? = { SliderLabel("Value") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.okhsvColor.intValue}%") },
     semanticLabel: String? = "Value",
     semanticValueText: String? = "${state.okhsvColor.intValue}%",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val okhsv = state.okhsvColor
     val trackSaturation = when (coloringMode) {
@@ -220,6 +225,7 @@ public fun OkhsvValueSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,

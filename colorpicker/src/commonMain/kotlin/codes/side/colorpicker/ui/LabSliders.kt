@@ -69,16 +69,17 @@ private val BAxisIndependentGradient = buildLabBGradient(l = 50f, a = 0f)
 public fun LightnessLabSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("L") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.labColor.intL}") },
     semanticLabel: String? = "L*",
     semanticValueText: String? = "${state.labColor.intL}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.a, lab.b, coloringMode) {
@@ -110,6 +111,7 @@ public fun LightnessLabSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -131,16 +133,17 @@ public fun LightnessLabSlider(
 public fun LabASlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("a") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.labColor.intA}") },
     semanticLabel: String? = "a*",
     semanticValueText: String? = "${state.labColor.intA}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.l, lab.b, coloringMode) {
@@ -172,6 +175,7 @@ public fun LabASlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
@@ -193,16 +197,17 @@ public fun LabASlider(
 public fun LabBSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.Contextual,
     label: (@Composable () -> Unit)? = { SliderLabel("b") },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel("${state.labColor.intB}") },
     semanticLabel: String? = "b*",
     semanticValueText: String? = "${state.labColor.intB}",
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.shapes(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.ThumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.ThumbTrackGap,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val lab = state.labColor
     val gradientColors = remember(lab.l, lab.a, coloringMode) {
@@ -234,6 +239,7 @@ public fun LabBSlider(
         colors = colors,
         shapes = shapes,
         modifier = modifier,
+        enabled = enabled,
         onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,

@@ -30,9 +30,9 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
 public fun ColorSwatch(
     color: Color,
     modifier: Modifier = Modifier,
-    shape: Shape = ColorPickerDefaults.shapes().swatchShape,
+    shape: Shape = ColorPickerDefaults.currentShapes().swatchShape,
     contentDescription: String? = null,
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
 ) {
     Box(
         modifier = modifier

@@ -12,7 +12,7 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
 internal fun TransparencyCheckerboard(
     modifier: Modifier = Modifier,
     cellSize: Dp = CheckerboardCellSize,
-    colors: ColorPickerColors = ColorPickerDefaults.colors(),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
 ) {
     val brush = rememberCheckerboardBrush(
         cellSize = cellSize,
