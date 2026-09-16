@@ -154,4 +154,60 @@ class HoistedColorTest {
         assertEquals(186f, held.hue)
         assertEquals(1, reports, "the value the caller chose is not reported back at them")
     }
+
+    @Test
+    fun aSlowCallerIsLeftAloneWhileTheFingerIsDown() = runComposeUiTest {
+        // A debounced caller, or one waiting on a store to confirm: their value still holds the
+        // old colour at the moment the change is reported. Putting it back then would pin the
+        // thumb where the drag started for the whole gesture.
+        var held by mutableStateOf(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        var queued: HslColor? = null
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                onColorChange = { queued = it },
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.beginInteraction() }
+        for (hue in listOf(120f, 121f, 122f)) {
+            runOnUiThread { state.updateHue(hue) }
+            waitForIdle()
+            assertEquals(hue, state.hslColor.hue, "the drag reaches the screen at $hue")
+        }
+
+        runOnUiThread { state.endInteraction() }
+        waitForIdle()
+        assertEquals(200f, state.hslColor.hue, "and is corrected once, on the lift")
+
+        held = queued!!
+        waitForIdle()
+        assertEquals(122f, state.hslColor.hue, "then the caller's value lands")
+    }
+
+    @Test
+    fun aRejectionDuringAGestureIsAppliedWhenItEnds() = runComposeUiTest {
+        val held = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)
+        var reports = 0
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                onColorChange = { reports++ },
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.beginInteraction() }
+        runOnUiThread { state.updateHue(120f) }
+        waitForIdle()
+        runOnUiThread { state.endInteraction() }
+        waitForIdle()
+        assertEquals(200f, state.hslColor.hue, "the caller's value is the one that survives")
+        assertEquals(1, reports, "and the end of the gesture is not a second change")
+    }
 }

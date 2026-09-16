@@ -727,6 +727,9 @@ class ColorPickerStateTest {
         state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
         assertEquals(140f, state.okhslColor.hue)
         assertEquals(140f, state.okhsvColor.hue, "Okhsv shares the angle")
+        // OkLCh reaches the same decision through chroma, which the conversion has to report
+        // as zero for a grey rather than as the 1e-8 the matrices leave behind.
+        assertEquals(140f, state.oklchColor.hue, "OkLCh shares it too")
     }
 
     @Test

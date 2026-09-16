@@ -16,14 +16,19 @@ import codes.side.colorpicker.state.ColorPickerState
  * and a callback rather than a state object.
  *
  * The caller's value wins. A change the user makes is reported out, and whatever the caller
- * holds afterwards is written back in — so a callback that declines the change, clamps it, or
- * snaps it to a step leaves the picker showing what the caller settled on rather than what the
- * finger did. Keying the write-in on [color] alone is not enough for that: a caller who rejects
- * leaves their value untouched, and an effect keyed on an unchanged value never runs again.
- * [reports] is bumped on the way out so the write-in is re-armed by the report itself.
+ * holds once the gesture ends is written back in — so a callback that declines the change,
+ * clamps it, or snaps it to a step leaves the picker showing what the caller settled on rather
+ * than what the finger did. Keying the write-in on [color] alone is not enough for that: a
+ * caller who rejects leaves their value untouched, and an effect keyed on an unchanged value
+ * never runs again, so the report bumps [reports] to re-arm it.
  *
- * Reporting out compares against the caller's current value, so a colour the caller writes in
- * is shown without being handed straight back as a change.
+ * The re-arm waits for [ColorPickerState.isInteracting] to go false. Correcting mid-gesture
+ * would fight a caller whose own value lands late — debounced, written by a background
+ * coroutine, confirmed by a store — by putting their stale colour back under a moving finger,
+ * every frame, so the thumb would never leave where the drag started. Such a caller is still
+ * corrected once, when the finger lifts. **The callback is expected to update [color]
+ * synchronously**; one that does not will show that single correction before its own value
+ * arrives.
  *
  * The state itself still owns the origin space, so the zero-drift guarantee survives the trip:
  * a caller round-tripping HSL through their own value never sees it re-derived. That also keeps
@@ -47,11 +52,20 @@ internal fun <T : PickerColor> rememberHoistedColorState(
     }
 
     LaunchedEffect(state) {
-        snapshotFlow { state.read() }.collect { changed ->
-            if (changed != currentColor) {
-                currentOnColorChange(changed)
-                reports++
+        // The colour the caller was last told about, so the emission that only marks the end
+        // of a gesture does not hand them the same one a second time. Cleared once the two
+        // ends agree, or a value reported and put back could never be reported again.
+        var reported: T? = null
+        snapshotFlow { state.read() to state.isInteracting }.collect { (changed, interacting) ->
+            if (changed == currentColor) {
+                reported = null
+                return@collect
             }
+            if (changed != reported) {
+                reported = changed
+                currentOnColorChange(changed)
+            }
+            if (!interacting) reports++
         }
     }
 

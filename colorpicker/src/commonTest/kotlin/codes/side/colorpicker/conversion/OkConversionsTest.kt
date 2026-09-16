@@ -249,6 +249,13 @@ class OkConversionsTest {
             val okhsv = gray.toOkhsv()
             assertNear(0f, okhsl.saturation, 1e-5f, "okhsl saturation at $level")
             assertNear(0f, okhsv.saturation, 1e-5f, "okhsv saturation at $level")
+
+            // Exactly zero, not nearly: anything reading this to decide whether a colour has a
+            // hue gets one answer for every grey. Off the neutral axis by 1e-8 — which is what
+            // the matrices leave behind — atan2 answers 89.9 degrees for all of them.
+            val oklch = gray.toOklch()
+            assertEquals(0f, oklch.chroma, "oklch chroma at $level")
+            assertEquals(0f, oklch.hue, "oklch hue at $level")
         }
     }
 

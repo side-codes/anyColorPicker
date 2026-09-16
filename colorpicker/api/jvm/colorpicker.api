@@ -46,9 +46,7 @@ public final class codes/side/colorpicker/conversion/HexConversionsKt {
 	public static final fun toHexString (Lcodes/side/colorpicker/model/PickerColor;Lcodes/side/colorpicker/conversion/HexAlpha;)Ljava/lang/String;
 	public static synthetic fun toHexString$default (Lcodes/side/colorpicker/model/PickerColor;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Ljava/lang/String;
 	public static final fun toRgbColor (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;)Lcodes/side/colorpicker/model/RgbColor;
-	public static synthetic fun toRgbColor$default (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Lcodes/side/colorpicker/model/RgbColor;
 	public static final fun toRgbColorOrNull (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;)Lcodes/side/colorpicker/model/RgbColor;
-	public static synthetic fun toRgbColorOrNull$default (Ljava/lang/String;Lcodes/side/colorpicker/conversion/HexAlpha;ILjava/lang/Object;)Lcodes/side/colorpicker/model/RgbColor;
 }
 
 public final class codes/side/colorpicker/conversion/HslConversionsKt {
@@ -632,12 +630,6 @@ public final class codes/side/colorpicker/ui/PlaneActionLabels {
 	public static final field $stable I
 	public static final field Companion Lcodes/side/colorpicker/ui/PlaneActionLabels$Companion;
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public final fun component1 ()Ljava/lang/String;
-	public final fun component2 ()Ljava/lang/String;
-	public final fun component3 ()Ljava/lang/String;
-	public final fun component4 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcodes/side/colorpicker/ui/PlaneActionLabels;
-	public static synthetic fun copy$default (Lcodes/side/colorpicker/ui/PlaneActionLabels;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lcodes/side/colorpicker/ui/PlaneActionLabels;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDecreaseX ()Ljava/lang/String;
 	public final fun getDecreaseY ()Ljava/lang/String;

@@ -253,27 +253,26 @@ rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha firs
 rgb.toHexString(HexAlpha.None)             // "#3380CC"
 0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
 
-// Parsing: #RGB and #RRGGBB by default; the '#' is optional
-"#3380CC".toRgbColorOrNull()               // RgbColor, alpha defaults to FF
-"#ABC".toRgbColorOrNull()                  // shorthand, expands to #AABBCC
-"not a color".toRgbColorOrNull()           // null, never throws
-"#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
+// Parsing: the ordering is required, since four and eight digits are ambiguous
+"#3380CC".toRgbColorOrNull(HexAlpha.None)  // RgbColor, alpha defaults to FF
+"#ABC".toRgbColorOrNull(HexAlpha.None)     // shorthand, expands to #AABBCC
+"not a color".toRgbColorOrNull(HexAlpha.None)   // null, never throws
+"#3380CC".toRgbColor(HexAlpha.None)        // throws IllegalArgumentException on invalid input
 ```
 
 Four and eight hex digits carry an alpha channel and cannot tell you at which end —
 `#FF000080` is a half-transparent red to a stylesheet and an opaque navy to
-`android.graphics.Color`. Parsing them needs the convention named, or you get a color that is
-wrong and looks right:
+`android.graphics.Color`. The parser has no default, so every call site says which it has:
 
 ```kotlin
-"#FF000080".toRgbColorOrNull()                   // null: nobody said which end
 "#FF000080".toRgbColorOrNull(HexAlpha.First)     // opaque navy, as Android reads it
 "#FF000080".toRgbColorOrNull(HexAlpha.Last)      // half-transparent red, as CSS reads it
+"#FF000080".toRgbColorOrNull(HexAlpha.None)      // null: the opaque forms only
 "#F00C".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, red at 80%
 ```
 
-Formatting has no such doubt, so it keeps writing `#AARRGGBB` unless told otherwise — which
-means a string from `toHexString()` needs `HexAlpha.First` to read back:
+Formatting has no such doubt, so it keeps its `#AARRGGBB` default — which is what reads its
+own output back:
 
 ```kotlin
 rgb.toHexString()                                // "#FF3380CC"
@@ -281,7 +280,7 @@ rgb.toHexString().toRgbColorOrNull(HexAlpha.First)
 rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
 ```
 
-Three and six digits carry no alpha, so they mean the same thing either way.
+Three and six digits carry no alpha, so they mean the same thing whichever you name.
 
 ## 🧩 Color Picker Components
 
@@ -385,7 +384,9 @@ HslPlane(
 
 Passing `null` drops the actions and leaves the plane readable but not adjustable.
 
-`thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
+`thumb` replaces the position indicator, and receives the plane's `InteractionSource` — which
+carries focus as well as drag, so a replacement can mark keyboard focus the way the default
+indicator does, with a second ring:
 
 ```kotlin
 HslPlane(
