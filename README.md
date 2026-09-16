@@ -248,12 +248,13 @@ val backToOkhsl: OkhslColor = composeColor.toOkhslColor()
 ```kotlin
 val rgb = RgbColor(red = 0.2f, green = 0.5f, blue = 0.8f)
 
-// Formatting: any PickerColor or packed ARGB Int
-rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha first)
+// Formatting: any PickerColor or packed ARGB Int. The ordering is always named.
+rgb.toHexString(HexAlpha.First)            // "#FF3380CC", as android.graphics.Color writes it
+rgb.toHexString(HexAlpha.Last)             // "#3380CCFF", as CSS writes it
 rgb.toHexString(HexAlpha.None)             // "#3380CC"
-0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
+0xFF3380CC.toInt().toHexColorString(HexAlpha.First)
 
-// Parsing: the ordering is required, since four and eight digits are ambiguous
+// Parsing: named there too
 "#3380CC".toRgbColorOrNull(HexAlpha.None)  // RgbColor, alpha defaults to FF
 "#ABC".toRgbColorOrNull(HexAlpha.None)     // shorthand, expands to #AABBCC
 "not a color".toRgbColorOrNull(HexAlpha.None)   // null, never throws
@@ -262,22 +263,17 @@ rgb.toHexString(HexAlpha.None)             // "#3380CC"
 
 Four and eight hex digits carry an alpha channel and cannot tell you at which end —
 `#FF000080` is a half-transparent red to a stylesheet and an opaque navy to
-`android.graphics.Color`. The parser has no default, so every call site says which it has:
+`android.graphics.Color`. Neither end has a default, so a round trip names the same ordering
+twice and the pair reads off one screen:
 
 ```kotlin
+val stored = rgb.toHexString(HexAlpha.First)
+stored.toRgbColorOrNull(HexAlpha.First)          // the colour that went in
+
 "#FF000080".toRgbColorOrNull(HexAlpha.First)     // opaque navy, as Android reads it
 "#FF000080".toRgbColorOrNull(HexAlpha.Last)      // half-transparent red, as CSS reads it
 "#FF000080".toRgbColorOrNull(HexAlpha.None)      // null: the opaque forms only
 "#F00C".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, red at 80%
-```
-
-Formatting has no such doubt, so it keeps its `#AARRGGBB` default — which is what reads its
-own output back:
-
-```kotlin
-rgb.toHexString()                                // "#FF3380CC"
-rgb.toHexString().toRgbColorOrNull(HexAlpha.First)
-rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
 ```
 
 Three and six digits carry no alpha, so they mean the same thing whichever you name.
@@ -366,7 +362,10 @@ colour space rather than showing progress, and mirroring it would have saturatio
 leftwards here while it still grows rightwards on the hue slider beside it.
 
 A plane is reachable without a pointer. It takes focus — by tab or by being pressed — and the
-arrow keys move it a percent at a time, ten with shift held. A screen reader has no gesture for
+arrow keys move it a percent at a time, ten with shift held. An arrow it cannot use, because
+that edge is already reached, is passed on, so focus can still leave on a device driven by a
+D-pad alone. The focus ring is drawn only while the input mode is keyboard, so a finger that
+took focus by pressing the surface does not leave one behind. A screen reader has no gesture for
 two degrees of freedom, so each direction is offered as a named action instead, stepping ten
 percent because an action menu has no modifier key to hold:
 

@@ -4,10 +4,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.PixelMap
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -111,7 +116,11 @@ class PlaneInputTest {
     fun focusShowsOnScreen() = runComposeUiTest {
         // Keyboard focus that changes nothing visible leaves its user guessing which control
         // the arrow keys are about to move.
-        setContent { HslPlane(state = state(), modifier = Modifier.testTag("plane").size(200.dp)) }
+        setContent {
+            CompositionLocalProvider(LocalInputModeManager provides KeyboardInputMode) {
+                HslPlane(state = state(), modifier = Modifier.testTag("plane").size(200.dp))
+            }
+        }
         waitForIdle()
         val before = onNodeWithTag("plane").captureToImage().toPixelMap()
 
@@ -119,12 +128,7 @@ class PlaneInputTest {
         waitForIdle()
         val after = onNodeWithTag("plane").captureToImage().toPixelMap()
 
-        var changed = 0
-        for (x in 0 until before.width) {
-            for (y in 0 until before.height) {
-                if (before[x, y] != after[x, y]) changed++
-            }
-        }
+        val changed = changedPixels(before, after)
         assertTrue(changed > 200, "only $changed pixels changed when the plane took focus")
     }
 
@@ -147,6 +151,25 @@ class PlaneInputTest {
         assertTrue(SemanticsProperties.Focused !in config, "nothing to focus")
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
         assertEquals(0.5f, state.hslColor.saturation, 1e-4f)
+    }
+
+    @Test
+    fun aFingerDoesNotLeaveTheFocusRingBehind() = runComposeUiTest {
+        // Pressing the surface takes focus so the arrow keys carry on from there, which on a
+        // touch device would otherwise paint a keyboard affordance after every drag.
+        setContent {
+            CompositionLocalProvider(LocalInputModeManager provides TouchInputMode) {
+                HslPlane(state = state(), modifier = Modifier.testTag("plane").size(200.dp))
+            }
+        }
+        waitForIdle()
+        val before = onNodeWithTag("plane").captureToImage().toPixelMap()
+
+        onNodeWithTag("plane").requestFocus()
+        waitForIdle()
+        val after = onNodeWithTag("plane").captureToImage().toPixelMap()
+
+        assertEquals(0, changedPixels(before, after), "nothing is drawn for a touch user")
     }
 
     @Test
@@ -192,3 +215,21 @@ private fun Modifier.countKeyDowns(onKeyDown: () -> Unit): Modifier = onKeyEvent
     if (event.type == KeyEventType.KeyDown) onKeyDown()
     false
 }
+
+private fun changedPixels(before: PixelMap, after: PixelMap): Int {
+    var changed = 0
+    for (x in 0 until before.width) {
+        for (y in 0 until before.height) {
+            if (before[x, y] != after[x, y]) changed++
+        }
+    }
+    return changed
+}
+
+private fun inputMode(mode: InputMode) = object : InputModeManager {
+    override val inputMode: InputMode = mode
+    override fun requestInputMode(inputMode: InputMode): Boolean = false
+}
+
+private val TouchInputMode = inputMode(InputMode.Touch)
+private val KeyboardInputMode = inputMode(InputMode.Keyboard)

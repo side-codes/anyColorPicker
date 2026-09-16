@@ -31,9 +31,11 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
@@ -256,11 +258,17 @@ private val FocusRingGap = 4.dp
 private fun PlaneThumb(diameter: Dp, interactionSource: InteractionSource) {
     // Focus is marked on the indicator rather than around the plane: it is where the eye
     // already is, and it moves with the value the arrow keys are changing.
+    //
+    // Only for whoever needs it. Pressing the surface takes focus too, so a finger would
+    // otherwise leave the ring sitting there after the drag, marking a thing the toucher has
+    // no way to act on. A platform with no touch reports Keyboard throughout.
     val focused by interactionSource.collectIsFocusedAsState()
+    val keyboard = LocalInputModeManager.current.inputMode == InputMode.Keyboard
+    val showFocus = focused && keyboard
 
-    Canvas(Modifier.size(if (focused) diameter + FocusRingGap * 2 else diameter)) {
+    Canvas(Modifier.size(if (showFocus) diameter + FocusRingGap * 2 else diameter)) {
         val outer = size.minDimension / 2f - 2.dp.toPx()
-        val radius = if (focused) outer - FocusRingGap.toPx() else outer
+        val radius = if (showFocus) outer - FocusRingGap.toPx() else outer
         // A dark halo under a white ring keeps the indicator readable at both
         // ends of the surface, where a single-colour ring vanishes.
         fun ring(at: Float) {
@@ -277,6 +285,6 @@ private fun PlaneThumb(diameter: Dp, interactionSource: InteractionSource) {
         }
 
         ring(radius)
-        if (focused) ring(outer)
+        if (showFocus) ring(outer)
     }
 }

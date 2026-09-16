@@ -26,15 +26,19 @@ public enum class HexAlpha {
  *
  * The color is first packed into an ARGB [Int], quantizing each channel to 8 bits. [alpha]
  * picks the shape: `#AARRGGBB`, `#RRGGBBAA`, or `#RRGGBB` with the channel dropped.
+ *
+ * There is no default here either. Eight digits mean different colors to a stylesheet and to
+ * `android.graphics.Color`, and a string written without saying which is one that some reader
+ * will get wrong — the same failure as [toRgbColorOrNull], at the end where it starts.
  */
-public fun PickerColor.toHexString(alpha: HexAlpha = HexAlpha.First): String =
+public fun PickerColor.toHexString(alpha: HexAlpha): String =
     toRgbColor().toArgbInt().toHexColorString(alpha)
 
 /**
  * Formats this packed ARGB [Int] as an uppercase hex string with a leading `#`; see
- * [PickerColor.toHexString].
+ * [PickerColor.toHexString], including for why [alpha] has no default.
  */
-public fun Int.toHexColorString(alpha: HexAlpha = HexAlpha.First): String {
+public fun Int.toHexColorString(alpha: HexAlpha): String {
     val rgb = (this and 0xFFFFFF).toString(16).uppercase().padStart(6, '0')
     if (alpha == HexAlpha.None) return "#$rgb"
     val alphaDigits = ((this ushr 24) and 0xFF).toString(16).uppercase().padStart(2, '0')
@@ -56,9 +60,8 @@ public fun Int.toHexColorString(alpha: HexAlpha = HexAlpha.First): String {
  *
  * There is no default: an app that stored colours with 1.1.1's formatter would otherwise find
  * them parsing to `null` after an upgrade, with nothing failing at compile time to say why.
- * [toHexString] writes [HexAlpha.First] unless told otherwise, so that is what reads its output
- * back. Dropping the alpha on the way out instead, to make a bare round trip work, would lose
- * the channel without saying so — which is the same failure at the other end.
+ * [toHexString] has none either, so a round trip names the same ordering at both ends and the
+ * pair can be read off one screen.
  *
  * - `RGB` (3 digits, `#ABC` expands to `#AABBCC`), alpha defaults to `FF`
  * - `ARGB` or `RGBA` (4 digits), each digit doubled as above

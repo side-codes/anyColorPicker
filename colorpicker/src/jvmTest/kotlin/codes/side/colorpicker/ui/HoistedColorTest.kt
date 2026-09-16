@@ -189,6 +189,40 @@ class HoistedColorTest {
     }
 
     @Test
+    fun aCallerArrivingOneStepBehindTheFingerDoesNotPullItBack() = runComposeUiTest {
+        // The other half of a slow caller: one that does answer during the drag, a frame or
+        // more behind it. Each answer is a colour the finger has already moved past, and
+        // writing it in drags the thumb backwards under a gesture that is still going.
+        var held by mutableStateOf(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                // Confirmed elsewhere and written back later, so nothing lands here.
+                onColorChange = {},
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.beginInteraction() }
+        runOnUiThread { state.updateHue(120f) }
+        waitForIdle()
+        runOnUiThread { state.updateHue(121f) }
+        waitForIdle()
+
+        held = HslColor(hue = 120f, saturation = 0.8f, lightness = 0.5f)
+        waitForIdle()
+        assertEquals(121f, state.hslColor.hue, "the finger is at 121, not back at 120")
+
+        runOnUiThread { state.updateHue(122f) }
+        waitForIdle()
+        runOnUiThread { state.endInteraction() }
+        waitForIdle()
+        assertEquals(120f, state.hslColor.hue, "and the lift settles on what the caller holds")
+    }
+
+    @Test
     fun aRejectionDuringAGestureIsAppliedWhenItEnds() = runComposeUiTest {
         val held = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)
         var reports = 0

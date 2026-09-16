@@ -16,7 +16,7 @@ class HexConversionsTest {
 
     @Test
     fun rgbToHexStringWithAlpha() {
-        assertEquals("#FFFF0000", RgbColor.Red.toHexString())
+        assertEquals("#FFFF0000", RgbColor.Red.toHexString(HexAlpha.First))
     }
 
     @Test
@@ -27,40 +27,40 @@ class HexConversionsTest {
     @Test
     fun rgbToHexStringWithTranslucentAlpha() {
         val color = RgbColor.fromInt(red = 255, green = 128, blue = 64, alpha = 128)
-        assertEquals("#80FF8040", color.toHexString())
+        assertEquals("#80FF8040", color.toHexString(HexAlpha.First))
         assertEquals("#FF8040", color.toHexString(HexAlpha.None))
     }
 
     @Test
     fun hexStringPadsLeadingZeros() {
         val color = RgbColor.fromInt(red = 0, green = 0, blue = 18, alpha = 0)
-        assertEquals("#00000012", color.toHexString())
+        assertEquals("#00000012", color.toHexString(HexAlpha.First))
         assertEquals("#000012", color.toHexString(HexAlpha.None))
     }
 
     @Test
     fun hslToHexString() {
-        assertEquals("#FFFF0000", HslColor.Red.toHexString())
+        assertEquals("#FFFF0000", HslColor.Red.toHexString(HexAlpha.First))
     }
 
     @Test
     fun cmykToHexString() {
-        assertEquals("#FFFFFFFF", CmykColor.White.toHexString())
+        assertEquals("#FFFFFFFF", CmykColor.White.toHexString(HexAlpha.First))
     }
 
     @Test
     fun labToHexString() {
-        assertEquals("#FF000000", LabColor.Black.toHexString())
+        assertEquals("#FF000000", LabColor.Black.toHexString(HexAlpha.First))
     }
 
     // ---- Int.toHexColorString ----
 
     @Test
     fun intToHexColorString() {
-        assertEquals("#80FF8040", 0x80FF8040.toInt().toHexColorString())
+        assertEquals("#80FF8040", 0x80FF8040.toInt().toHexColorString(HexAlpha.First))
         assertEquals("#FF8040", 0x80FF8040.toInt().toHexColorString(HexAlpha.None))
-        assertEquals("#00000000", 0x00000000.toHexColorString())
-        assertEquals("#FFFFFFFF", 0xFFFFFFFF.toInt().toHexColorString())
+        assertEquals("#00000000", 0x00000000.toHexColorString(HexAlpha.First))
+        assertEquals("#FFFFFFFF", 0xFFFFFFFF.toInt().toHexColorString(HexAlpha.First))
     }
 
     // ---- String.toRgbColorOrNull ----
@@ -145,8 +145,8 @@ class HexConversionsTest {
 
     @Test
     fun hexToColorToHexRoundTrip() {
-        assertEquals("#80FF8040", "#80FF8040".toRgbColor(HexAlpha.First).toHexString())
-        assertEquals("#FF336699", "#336699".toRgbColor(HexAlpha.None).toHexString())
+        assertEquals("#80FF8040", "#80FF8040".toRgbColor(HexAlpha.First).toHexString(HexAlpha.First))
+        assertEquals("#FF336699", "#336699".toRgbColor(HexAlpha.None).toHexString(HexAlpha.First))
         assertEquals("#336699", "#336699".toRgbColor(HexAlpha.None).toHexString(HexAlpha.None))
     }
 
@@ -155,7 +155,7 @@ class HexConversionsTest {
         // Formatting writes the alpha first; reading it back is where that has to be said, and
         // the parser has no default precisely so this line cannot be written without saying it.
         val original = RgbColor.fromInt(red = 12, green = 200, blue = 99, alpha = 42)
-        assertEquals(original, original.toHexString().toRgbColor(HexAlpha.First))
+        assertEquals(original, original.toHexString(HexAlpha.First).toRgbColor(HexAlpha.First))
     }
 
     // ---- Alpha at the other end ----

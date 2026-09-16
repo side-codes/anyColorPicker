@@ -22,13 +22,15 @@ import codes.side.colorpicker.state.ColorPickerState
  * caller who rejects leaves their value untouched, and an effect keyed on an unchanged value
  * never runs again, so the report bumps [reports] to re-arm it.
  *
- * The re-arm waits for [ColorPickerState.isInteracting] to go false. Correcting mid-gesture
+ * Nothing is written in while [ColorPickerState.isInteracting] is true. Correcting mid-gesture
  * would fight a caller whose own value lands late — debounced, written by a background
- * coroutine, confirmed by a store — by putting their stale colour back under a moving finger,
- * every frame, so the thumb would never leave where the drag started. Such a caller is still
- * corrected once, when the finger lifts. **The callback is expected to update [color]
- * synchronously**; one that does not will show that single correction before its own value
- * arrives.
+ * coroutine, confirmed by a store — by putting their stale colour back under a moving finger:
+ * the thumb would either never leave where the drag started, or jump back a step behind the
+ * finger each time the store answered. The guard covers both arrivals, the report re-arming
+ * the write-in and the caller's own value changing, since either can land mid-drag. Such a
+ * caller is still corrected once, when the finger lifts. **The callback is expected to update
+ * [color] synchronously**; one that does not will show that single correction before its own
+ * value arrives.
  *
  * The state itself still owns the origin space, so the zero-drift guarantee survives the trip:
  * a caller round-tripping HSL through their own value never sees it re-derived. That also keeps
@@ -48,7 +50,7 @@ internal fun <T : PickerColor> rememberHoistedColorState(
     var reports by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(color, reports) {
-        if (state.read() != color) state.write(color)
+        if (!state.isInteracting && state.read() != color) state.write(color)
     }
 
     LaunchedEffect(state) {
