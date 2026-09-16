@@ -23,6 +23,8 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
+ * @param actionLabels names the four accessibility actions that move the plane; see
+ * [ColorPlane].
  * @param thumb optional replacement for the position indicator; see [ColorPlane].
  */
 @Composable
@@ -33,6 +35,12 @@ public fun HslPlane(
     semanticLabel: String? = "Saturation and lightness",
     semanticValueText: String? =
         "${state.hslColor.intSaturation}% saturation, ${state.hslColor.intLightness}% lightness",
+    actionLabels: PlaneActionLabels? = PlaneActionLabels(
+        increaseX = "Increase saturation",
+        decreaseX = "Decrease saturation",
+        increaseY = "Increase lightness",
+        decreaseY = "Decrease lightness",
+    ),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
@@ -72,6 +80,7 @@ public fun HslPlane(
         onValueChangeFinished = { interaction.end() },
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,
+        actionLabels = actionLabels,
         shapes = shapes,
         thumb = thumb,
     )

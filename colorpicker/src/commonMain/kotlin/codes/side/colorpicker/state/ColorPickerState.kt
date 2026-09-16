@@ -141,25 +141,32 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
 
     // A converted neutral reports hue zero because there is no hue in it to find, not because
     // red was chosen. Where the conversion had nothing to say, the last hue that did is used.
+    // Only where it converted: a cylindrical color written in directly carries its own hue,
+    // and overriding that would leave the space unable to say "neutral" at all — the hue the
+    // caller passed would come back as one they had picked earlier.
     private val hslDerived = derivedStateOf {
-        val hsl = authoritative as? HslColor ?: authoritative.toRgbColor().toHsl()
-        if (hsl.saturation == 0f && hsl.hue == 0f) hsl.copy(hue = rememberedHslHue) else hsl
+        authoritative as? HslColor ?: authoritative.toRgbColor().toHsl().let {
+            if (it.saturation == 0f) it.copy(hue = rememberedHslHue) else it
+        }
     }
     private val rgbDerived = derivedStateOf { authoritative.toRgbColor() }
     private val cmykDerived = derivedSpace { it.toCmyk() }
     private val labDerived = derivedSpace { it.toLab() }
     private val oklabDerived = derivedSpace { it.toOklab() }
     private val oklchDerived = derivedStateOf {
-        val oklch = authoritative as? OklchColor ?: authoritative.toRgbColor().toOklch()
-        if (oklch.chroma == 0f && oklch.hue == 0f) oklch.copy(hue = rememberedOkHue) else oklch
+        authoritative as? OklchColor ?: authoritative.toRgbColor().toOklch().let {
+            if (it.chroma == 0f) it.copy(hue = rememberedOkHue) else it
+        }
     }
     private val okhslDerived = derivedStateOf {
-        val okhsl = authoritative as? OkhslColor ?: authoritative.toRgbColor().toOkhsl()
-        if (okhsl.saturation == 0f && okhsl.hue == 0f) okhsl.copy(hue = rememberedOkHue) else okhsl
+        authoritative as? OkhslColor ?: authoritative.toRgbColor().toOkhsl().let {
+            if (it.saturation == 0f) it.copy(hue = rememberedOkHue) else it
+        }
     }
     private val okhsvDerived = derivedStateOf {
-        val okhsv = authoritative as? OkhsvColor ?: authoritative.toRgbColor().toOkhsv()
-        if (okhsv.saturation == 0f && okhsv.hue == 0f) okhsv.copy(hue = rememberedOkHue) else okhsv
+        authoritative as? OkhsvColor ?: authoritative.toRgbColor().toOkhsv().let {
+            if (it.saturation == 0f) it.copy(hue = rememberedOkHue) else it
+        }
     }
 
     // ---- Public read access ----

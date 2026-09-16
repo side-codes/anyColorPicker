@@ -17,7 +17,8 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Hex string parsing and formatting
 - Color picker dialog
 - Two-dimensional color planes — saturation paired with lightness or value — alongside the single-channel sliders
-- Accessibility semantics, and RTL layout support everywhere but the planes, which map a color space rather than showing progress
+- Accessibility semantics throughout — the planes take focus, move with the arrow keys, and offer a screen reader one named action per direction
+- RTL layout support everywhere but the planes, which map a color space rather than showing progress
 
 ## 📦 Setup
 
@@ -247,31 +248,35 @@ val backToOkhsl: OkhslColor = composeColor.toOkhslColor()
 ```kotlin
 val rgb = RgbColor(red = 0.2f, green = 0.5f, blue = 0.8f)
 
-// Formatting: any PickerColor or packed ARGB Int
-rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha first)
+// Formatting: any PickerColor or packed ARGB Int. The ordering is always named.
+rgb.toHexString(HexAlpha.First)            // "#FF3380CC", as android.graphics.Color writes it
+rgb.toHexString(HexAlpha.Last)             // "#3380CCFF", as CSS writes it
 rgb.toHexString(HexAlpha.None)             // "#3380CC"
-0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
+0xFF3380CC.toInt().toHexColorString(HexAlpha.First)
 
-// Parsing: accepts #RGB, #ARGB, #RRGGBB and #AARRGGBB; the '#' is optional
-"#3380CC".toRgbColorOrNull()               // RgbColor, alpha defaults to FF
-"#ABC".toRgbColorOrNull()                  // shorthand, expands to #AABBCC
-"not a color".toRgbColorOrNull()           // null, never throws
-"#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
+// Parsing: named there too
+"#3380CC".toRgbColorOrNull(HexAlpha.None)  // RgbColor, alpha defaults to FF
+"#ABC".toRgbColorOrNull(HexAlpha.None)     // shorthand, expands to #AABBCC
+"not a color".toRgbColorOrNull(HexAlpha.None)   // null, never throws
+"#3380CC".toRgbColor(HexAlpha.None)        // throws IllegalArgumentException on invalid input
 ```
 
-Alpha comes first by default, the way `android.graphics.Color` writes and reads it. CSS puts
-it last, and eight hex digits cannot tell you which you have — `#FF000080` is a
-half-transparent red to a stylesheet and an opaque navy to Android. Say which you mean when
-the string came from somewhere else:
+Four and eight hex digits carry an alpha channel and cannot tell you at which end —
+`#FF000080` is a half-transparent red to a stylesheet and an opaque navy to
+`android.graphics.Color`. Neither end has a default, so a round trip names the same ordering
+twice and the pair reads off one screen:
 
 ```kotlin
-rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
-"#3380CCFF".toRgbColorOrNull(HexAlpha.Last)      // the opaque blue it means
-"#F00F".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, opaque red
+val stored = rgb.toHexString(HexAlpha.First)
+stored.toRgbColorOrNull(HexAlpha.First)          // the colour that went in
+
+"#FF000080".toRgbColorOrNull(HexAlpha.First)     // opaque navy, as Android reads it
+"#FF000080".toRgbColorOrNull(HexAlpha.Last)      // half-transparent red, as CSS reads it
+"#FF000080".toRgbColorOrNull(HexAlpha.None)      // null: the opaque forms only
+"#F00C".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, red at 80%
 ```
 
-Three and six digits carry no alpha, so they mean the same thing either way. `HexAlpha.None`
-formats without it and, when parsing, accepts only the forms that carry none.
+Three and six digits carry no alpha, so they mean the same thing whichever you name.
 
 ## 🧩 Color Picker Components
 
@@ -354,11 +359,33 @@ that the difference is invisible instead.
 
 The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
 colour space rather than showing progress, and mirroring it would have saturation growing
-leftwards here while it still grows rightwards on the hue slider beside it. Screen readers
-get a label and both values, but a two-dimensional drag has no linear equivalent, so the
-sliders remain the accessible path to the same channels.
+leftwards here while it still grows rightwards on the hue slider beside it.
 
-`thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
+A plane is reachable without a pointer. It takes focus — by tab or by being pressed — and the
+arrow keys move it a percent at a time, ten with shift held. An arrow it cannot use, because
+that edge is already reached, is passed on, so focus can still leave on a device driven by a
+D-pad alone. The focus ring is drawn only while the input mode is keyboard, so a finger that
+took focus by pressing the surface does not leave one behind. A screen reader has no gesture for
+two degrees of freedom, so each direction is offered as a named action instead, stepping ten
+percent because an action menu has no modifier key to hold:
+
+```kotlin
+HslPlane(
+    state = state,
+    actionLabels = PlaneActionLabels(          // read aloud, so localize them
+        increaseX = "Sättigung erhöhen",
+        decreaseX = "Sättigung verringern",
+        increaseY = "Helligkeit erhöhen",
+        decreaseY = "Helligkeit verringern",
+    ),
+)
+```
+
+Passing `null` drops the actions and leaves the plane readable but not adjustable.
+
+`thumb` replaces the position indicator, and receives the plane's `InteractionSource` — which
+carries focus as well as drag, so a replacement can mark keyboard focus the way the default
+indicator does, with a second ring:
 
 ```kotlin
 HslPlane(
@@ -505,6 +532,18 @@ ColorPickerDialog(
 ```
 
 In-progress edits inside the dialog survive configuration changes; passing a new `initialColor` resets the picker.
+
+The dialog builds its own state, so unlike the pickers its slider slots are handed that state —
+without it a replacement would have nothing to read or write, which is what localizing a
+dialog's sliders needs:
+
+```kotlin
+ColorPickerDialog(
+    onColorSelected = { /* ... */ },
+    onDismiss = { /* ... */ },
+    hueSlider = { state -> HueSlider(state, label = { Text(stringResource(Res.string.hue)) }) },
+)
+```
 
 ### Theming
 

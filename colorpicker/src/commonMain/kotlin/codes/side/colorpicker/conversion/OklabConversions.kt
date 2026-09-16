@@ -12,6 +12,12 @@ import kotlin.math.sin
 
 private const val DEGREES_PER_RADIAN = 180.0 / kotlin.math.PI
 
+// The sRGB-to-Oklab matrices do not land on exactly zero for a grey: a and b come out around
+// 1e-8, and atan2 reads that as 89.9 degrees with complete confidence. Anything under this is
+// arithmetic residue, not a colour, and calling it neutral is what lets a grey say it has no
+// hue instead of naming one nobody chose.
+private const val NEUTRAL_CHROMA = 1e-6
+
 /** Converts this sRGB color to Oklab. Alpha is carried over unchanged. */
 public fun RgbColor.toOklab(): OklabColor {
     val lab = linearSrgbToOklab(
@@ -53,9 +59,15 @@ public fun OklabColor.toRgb(): RgbColor {
  * Chroma is clamped to `0.4`. [OklabColor]'s a and b are bounded individually, so their
  * square reaches `0.566` at the corners, which [OklchColor]'s radius cannot hold; those
  * colors are far outside sRGB and render the same either way.
+ *
+ * A chroma under `1e-6` is reported as zero with a hue of zero. A grey converted from sRGB
+ * misses the neutral axis by about `1e-8`, which is plenty for an angle to be computed from,
+ * and a hue read off that is arithmetic noise rather than a colour anyone picked.
  */
 public fun OklabColor.toOklch(): OklchColor {
     val chroma = hypot(a.toDouble(), b.toDouble())
+    if (chroma < NEUTRAL_CHROMA) return OklchColor(l = l, chroma = 0f, hue = 0f, alpha = alpha)
+
     val degrees = atan2(b.toDouble(), a.toDouble()) * DEGREES_PER_RADIAN
 
     return OklchColor(

@@ -30,6 +30,8 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
+ * @param actionLabels names the four accessibility actions that move the plane; see
+ * [ColorPlane].
  * @param thumb optional replacement for the position indicator; see [ColorPlane].
  */
 @Composable
@@ -40,6 +42,12 @@ public fun OkhsvPlane(
     semanticLabel: String? = "Saturation and value",
     semanticValueText: String? =
         "${state.okhsvColor.intSaturation}% saturation, ${state.okhsvColor.intValue}% value",
+    actionLabels: PlaneActionLabels? = PlaneActionLabels(
+        increaseX = "Increase saturation",
+        decreaseX = "Decrease saturation",
+        increaseY = "Increase value",
+        decreaseY = "Decrease value",
+    ),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
@@ -66,6 +74,7 @@ public fun OkhsvPlane(
         onValueChangeFinished = { interaction.end() },
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,
+        actionLabels = actionLabels,
         shapes = shapes,
         thumb = thumb,
     )

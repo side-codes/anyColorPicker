@@ -1,11 +1,13 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
@@ -18,12 +20,25 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -35,6 +50,27 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
+
+// One percent of the field per arrow press and ten with shift held, the step the M3 slider
+// uses for its own arrow keys. The accessibility actions take the coarse step whatever is
+// held: there is no modifier to hold in a screen reader's action menu, and a hundred taps to
+// cross the field is not a way to pick a colour.
+internal const val PlaneKeyStep: Float = 0.01f
+internal const val PlaneCoarseKeyStep: Float = 0.1f
+
+/** The step and direction an arrow key asks for, or `null` if [event] is not one. */
+private fun planeKeyStep(event: KeyEvent): Pair<Float, Float>? {
+    if (event.type != KeyEventType.KeyDown) return null
+    val step = if (event.isShiftPressed) PlaneCoarseKeyStep else PlaneKeyStep
+    return when (event.key) {
+        Key.DirectionLeft -> -step to 0f
+        Key.DirectionRight -> step to 0f
+        // yValue grows upward, so the up arrow adds.
+        Key.DirectionUp -> 0f to step
+        Key.DirectionDown -> 0f to -step
+        else -> null
+    }
+}
 
 /** The fraction across a plane [width] pixels wide that a pointer at [x] sits at. */
 internal fun planeXFraction(x: Float, width: Int): Float =
@@ -60,8 +96,14 @@ internal fun planeYFraction(y: Float, height: Int): Float =
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
+ * @param actionLabels names the four accessibility actions that move the plane, since a screen
+ * reader has no gesture for a surface with two degrees of freedom; `null` omits them and leaves
+ * the plane readable but not adjustable. Arrow keys move it by one percent and shift-arrow by
+ * ten, and pressing the surface takes focus so they land where they were aimed.
  * @param thumb optional replacement for the position indicator, receiving the surface's
- * [InteractionSource] so it can react to being dragged. The plane centres whatever it is
+ * [InteractionSource] so it can react to being dragged — and to being focused, which the
+ * default indicator marks with a second ring and a replacement is expected to mark somehow,
+ * since keyboard focus that shows nowhere on screen leaves its user guessing. The plane centres whatever it is
  * given on the current pair of values at whatever size that composable measures to, and
  * draws it outside the clipped surface so that it stays whole at the edges; the composable
  * only has to draw itself.
@@ -77,11 +119,13 @@ public fun ColorPlane(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
+    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val dimensions = ColorPickerDefaults.currentDimensions()
     // The gesture handler outlives any one composition, so it reads the callbacks and the
@@ -89,6 +133,18 @@ public fun ColorPlane(
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
     val currentSurface by rememberUpdatedState(surface)
+
+    // False when the plane is already against that edge. An arrow the plane keeps is an arrow
+    // focus cannot leave on, and a device driven by a D-pad alone has nothing else to press.
+    fun step(dx: Float, dy: Float): Boolean {
+        val newX = (xValue + dx).coerceIn(0f, 1f)
+        val newY = (yValue + dy).coerceIn(0f, 1f)
+        if (newX == xValue && newY == yValue) return false
+
+        currentOnValueChange(newX, newY)
+        currentOnFinished?.invoke()
+        return true
+    }
 
     Layout(
         content = {
@@ -103,7 +159,10 @@ public fun ColorPlane(
             // A bare Box, so the indicator measures to its own size. Giving the wrapper a
             // size instead squeezes a larger custom thumb into the default diameter and
             // strands a smaller one in the corner of it, off the value it marks.
-            Box { if (thumb != null) thumb(interactionSource) else PlaneThumb(dimensions.planeThumbSize) }
+            Box {
+                if (thumb != null) thumb(interactionSource)
+                else PlaneThumb(dimensions.planeThumbSize, interactionSource)
+            }
         },
         modifier = modifier
             .defaultMinSize(dimensions.planeMinSize, dimensions.planeMinSize)
@@ -112,13 +171,39 @@ public fun ColorPlane(
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
                 if (!enabled) disabled()
+                if (enabled && actionLabels != null) {
+                    customActions = listOf(
+                        CustomAccessibilityAction(actionLabels.increaseX) {
+                            step(PlaneCoarseKeyStep, 0f)
+                        },
+                        CustomAccessibilityAction(actionLabels.decreaseX) {
+                            step(-PlaneCoarseKeyStep, 0f)
+                        },
+                        CustomAccessibilityAction(actionLabels.increaseY) {
+                            step(0f, PlaneCoarseKeyStep)
+                        },
+                        CustomAccessibilityAction(actionLabels.decreaseY) {
+                            step(0f, -PlaneCoarseKeyStep)
+                        },
+                    )
+                }
             }
+            .onKeyEvent { event ->
+                if (!enabled) return@onKeyEvent false
+                val (dx, dy) = planeKeyStep(event) ?: return@onKeyEvent false
+                step(dx, dy)
+            }
+            .focusRequester(focusRequester)
+            .focusable(enabled, interactionSource)
             // Keyed on enabled so the handler is torn down rather than left running with a
             // flag it checks: a gesture in flight when the plane is disabled ends there.
             .pointerInput(enabled) {
                 if (!enabled) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Pressing takes focus, so the arrow keys carry on from where the finger
+                    // left off rather than doing nothing until something is tabbed to.
+                    focusRequester.requestFocus()
                     val press = DragInteraction.Start()
                     scope.launch { interactionSource.emit(press) }
                     currentOnValueChange(
@@ -165,22 +250,41 @@ public fun ColorPlane(
     }
 }
 
+// How far outside the indicator the focus ring sits.
+private val FocusRingGap = 4.dp
+
 /** Default position indicator, sized from [ColorPickerDefaults.currentDimensions]. */
 @Composable
-private fun PlaneThumb(diameter: Dp) {
-    Canvas(Modifier.size(diameter)) {
-        val radius = size.minDimension / 2f - 2.dp.toPx()
+private fun PlaneThumb(diameter: Dp, interactionSource: InteractionSource) {
+    // Focus is marked on the indicator rather than around the plane: it is where the eye
+    // already is, and it moves with the value the arrow keys are changing.
+    //
+    // Only for whoever needs it. Pressing the surface takes focus too, so a finger would
+    // otherwise leave the ring sitting there after the drag, marking a thing the toucher has
+    // no way to act on. A platform with no touch reports Keyboard throughout.
+    val focused by interactionSource.collectIsFocusedAsState()
+    val keyboard = LocalInputModeManager.current.inputMode == InputMode.Keyboard
+    val showFocus = focused && keyboard
+
+    Canvas(Modifier.size(if (showFocus) diameter + FocusRingGap * 2 else diameter)) {
+        val outer = size.minDimension / 2f - 2.dp.toPx()
+        val radius = if (showFocus) outer - FocusRingGap.toPx() else outer
         // A dark halo under a white ring keeps the indicator readable at both
         // ends of the surface, where a single-colour ring vanishes.
-        drawCircle(
-            color = Color.Black.copy(alpha = 0.35f),
-            radius = radius,
-            style = Stroke(width = 4.dp.toPx()),
-        )
-        drawCircle(
-            color = Color.White,
-            radius = radius,
-            style = Stroke(width = 2.dp.toPx()),
-        )
+        fun ring(at: Float) {
+            drawCircle(
+                color = Color.Black.copy(alpha = 0.35f),
+                radius = at,
+                style = Stroke(width = 4.dp.toPx()),
+            )
+            drawCircle(
+                color = Color.White,
+                radius = at,
+                style = Stroke(width = 2.dp.toPx()),
+            )
+        }
+
+        ring(radius)
+        if (showFocus) ring(outer)
     }
 }

@@ -7,6 +7,8 @@ import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
 import codes.side.colorpicker.model.OkhslColor
+import codes.side.colorpicker.model.OkhsvColor
+import codes.side.colorpicker.model.OklchColor
 import codes.side.colorpicker.model.RgbColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
@@ -725,6 +727,9 @@ class ColorPickerStateTest {
         state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
         assertEquals(140f, state.okhslColor.hue)
         assertEquals(140f, state.okhsvColor.hue, "Okhsv shares the angle")
+        // OkLCh reaches the same decision through chroma, which the conversion has to report
+        // as zero for a grey rather than as the 1e-8 the matrices leave behind.
+        assertEquals(140f, state.oklchColor.hue, "OkLCh shares it too")
     }
 
     @Test
@@ -742,5 +747,44 @@ class ColorPickerStateTest {
         val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
         state.updateSaturation(0f)
         assertEquals(200f, state.hslColor.hue)
+    }
+
+    @Test
+    fun aNeutralWrittenInHslReadsBackAsItself() {
+        // The space being written to is not a conversion, so nothing about it is missing and
+        // there is nothing to fill in. A picker bound to a caller's value depends on this:
+        // a colour that read back different from the one passed in would be reported straight
+        // back out as a change the user never made.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromHsl(HslColor.White)
+        assertEquals(HslColor.White, state.hslColor)
+    }
+
+    @Test
+    fun hueDraggedToZeroOnAGreyStaysAtZero() {
+        // Saturation at zero and the hue slider dragged to its left end. The thumb has to stay
+        // where it was put; substituting the remembered angle snaps it back and colours the
+        // swatch with a hue the user had already moved off.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateSaturation(0f)
+        state.updateHue(0f)
+        assertEquals(0f, state.hslColor.hue)
+        state.updateSaturation(1f)
+        assertEquals(0f, state.hslColor.hue, "and raising saturation gives red, not the old hue")
+    }
+
+    @Test
+    fun theOkSpacesAlsoReadBackWhatWasWrittenToThem() {
+        val okhsl = ColorPickerState(OkhslColor(hue = 140f, saturation = 0.9f, lightness = 0.5f))
+        okhsl.updateFromOkhsl(OkhslColor(hue = 0f, saturation = 0f, lightness = 1f))
+        assertEquals(0f, okhsl.okhslColor.hue, "Okhsl")
+
+        val okhsv = ColorPickerState(OkhsvColor(hue = 140f, saturation = 0.9f, value = 0.5f))
+        okhsv.updateFromOkhsv(OkhsvColor(hue = 0f, saturation = 0f, value = 1f))
+        assertEquals(0f, okhsv.okhsvColor.hue, "Okhsv")
+
+        val oklch = ColorPickerState(OklchColor(l = 0.5f, chroma = 0.1f, hue = 140f))
+        oklch.updateFromOklch(OklchColor(l = 1f, chroma = 0f, hue = 0f))
+        assertEquals(0f, oklch.oklchColor.hue, "OkLCh")
     }
 }
