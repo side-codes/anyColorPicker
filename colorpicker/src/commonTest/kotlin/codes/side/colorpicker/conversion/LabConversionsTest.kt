@@ -48,11 +48,12 @@ class LabConversionsTest {
 
     @Test
     fun midGrayLabToRgb() {
-        // L=50 should give a mid-gray
         val lab = LabColor(l = 50f, a = 0f, b = 0f)
         val rgb = lab.toRgb()
-        // Mid gray L=50 is roughly sRGB 0.184 (not 0.5, due to gamma)
-        assertTrue(rgb.red > 0.1f && rgb.red < 0.6f, "red should be mid-range: ${rgb.red}")
+        // L* 50 is half-way perceptually, not half-way up the encoding: it carries a linear
+        // luminance of 0.184, which sRGB encodes as 0.466. Pinned to the encoded value, because
+        // a range loose enough to hold both would pass with the gamma step missing altogether.
+        assertNear(0.4663f, rgb.red, tolerance = 0.001f, msg = "encoded mid gray")
         assertNear(rgb.red, rgb.green, tolerance = 0.01f, msg = "gray R==G")
         assertNear(rgb.red, rgb.blue, tolerance = 0.01f, msg = "gray R==B")
     }
@@ -95,14 +96,8 @@ class LabConversionsTest {
         assertNear(0f, lab.b, tolerance = 0.01f, msg = "b")
     }
 
-    @Test
-    fun rgbRedToLab() {
-        val rgb = RgbColor(1f, 0f, 0f)
-        val lab = rgb.toLab()
-        assertTrue(lab.l > 50f && lab.l < 56f, "L for red: ${lab.l}")
-        assertTrue(lab.a > 75f, "a for red: ${lab.a}")
-        assertTrue(lab.b > 60f, "b for red: ${lab.b}")
-    }
+    // Red's exact Lab value is pinned by redMatchesTheLabValueOtherToolsReport; a second,
+    // looser assertion on the same input would only be a weaker way to fail.
 
     // ---- Interchange with other tools ----
 

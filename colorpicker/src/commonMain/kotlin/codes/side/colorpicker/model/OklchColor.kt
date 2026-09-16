@@ -102,12 +102,13 @@ public class OklchColor(
          * Creates an [OklchColor] from integer channels: [l] in `0..100` percent,
          * [chroma] in `0..100` percent of the `0..0.4` reference range, [hue] in degrees,
          * [alpha] in `0..255`. Unlike the constructor, out-of-range values are clamped
-         * instead of throwing.
+         * instead of throwing — except [hue], which wraps, since an angle has no ends:
+         * `370` is `10` and `-10` is `350`.
          */
         public fun fromInt(l: Int, chroma: Int, hue: Int, alpha: Int = 255): OklchColor = OklchColor(
             l = (l / 100f).coerceIn(0f, 1f),
             chroma = (chroma / 100f * OKLAB_AB_RANGE).coerceIn(0f, OKLAB_AB_RANGE),
-            hue = hue.toFloat().coerceIn(0f, 360f),
+            hue = wrapHue(hue),
             alpha = (alpha / 255f).coerceIn(0f, 1f),
         )
     }

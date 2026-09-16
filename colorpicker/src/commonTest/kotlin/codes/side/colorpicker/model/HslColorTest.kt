@@ -213,8 +213,8 @@ class HslColorTest {
     @Test
     fun fromIntClampsValues() {
         val hsl = HslColor.fromInt(hue = 999, saturation = 200, lightness = -10, alpha = 300)
-        // hue clamps to 360, which the constructor normalizes to 0
-        assertEquals(0f, hsl.hue)
+        // Hue wraps rather than clamping: 999 is two turns and 279 degrees.
+        assertEquals(279f, hsl.hue)
         assertEquals(1f, hsl.saturation)
         assertEquals(0f, hsl.lightness)
         assertEquals(1f, hsl.alpha)
@@ -223,7 +223,7 @@ class HslColorTest {
     @Test
     fun fromIntClampsNegatives() {
         val hsl = HslColor.fromInt(hue = -10, saturation = -5, lightness = -1, alpha = -1)
-        assertEquals(0f, hsl.hue)
+        assertEquals(350f, hsl.hue, "a negative hue wraps backwards")
         assertEquals(0f, hsl.saturation)
         assertEquals(0f, hsl.lightness)
         assertEquals(0f, hsl.alpha)

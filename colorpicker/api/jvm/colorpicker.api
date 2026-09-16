@@ -490,6 +490,7 @@ public final class codes/side/colorpicker/ui/AlphaSliderKt {
 }
 
 public final class codes/side/colorpicker/ui/CmykColorPickerKt {
+	public static final fun CmykColorPicker (Lcodes/side/colorpicker/model/CmykColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun CmykColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -572,6 +573,7 @@ public final class codes/side/colorpicker/ui/ComposableSingletons$RgbSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/HslColorPickerKt {
+	public static final fun HslColorPicker (Lcodes/side/colorpicker/model/HslColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun HslColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -586,6 +588,7 @@ public final class codes/side/colorpicker/ui/HslSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/LabColorPickerKt {
+	public static final fun LabColorPicker (Lcodes/side/colorpicker/model/LabColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun LabColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -596,6 +599,7 @@ public final class codes/side/colorpicker/ui/LabSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/OkhslColorPickerKt {
+	public static final fun OkhslColorPicker (Lcodes/side/colorpicker/model/OkhslColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun OkhslColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -610,6 +614,7 @@ public final class codes/side/colorpicker/ui/OkhslSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/OkhsvColorPickerKt {
+	public static final fun OkhsvColorPicker (Lcodes/side/colorpicker/model/OkhsvColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun OkhsvColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 
@@ -624,6 +629,7 @@ public final class codes/side/colorpicker/ui/OkhsvSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/RgbColorPickerKt {
+	public static final fun RgbColorPicker (Lcodes/side/colorpicker/model/RgbColor;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun RgbColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;III)V
 }
 

@@ -4,7 +4,14 @@ import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.RgbColor
 
-/** Converts this CMYK color to RGB. Alpha is carried over unchanged. */
+/**
+ * Converts this CMYK color to RGB. Alpha is carried over unchanged.
+ *
+ * The naive conversion — the arithmetic below and no colour profile. It is a reversible way to
+ * put four numbers on screen, and it is not what a press will print: real CMYK is device
+ * dependent, its gamut is not sRGB's, and getting from one to the other means an ICC profile
+ * and a rendering intent. Treat these values as a screen-space parameterisation rather than ink.
+ */
 public fun CmykColor.toRgb(): RgbColor {
     val r = (1f - cyan) * (1f - key)
     val g = (1f - magenta) * (1f - key)

@@ -105,7 +105,7 @@ class OkColorModelTest {
         val oklch = OklchColor.fromInt(l = -10, chroma = 500, hue = 400, alpha = -1)
         assertEquals(0f, oklch.l)
         assertEquals(0.4f, oklch.chroma)
-        assertEquals(0f, oklch.hue) // 400 clamps to 360, which normalizes to 0
+        assertEquals(40f, oklch.hue) // 400 wraps to 40
         assertEquals(0f, oklch.alpha)
     }
 
@@ -154,7 +154,7 @@ class OkColorModelTest {
     @Test
     fun okhslFromIntClampsInsteadOfThrowing() {
         val okhsl = OkhslColor.fromInt(hue = -20, saturation = 150, lightness = -5, alpha = 999)
-        assertEquals(0f, okhsl.hue)
+        assertEquals(340f, okhsl.hue) // -20 wraps to 340
         assertEquals(1f, okhsl.saturation)
         assertEquals(0f, okhsl.lightness)
         assertEquals(1f, okhsl.alpha)
@@ -197,7 +197,7 @@ class OkColorModelTest {
     @Test
     fun okhsvFromIntClampsInsteadOfThrowing() {
         val okhsv = OkhsvColor.fromInt(hue = 400, saturation = -50, value = 150, alpha = -1)
-        assertEquals(0f, okhsv.hue) // 400 clamps to 360, which normalizes to 0
+        assertEquals(40f, okhsv.hue) // 400 wraps to 40
         assertEquals(0f, okhsv.saturation)
         assertEquals(1f, okhsv.value)
         assertEquals(0f, okhsv.alpha)

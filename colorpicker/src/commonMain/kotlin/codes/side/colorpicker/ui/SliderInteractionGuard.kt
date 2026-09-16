@@ -18,16 +18,23 @@ internal class SliderInteractionGuard(private val state: ColorPickerState) : Rem
 
     private var active = false
 
-    /** Call from `onValueChange`, or when a pointer goes down: marks the gesture active. */
+    /**
+     * Call from `onValueChange`, or when a pointer goes down: marks the gesture active.
+     *
+     * `onValueChange` fires on every movement, so this counts the component in once and
+     * ignores the rest until it ends.
+     */
     fun begin() {
+        if (active) return
         active = true
-        state.isInteracting = true
+        state.beginInteraction()
     }
 
     /** Call from `onValueChangeFinished`, or when the drag ends: marks the gesture finished. */
     fun end() {
+        if (!active) return
         active = false
-        state.isInteracting = false
+        state.endInteraction()
     }
 
     override fun onRemembered() {}

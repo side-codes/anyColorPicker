@@ -137,8 +137,11 @@ public fun SaturationSlider(
     val hsl = state.hslColor
     val gradientColors = remember(hsl.hue, hsl.lightness, coloringMode) {
         when (coloringMode) {
+            // Both ends through the conversion. Compose's Color.Gray is #888888 and zero
+            // saturation at mid lightness is #808080, so naming the constant put the track a
+            // step off the colour its own thumb is painted with.
             ColoringMode.Independent -> persistentListOf(
-                Color.Gray,
+                HslColor(hue = hsl.hue, saturation = 0f, lightness = 0.5f).toComposeColor(),
                 HslColor(hue = hsl.hue, saturation = 1f, lightness = 0.5f).toComposeColor(),
             )
 
