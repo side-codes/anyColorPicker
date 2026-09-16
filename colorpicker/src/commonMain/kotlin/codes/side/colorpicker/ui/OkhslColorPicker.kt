@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -70,4 +71,44 @@ public fun OkhslColorPicker(
             if (showAlpha) alphaSlider()
         }
     }
+}
+
+/**
+ * [OkhslColorPicker] over a colour the caller holds, for an app keeping it in a view model rather
+ * than in a [ColorPickerState].
+ *
+ * [onColorChange] fires for changes the user makes, not for a [color] written back in, so the
+ * usual loop of the two updating each other does not start.
+ *
+ * The slots are not here: their defaults name the state, which this overload owns. Reach for
+ * the [ColorPickerState] overload to replace a slider.
+ */
+@Composable
+public fun OkhslColorPicker(
+    color: OkhslColor,
+    onColorChange: (OkhslColor) -> Unit,
+    modifier: Modifier = Modifier,
+    showAlpha: Boolean = true,
+    enabled: Boolean = true,
+    coloringMode: ColoringMode = ColoringMode.Independent,
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+) {
+    val state = rememberHoistedColorState(
+        color = color,
+        read = { okhslColor },
+        write = { updateFromOkhsl(it) },
+        onColorChange = onColorChange,
+    )
+    OkhslColorPicker(
+        state = state,
+        modifier = modifier,
+        showAlpha = showAlpha,
+        enabled = enabled,
+        coloringMode = coloringMode,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+    )
 }

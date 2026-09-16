@@ -38,8 +38,16 @@ import codes.side.colorpicker.model.RgbColor
  * observed in the other spaces are conversions and carry ordinary conversion
  * rounding.
  *
+ * The guarantee covers the space being written to, and nothing else. A colour written from one
+ * space and read in another is a conversion, and a conversion cannot invent what the colour
+ * does not carry: grey, black and white have no hue, so reading a hue off one would report red.
+ * Since a user dragging lightness to zero has not chosen red, the last hue that was actually
+ * chosen is kept and handed back for those, the way a painting tool does. HSL's hue angle and
+ * Oklab's are different quantities and are remembered separately. Saturation is not treated the
+ * same way: a grey really is unsaturated, whereas its hue is merely unknown.
+ *
  * Backed by Compose snapshot state: reads are safe from any thread, but writes
- * (the `update*` methods and [isInteracting]) are expected on the main thread,
+ * (the `update*` methods) are expected on the main thread,
  * like other Compose UI state. Updates are idempotent — writing a value equal to
  * the current one produces no observable state change.
  *
@@ -55,18 +63,67 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
 
     // The single authoritative value. Its runtime type is the origin space —
     // whichever space was last written to.
-    private var authoritative by mutableStateOf<PickerColor>(initialColor)
+    private var authoritativeColor by mutableStateOf<PickerColor>(initialColor)
+
+    // Grey, black and white have no hue to convert, so a cylindrical view of one reports zero
+    // — red. Origin tracking already keeps the hue while the cylindrical space is the one being
+    // written to; this is for when another space writes the neutral, which is where it would
+    // otherwise be lost. HSL's hue and Oklab's are different angles, so they are kept apart;
+    // Okhsl, Okhsv and OkLCh all share the second.
+    private var rememberedHslHue by mutableStateOf(0f)
+    private var rememberedOkHue by mutableStateOf(0f)
+
+    private var authoritative: PickerColor
+        get() = authoritativeColor
+        set(value) {
+            authoritativeColor = value
+            rememberHueOf(value)
+        }
 
     /**
-     * True while the user is actively dragging one of the library's sliders or planes —
-     * [codes.side.colorpicker.ui.HslPlane], [codes.side.colorpicker.ui.OkhslPlane] or
-     * [codes.side.colorpicker.ui.OkhsvPlane] — set on the first value change, cleared when
-     * the gesture finishes or the interacting component leaves composition mid-drag. Useful
-     * for deferring expensive work until the interaction ends. Programmatic `update*` calls
-     * do not affect this flag.
+     * Records the hue of a colour that has one, taken from the colour itself rather than
+     * converted, so a write costs nothing beyond a type check.
      */
-    public var isInteracting: Boolean by mutableStateOf(false)
-        internal set
+    private fun rememberHueOf(color: PickerColor) {
+        when (color) {
+            is HslColor -> if (color.saturation > 0f) rememberedHslHue = color.hue
+            is OkhslColor -> if (color.saturation > 0f) rememberedOkHue = color.hue
+            is OkhsvColor -> if (color.saturation > 0f) rememberedOkHue = color.hue
+            is OklchColor -> if (color.chroma > 0f) rememberedOkHue = color.hue
+            else -> Unit
+        }
+    }
+
+    init {
+        rememberHueOf(initialColor)
+    }
+
+    // How many components are mid-gesture, not whether any is. A touch screen can drag two
+    // sliders at once, and a single flag would go false when the first of them finished while
+    // the second was still moving.
+    private var interactions by mutableStateOf(0)
+
+    /**
+     * True while the user is actively dragging any of the library's sliders or planes —
+     * [codes.side.colorpicker.ui.HslPlane], [codes.side.colorpicker.ui.OkhslPlane] or
+     * [codes.side.colorpicker.ui.OkhsvPlane] — set on the first value change, cleared when the
+     * last gesture finishes or the interacting components leave composition mid-drag. Useful
+     * for deferring expensive work until the interaction ends. Programmatic `update*` calls do
+     * not affect it.
+     *
+     * Stays true while any one of several simultaneous drags is still going.
+     */
+    public val isInteracting: Boolean get() = interactions > 0
+
+    /** Counts one component into [isInteracting]; balanced by [endInteraction]. */
+    internal fun beginInteraction() {
+        interactions++
+    }
+
+    /** Counts one component back out of [isInteracting]. */
+    internal fun endInteraction() {
+        if (interactions > 0) interactions--
+    }
 
     // ---- Derived spaces (pure computation, no writes on read) ----
 
@@ -82,14 +139,28 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
         color as? T ?: convert(color.toRgbColor())
     }
 
-    private val hslDerived = derivedSpace { it.toHsl() }
+    // A converted neutral reports hue zero because there is no hue in it to find, not because
+    // red was chosen. Where the conversion had nothing to say, the last hue that did is used.
+    private val hslDerived = derivedStateOf {
+        val hsl = authoritative as? HslColor ?: authoritative.toRgbColor().toHsl()
+        if (hsl.saturation == 0f && hsl.hue == 0f) hsl.copy(hue = rememberedHslHue) else hsl
+    }
     private val rgbDerived = derivedStateOf { authoritative.toRgbColor() }
     private val cmykDerived = derivedSpace { it.toCmyk() }
     private val labDerived = derivedSpace { it.toLab() }
     private val oklabDerived = derivedSpace { it.toOklab() }
-    private val oklchDerived = derivedSpace { it.toOklch() }
-    private val okhslDerived = derivedSpace { it.toOkhsl() }
-    private val okhsvDerived = derivedSpace { it.toOkhsv() }
+    private val oklchDerived = derivedStateOf {
+        val oklch = authoritative as? OklchColor ?: authoritative.toRgbColor().toOklch()
+        if (oklch.chroma == 0f && oklch.hue == 0f) oklch.copy(hue = rememberedOkHue) else oklch
+    }
+    private val okhslDerived = derivedStateOf {
+        val okhsl = authoritative as? OkhslColor ?: authoritative.toRgbColor().toOkhsl()
+        if (okhsl.saturation == 0f && okhsl.hue == 0f) okhsl.copy(hue = rememberedOkHue) else okhsl
+    }
+    private val okhsvDerived = derivedStateOf {
+        val okhsv = authoritative as? OkhsvColor ?: authoritative.toRgbColor().toOkhsv()
+        if (okhsv.saturation == 0f && okhsv.hue == 0f) okhsv.copy(hue = rememberedOkHue) else okhsv
+    }
 
     // ---- Public read access ----
 

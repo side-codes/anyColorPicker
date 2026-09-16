@@ -109,7 +109,8 @@ public class OkhslColor(
         /**
          * Creates an [OkhslColor] from integer channels: [hue] in degrees, [saturation]
          * and [lightness] in `0..100` percent, [alpha] in `0..255`. Unlike the
-         * constructor, out-of-range values are clamped instead of throwing.
+         * constructor, out-of-range values are clamped instead of throwing — except [hue],
+         * which wraps, since an angle has no ends: `370` is `10` and `-10` is `350`.
          */
         public fun fromInt(
             hue: Int,
@@ -117,7 +118,7 @@ public class OkhslColor(
             lightness: Int,
             alpha: Int = 255,
         ): OkhslColor = OkhslColor(
-            hue = hue.toFloat().coerceIn(0f, 360f),
+            hue = wrapHue(hue),
             saturation = (saturation / 100f).coerceIn(0f, 1f),
             lightness = (lightness / 100f).coerceIn(0f, 1f),
             alpha = (alpha / 255f).coerceIn(0f, 1f),

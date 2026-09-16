@@ -6,6 +6,7 @@ import androidx.compose.runtime.snapshots.Snapshot
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
+import codes.side.colorpicker.model.OkhslColor
 import codes.side.colorpicker.model.RgbColor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
@@ -531,13 +532,38 @@ class ColorPickerStateTest {
     // ---- isInteracting ----
 
     @Test
-    fun isInteractingIsSettableFromInternalCode() {
+    fun isInteractingTracksOneGesture() {
         val state = createState()
         assertFalse(state.isInteracting)
-        state.isInteracting = true
+        state.beginInteraction()
         assertTrue(state.isInteracting)
-        state.isInteracting = false
+        state.endInteraction()
         assertFalse(state.isInteracting)
+    }
+
+    @Test
+    fun isInteractingOutlastsTheFirstOfTwoGestures() {
+        // Two fingers, two sliders. The flag is about whether a drag is in progress at all, so
+        // the first one to finish must not answer for the one still moving.
+        val state = createState()
+        state.beginInteraction()
+        state.beginInteraction()
+        state.endInteraction()
+        assertTrue(state.isInteracting, "one gesture is still going")
+        state.endInteraction()
+        assertFalse(state.isInteracting)
+    }
+
+    @Test
+    fun isInteractingDoesNotGoNegative() {
+        // A component disposed mid-drag ends its own gesture, and ending twice must not leave
+        // a count that a later begin cannot lift off zero.
+        val state = createState()
+        state.beginInteraction()
+        state.endInteraction()
+        state.endInteraction()
+        state.beginInteraction()
+        assertTrue(state.isInteracting)
     }
 
     // ---- Saver ----
@@ -669,5 +695,52 @@ class ColorPickerStateTest {
     @Test
     fun saverRestoreWrongSizeReturnsNull() {
         assertNull(ColorPickerStateSaver.restore(floatArrayOf(0f, 120f)))
+    }
+
+    // ---- Hue through a neutral ----
+
+    @Test
+    fun hueSurvivesAGreyWrittenFromAnotherSpace() {
+        // The scenario: HSL sliders and an RGB field over one state. Dragging RGB to grey used
+        // to answer red on the hue slider, because a grey has no hue to convert.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        assertEquals(200f, state.hslColor.hue)
+        assertEquals(0f, state.hslColor.saturation, "a grey is still a grey")
+    }
+
+    @Test
+    fun hueSurvivesBlackAndWhite() {
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(0f, 0f, 0f))
+        assertEquals(200f, state.hslColor.hue)
+        state.updateFromRgb(RgbColor(1f, 1f, 1f))
+        assertEquals(200f, state.hslColor.hue)
+    }
+
+    @Test
+    fun theOkSpacesKeepTheirOwnHue() {
+        // Oklab's hue angle is not HSL's, so the two are remembered separately.
+        val state = ColorPickerState(OkhslColor(hue = 140f, saturation = 0.9f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        assertEquals(140f, state.okhslColor.hue)
+        assertEquals(140f, state.okhsvColor.hue, "Okhsv shares the angle")
+    }
+
+    @Test
+    fun aColouredConversionIsNotOverridden() {
+        // Only a hueless colour borrows the remembered angle; anything with a hue keeps its own.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(1f, 0f, 0f))
+        assertEquals(0f, state.hslColor.hue, "red is red, not the remembered 200")
+    }
+
+    @Test
+    fun aDeliberateZeroHueAtZeroSaturationIsLeftAlone() {
+        // Saturation dragged to zero inside HSL: origin tracking already holds the hue, and the
+        // remembered one must not be substituted over it.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateSaturation(0f)
+        assertEquals(200f, state.hslColor.hue)
     }
 }

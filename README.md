@@ -126,6 +126,8 @@ val color = CmykColor(cyan = 0.3f, magenta = 0.6f, yellow = 0.1f, key = 0.2f)
 CmykColor.fromInt(cyan = 30, magenta = 60, yellow = 10, key = 20)
 ```
 
+The naive conversion, with no colour profile. It round-trips on screen and is not what a press will print — real CMYK is device dependent, its gamut is not sRGB's, and crossing between them needs an ICC profile and a rendering intent. Treat these as a screen-space parameterisation rather than ink.
+
 ### LAB
 
 ```kotlin
@@ -589,6 +591,8 @@ Color space conversions are inherently lossy when values are quantized to intege
 **Store colors in their authored color space. Convert forward only. Never convert back.**
 
 `ColorPickerState` tracks which color space was last written to (the *origin*). When you read a different space, it converts forward once from the origin. The origin value is never re-derived from a conversion.
+
+That covers the space being written to. Read a *different* space and you get a conversion, which cannot invent what the colour does not carry — grey, black and white have no hue, so a hue read off one would be red. Because someone who dragged lightness to zero did not choose red, the last hue actually chosen is kept and handed back, as a painting tool does. HSL's hue angle and Oklab's are separate quantities and are remembered separately. Saturation is not treated this way: a grey really is unsaturated, where its hue is only unknown.
 
 ```
 User drags Red slider
