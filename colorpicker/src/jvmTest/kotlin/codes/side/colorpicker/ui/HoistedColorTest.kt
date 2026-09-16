@@ -12,6 +12,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.state.ColorPickerState
+import kotlin.math.round
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -86,5 +87,71 @@ class HoistedColorTest {
             waitForIdle()
         }
         assertEquals(0, reports, "nothing the caller wrote should have come back as a change")
+    }
+
+    @Test
+    fun aRejectedChangeIsPutBack() = runComposeUiTest {
+        // A caller that validates and says no. The picker cannot be left showing a colour its
+        // owner refused, or the swatch and the caller's value disagree with nothing on screen
+        // to say which one is real.
+        val held = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)
+        var reports = 0
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                onColorChange = { reports++ },
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.updateHue(120f) }
+        waitForIdle()
+        assertEquals(200f, state.hslColor.hue, "the caller's value is the one that survives")
+        assertEquals(1, reports, "and they were asked once, not once per frame")
+    }
+
+    @Test
+    fun aChangeRoundedByTheCallerIsShownRounded() = runComposeUiTest {
+        // Snapping to steps is the common shape of this: the callback answers with a value the
+        // picker never sent, and it happens to equal the one the caller already held, so there
+        // is no change for an effect keyed on the value to notice.
+        var held by mutableStateOf(HslColor(hue = 180f, saturation = 0.8f, lightness = 0.5f))
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                onColorChange = { held = it.copy(hue = round(it.hue / 30f) * 30f) },
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.updateHue(185f) }
+        waitForIdle()
+        assertEquals(180f, state.hslColor.hue, "the picker shows the step, not the finger")
+        assertEquals(180f, held.hue)
+    }
+
+    @Test
+    fun aCallerThatTransformsEveryChangeStillSettles() = runComposeUiTest {
+        var held by mutableStateOf(HslColor(hue = 180f, saturation = 0.8f, lightness = 0.5f))
+        var reports = 0
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberHoistedColorState(
+                color = held,
+                read = { hslColor },
+                write = { updateFromHsl(it) },
+                onColorChange = { held = it.copy(hue = it.hue + 1f); reports++ },
+            )
+        }
+        waitForIdle()
+        runOnUiThread { state.updateHue(185f) }
+        waitForIdle()
+        assertEquals(186f, state.hslColor.hue)
+        assertEquals(186f, held.hue)
+        assertEquals(1, reports, "the value the caller chose is not reported back at them")
     }
 }

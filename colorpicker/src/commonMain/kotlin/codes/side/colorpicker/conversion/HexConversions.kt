@@ -11,7 +11,10 @@ import codes.side.colorpicker.model.RgbColor
  * Both conventions are in wide use, so the one in play is named rather than guessed.
  */
 public enum class HexAlpha {
-    /** `#RRGGBB` and `#RGB`, with no alpha digits. Formats opaque; parses opaque-only. */
+    /**
+     * `#RRGGBB` and `#RGB`, with no alpha digits. Formats opaque; parses the opaque forms and
+     * refuses the rest, which is what makes it the safe default for parsing.
+     */
     None,
 
     /** `#AARRGGBB` and `#ARGB`, as `android.graphics.Color` writes and reads them. */
@@ -47,11 +50,16 @@ public fun Int.toHexColorString(alpha: HexAlpha = HexAlpha.First): String {
 /**
  * Parses this string as a hex color, or returns `null` if it is not one.
  *
- * The leading `#` is optional and parsing is case-insensitive. Three and six digits carry
- * no alpha and mean the same thing whatever [alpha] says; four and eight read theirs from
- * the end it names, so a string copied out of a stylesheet needs [HexAlpha.Last] or it comes
- * back a different color rather than `null`. [HexAlpha.None] accepts only the forms that
- * carry no alpha, for a caller that wants an opaque color or nothing.
+ * The leading `#` is optional and parsing is case-insensitive. Three and six digits carry no
+ * alpha and mean the same thing whatever [alpha] says. Four and eight carry one and cannot say
+ * at which end, so the default refuses them: `#F00C` is a red at 80% to a stylesheet and an
+ * opaque navy to `android.graphics.Color`, and answering with either is a wrong color that
+ * looks like a right one. Name the end — [HexAlpha.First] for Android's strings, [HexAlpha.Last]
+ * for CSS — and they parse.
+ *
+ * [toHexString] still writes [HexAlpha.First] by default, so its output needs that named back
+ * here. Matching the two by dropping the alpha on the way out instead would lose the channel
+ * without saying so, which is the failure this default exists to avoid; `null` at least asks.
  *
  * - `RGB` (3 digits, `#ABC` expands to `#AABBCC`), alpha defaults to `FF`
  * - `ARGB` or `RGBA` (4 digits), each digit doubled as above
@@ -60,7 +68,7 @@ public fun Int.toHexColorString(alpha: HexAlpha = HexAlpha.First): String {
  *
  * Any other length or any non-hex character yields `null`; this function never throws.
  */
-public fun String.toRgbColorOrNull(alpha: HexAlpha = HexAlpha.First): RgbColor? {
+public fun String.toRgbColorOrNull(alpha: HexAlpha = HexAlpha.None): RgbColor? {
     val hex = removePrefix("#")
     if (hex.any { it !in '0'..'9' && it !in 'a'..'f' && it !in 'A'..'F' }) {
         return null
@@ -99,5 +107,5 @@ private fun alphaFirst(hex: String, alpha: HexAlpha): String = when (alpha) {
  *
  * @throws IllegalArgumentException if the string is not a valid hex color.
  */
-public fun String.toRgbColor(alpha: HexAlpha = HexAlpha.First): RgbColor =
+public fun String.toRgbColor(alpha: HexAlpha = HexAlpha.None): RgbColor =
     toRgbColorOrNull(alpha) ?: throw IllegalArgumentException("Invalid hex color string: '$this'")

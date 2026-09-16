@@ -17,7 +17,8 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Hex string parsing and formatting
 - Color picker dialog
 - Two-dimensional color planes — saturation paired with lightness or value — alongside the single-channel sliders
-- Accessibility semantics, and RTL layout support everywhere but the planes, which map a color space rather than showing progress
+- Accessibility semantics throughout — the planes take focus, move with the arrow keys, and offer a screen reader one named action per direction
+- RTL layout support everywhere but the planes, which map a color space rather than showing progress
 
 ## 📦 Setup
 
@@ -252,26 +253,35 @@ rgb.toHexString()                          // "#FF3380CC" (#AARRGGBB, alpha firs
 rgb.toHexString(HexAlpha.None)             // "#3380CC"
 0xFF3380CC.toInt().toHexColorString()      // "#FF3380CC"
 
-// Parsing: accepts #RGB, #ARGB, #RRGGBB and #AARRGGBB; the '#' is optional
+// Parsing: #RGB and #RRGGBB by default; the '#' is optional
 "#3380CC".toRgbColorOrNull()               // RgbColor, alpha defaults to FF
 "#ABC".toRgbColorOrNull()                  // shorthand, expands to #AABBCC
 "not a color".toRgbColorOrNull()           // null, never throws
 "#3380CC".toRgbColor()                     // throws IllegalArgumentException on invalid input
 ```
 
-Alpha comes first by default, the way `android.graphics.Color` writes and reads it. CSS puts
-it last, and eight hex digits cannot tell you which you have — `#FF000080` is a
-half-transparent red to a stylesheet and an opaque navy to Android. Say which you mean when
-the string came from somewhere else:
+Four and eight hex digits carry an alpha channel and cannot tell you at which end —
+`#FF000080` is a half-transparent red to a stylesheet and an opaque navy to
+`android.graphics.Color`. Parsing them needs the convention named, or you get a color that is
+wrong and looks right:
 
 ```kotlin
-rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
-"#3380CCFF".toRgbColorOrNull(HexAlpha.Last)      // the opaque blue it means
-"#F00F".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, opaque red
+"#FF000080".toRgbColorOrNull()                   // null: nobody said which end
+"#FF000080".toRgbColorOrNull(HexAlpha.First)     // opaque navy, as Android reads it
+"#FF000080".toRgbColorOrNull(HexAlpha.Last)      // half-transparent red, as CSS reads it
+"#F00C".toRgbColorOrNull(HexAlpha.Last)          // #RGBA shorthand, red at 80%
 ```
 
-Three and six digits carry no alpha, so they mean the same thing either way. `HexAlpha.None`
-formats without it and, when parsing, accepts only the forms that carry none.
+Formatting has no such doubt, so it keeps writing `#AARRGGBB` unless told otherwise — which
+means a string from `toHexString()` needs `HexAlpha.First` to read back:
+
+```kotlin
+rgb.toHexString()                                // "#FF3380CC"
+rgb.toHexString().toRgbColorOrNull(HexAlpha.First)
+rgb.toHexString(HexAlpha.Last)                   // "#3380CCFF", as CSS writes it
+```
+
+Three and six digits carry no alpha, so they mean the same thing either way.
 
 ## 🧩 Color Picker Components
 
@@ -354,9 +364,26 @@ that the difference is invisible instead.
 
 The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
 colour space rather than showing progress, and mirroring it would have saturation growing
-leftwards here while it still grows rightwards on the hue slider beside it. Screen readers
-get a label and both values, but a two-dimensional drag has no linear equivalent, so the
-sliders remain the accessible path to the same channels.
+leftwards here while it still grows rightwards on the hue slider beside it.
+
+A plane is reachable without a pointer. It takes focus — by tab or by being pressed — and the
+arrow keys move it a percent at a time, ten with shift held. A screen reader has no gesture for
+two degrees of freedom, so each direction is offered as a named action instead, stepping ten
+percent because an action menu has no modifier key to hold:
+
+```kotlin
+HslPlane(
+    state = state,
+    actionLabels = PlaneActionLabels(          // read aloud, so localize them
+        increaseX = "Sättigung erhöhen",
+        decreaseX = "Sättigung verringern",
+        increaseY = "Helligkeit erhöhen",
+        decreaseY = "Helligkeit verringern",
+    ),
+)
+```
+
+Passing `null` drops the actions and leaves the plane readable but not adjustable.
 
 `thumb` replaces the position indicator, and receives the plane's `InteractionSource`:
 
@@ -505,6 +532,18 @@ ColorPickerDialog(
 ```
 
 In-progress edits inside the dialog survive configuration changes; passing a new `initialColor` resets the picker.
+
+The dialog builds its own state, so unlike the pickers its slider slots are handed that state —
+without it a replacement would have nothing to read or write, which is what localizing a
+dialog's sliders needs:
+
+```kotlin
+ColorPickerDialog(
+    onColorSelected = { /* ... */ },
+    onDismiss = { /* ... */ },
+    hueSlider = { state -> HueSlider(state, label = { Text(stringResource(Res.string.hue)) }) },
+)
+```
 
 ### Theming
 

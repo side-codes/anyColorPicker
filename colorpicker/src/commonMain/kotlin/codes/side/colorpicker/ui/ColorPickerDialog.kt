@@ -42,7 +42,9 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * slider; see [ColorPickerDefaults.colors].
  * @param shapes track and swatch shapes; see [ColorPickerDefaults.shapes].
  * @param thumb optional replacement for every slider's thumb; see [ColorSlider].
- * @param hueSlider slot for the hue channel; `null` keeps [HueSlider].
+ * @param hueSlider slot for the hue channel; `null` keeps [HueSlider]. The dialog owns its
+ * state, so every slot is handed the [ColorPickerState] to read and write — without it a
+ * replacement slider would have nothing to bind to.
  * @param saturationSlider slot for the saturation channel; `null` keeps [SaturationSlider].
  * @param lightnessSlider slot for the lightness channel; `null` keeps [LightnessSlider].
  * @param alphaSlider slot for the alpha channel; `null` keeps [AlphaSlider].
@@ -61,10 +63,10 @@ public fun ColorPickerDialog(
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    hueSlider: (@Composable () -> Unit)? = null,
-    saturationSlider: (@Composable () -> Unit)? = null,
-    lightnessSlider: (@Composable () -> Unit)? = null,
-    alphaSlider: (@Composable () -> Unit)? = null,
+    hueSlider: (@Composable (ColorPickerState) -> Unit)? = null,
+    saturationSlider: (@Composable (ColorPickerState) -> Unit)? = null,
+    lightnessSlider: (@Composable (ColorPickerState) -> Unit)? = null,
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
 ) {
     // initialColor is a reset key: a new initial color re-creates the state,
     // while configuration changes restore in-progress edits via the saver.
@@ -86,9 +88,9 @@ public fun ColorPickerDialog(
                     colors = colors,
                 )
                 Spacer(Modifier.height(16.dp))
-                // The slots are nullable here rather than defaulted to the sliders: the
-                // dialog owns the state, so a default would have to name a state the caller
-                // never sees. Null means whatever the picker would have drawn.
+                // The slots are nullable rather than defaulted to the sliders: a default
+                // would have to name the state the dialog creates, which does not exist yet
+                // where the parameter list is written. Null means whatever the picker draws.
                 HslColorPicker(
                     state = state,
                     showAlpha = showAlpha,
@@ -96,10 +98,10 @@ public fun ColorPickerDialog(
                     colors = colors,
                     shapes = shapes,
                     thumb = thumb,
-                    hueSlider = hueSlider ?: { HueSlider(state, enabled = enabled, thumb = thumb) },
-                    saturationSlider = saturationSlider ?: { SaturationSlider(state, enabled = enabled, thumb = thumb) },
-                    lightnessSlider = lightnessSlider ?: { LightnessSlider(state, enabled = enabled, thumb = thumb) },
-                    alphaSlider = alphaSlider ?: { AlphaSlider(state, enabled = enabled, thumb = thumb) },
+                    hueSlider = hueSlider.boundTo(state) { HueSlider(state, enabled = enabled, thumb = thumb) },
+                    saturationSlider = saturationSlider.boundTo(state) { SaturationSlider(state, enabled = enabled, thumb = thumb) },
+                    lightnessSlider = lightnessSlider.boundTo(state) { LightnessSlider(state, enabled = enabled, thumb = thumb) },
+                    alphaSlider = alphaSlider.boundTo(state) { AlphaSlider(state, enabled = enabled, thumb = thumb) },
                 )
             }
         },
@@ -114,4 +116,16 @@ public fun ColorPickerDialog(
             }
         },
     )
+}
+
+/**
+ * Adapts a dialog slot, which is given the state the dialog owns, to a picker slot, which is
+ * given nothing. Null keeps [default].
+ */
+private fun (@Composable (ColorPickerState) -> Unit)?.boundTo(
+    state: ColorPickerState,
+    default: @Composable () -> Unit,
+): @Composable () -> Unit {
+    val slot = this ?: return default
+    return { slot(state) }
 }

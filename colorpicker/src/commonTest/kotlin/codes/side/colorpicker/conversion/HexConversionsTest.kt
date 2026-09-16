@@ -104,7 +104,7 @@ class HexConversionsTest {
 
     @Test
     fun parseEightDigitReadsAlphaFirst() {
-        val color = "#80FF0000".toRgbColorOrNull()!!
+        val color = "#80FF0000".toRgbColorOrNull(HexAlpha.First)!!
         assertEquals(128, color.intAlpha)
         assertEquals(255, color.intRed)
         assertEquals(0, color.intGreen)
@@ -145,15 +145,16 @@ class HexConversionsTest {
 
     @Test
     fun hexToColorToHexRoundTrip() {
-        assertEquals("#80FF8040", "#80FF8040".toRgbColor().toHexString())
+        assertEquals("#80FF8040", "#80FF8040".toRgbColor(HexAlpha.First).toHexString())
         assertEquals("#FF336699", "#336699".toRgbColor().toHexString())
         assertEquals("#336699", "#336699".toRgbColor().toHexString(HexAlpha.None))
     }
 
     @Test
     fun colorToHexToColorRoundTrip() {
+        // Formatting writes the alpha first; reading it back is where that has to be said.
         val original = RgbColor.fromInt(red = 12, green = 200, blue = 99, alpha = 42)
-        assertEquals(original, original.toHexString().toRgbColor())
+        assertEquals(original, original.toHexString().toRgbColor(HexAlpha.First))
     }
 
     // ---- Alpha at the other end ----
@@ -174,8 +175,8 @@ class HexConversionsTest {
         assertEquals(128, css.intGreen)
         assertEquals(204, css.intBlue)
         assertEquals(255, css.intAlpha)
-        // The same colour the Android way, which is what the default still reads.
-        assertEquals(css, "#FF3380CC".toRgbColorOrNull())
+        // The same colour the Android way.
+        assertEquals(css, "#FF3380CC".toRgbColorOrNull(HexAlpha.First))
     }
 
     @Test
@@ -226,5 +227,41 @@ class HexConversionsTest {
         // Asking for no alpha and being handed some is a rejection, not a quiet reinterpretation.
         assertNull("#FF0000FF".toRgbColorOrNull(HexAlpha.None))
         assertNull("#F00F".toRgbColorOrNull(HexAlpha.None))
+    }
+
+    // ---- The default refuses what it cannot resolve ----
+
+    @Test
+    fun theDefaultRefusesTheLengthsThatCarryAlpha() {
+        // Answering either way would be a colour that is wrong and looks right; null is the
+        // only honest answer to a string nobody has said how to read.
+        assertNull("#FF000080".toRgbColorOrNull(), "eight digits")
+        assertNull("#F00C".toRgbColorOrNull(), "four digits")
+    }
+
+    @Test
+    fun theDefaultStillTakesTheLengthsThatCannotBeAmbiguous() {
+        assertEquals(RgbColor(1f, 0f, 0f), "#FF0000".toRgbColorOrNull())
+        assertEquals(RgbColor(1f, 0f, 0f), "#F00".toRgbColorOrNull())
+    }
+
+    @Test
+    fun aCssStringReadWithTheAndroidOrderingIsTheWrongColour() {
+        // The reason for the default: #F00C is a red at 80% in a stylesheet, and reading it
+        // alpha-first turns it into an opaque navy without a word.
+        val asAndroid = "#F00C".toRgbColorOrNull(HexAlpha.First)!!
+        assertEquals(0, asAndroid.intRed)
+        assertEquals(204, asAndroid.intBlue)
+        assertEquals(255, asAndroid.intAlpha)
+
+        val asCss = "#F00C".toRgbColorOrNull(HexAlpha.Last)!!
+        assertEquals(255, asCss.intRed)
+        assertEquals(0, asCss.intBlue)
+        assertEquals(204, asCss.intAlpha)
+    }
+
+    @Test
+    fun theThrowingParserRefusesThemToo() {
+        assertFailsWith<IllegalArgumentException> { "#FF000080".toRgbColor() }
     }
 }

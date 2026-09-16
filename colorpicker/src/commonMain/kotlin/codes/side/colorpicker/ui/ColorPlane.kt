@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
@@ -18,12 +19,23 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -35,6 +47,27 @@ import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
+
+// One percent of the field per arrow press and ten with shift held, the step the M3 slider
+// uses for its own arrow keys. The accessibility actions take the coarse step whatever is
+// held: there is no modifier to hold in a screen reader's action menu, and a hundred taps to
+// cross the field is not a way to pick a colour.
+internal const val PlaneKeyStep: Float = 0.01f
+internal const val PlaneCoarseKeyStep: Float = 0.1f
+
+/** The step and direction an arrow key asks for, or `null` if [event] is not one. */
+private fun planeKeyStep(event: KeyEvent): Pair<Float, Float>? {
+    if (event.type != KeyEventType.KeyDown) return null
+    val step = if (event.isShiftPressed) PlaneCoarseKeyStep else PlaneKeyStep
+    return when (event.key) {
+        Key.DirectionLeft -> -step to 0f
+        Key.DirectionRight -> step to 0f
+        // yValue grows upward, so the up arrow adds.
+        Key.DirectionUp -> 0f to step
+        Key.DirectionDown -> 0f to -step
+        else -> null
+    }
+}
 
 /** The fraction across a plane [width] pixels wide that a pointer at [x] sits at. */
 internal fun planeXFraction(x: Float, width: Int): Float =
@@ -60,6 +93,10 @@ internal fun planeYFraction(y: Float, height: Int): Float =
  * @param semanticLabel accessibility description of the surface; pass a localized string to
  * replace the English default, or `null` to omit.
  * @param semanticValueText accessibility announcement of the current pair of values.
+ * @param actionLabels names the four accessibility actions that move the plane, since a screen
+ * reader has no gesture for a surface with two degrees of freedom; `null` omits them and leaves
+ * the plane readable but not adjustable. Arrow keys move it by one percent and shift-arrow by
+ * ten, and pressing the surface takes focus so they land where they were aimed.
  * @param thumb optional replacement for the position indicator, receiving the surface's
  * [InteractionSource] so it can react to being dragged. The plane centres whatever it is
  * given on the current pair of values at whatever size that composable measures to, and
@@ -77,11 +114,13 @@ public fun ColorPlane(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
+    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val dimensions = ColorPickerDefaults.currentDimensions()
     // The gesture handler outlives any one composition, so it reads the callbacks and the
@@ -89,6 +128,11 @@ public fun ColorPlane(
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
     val currentSurface by rememberUpdatedState(surface)
+
+    fun step(dx: Float, dy: Float) {
+        currentOnValueChange((xValue + dx).coerceIn(0f, 1f), (yValue + dy).coerceIn(0f, 1f))
+        currentOnFinished?.invoke()
+    }
 
     Layout(
         content = {
@@ -112,13 +156,44 @@ public fun ColorPlane(
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
                 if (!enabled) disabled()
+                if (enabled && actionLabels != null) {
+                    customActions = listOf(
+                        CustomAccessibilityAction(actionLabels.increaseX) {
+                            step(PlaneCoarseKeyStep, 0f)
+                            true
+                        },
+                        CustomAccessibilityAction(actionLabels.decreaseX) {
+                            step(-PlaneCoarseKeyStep, 0f)
+                            true
+                        },
+                        CustomAccessibilityAction(actionLabels.increaseY) {
+                            step(0f, PlaneCoarseKeyStep)
+                            true
+                        },
+                        CustomAccessibilityAction(actionLabels.decreaseY) {
+                            step(0f, -PlaneCoarseKeyStep)
+                            true
+                        },
+                    )
+                }
             }
+            .onKeyEvent { event ->
+                if (!enabled) return@onKeyEvent false
+                val (dx, dy) = planeKeyStep(event) ?: return@onKeyEvent false
+                step(dx, dy)
+                true
+            }
+            .focusRequester(focusRequester)
+            .focusable(enabled, interactionSource)
             // Keyed on enabled so the handler is torn down rather than left running with a
             // flag it checks: a gesture in flight when the plane is disabled ends there.
             .pointerInput(enabled) {
                 if (!enabled) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Pressing takes focus, so the arrow keys carry on from where the finger
+                    // left off rather than doing nothing until something is tabbed to.
+                    focusRequester.requestFocus()
                     val press = DragInteraction.Start()
                     scope.launch { interactionSource.emit(press) }
                     currentOnValueChange(
