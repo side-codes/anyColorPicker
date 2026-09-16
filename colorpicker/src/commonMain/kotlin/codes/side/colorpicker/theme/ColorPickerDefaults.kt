@@ -39,7 +39,13 @@ public object ColorPickerDefaults {
     public val PlaneThumbSize: Dp = 24.dp
 
     /** Opacity a disabled component draws at, the Material 3 disabled content value. */
-    public val DisabledAlpha: Float = 0.38f
+    public const val DisabledAlpha: Float = 0.38f
+
+    /**
+     * Colour a disabled component keeps. Full, by default: dimming alone is the Material
+     * convention, and draining the colour as well is a choice a caller makes.
+     */
+    public const val DisabledSaturation: Float = 1f
 
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
@@ -53,10 +59,12 @@ public object ColorPickerDefaults {
         checkerboardLight: Color = MaterialTheme.colorScheme.surfaceBright,
         checkerboardDark: Color = MaterialTheme.colorScheme.surfaceDim,
         disabledAlpha: Float = DisabledAlpha,
+        disabledSaturation: Float = DisabledSaturation,
     ): ColorPickerColors = ColorPickerColors(
         checkerboardLight = checkerboardLight,
         checkerboardDark = checkerboardDark,
         disabledAlpha = disabledAlpha,
+        disabledSaturation = disabledSaturation,
     )
 
     /**

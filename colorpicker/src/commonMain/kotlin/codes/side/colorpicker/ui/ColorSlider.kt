@@ -14,7 +14,6 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -78,16 +77,13 @@ public fun ColorSlider(
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    // The track is a gradient of the colors being picked, so there is no disabled palette to
-    // swap to — it dims instead, and the thumb with it.
-    val contentAlpha = if (enabled) 1f else colors.disabledAlpha
     val sliderColors = SliderDefaults.colors(
         thumbColor = thumbColor.asOpaqueThumb(),
         activeTrackColor = Color.Transparent,
         inactiveTrackColor = Color.Transparent,
     )
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().disabledAppearance(enabled, colors)) {
         if (label != null || valueLabel != null) {
             Row(
                 modifier = Modifier
@@ -127,8 +123,7 @@ public fun ColorSlider(
                     thumbTrackGap = thumbTrackGap,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(trackHeight)
-                        .alpha(contentAlpha),
+                        .height(trackHeight),
                 )
             },
             // The slot takes the InteractionSource rather than M3's SliderState. Two
@@ -138,10 +133,8 @@ public fun ColorSlider(
             // by the lambda; press and drag state is the only thing a caller cannot
             // reach, because this source is created here.
             thumb = {
-                Box(Modifier.alpha(contentAlpha)) {
-                    if (thumb != null) thumb(interactionSource)
-                    else SliderDefaults.Thumb(interactionSource, colors = sliderColors)
-                }
+                if (thumb != null) thumb(interactionSource)
+                else SliderDefaults.Thumb(interactionSource, colors = sliderColors)
             },
             colors = sliderColors,
         )

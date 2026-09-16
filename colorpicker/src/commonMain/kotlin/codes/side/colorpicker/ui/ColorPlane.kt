@@ -16,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -108,7 +107,7 @@ public fun ColorPlane(
         },
         modifier = modifier
             .defaultMinSize(dimensions.planeMinSize, dimensions.planeMinSize)
-            .alpha(if (enabled) 1f else colors.disabledAlpha)
+            .disabledAppearance(enabled, colors)
             .semantics {
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }

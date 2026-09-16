@@ -391,7 +391,7 @@ final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorp
 }
 
 final class codes.side.colorpicker.theme/ColorPickerColors { // codes.side.colorpicker.theme/ColorPickerColors|null[0]
-    constructor <init>(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, kotlin/Float) // codes.side.colorpicker.theme/ColorPickerColors.<init>|<init>(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float){}[0]
+    constructor <init>(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, kotlin/Float, kotlin/Float) // codes.side.colorpicker.theme/ColorPickerColors.<init>|<init>(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float;kotlin.Float){}[0]
 
     final val checkerboardDark // codes.side.colorpicker.theme/ColorPickerColors.checkerboardDark|{}checkerboardDark[0]
         final fun <get-checkerboardDark>(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.theme/ColorPickerColors.checkerboardDark.<get-checkerboardDark>|<get-checkerboardDark>(){}[0]
@@ -399,11 +399,14 @@ final class codes.side.colorpicker.theme/ColorPickerColors { // codes.side.color
         final fun <get-checkerboardLight>(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.theme/ColorPickerColors.checkerboardLight.<get-checkerboardLight>|<get-checkerboardLight>(){}[0]
     final val disabledAlpha // codes.side.colorpicker.theme/ColorPickerColors.disabledAlpha|{}disabledAlpha[0]
         final fun <get-disabledAlpha>(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerColors.disabledAlpha.<get-disabledAlpha>|<get-disabledAlpha>(){}[0]
+    final val disabledSaturation // codes.side.colorpicker.theme/ColorPickerColors.disabledSaturation|{}disabledSaturation[0]
+        final fun <get-disabledSaturation>(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerColors.disabledSaturation.<get-disabledSaturation>|<get-disabledSaturation>(){}[0]
 
     final fun component1(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.theme/ColorPickerColors.component1|component1(){}[0]
     final fun component2(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.theme/ColorPickerColors.component2|component2(){}[0]
     final fun component3(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerColors.component3|component3(){}[0]
-    final fun copy(androidx.compose.ui.graphics/Color = ..., androidx.compose.ui.graphics/Color = ..., kotlin/Float = ...): codes.side.colorpicker.theme/ColorPickerColors // codes.side.colorpicker.theme/ColorPickerColors.copy|copy(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float){}[0]
+    final fun component4(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerColors.component4|component4(){}[0]
+    final fun copy(androidx.compose.ui.graphics/Color = ..., androidx.compose.ui.graphics/Color = ..., kotlin/Float = ..., kotlin/Float = ...): codes.side.colorpicker.theme/ColorPickerColors // codes.side.colorpicker.theme/ColorPickerColors.copy|copy(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float;kotlin.Float){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.colorpicker.theme/ColorPickerColors.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // codes.side.colorpicker.theme/ColorPickerColors.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // codes.side.colorpicker.theme/ColorPickerColors.toString|toString(){}[0]
@@ -454,8 +457,11 @@ final class codes.side.colorpicker.theme/ColorPickerShapes { // codes.side.color
 }
 
 final object codes.side.colorpicker.theme/ColorPickerDefaults { // codes.side.colorpicker.theme/ColorPickerDefaults|null[0]
-    final val DisabledAlpha // codes.side.colorpicker.theme/ColorPickerDefaults.DisabledAlpha|{}DisabledAlpha[0]
+    final const val DisabledAlpha // codes.side.colorpicker.theme/ColorPickerDefaults.DisabledAlpha|{}DisabledAlpha[0]
         final fun <get-DisabledAlpha>(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerDefaults.DisabledAlpha.<get-DisabledAlpha>|<get-DisabledAlpha>(){}[0]
+    final const val DisabledSaturation // codes.side.colorpicker.theme/ColorPickerDefaults.DisabledSaturation|{}DisabledSaturation[0]
+        final fun <get-DisabledSaturation>(): kotlin/Float // codes.side.colorpicker.theme/ColorPickerDefaults.DisabledSaturation.<get-DisabledSaturation>|<get-DisabledSaturation>(){}[0]
+
     final val PlaneMinSize // codes.side.colorpicker.theme/ColorPickerDefaults.PlaneMinSize|{}PlaneMinSize[0]
         final fun <get-PlaneMinSize>(): androidx.compose.ui.unit/Dp // codes.side.colorpicker.theme/ColorPickerDefaults.PlaneMinSize.<get-PlaneMinSize>|<get-PlaneMinSize>(){}[0]
     final val PlaneThumbSize // codes.side.colorpicker.theme/ColorPickerDefaults.PlaneThumbSize|{}PlaneThumbSize[0]
@@ -469,7 +475,7 @@ final object codes.side.colorpicker.theme/ColorPickerDefaults { // codes.side.co
     final val TrackHeight // codes.side.colorpicker.theme/ColorPickerDefaults.TrackHeight|{}TrackHeight[0]
         final fun <get-TrackHeight>(): androidx.compose.ui.unit/Dp // codes.side.colorpicker.theme/ColorPickerDefaults.TrackHeight.<get-TrackHeight>|<get-TrackHeight>(){}[0]
 
-    final fun colors(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, kotlin/Float, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.theme/ColorPickerColors // codes.side.colorpicker.theme/ColorPickerDefaults.colors|colors(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+    final fun colors(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, kotlin/Float, kotlin/Float, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.theme/ColorPickerColors // codes.side.colorpicker.theme/ColorPickerDefaults.colors|colors(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;kotlin.Float;kotlin.Float;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
     final fun currentColors(androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.theme/ColorPickerColors // codes.side.colorpicker.theme/ColorPickerDefaults.currentColors|currentColors(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
     final fun currentDimensions(androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.theme/ColorPickerDimensions // codes.side.colorpicker.theme/ColorPickerDefaults.currentDimensions|currentDimensions(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
     final fun currentShapes(androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.theme/ColorPickerShapes // codes.side.colorpicker.theme/ColorPickerDefaults.currentShapes|currentShapes(androidx.compose.runtime.Composer?;kotlin.Int){}[0]

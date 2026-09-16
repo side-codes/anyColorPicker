@@ -56,6 +56,7 @@ class PickerConfigurationTest {
             checkerboardLight = Color.Red,
             checkerboardDark = Color.Green,
             disabledAlpha = 0.5f,
+            disabledSaturation = 1f,
         )
         var seen: ColorPickerColors? = null
         setContent {
@@ -251,5 +252,57 @@ class PickerConfigurationTest {
             dimmed < lit * 0.75f,
             "a disabled plane should be visibly washed out: $dimmed against $lit",
         )
+    }
+
+    /**
+     * The two knobs are independent, so all four settings have to behave: dim only, drain only,
+     * both, and neither. Colourfulness catches draining; lightness toward the white background
+     * catches dimming.
+     */
+    @Test
+    fun theDisabledLookIsWhateverTheColorsAskFor() = runComposeUiTest {
+        fun measure(disabledAlpha: Float, disabledSaturation: Float): Pair<Float, Float> {
+            setContent {
+                ColorPickerTheme(
+                    colors = ColorPickerDefaults.colors(
+                        disabledAlpha = disabledAlpha,
+                        disabledSaturation = disabledSaturation,
+                    ),
+                ) {
+                    Box(Modifier.background(Color.White)) {
+                        HslPlane(
+                            state = state(),
+                            enabled = false,
+                            modifier = Modifier.testTag("plane").size(160.dp),
+                        )
+                    }
+                }
+            }
+            val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
+            var colour = 0f
+            var light = 0f
+            val y = pixels.height / 2
+            for (x in 0 until pixels.width) {
+                val c = pixels[x, y]
+                colour += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
+                light += (c.red + c.green + c.blue) / 3f
+            }
+            return colour / pixels.width to light / pixels.width
+        }
+
+        val (untouchedColour, untouchedLight) = measure(1f, 1f)
+        val (dimmedColour, dimmedLight) = measure(0.38f, 1f)
+        val (drainedColour, drainedLight) = measure(1f, 0f)
+        val (bothColour, bothLight) = measure(0.38f, 0f)
+
+        // Neither knob set leaves it looking enabled.
+        assertTrue(untouchedColour > 0.05f, "untouched should still be colourful: $untouchedColour")
+        // Dimming lightens it toward the background without draining much colour outright.
+        assertTrue(dimmedLight > untouchedLight, "dimming should lighten: $dimmedLight vs $untouchedLight")
+        // Draining removes the colour while leaving the weight alone.
+        assertTrue(drainedColour < untouchedColour * 0.1f, "draining should remove colour: $drainedColour")
+        // Both does both.
+        assertTrue(bothColour < untouchedColour * 0.1f, "both should remove colour: $bothColour")
+        assertTrue(bothLight > untouchedLight, "both should lighten: $bothLight vs $untouchedLight")
     }
 }
