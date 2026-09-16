@@ -1,14 +1,18 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -171,5 +175,81 @@ class PickerConfigurationTest {
             val shared = state()
             pickers.forEach { picker -> Box { picker(shared) } }
         }
+    }
+
+    /**
+     * Refusing the gesture is half of disabled; the other half is looking it. Measured as how
+     * colourful the track still is, since a dimmed gradient over the background loses spread
+     * between its channels rather than moving in any one direction.
+     */
+    @Test
+    fun aDisabledSliderIsDrawnDimmer() = runComposeUiTest {
+        fun colourfulness(): Float {
+            val pixels = onNodeWithTag("slider").captureToImage().toPixelMap()
+            var total = 0f
+            val y = pixels.height / 2
+            for (x in 0 until pixels.width) {
+                val c = pixels[x, y]
+                total += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
+            }
+            return total / pixels.width
+        }
+
+        setContent {
+            Box(Modifier.testTag("slider").width(200.dp).background(Color.White)) {
+                HueSlider(state = state(), label = null, valueLabel = null)
+            }
+        }
+        val lit = colourfulness()
+
+        setContent {
+            Box(Modifier.testTag("slider").width(200.dp).background(Color.White)) {
+                HueSlider(state = state(), enabled = false, label = null, valueLabel = null)
+            }
+        }
+        val dimmed = colourfulness()
+
+        assertTrue(
+            dimmed < lit * 0.75f,
+            "a disabled track should be visibly washed out: $dimmed against $lit",
+        )
+    }
+
+    /** The planes dim through their own path, not the slider's, so they get their own check. */
+    @Test
+    fun aDisabledPlaneIsDrawnDimmer() = runComposeUiTest {
+        fun colourfulness(): Float {
+            val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
+            var total = 0f
+            val y = pixels.height / 2
+            for (x in 0 until pixels.width) {
+                val c = pixels[x, y]
+                total += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
+            }
+            return total / pixels.width
+        }
+
+        setContent {
+            Box(Modifier.background(Color.White)) {
+                HslPlane(state = state(), modifier = Modifier.testTag("plane").size(160.dp))
+            }
+        }
+        val lit = colourfulness()
+
+        setContent {
+            Box(Modifier.background(Color.White)) {
+                HslPlane(
+                    state = state(),
+                    enabled = false,
+                    modifier = Modifier.testTag("plane").size(160.dp),
+                )
+            }
+        }
+        val dimmed = colourfulness()
+
+        assertTrue(
+            dimmed < lit * 0.75f,
+            "a disabled plane should be visibly washed out: $dimmed against $lit",
+        )
     }
 }

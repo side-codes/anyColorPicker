@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -84,6 +85,7 @@ fun SampleApp() {
         )
         var showDialog by rememberSaveable { mutableStateOf(false) }
         var coloringMode by rememberSaveable { mutableStateOf(ColoringMode.Contextual) }
+        var enabled by rememberSaveable { mutableStateOf(true) }
 
         Scaffold(
             topBar = {
@@ -125,6 +127,18 @@ fun SampleApp() {
                                 label = { Text(mode.name) },
                             )
                         }
+                    }
+                }
+
+                // Everything below reads this, so the whole sample greys out together.
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text("Enabled")
+                        Switch(checked = enabled, onCheckedChange = { enabled = it })
                     }
                 }
 
@@ -198,6 +212,7 @@ fun SampleApp() {
                 item {
                     HslPlane(
                         state = state,
+                        enabled = enabled,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )
                 }
@@ -208,6 +223,7 @@ fun SampleApp() {
                 item {
                     OkhslPlane(
                         state = state,
+                        enabled = enabled,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )
                 }
@@ -218,6 +234,7 @@ fun SampleApp() {
                 item {
                     OkhsvPlane(
                         state = state,
+                        enabled = enabled,
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                     )
                 }
@@ -226,57 +243,57 @@ fun SampleApp() {
 
                 // HSL section
                 item { SectionHeader("HSL") }
-                item { HueSlider(state = state, coloringMode = coloringMode) }
-                item { SaturationSlider(state = state, coloringMode = coloringMode) }
-                item { LightnessSlider(state = state, coloringMode = coloringMode) }
+                item { HueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { SaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { LightnessSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // RGB section
                 item { SectionHeader("RGB") }
-                item { RedSlider(state = state, coloringMode = coloringMode) }
-                item { GreenSlider(state = state, coloringMode = coloringMode) }
-                item { BlueSlider(state = state, coloringMode = coloringMode) }
+                item { RedSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { GreenSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { BlueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // CMYK section
                 item { SectionHeader("CMYK") }
-                item { CyanSlider(state = state, coloringMode = coloringMode) }
-                item { MagentaSlider(state = state, coloringMode = coloringMode) }
-                item { YellowSlider(state = state, coloringMode = coloringMode) }
-                item { KeySlider(state = state, coloringMode = coloringMode) }
+                item { CyanSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { MagentaSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { YellowSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { KeySlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // LAB section
                 item { SectionHeader("LAB") }
-                item { LightnessLabSlider(state = state, coloringMode = coloringMode) }
-                item { LabASlider(state = state, coloringMode = coloringMode) }
-                item { LabBSlider(state = state, coloringMode = coloringMode) }
+                item { LightnessLabSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { LabASlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { LabBSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // Okhsl section. Drag the lightness slider here and then the HSL one
                 // above at the same hue: only this one holds its apparent brightness.
                 item { SectionHeader("Okhsl") }
-                item { OkhslHueSlider(state = state, coloringMode = coloringMode) }
-                item { OkhslSaturationSlider(state = state, coloringMode = coloringMode) }
-                item { OkhslLightnessSlider(state = state, coloringMode = coloringMode) }
+                item { OkhslHueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { OkhslSaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { OkhslLightnessSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // Okhsv section
                 item { SectionHeader("Okhsv") }
-                item { OkhsvHueSlider(state = state, coloringMode = coloringMode) }
-                item { OkhsvSaturationSlider(state = state, coloringMode = coloringMode) }
-                item { OkhsvValueSlider(state = state, coloringMode = coloringMode) }
+                item { OkhsvHueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { OkhsvSaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
+                item { OkhsvValueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
 
                 item { HorizontalDivider() }
 
                 // Alpha section
                 item { SectionHeader("Alpha") }
-                item { AlphaSlider(state = state) }
+                item { AlphaSlider(state = state, enabled = enabled) }
 
                 item { HorizontalDivider() }
 
@@ -286,6 +303,7 @@ fun SampleApp() {
                 item {
                     HueSlider(
                         state = state,
+                        enabled = enabled,
                         coloringMode = coloringMode,
                         thumb = { source -> SquareThumb(state.hslColor.toComposeColor(), source) },
                         thumbWidth = SquareThumbSize,
