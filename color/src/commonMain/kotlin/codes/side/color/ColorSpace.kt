@@ -2,7 +2,6 @@ package codes.side.color
 
 import codes.side.color.internal.MAX_COMPONENTS
 import codes.side.color.internal.Step
-import kotlin.concurrent.Volatile
 
 /** How faithfully a space's conversions describe color. */
 public enum class Exactness {
@@ -80,17 +79,10 @@ public abstract class ColorSpace protected constructor(
     public fun color(components: DoubleArray, alpha: Double = 1.0, missing: Int = 0): ColorValue =
         ColorValue.create(this, components, alpha, missing)
 
-    @Volatile
-    private var converters: Array<ColorConverter> = emptyArray()
+    private val converters = ConverterCache(this)
 
     /** A prepared converter from this space to [target]. Converters are cached per target. */
-    public fun converterTo(target: ColorSpace): ColorConverter {
-        val cached = converters
-        for (converter in cached) if (converter.target === target) return converter
-        val made = ColorConverter.build(this, target)
-        converters = cached + made
-        return made
-    }
+    public fun converterTo(target: ColorSpace): ColorConverter = converters.converterTo(target)
 
     internal open fun stepsToBase(): List<Step> = listOf(Step { v -> toBase(v, v) })
 
