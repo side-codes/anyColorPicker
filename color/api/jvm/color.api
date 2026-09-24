@@ -30,6 +30,20 @@ public final class codes/side/color/ChannelKind$Linear : codes/side/color/Channe
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class codes/side/color/Cmyk : codes/side/color/ColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Cmyk;
+	public fun fromBase ([D[D)V
+	public final fun getC ()Lcodes/side/color/ColorChannel;
+	public fun getExactness ()Lcodes/side/color/Exactness;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getK ()Lcodes/side/color/ColorChannel;
+	public final fun getM ()Lcodes/side/color/ColorChannel;
+	public final fun getY ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/Cmyk;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun toBase ([D[D)V
+}
+
 public final class codes/side/color/ColorChannel {
 	public fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;I)V
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -76,6 +90,9 @@ public abstract class codes/side/color/ColorSpace {
 }
 
 public final class codes/side/color/ColorSpace$Companion {
+	public final fun hsl (Ljava/lang/String;Lcodes/side/color/RgbColorSpace;)Lcodes/side/color/HslColorSpace;
+	public final fun hsv (Ljava/lang/String;Lcodes/side/color/RgbColorSpace;)Lcodes/side/color/HsvColorSpace;
+	public final fun hwb (Ljava/lang/String;Lcodes/side/color/RgbColorSpace;)Lcodes/side/color/HwbColorSpace;
 	public final fun polar (Ljava/lang/String;Lcodes/side/color/ColorSpace;DDLcodes/side/color/HueFamily;)Lcodes/side/color/PolarColorSpace;
 	public final fun rgb (Ljava/lang/String;Lcodes/side/color/RgbPrimaries;Lcodes/side/color/WhitePoint;Lcodes/side/color/TransferFunction;)Lcodes/side/color/RgbColorSpace;
 }
@@ -118,6 +135,38 @@ public final class codes/side/color/Exactness : java/lang/Enum {
 public abstract interface annotation class codes/side/color/ExperimentalColorSpaceApi : java/lang/annotation/Annotation {
 }
 
+public final class codes/side/color/Hsl : codes/side/color/HslColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Hsl;
+}
+
+public class codes/side/color/HslColorSpace : codes/side/color/ColorSpace {
+	public fun fromBase ([D[D)V
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getL ()Lcodes/side/color/ColorChannel;
+	public final fun getS ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/HslColorSpace;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/Hsv : codes/side/color/HsvColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Hsv;
+}
+
+public class codes/side/color/HsvColorSpace : codes/side/color/ColorSpace {
+	public fun fromBase ([D[D)V
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getS ()Lcodes/side/color/ColorChannel;
+	public final fun getV ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/HsvColorSpace;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
+}
+
 public final class codes/side/color/HueFamily {
 	public static final field Companion Lcodes/side/color/HueFamily$Companion;
 	public fun <init> (Ljava/lang/String;)V
@@ -131,6 +180,22 @@ public final class codes/side/color/HueFamily$Companion {
 	public final fun getCieLab ()Lcodes/side/color/HueFamily;
 	public final fun getOklab ()Lcodes/side/color/HueFamily;
 	public final fun rgbHexcone (Lcodes/side/color/ColorSpace;)Lcodes/side/color/HueFamily;
+}
+
+public final class codes/side/color/Hwb : codes/side/color/HwbColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Hwb;
+}
+
+public class codes/side/color/HwbColorSpace : codes/side/color/ColorSpace {
+	public fun fromBase ([D[D)V
+	public final fun getB ()Lcodes/side/color/ColorChannel;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getW ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/HwbColorSpace;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
 }
 
 public final class codes/side/color/Lab : codes/side/color/ColorSpace {

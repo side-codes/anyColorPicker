@@ -65,6 +65,9 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
     open fun toString(): kotlin/String // codes.side.color/ColorSpace.toString|toString(){}[0]
 
     final object Companion { // codes.side.color/ColorSpace.Companion|null[0]
+        final fun hsl(kotlin/String, codes.side.color/RgbColorSpace): codes.side.color/HslColorSpace // codes.side.color/ColorSpace.Companion.hsl|hsl(kotlin.String;codes.side.color.RgbColorSpace){}[0]
+        final fun hsv(kotlin/String, codes.side.color/RgbColorSpace): codes.side.color/HsvColorSpace // codes.side.color/ColorSpace.Companion.hsv|hsv(kotlin.String;codes.side.color.RgbColorSpace){}[0]
+        final fun hwb(kotlin/String, codes.side.color/RgbColorSpace): codes.side.color/HwbColorSpace // codes.side.color/ColorSpace.Companion.hwb|hwb(kotlin.String;codes.side.color.RgbColorSpace){}[0]
         final fun polar(kotlin/String, codes.side.color/ColorSpace, kotlin/Double, kotlin/Double, codes.side.color/HueFamily): codes.side.color/PolarColorSpace // codes.side.color/ColorSpace.Companion.polar|polar(kotlin.String;codes.side.color.ColorSpace;kotlin.Double;kotlin.Double;codes.side.color.HueFamily){}[0]
         final fun rgb(kotlin/String, codes.side.color/RgbPrimaries, codes.side.color/WhitePoint, codes.side.color/TransferFunction): codes.side.color/RgbColorSpace // codes.side.color/ColorSpace.Companion.rgb|rgb(kotlin.String;codes.side.color.RgbPrimaries;codes.side.color.WhitePoint;codes.side.color.TransferFunction){}[0]
     }
@@ -233,6 +236,54 @@ final class codes.side.color/WhitePoint { // codes.side.color/WhitePoint|null[0]
     }
 }
 
+open class codes.side.color/HslColorSpace : codes.side.color/ColorSpace { // codes.side.color/HslColorSpace|null[0]
+    final val H // codes.side.color/HslColorSpace.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/HslColorSpace.H.<get-H>|<get-H>(){}[0]
+    final val L // codes.side.color/HslColorSpace.L|{}L[0]
+        final fun <get-L>(): codes.side.color/ColorChannel // codes.side.color/HslColorSpace.L.<get-L>|<get-L>(){}[0]
+    final val S // codes.side.color/HslColorSpace.S|{}S[0]
+        final fun <get-S>(): codes.side.color/ColorChannel // codes.side.color/HslColorSpace.S.<get-S>|<get-S>(){}[0]
+    open val gamut // codes.side.color/HslColorSpace.gamut|{}gamut[0]
+        open fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/HslColorSpace.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/HslColorSpace.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    open fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HslColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/HslColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
+    open fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HslColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
+open class codes.side.color/HsvColorSpace : codes.side.color/ColorSpace { // codes.side.color/HsvColorSpace|null[0]
+    final val H // codes.side.color/HsvColorSpace.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/HsvColorSpace.H.<get-H>|<get-H>(){}[0]
+    final val S // codes.side.color/HsvColorSpace.S|{}S[0]
+        final fun <get-S>(): codes.side.color/ColorChannel // codes.side.color/HsvColorSpace.S.<get-S>|<get-S>(){}[0]
+    final val V // codes.side.color/HsvColorSpace.V|{}V[0]
+        final fun <get-V>(): codes.side.color/ColorChannel // codes.side.color/HsvColorSpace.V.<get-V>|<get-V>(){}[0]
+    open val gamut // codes.side.color/HsvColorSpace.gamut|{}gamut[0]
+        open fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/HsvColorSpace.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/HsvColorSpace.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    open fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HsvColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/HsvColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
+    open fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HsvColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
+open class codes.side.color/HwbColorSpace : codes.side.color/ColorSpace { // codes.side.color/HwbColorSpace|null[0]
+    final val B // codes.side.color/HwbColorSpace.B|{}B[0]
+        final fun <get-B>(): codes.side.color/ColorChannel // codes.side.color/HwbColorSpace.B.<get-B>|<get-B>(){}[0]
+    final val H // codes.side.color/HwbColorSpace.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/HwbColorSpace.H.<get-H>|<get-H>(){}[0]
+    final val W // codes.side.color/HwbColorSpace.W|{}W[0]
+        final fun <get-W>(): codes.side.color/ColorChannel // codes.side.color/HwbColorSpace.W.<get-W>|<get-W>(){}[0]
+    open val gamut // codes.side.color/HwbColorSpace.gamut|{}gamut[0]
+        open fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/HwbColorSpace.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/HwbColorSpace.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    open fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HwbColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/HwbColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
+    open fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/HwbColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
 open class codes.side.color/PolarColorSpace : codes.side.color/ColorSpace { // codes.side.color/PolarColorSpace|null[0]
     final val C // codes.side.color/PolarColorSpace.C|{}C[0]
         final fun <get-C>(): codes.side.color/ColorChannel // codes.side.color/PolarColorSpace.C.<get-C>|<get-C>(){}[0]
@@ -287,7 +338,32 @@ sealed class codes.side.color/ChannelKind { // codes.side.color/ChannelKind|null
     }
 }
 
+final object codes.side.color/Cmyk : codes.side.color/ColorSpace { // codes.side.color/Cmyk|null[0]
+    final val C // codes.side.color/Cmyk.C|{}C[0]
+        final fun <get-C>(): codes.side.color/ColorChannel // codes.side.color/Cmyk.C.<get-C>|<get-C>(){}[0]
+    final val K // codes.side.color/Cmyk.K|{}K[0]
+        final fun <get-K>(): codes.side.color/ColorChannel // codes.side.color/Cmyk.K.<get-K>|<get-K>(){}[0]
+    final val M // codes.side.color/Cmyk.M|{}M[0]
+        final fun <get-M>(): codes.side.color/ColorChannel // codes.side.color/Cmyk.M.<get-M>|<get-M>(){}[0]
+    final val Y // codes.side.color/Cmyk.Y|{}Y[0]
+        final fun <get-Y>(): codes.side.color/ColorChannel // codes.side.color/Cmyk.Y.<get-Y>|<get-Y>(){}[0]
+    final val exactness // codes.side.color/Cmyk.exactness|{}exactness[0]
+        final fun <get-exactness>(): codes.side.color/Exactness // codes.side.color/Cmyk.exactness.<get-exactness>|<get-exactness>(){}[0]
+    final val gamut // codes.side.color/Cmyk.gamut|{}gamut[0]
+        final fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/Cmyk.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Cmyk.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/Cmyk.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Cmyk.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
 final object codes.side.color/DisplayP3 : codes.side.color/RgbColorSpace // codes.side.color/DisplayP3|null[0]
+
+final object codes.side.color/Hsl : codes.side.color/HslColorSpace // codes.side.color/Hsl|null[0]
+
+final object codes.side.color/Hsv : codes.side.color/HsvColorSpace // codes.side.color/Hsv|null[0]
+
+final object codes.side.color/Hwb : codes.side.color/HwbColorSpace // codes.side.color/Hwb|null[0]
 
 final object codes.side.color/Lab : codes.side.color/ColorSpace { // codes.side.color/Lab|null[0]
     final val A // codes.side.color/Lab.A|{}A[0]

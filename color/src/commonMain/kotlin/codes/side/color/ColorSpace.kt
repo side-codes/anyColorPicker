@@ -129,6 +129,15 @@ public abstract class ColorSpace protected constructor(
             transfer: TransferFunction,
         ): RgbColorSpace = RgbColorSpace.derive(appId(id), primaries, whitePoint, transfer)
 
+        /** HSL over [over], with CSS's `hsl()` formulas. */
+        public fun hsl(id: String, over: RgbColorSpace): HslColorSpace = HslColorSpace(appId(id), over)
+
+        /** HSV over [over]. */
+        public fun hsv(id: String, over: RgbColorSpace): HsvColorSpace = HsvColorSpace(appId(id), over)
+
+        /** HWB over [over], with CSS's `hwb()` formulas. */
+        public fun hwb(id: String, over: RgbColorSpace): HwbColorSpace = HwbColorSpace(appId(id), over)
+
         /**
          * The cylindrical form of [of], a space whose channels are lightness and two opponent
          * axes, as LCH is of Lab. Its hue is powerless at chroma ≤ [powerlessChroma], and 100%
