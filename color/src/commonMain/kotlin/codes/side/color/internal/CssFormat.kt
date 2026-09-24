@@ -38,25 +38,27 @@ internal fun cssString(color: ColorValue, precision: Int, legacy: Boolean): Stri
 
 /**
  * [value] rounded to [precision] digits counted from its first integer digit, or from the decimal
- * point when it is below 1, as color.js rounds, and written without an exponent.
+ * point when it is below 1, and written without an exponent. color.js rounds the signed value up
+ * from a tie, floor(x + 0.5), so -0.125 at two decimals is -0.12; a value that rounds to zero is 0.
  */
 internal fun cssNumber(value: Double, precision: Int): String {
     val magnitude = abs(value)
     var integerDigits = 0
     while (integerDigits < POWERS_OF_TEN.size && magnitude >= POWERS_OF_TEN[integerDigits]) integerDigits++
     val decimals = precision - integerDigits
-    val digits = if (decimals >= 0) {
-        val units = floor(magnitude * POWERS_OF_TEN[decimals] + 0.5).toLong()
-        if (units == 0L) return "0"
-        val padded = units.toString().padStart(decimals + 1, '0')
+    val scaled = if (decimals >= 0) value * POWERS_OF_TEN[decimals] else value / POWERS_OF_TEN[-decimals]
+    val units = floor(scaled + 0.5).toLong()
+    if (units == 0L) return "0"
+    val digits = abs(units).toString()
+    val text = if (decimals >= 0) {
+        val padded = digits.padStart(decimals + 1, '0')
         val whole = padded.substring(0, padded.length - decimals)
         val fraction = padded.substring(padded.length - decimals).trimEnd('0')
         if (fraction.isEmpty()) whole else "$whole.$fraction"
     } else {
-        val units = floor(magnitude / POWERS_OF_TEN[-decimals] + 0.5).toLong()
-        "$units${"0".repeat(-decimals)}"
+        "$digits${"0".repeat(-decimals)}"
     }
-    return if (value < 0.0) "-$digits" else digits
+    return if (units < 0) "-$text" else text
 }
 
 // 10^0 to 10^308, each the previous times ten: exact to 10^22, and the same on every platform past it.
