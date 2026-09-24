@@ -357,6 +357,11 @@ final object codes.side.color/Cmyk : codes.side.color/ColorSpace { // codes.side
     final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Cmyk.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
 }
 
+final object codes.side.color/ColorSpaces { // codes.side.color/ColorSpaces|null[0]
+    final val all // codes.side.color/ColorSpaces.all|{}all[0]
+        final fun <get-all>(): kotlin.collections/List<codes.side.color/ColorSpace> // codes.side.color/ColorSpaces.all.<get-all>|<get-all>(){}[0]
+}
+
 final object codes.side.color/DisplayP3 : codes.side.color/RgbColorSpace // codes.side.color/DisplayP3|null[0]
 
 final object codes.side.color/Hsl : codes.side.color/HslColorSpace // codes.side.color/Hsl|null[0]

@@ -97,6 +97,11 @@ public final class codes/side/color/ColorSpace$Companion {
 	public final fun rgb (Ljava/lang/String;Lcodes/side/color/RgbPrimaries;Lcodes/side/color/WhitePoint;Lcodes/side/color/TransferFunction;)Lcodes/side/color/RgbColorSpace;
 }
 
+public final class codes/side/color/ColorSpaces {
+	public static final field INSTANCE Lcodes/side/color/ColorSpaces;
+	public final fun getAll ()Ljava/util/List;
+}
+
 public final class codes/side/color/ColorValue {
 	public static final field Companion Lcodes/side/color/ColorValue$Companion;
 	public static final field MISSING_ALPHA I
