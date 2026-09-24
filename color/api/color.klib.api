@@ -384,6 +384,42 @@ final object codes.side.color/Lch : codes.side.color/PolarColorSpace // codes.si
 
 final object codes.side.color/OkLch : codes.side.color/PolarColorSpace // codes.side.color/OkLch|null[0]
 
+final object codes.side.color/Okhsl : codes.side.color/ColorSpace { // codes.side.color/Okhsl|null[0]
+    final val H // codes.side.color/Okhsl.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/Okhsl.H.<get-H>|<get-H>(){}[0]
+    final val L // codes.side.color/Okhsl.L|{}L[0]
+        final fun <get-L>(): codes.side.color/ColorChannel // codes.side.color/Okhsl.L.<get-L>|<get-L>(){}[0]
+    final val S // codes.side.color/Okhsl.S|{}S[0]
+        final fun <get-S>(): codes.side.color/ColorChannel // codes.side.color/Okhsl.S.<get-S>|<get-S>(){}[0]
+    final val exactness // codes.side.color/Okhsl.exactness|{}exactness[0]
+        final fun <get-exactness>(): codes.side.color/Exactness // codes.side.color/Okhsl.exactness.<get-exactness>|<get-exactness>(){}[0]
+    final val gamut // codes.side.color/Okhsl.gamut|{}gamut[0]
+        final fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/Okhsl.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Okhsl.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/Okhsl.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/Okhsl.powerless|powerless(kotlin.DoubleArray){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Okhsl.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
+final object codes.side.color/Okhsv : codes.side.color/ColorSpace { // codes.side.color/Okhsv|null[0]
+    final val H // codes.side.color/Okhsv.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/Okhsv.H.<get-H>|<get-H>(){}[0]
+    final val S // codes.side.color/Okhsv.S|{}S[0]
+        final fun <get-S>(): codes.side.color/ColorChannel // codes.side.color/Okhsv.S.<get-S>|<get-S>(){}[0]
+    final val V // codes.side.color/Okhsv.V|{}V[0]
+        final fun <get-V>(): codes.side.color/ColorChannel // codes.side.color/Okhsv.V.<get-V>|<get-V>(){}[0]
+    final val exactness // codes.side.color/Okhsv.exactness|{}exactness[0]
+        final fun <get-exactness>(): codes.side.color/Exactness // codes.side.color/Okhsv.exactness.<get-exactness>|<get-exactness>(){}[0]
+    final val gamut // codes.side.color/Okhsv.gamut|{}gamut[0]
+        final fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/Okhsv.gamut.<get-gamut>|<get-gamut>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Okhsv.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/Okhsv.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/Okhsv.powerless|powerless(kotlin.DoubleArray){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Okhsv.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
 final object codes.side.color/Oklab : codes.side.color/ColorSpace { // codes.side.color/Oklab|null[0]
     final val A // codes.side.color/Oklab.A|{}A[0]
         final fun <get-A>(): codes.side.color/ColorChannel // codes.side.color/Oklab.A.<get-A>|<get-A>(){}[0]

@@ -218,6 +218,34 @@ public final class codes/side/color/OkLch : codes/side/color/PolarColorSpace {
 	public static final field INSTANCE Lcodes/side/color/OkLch;
 }
 
+public final class codes/side/color/Okhsl : codes/side/color/ColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Okhsl;
+	public fun fromBase ([D[D)V
+	public fun getExactness ()Lcodes/side/color/Exactness;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getL ()Lcodes/side/color/ColorChannel;
+	public final fun getS ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/Okhsl;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/Okhsv : codes/side/color/ColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Okhsv;
+	public fun fromBase ([D[D)V
+	public fun getExactness ()Lcodes/side/color/Exactness;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getS ()Lcodes/side/color/ColorChannel;
+	public final fun getV ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/Okhsv;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
+}
+
 public final class codes/side/color/Oklab : codes/side/color/ColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Oklab;
 	public fun fromBase ([D[D)V
