@@ -24,12 +24,13 @@ private const val SPACE_KEY_OKLCH = 5f
 private const val SPACE_KEY_OKHSL = 6f
 private const val SPACE_KEY_OKHSV = 7f
 
-private const val SAVED_ARRAY_SIZE = 6
+private const val SAVED_ARRAY_SIZE = 8
+private const val HUELESS_SAVED_ARRAY_SIZE = 6
 
 /**
  * Encodes the authoritative space and its native components in a single FloatArray.
  *
- * Layout: `[spaceKey, c0, c1, c2, c3, c4]`
+ * Layout: `[spaceKey, c0, c1, c2, c3, c4, hslHue, okHue]`
  * - `spaceKey` = stable space key (0=HSL, 1=RGB, 2=CMYK, 3=LAB, 4=Oklab, 5=OkLCh,
  *   6=Okhsl, 7=Okhsv)
  * - HSL:   c0=hue, c1=saturation, c2=lightness, c3=alpha, c4 unused
@@ -40,16 +41,20 @@ private const val SAVED_ARRAY_SIZE = 6
  * - OkLCh: c0=l, c1=chroma, c2=hue, c3=alpha, c4 unused
  * - Okhsl: c0=hue, c1=saturation, c2=lightness, c3=alpha, c4 unused
  * - Okhsv: c0=hue, c1=saturation, c2=value, c3=alpha, c4 unused
+ * - `hslHue`, `okHue`: the hues a grey reports in each family (see [ColorPickerState])
+ *
+ * The six-element form without the hues is accepted too, so a state an app saved on 1.2.0
+ * restores after it upgrades.
  *
  * This preserves the authoritative space across process death so the user's
  * "origin" choice survives rotation, not just the visible color.
  *
  * Restoring invalid data (unknown space key, wrong array size, or out-of-range
- * channels) returns `null` per the [Saver] contract instead of throwing.
+ * channels or hues) returns `null` per the [Saver] contract instead of throwing.
  */
 internal val ColorPickerStateSaver = Saver<ColorPickerState, FloatArray>(
     save = { state ->
-        when (val color = state.pickerColor) {
+        val components = when (val color = state.pickerColor) {
             is HslColor -> floatArrayOf(
                 SPACE_KEY_HSL,
                 color.hue, color.saturation, color.lightness, color.alpha, 0f,
@@ -90,9 +95,10 @@ internal val ColorPickerStateSaver = Saver<ColorPickerState, FloatArray>(
                 color.hue, color.saturation, color.value, color.alpha, 0f,
             )
         }
+        components + floatArrayOf(state.rememberedHslHue, state.rememberedOkHue)
     },
     restore = { array ->
-        val color: PickerColor? = if (array.size != SAVED_ARRAY_SIZE) {
+        val color: PickerColor? = if (array.size != SAVED_ARRAY_SIZE && array.size != HUELESS_SAVED_ARRAY_SIZE) {
             null
         } else {
             try {
@@ -160,7 +166,14 @@ internal val ColorPickerStateSaver = Saver<ColorPickerState, FloatArray>(
                 null
             }
         }
-        color?.let { ColorPickerState(it) }
+        val hslHue = array.getOrNull(6)
+        val okHue = array.getOrNull(7)
+        when {
+            color == null -> null
+            hslHue == null || okHue == null -> ColorPickerState(color)
+            hslHue !in 0f..360f || okHue !in 0f..360f -> null
+            else -> ColorPickerState(color).apply { restoreRememberedHues(hslHue, okHue) }
+        }
     },
 )
 

@@ -3,6 +3,9 @@ package codes.side.colorpicker.state
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
+import codes.side.colorpicker.conversion.toHsl
+import codes.side.colorpicker.conversion.toOkhsl
+import codes.side.colorpicker.conversion.toRgb
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
@@ -699,6 +702,30 @@ class ColorPickerStateTest {
         assertNull(ColorPickerStateSaver.restore(floatArrayOf(0f, 120f)))
     }
 
+    @Test
+    fun saverKeepsTheRememberedHues() {
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(state)))
+        assertEquals(200f, restored.hslColor.hue, "HSL")
+        assertEquals(state.okhslColor.hue, restored.okhslColor.hue, "Okhsl")
+    }
+
+    @Test
+    fun saverRestoresTheSixElementForm() {
+        // The form 1.2.0 saves in: a state an app saved before upgrading has to restore after it.
+        val restored = assertNotNull(
+            ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f)),
+        )
+        assertEquals(RgbColor(0.5f, 0.5f, 0.5f), restored.pickerColor)
+    }
+
+    @Test
+    fun saverRestoreRememberedHueOutOfRangeReturnsNull() {
+        assertNull(ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f, 400f, 0f)))
+        assertNull(ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f, 0f, Float.NaN)))
+    }
+
     // ---- Hue through a neutral ----
 
     @Test
@@ -730,6 +757,71 @@ class ColorPickerStateTest {
         // OkLCh reaches the same decision through chroma, which the conversion has to report
         // as zero for a grey rather than as the 1e-8 the matrices leave behind.
         assertEquals(140f, state.oklchColor.hue, "OkLCh shares it too")
+    }
+
+    @Test
+    fun theLastHueChosenAnywhereIsTheOneRemembered() {
+        // HSL chose 200, then an RGB field moved the colour to red. A grey written next has to
+        // come back red, the last hue anyone picked, in both families.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor.Red)
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        assertEquals(0f, state.hslColor.hue, "HSL")
+        assertNear(RgbColor.Red.toOkhsl().hue, state.okhslColor.hue, tolerance = 1e-3f, msg = "Okhsl")
+    }
+
+    @Test
+    fun anHslHueCarriesIntoTheOkSpaces() {
+        // HSL sliders took a blue to white. An Okhsl picker over the same state has to show that
+        // blue, not hue zero, or raising its saturation paints pink.
+        val chosen = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)
+        val state = ColorPickerState(chosen)
+        state.updateLightness(1f)
+        val expected = chosen.toRgb().toOkhsl().hue
+        assertNear(expected, state.okhslColor.hue, tolerance = 1e-3f, msg = "Okhsl")
+        assertNear(expected, state.okhsvColor.hue, tolerance = 1e-3f, msg = "Okhsv")
+        assertNear(expected, state.oklchColor.hue, tolerance = 1e-3f, msg = "OkLCh")
+    }
+
+    @Test
+    fun anOkHueCarriesIntoHsl() {
+        val chosen = OkhslColor(hue = 140f, saturation = 0.9f, lightness = 0.5f)
+        val state = ColorPickerState(chosen)
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        assertNear(chosen.toRgb().toHsl().hue, state.hslColor.hue, tolerance = 1e-3f)
+    }
+
+    @Test
+    fun aHueGivenAtWhiteCarriesAcrossFromTheStart() {
+        // White converts to no hue at all, so the other family's comes from the given hue at
+        // full saturation.
+        val hsl = ColorPickerState(HslColor(hue = 200f, saturation = 1f, lightness = 1f))
+        assertNear(
+            HslColor(hue = 200f, saturation = 1f, lightness = 0.5f).toRgb().toOkhsl().hue,
+            hsl.okhslColor.hue,
+            tolerance = 1e-3f,
+            msg = "HSL into Okhsl",
+        )
+        val ok = ColorPickerState(OkhslColor(hue = 140f, saturation = 1f, lightness = 1f))
+        assertNear(
+            OkhslColor(hue = 140f, saturation = 1f, lightness = 0.5f).toRgb().toHsl().hue,
+            ok.hslColor.hue,
+            tolerance = 1e-3f,
+            msg = "Okhsl into HSL",
+        )
+    }
+
+    @Test
+    fun aNewHueWrittenAtWhiteCarriesAcross() {
+        // A caller sets white with a different hue in one write, with no colour on the way for the
+        // other family's angle to come from.
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromHsl(HslColor(hue = 120f, saturation = 1f, lightness = 1f))
+        assertNear(
+            HslColor(hue = 120f, saturation = 1f, lightness = 0.5f).toRgb().toOkhsl().hue,
+            state.okhslColor.hue,
+            tolerance = 1e-3f,
+        )
     }
 
     @Test

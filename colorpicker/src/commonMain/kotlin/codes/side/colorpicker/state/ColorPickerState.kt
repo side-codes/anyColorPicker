@@ -14,6 +14,7 @@ import codes.side.colorpicker.conversion.toOkhsl
 import codes.side.colorpicker.conversion.toOkhsv
 import codes.side.colorpicker.conversion.toOklab
 import codes.side.colorpicker.conversion.toOklch
+import codes.side.colorpicker.conversion.toRgb
 import codes.side.colorpicker.conversion.toRgbColor
 import codes.side.colorpicker.conversion.withAlpha
 import codes.side.colorpicker.model.CmykColor
@@ -70,8 +71,10 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
     // written to; this is for when another space writes the neutral, which is where it would
     // otherwise be lost. HSL's hue and Oklab's are different angles, so they are kept apart;
     // Okhsl, Okhsv and OkLCh all share the second.
-    private var rememberedHslHue by mutableStateOf(0f)
-    private var rememberedOkHue by mutableStateOf(0f)
+    internal var rememberedHslHue by mutableStateOf(0f)
+        private set
+    internal var rememberedOkHue by mutableStateOf(0f)
+        private set
 
     private var authoritative: PickerColor
         get() = authoritativeColor
@@ -81,21 +84,46 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
         }
 
     /**
-     * Records the hue of a colour that has one, taken from the colour itself rather than
-     * converted, so a write costs nothing beyond a type check.
+     * Records, for both families, the hue [color] carries, so a neutral read in either reports the
+     * last hue actually chosen, whichever space it was chosen in.
+     *
+     * A cylindrical colour gives its own family's hue directly; the other family's, and both for a
+     * space with no hue channel, come from converting it. A neutral converts to no hue, but a
+     * cylindrical colour at black or white still carries the one it was given. When that hue is
+     * new — the [initial] colour's, or not the one already remembered — the other family's is taken
+     * from it at full saturation. The same hue again keeps the other family's as it is: dragging
+     * lightness to white passes through the actual colour first, and the angle taken from that is
+     * the exact one, where the stand-in is off by the few degrees the conversion bends with saturation.
      */
-    private fun rememberHueOf(color: PickerColor) {
-        when (color) {
-            is HslColor -> if (color.saturation > 0f) rememberedHslHue = color.hue
-            is OkhslColor -> if (color.saturation > 0f) rememberedOkHue = color.hue
-            is OkhsvColor -> if (color.saturation > 0f) rememberedOkHue = color.hue
-            is OklchColor -> if (color.chroma > 0f) rememberedOkHue = color.hue
-            else -> Unit
+    private fun rememberHueOf(color: PickerColor, initial: Boolean = false) {
+        val ownHslHue = (color as? HslColor)?.takeIf { it.saturation > 0f }?.hue
+        val ownOkHue = when (color) {
+            is OkhslColor -> color.hue.takeIf { color.saturation > 0f }
+            is OkhsvColor -> color.hue.takeIf { color.saturation > 0f }
+            is OklchColor -> color.hue.takeIf { color.chroma > 0f }
+            else -> null
         }
+        val rgb = color.toRgbColor()
+        val hslHue = ownHslHue
+            ?: rgb.toHsl().takeIf { it.saturation > 0f }?.hue
+            ?: ownOkHue?.takeIf { initial || it != rememberedOkHue }
+                ?.let { OkhslColor(hue = it, saturation = 1f, lightness = 0.5f).toRgb().toHsl().hue }
+        val okHue = ownOkHue
+            ?: rgb.toOklch().takeIf { it.chroma > 0f }?.hue
+            ?: ownHslHue?.takeIf { initial || it != rememberedHslHue }
+                ?.let { HslColor(hue = it, saturation = 1f, lightness = 0.5f).toRgb().toOklch().hue }
+        if (hslHue != null) rememberedHslHue = hslHue
+        if (okHue != null) rememberedOkHue = okHue
+    }
+
+    /** Puts back hues a saver kept, over the ones construction took from the initial colour. */
+    internal fun restoreRememberedHues(hslHue: Float, okHue: Float) {
+        rememberedHslHue = hslHue
+        rememberedOkHue = okHue
     }
 
     init {
-        rememberHueOf(initialColor)
+        rememberHueOf(initialColor, initial = true)
     }
 
     // How many components are mid-gesture, not whether any is. A touch screen can drag two

@@ -2,6 +2,8 @@ package codes.side.colorpicker.conversion
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.graphics.colorspace.Illuminant
+import androidx.compose.ui.graphics.colorspace.adapt
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
@@ -43,21 +45,35 @@ public fun OkhslColor.toComposeColor(): Color = toRgb().toComposeColor()
 public fun OkhsvColor.toComposeColor(): Color = toRgb().toComposeColor()
 
 /**
- * Converts this Compose [Color] to an [RgbColor], converting to the sRGB color space
- * first if needed (clamping any out-of-gamut channels to `0..1`).
+ * Converts this Compose [Color] to an [RgbColor].
+ *
+ * An sRGB color is read as it is. One in any other space goes through CIE XYZ, and if sRGB cannot
+ * show it, it is mapped as [LabColor.toRgb] maps: lightness and hue hold and chroma gives way,
+ * where clipping each channel would move all three.
  *
  * @throws IllegalArgumentException if this is [Color.Unspecified].
  */
 public fun Color.toRgbColor(): RgbColor {
     require(this != Color.Unspecified) { "Cannot convert Color.Unspecified to RgbColor" }
-    val srgb = convert(ColorSpaces.Srgb)
-    return RgbColor(
-        red = srgb.red.coerceIn(0f, 1f),
-        green = srgb.green.coerceIn(0f, 1f),
-        blue = srgb.blue.coerceIn(0f, 1f),
-        alpha = srgb.alpha.coerceIn(0f, 1f),
+    if (colorSpace == ColorSpaces.Srgb) {
+        return RgbColor(red = red, green = green, blue = blue, alpha = alpha)
+    }
+    // Float XYZ from the space itself. convert(ColorSpaces.CieXyz) would hand it back as a Color,
+    // which keeps components in half floats and clamps them to ±2.
+    val xyz = colorSpace.adapt(Illuminant.D50).toXyz(red, green, blue)
+    return gamutMappedRgbColor(
+        linear = relativeXyzToLinearSrgb(
+            xr = xyz[0] / ComposeD50X,
+            yr = xyz[1].toDouble(),
+            zr = xyz[2] / ComposeD50Z,
+        ),
+        alpha = alpha.coerceIn(0f, 1f),
     )
 }
+
+// The D50 white Compose adapts to, from the chromaticity it defines, as XYZ with Y = 1.
+private val ComposeD50X: Double = Illuminant.D50.x.toDouble() / Illuminant.D50.y
+private val ComposeD50Z: Double = (1.0 - Illuminant.D50.x - Illuminant.D50.y) / Illuminant.D50.y
 
 /** Converts this Compose [Color] to an [HslColor]; see [Color.toRgbColor] for sRGB handling. */
 public fun Color.toHslColor(): HslColor = toRgbColor().toHsl()

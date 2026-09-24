@@ -4,7 +4,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.RgbColor
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -63,6 +65,61 @@ class ComposeColorExtTest {
             "hue ordering preserved: blue=${rgb.blue} green=${rgb.green}",
         )
         assertEquals(1f, rgb.alpha)
+    }
+
+    @Test
+    fun displayP3RedIsGamutMappedRatherThanClipped() {
+        // Clipping each channel returns sRGB red, which sits 0.28 degrees of Oklab hue away and
+        // loses the lightness the source had. Mapping holds the hue and gives up chroma instead.
+        val p3Red = Color(red = 1f, green = 0f, blue = 0f, colorSpace = ColorSpaces.DisplayP3)
+        val rgb = p3Red.toRgbColor()
+        assertTrue(rgb.green > 0.02f, "clipping would leave green at zero: $rgb")
+        val source = p3Red.convert(ColorSpaces.Oklab)
+        val sourceHue = atan2(source.blue, source.green) * 180f / PI.toFloat()
+        assertNear(sourceHue, rgb.toOklch().hue, tolerance = 0.1f, msg = "hue")
+    }
+
+    @Test
+    fun aDisplayP3GreyStaysNeutral() {
+        // A grey carries no hue, so neither HSL nor OkLCh may find one in the conversion's rounding.
+        for (v in listOf(0.2f, 0.5f, 0.9f, 0.99f, 0.995f)) {
+            val rgb = Color(red = v, green = v, blue = v, colorSpace = ColorSpaces.DisplayP3).toRgbColor()
+            assertEquals(0f, rgb.toHsl().saturation, "HSL saturation at $v: $rgb")
+            assertEquals(0f, rgb.toOklch().chroma, "OkLCh chroma at $v: $rgb")
+        }
+    }
+
+    @Test
+    fun aDisplayP3ColorInsideSrgbIsOnlyConverted() {
+        val p3 = Color(red = 0.6f, green = 0.4f, blue = 0.3f, colorSpace = ColorSpaces.DisplayP3)
+        val expected = p3.convert(ColorSpaces.Srgb)
+        val rgb = p3.toRgbColor()
+        assertNear(expected.red, rgb.red, tolerance = 0.003f, msg = "red")
+        assertNear(expected.green, rgb.green, tolerance = 0.003f, msg = "green")
+        assertNear(expected.blue, rgb.blue, tolerance = 0.003f, msg = "blue")
+    }
+
+    @Test
+    fun anOklabComposeColorConverts() {
+        // sRGB red as Compose's own Oklab space holds it, in half floats.
+        val oklabRed = Color(
+            red = 0.6279554f,
+            green = 0.22486307f,
+            blue = 0.1258463f,
+            colorSpace = ColorSpaces.Oklab,
+        )
+        val rgb = oklabRed.toRgbColor()
+        assertNear(1f, rgb.red, tolerance = 0.01f, msg = "red")
+        assertNear(0f, rgb.green, tolerance = 0.01f, msg = "green")
+        assertNear(0f, rgb.blue, tolerance = 0.01f, msg = "blue")
+    }
+
+    @Test
+    fun anExtendedSrgbColorBeyondWhiteLandsInRange() {
+        // RgbColor's constructor rejects anything outside 0..1, so returning at all is the check.
+        val bright = Color(red = 1.5f, green = 0.5f, blue = 0.5f, colorSpace = ColorSpaces.ExtendedSrgb)
+        val rgb = bright.toRgbColor()
+        assertTrue(rgb.red > rgb.green, "still red: $rgb")
     }
 
     // ---- Unspecified ----

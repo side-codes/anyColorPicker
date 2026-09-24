@@ -24,7 +24,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 
 ```kotlin
 // build.gradle.kts
-implementation("codes.side:colorpicker:1.2.0")
+implementation("codes.side:colorpicker:1.2.1")
 ```
 
 In a Kotlin Multiplatform project, add it to `commonMain`:
@@ -33,7 +33,7 @@ In a Kotlin Multiplatform project, add it to `commonMain`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("codes.side:colorpicker:1.2.0")
+            implementation("codes.side:colorpicker:1.2.1")
         }
     }
 }
@@ -204,8 +204,8 @@ LAB, Oklab and OkLCh can describe colors sRGB cannot show. Converting one to RGB
 clamp each channel independently, which would shift lightness and hue as a side effect. It
 runs the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping): binary
 search down the chroma axis, comparing each candidate against its clipped form, and stop
-once the two are within a just-noticeable difference. Lightness and hue survive, chroma
-pays, and the result matches what a browser would render.
+once the two are within a just-noticeable difference. Lightness and hue survive and chroma
+pays.
 
 The search runs in Oklab whatever space the color came from, as CSS specifies, so what
 survives is Oklab's lightness and hue, not CIELAB's. L* lands within about 3 where clipping
@@ -589,6 +589,10 @@ state.hslColor
 state.rgbColor
 state.cmykColor
 state.labColor
+state.oklabColor
+state.oklchColor
+state.okhslColor
+state.okhsvColor
 state.argbInt
 state.pickerColor // the authoritative color, in whichever space was last written
 
@@ -606,6 +610,18 @@ state.updateKey(0.2f)
 state.updateLabLightness(50f)
 state.updateLabA(20f)
 state.updateLabB(-30f)
+state.updateOklabLightness(0.6f)
+state.updateOklabA(0.1f)
+state.updateOklabB(-0.1f)
+state.updateOklchLightness(0.6f)
+state.updateOklchChroma(0.15f)
+state.updateOklchHue(250f)
+state.updateOkhslHue(250f)
+state.updateOkhslSaturation(0.8f)
+state.updateOkhslLightness(0.6f)
+state.updateOkhsvHue(250f)
+state.updateOkhsvSaturation(0.8f)
+state.updateOkhsvValue(0.9f)
 state.updateAlpha(0.5f) // keeps the current origin space
 
 // Whole-color updates (the written space becomes the origin)
@@ -613,6 +629,10 @@ state.updateFromHsl(HslColor(hue = 0f, saturation = 1f, lightness = 0.5f))
 state.updateFromRgb(RgbColor(1f, 0f, 0f))
 state.updateFromCmyk(cmykColor)
 state.updateFromLab(labColor)
+state.updateFromOklab(oklabColor)
+state.updateFromOklch(oklchColor)
+state.updateFromOkhsl(okhslColor)
+state.updateFromOkhsv(okhsvColor)
 state.updateFromArgbInt(0xFFFF0000.toInt())
 
 // True while the user is dragging a slider
@@ -621,7 +641,7 @@ state.isInteracting
 
 `ColorPickerState` has a public constructor, so it can also be created and held outside of composition (e.g. in a ViewModel).
 
-Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color.
+Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color, and the hue a grey reports in each family.
 
 ## 🏗️ Architecture: Zero-Drift Color Conversions
 
@@ -670,7 +690,7 @@ The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar`
 
 ```diff
 - implementation("codes.side:andcolorpicker:0.6.2")
-+ implementation("codes.side:colorpicker:1.2.0")
++ implementation("codes.side:colorpicker:1.2.1")
 ```
 
 There is no 1:1 API mapping — migrate by concept:

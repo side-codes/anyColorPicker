@@ -29,6 +29,15 @@ class LabConversionsTest {
     // ---- LAB -> RGB known colors ----
 
     @Test
+    fun aLabGreyConvertsToAnExactGrey() {
+        // The matrices land a neutral an ulp or two off the diagonal, and HSL reads a hue out of that.
+        for (l in 0..100) {
+            val rgb = LabColor(l = l.toFloat(), a = 0f, b = 0f).toRgb()
+            assertTrue(rgb.red == rgb.green && rgb.green == rgb.blue, "L*=$l gave $rgb")
+        }
+    }
+
+    @Test
     fun whiteLabToRgb() {
         val lab = LabColor(l = 100f, a = 0f, b = 0f)
         val rgb = lab.toRgb()
