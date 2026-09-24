@@ -19,7 +19,7 @@ internal fun invert(m: DoubleArray): DoubleArray {
     val h = m[7]
     val i = m[8]
     val det = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
-    require(det != 0.0) { "Singular matrix" }
+    require(det != 0.0 && det.isFinite()) { "Singular matrix" }
     return doubleArrayOf(
         (e * i - f * h) / det, (c * h - b * i) / det, (b * f - c * e) / det,
         (f * g - d * i) / det, (a * i - c * g) / det, (c * d - a * f) / det,

@@ -18,6 +18,15 @@ public class RgbPrimaries(
     public val blueX: Double,
     public val blueY: Double,
 ) {
+    init {
+        for (value in doubleArrayOf(redX, redY, greenX, greenY, blueX, blueY)) {
+            require(value.isFinite()) { "A primary's chromaticity must be finite: $this" }
+        }
+        for (y in doubleArrayOf(redY, greenY, blueY)) {
+            require(y != 0.0) { "A primary's y must not be 0: $this" }
+        }
+    }
+
     override fun equals(other: Any?): Boolean = other is RgbPrimaries &&
         redX == other.redX && redY == other.redY &&
         greenX == other.greenX && greenY == other.greenY &&

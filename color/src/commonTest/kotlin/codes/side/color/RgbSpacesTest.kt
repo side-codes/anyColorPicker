@@ -72,6 +72,16 @@ class RgbSpacesTest {
     }
 
     @Test
+    fun primariesMustBeUsableChromaticities() {
+        assertFailsWith<IllegalArgumentException> { RgbPrimaries(0.64, 0.0, 0.30, 0.60, 0.15, 0.06) }
+        assertFailsWith<IllegalArgumentException> { RgbPrimaries(0.64, 0.33, 0.30, Double.NaN, 0.15, 0.06) }
+        // Collinear primaries span no volume.
+        assertFailsWith<IllegalArgumentException> {
+            ColorSpace.rgb("--flat", RgbPrimaries(0.2, 0.2, 0.3, 0.3, 0.4, 0.4), WhitePoint.D65, TransferFunction.Linear)
+        }
+    }
+
+    @Test
     fun anAppSpaceCannotTakeALibraryId() {
         // Spaces are equal by id, so one called srgb would be taken for Srgb and never converted.
         assertFailsWith<IllegalArgumentException> { ColorSpace.rgb("srgb", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.Srgb) }
