@@ -63,4 +63,10 @@ class HexTest {
             }
         }
     }
+
+    @Test
+    fun cssHexCarriesAlphaLast() {
+        assertEquals(ColorValue.parseHex("#FF000080", HexAlpha.Last), ColorValue.parseCss("#FF000080"))
+        assertEquals(ColorValue.parseHex("#F008", HexAlpha.Last), ColorValue.parseCss("#f008"))
+    }
 }

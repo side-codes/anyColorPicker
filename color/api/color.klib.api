@@ -190,6 +190,11 @@ final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
     }
 }
 
+final class codes.side.color/CssColorParseException : kotlin/IllegalArgumentException { // codes.side.color/CssColorParseException|null[0]
+    final val index // codes.side.color/CssColorParseException.index|{}index[0]
+        final fun <get-index>(): kotlin/Int // codes.side.color/CssColorParseException.index.<get-index>|<get-index>(){}[0]
+}
+
 final class codes.side.color/GamutMapper { // codes.side.color/GamutMapper|null[0]
     final val gamut // codes.side.color/GamutMapper.gamut|{}gamut[0]
         final fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/GamutMapper.gamut.<get-gamut>|<get-gamut>(){}[0]
@@ -525,5 +530,7 @@ final object codes.side.color/XyzD65 : codes.side.color/ColorSpace { // codes.si
 final fun (codes.side.color/ColorValue).codes.side.color/isInGamut(codes.side.color/RgbGamut, kotlin/Double = ...): kotlin/Boolean // codes.side.color/isInGamut|isInGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;kotlin.Double){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toGamut(codes.side.color/RgbGamut, codes.side.color/GamutMapping = ...): codes.side.color/ColorValue // codes.side.color/toGamut|toGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;codes.side.color.GamutMapping){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toHexString(codes.side.color/HexAlpha, codes.side.color/GamutMapping = ...): kotlin/String // codes.side.color/toHexString|toHexString@codes.side.color.ColorValue(codes.side.color.HexAlpha;codes.side.color.GamutMapping){}[0]
+final fun (codes.side.color/ColorValue.Companion).codes.side.color/parseCss(kotlin/String, kotlin.collections/Collection<codes.side.color/ColorSpace> = ...): codes.side.color/ColorValue // codes.side.color/parseCss|parseCss@codes.side.color.ColorValue.Companion(kotlin.String;kotlin.collections.Collection<codes.side.color.ColorSpace>){}[0]
+final fun (codes.side.color/ColorValue.Companion).codes.side.color/parseCssOrNull(kotlin/String, kotlin.collections/Collection<codes.side.color/ColorSpace> = ...): codes.side.color/ColorValue? // codes.side.color/parseCssOrNull|parseCssOrNull@codes.side.color.ColorValue.Companion(kotlin.String;kotlin.collections.Collection<codes.side.color.ColorSpace>){}[0]
 final fun (codes.side.color/ColorValue.Companion).codes.side.color/parseHex(kotlin/String, codes.side.color/HexAlpha): codes.side.color/ColorValue // codes.side.color/parseHex|parseHex@codes.side.color.ColorValue.Companion(kotlin.String;codes.side.color.HexAlpha){}[0]
 final fun (codes.side.color/ColorValue.Companion).codes.side.color/parseHexOrNull(kotlin/String, codes.side.color/HexAlpha): codes.side.color/ColorValue? // codes.side.color/parseHexOrNull|parseHexOrNull@codes.side.color.ColorValue.Companion(kotlin.String;codes.side.color.HexAlpha){}[0]

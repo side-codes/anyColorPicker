@@ -124,6 +124,17 @@ public final class codes/side/color/ColorValue {
 public final class codes/side/color/ColorValue$Companion {
 }
 
+public final class codes/side/color/CssColorParseException : java/lang/IllegalArgumentException {
+	public final fun getIndex ()I
+}
+
+public final class codes/side/color/CssKt {
+	public static final fun parseCss (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;)Lcodes/side/color/ColorValue;
+	public static synthetic fun parseCss$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public static final fun parseCssOrNull (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;)Lcodes/side/color/ColorValue;
+	public static synthetic fun parseCssOrNull$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/DisplayP3 : codes/side/color/RgbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/DisplayP3;
 }
