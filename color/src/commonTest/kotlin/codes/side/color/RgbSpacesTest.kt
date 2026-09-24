@@ -47,12 +47,21 @@ class RgbSpacesTest {
 
     @Test
     fun transferCurvesMirrorNegativeValues() {
-        for (x in doubleArrayOf(0.001, 0.03, 0.2, 0.7, 1.4)) {
-            val curve = TransferFunction.Srgb
-            assertEquals(-curve.decode(x), curve.decode(-x))
-            assertEquals(-curve.encode(x), curve.encode(-x))
-            assertNear(x, curve.encode(curve.decode(x)), 1e-15, "round trip at $x")
+        for (curve in listOf(TransferFunction.Srgb, TransferFunction.Linear, TransferFunction.gamma(2.2))) {
+            for (x in doubleArrayOf(0.001, 0.03, 0.2, 0.7, 1.4)) {
+                assertEquals(-curve.decode(x), curve.decode(-x))
+                assertEquals(-curve.encode(x), curve.encode(-x))
+                assertNear(x, curve.encode(curve.decode(x)), 1e-15, "round trip at $x")
+            }
         }
+    }
+
+    @Test
+    fun aGammaMustBePositiveAndFinite() {
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(0.0) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(-1.0) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(Double.NaN) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(Double.POSITIVE_INFINITY) }
     }
 
     @Test
@@ -63,12 +72,23 @@ class RgbSpacesTest {
     }
 
     @Test
-    fun aFactoryBuiltSpaceWithAnotherWhiteIsAdapted() {
+    fun aFactoryBuiltSpaceWithAnotherWhiteIsAdaptedWithBradford() {
         // An sRGB-primaried space whose white is D50 still maps its own white to D50, which XYZ-D65
-        // holds as the Bradford image of D50.
+        // holds as the Bradford image of D50; every adaptation method maps white to white, so a
+        // saturated color is what actually tells Bradford apart from another method.
         val built = ColorSpace.rgb("--srgb-d50", RgbPrimaries.Srgb, WhitePoint.D50, TransferFunction.Linear)
         val white = built(1.0, 1.0, 1.0).to(XyzD50)
-        assertComponents(doubleArrayOf(0.9642956764295676, 1.0, 0.8251046025104602), white, 1e-4)
+        assertComponents(doubleArrayOf(0.9642956764295676, 1.0, 0.8251046025104602), white, 1e-12)
+
+        // CSS Color 4's lin_ProPhoto_to_XYZ (D50), first column: linear ProPhoto red converted to XYZ-D50.
+        val proPhotoLinear = ColorSpace.rgb(
+            "--prophoto-linear",
+            RgbPrimaries(0.734699, 0.265301, 0.159597, 0.840403, 0.036598, 0.000105),
+            WhitePoint.D50,
+            TransferFunction.Linear,
+        )
+        val red = proPhotoLinear(1.0, 0.0, 0.0).to(XyzD50)
+        assertComponents(doubleArrayOf(0.79776664490064230, 0.28807482881940130, 0.0), red, 1e-12)
     }
 
     @Test

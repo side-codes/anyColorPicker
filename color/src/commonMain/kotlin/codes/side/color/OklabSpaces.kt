@@ -49,5 +49,8 @@ public object Oklab : ColorSpace(
         colorOf(arrayOf(l, a, b), alpha)
 }
 
+// OkLCh's hue is powerless at or below this Oklab chroma; Okhsl and Okhsv share it.
+internal const val OKLCH_POWERLESS_CHROMA: Double = 0.000004
+
 /** OkLCh, the polar form of [Oklab]. CSS `oklch()`; its hue is powerless at C ≤ 0.000004. */
-public object OkLch : PolarColorSpace("oklch", Oklab, 0.4, 0.000004, HueFamily.Oklab)
+public object OkLch : PolarColorSpace("oklch", Oklab, 0.4, OKLCH_POWERLESS_CHROMA, HueFamily.Oklab)

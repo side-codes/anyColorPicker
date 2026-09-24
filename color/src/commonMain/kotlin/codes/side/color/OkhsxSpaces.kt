@@ -14,9 +14,6 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-// The Oklab chroma below which Okhsl's and Okhsv's hue is powerless: OkLCh's threshold.
-private const val POWERLESS_CHROMA = 0.000004
-
 /**
  * Okhsl, Björn Ottosson's perceptual HSL over [Oklab], normalized to the sRGB gamut. S and L run
  * 0–1 and s = 1 is as colorful as sRGB allows. Serializes as `color(--okhsl …)`.
@@ -270,5 +267,5 @@ private fun okPowerless(space: ColorSpace, components: DoubleArray): Int {
     val lab = DoubleArray(4)
     components.copyInto(lab, 0, 0, 3)
     space.toBase(lab, lab)
-    return if (hypot(lab[1], lab[2]) <= POWERLESS_CHROMA) 1 else 0
+    return if (hypot(lab[1], lab[2]) <= OKLCH_POWERLESS_CHROMA) 1 else 0
 }

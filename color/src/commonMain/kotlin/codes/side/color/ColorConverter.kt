@@ -77,8 +77,6 @@ public class ColorConverter internal constructor(
 
     override fun toString(): String = "ColorConverter(${source.id} → ${target.id}, ${steps.size} steps)"
 
-    internal val stepCount: Int get() = steps.size
-
     internal companion object {
         fun build(from: ColorSpace, to: ColorSpace): ColorConverter {
             val up = ancestry(from)
