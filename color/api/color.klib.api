@@ -50,6 +50,8 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
         final fun <get-id>(): kotlin/String // codes.side.color/ColorSpace.id.<get-id>|<get-id>(){}[0]
     open val exactness // codes.side.color/ColorSpace.exactness|{}exactness[0]
         open fun <get-exactness>(): codes.side.color/Exactness // codes.side.color/ColorSpace.exactness.<get-exactness>|<get-exactness>(){}[0]
+    open val gamut // codes.side.color/ColorSpace.gamut|{}gamut[0]
+        open fun <get-gamut>(): codes.side.color/RgbGamut? // codes.side.color/ColorSpace.gamut.<get-gamut>|<get-gamut>(){}[0]
     open val whitePoint // codes.side.color/ColorSpace.whitePoint|{}whitePoint[0]
         open fun <get-whitePoint>(): codes.side.color/WhitePoint // codes.side.color/ColorSpace.whitePoint.<get-whitePoint>|<get-whitePoint>(){}[0]
 
@@ -61,6 +63,26 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
     final fun hashCode(): kotlin/Int // codes.side.color/ColorSpace.hashCode|hashCode(){}[0]
     open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/ColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
     open fun toString(): kotlin/String // codes.side.color/ColorSpace.toString|toString(){}[0]
+
+    final object Companion { // codes.side.color/ColorSpace.Companion|null[0]
+        final fun rgb(kotlin/String, codes.side.color/RgbPrimaries, codes.side.color/WhitePoint, codes.side.color/TransferFunction): codes.side.color/RgbColorSpace // codes.side.color/ColorSpace.Companion.rgb|rgb(kotlin.String;codes.side.color.RgbPrimaries;codes.side.color.WhitePoint;codes.side.color.TransferFunction){}[0]
+    }
+}
+
+abstract class codes.side.color/TransferFunction { // codes.side.color/TransferFunction|null[0]
+    constructor <init>() // codes.side.color/TransferFunction.<init>|<init>(){}[0]
+
+    abstract fun decode(kotlin/Double): kotlin/Double // codes.side.color/TransferFunction.decode|decode(kotlin.Double){}[0]
+    abstract fun encode(kotlin/Double): kotlin/Double // codes.side.color/TransferFunction.encode|encode(kotlin.Double){}[0]
+
+    final object Companion { // codes.side.color/TransferFunction.Companion|null[0]
+        final val Linear // codes.side.color/TransferFunction.Companion.Linear|{}Linear[0]
+            final fun <get-Linear>(): codes.side.color/TransferFunction // codes.side.color/TransferFunction.Companion.Linear.<get-Linear>|<get-Linear>(){}[0]
+        final val Srgb // codes.side.color/TransferFunction.Companion.Srgb|{}Srgb[0]
+            final fun <get-Srgb>(): codes.side.color/TransferFunction // codes.side.color/TransferFunction.Companion.Srgb.<get-Srgb>|<get-Srgb>(){}[0]
+
+        final fun gamma(kotlin/Double): codes.side.color/TransferFunction // codes.side.color/TransferFunction.Companion.gamma|gamma(kotlin.Double){}[0]
+    }
 }
 
 final class codes.side.color/ColorChannel { // codes.side.color/ColorChannel|null[0]
@@ -148,6 +170,43 @@ final class codes.side.color/HueFamily { // codes.side.color/HueFamily|null[0]
     }
 }
 
+final class codes.side.color/RgbGamut { // codes.side.color/RgbGamut|null[0]
+    final val peakLuminance // codes.side.color/RgbGamut.peakLuminance|{}peakLuminance[0]
+        final fun <get-peakLuminance>(): kotlin/Double // codes.side.color/RgbGamut.peakLuminance.<get-peakLuminance>|<get-peakLuminance>(){}[0]
+    final val space // codes.side.color/RgbGamut.space|{}space[0]
+        final fun <get-space>(): codes.side.color/RgbColorSpace // codes.side.color/RgbGamut.space.<get-space>|<get-space>(){}[0]
+
+    final fun toString(): kotlin/String // codes.side.color/RgbGamut.toString|toString(){}[0]
+}
+
+final class codes.side.color/RgbPrimaries { // codes.side.color/RgbPrimaries|null[0]
+    constructor <init>(kotlin/Double, kotlin/Double, kotlin/Double, kotlin/Double, kotlin/Double, kotlin/Double) // codes.side.color/RgbPrimaries.<init>|<init>(kotlin.Double;kotlin.Double;kotlin.Double;kotlin.Double;kotlin.Double;kotlin.Double){}[0]
+
+    final val blueX // codes.side.color/RgbPrimaries.blueX|{}blueX[0]
+        final fun <get-blueX>(): kotlin/Double // codes.side.color/RgbPrimaries.blueX.<get-blueX>|<get-blueX>(){}[0]
+    final val blueY // codes.side.color/RgbPrimaries.blueY|{}blueY[0]
+        final fun <get-blueY>(): kotlin/Double // codes.side.color/RgbPrimaries.blueY.<get-blueY>|<get-blueY>(){}[0]
+    final val greenX // codes.side.color/RgbPrimaries.greenX|{}greenX[0]
+        final fun <get-greenX>(): kotlin/Double // codes.side.color/RgbPrimaries.greenX.<get-greenX>|<get-greenX>(){}[0]
+    final val greenY // codes.side.color/RgbPrimaries.greenY|{}greenY[0]
+        final fun <get-greenY>(): kotlin/Double // codes.side.color/RgbPrimaries.greenY.<get-greenY>|<get-greenY>(){}[0]
+    final val redX // codes.side.color/RgbPrimaries.redX|{}redX[0]
+        final fun <get-redX>(): kotlin/Double // codes.side.color/RgbPrimaries.redX.<get-redX>|<get-redX>(){}[0]
+    final val redY // codes.side.color/RgbPrimaries.redY|{}redY[0]
+        final fun <get-redY>(): kotlin/Double // codes.side.color/RgbPrimaries.redY.<get-redY>|<get-redY>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/RgbPrimaries.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/RgbPrimaries.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // codes.side.color/RgbPrimaries.toString|toString(){}[0]
+
+    final object Companion { // codes.side.color/RgbPrimaries.Companion|null[0]
+        final val DisplayP3 // codes.side.color/RgbPrimaries.Companion.DisplayP3|{}DisplayP3[0]
+            final fun <get-DisplayP3>(): codes.side.color/RgbPrimaries // codes.side.color/RgbPrimaries.Companion.DisplayP3.<get-DisplayP3>|<get-DisplayP3>(){}[0]
+        final val Srgb // codes.side.color/RgbPrimaries.Companion.Srgb|{}Srgb[0]
+            final fun <get-Srgb>(): codes.side.color/RgbPrimaries // codes.side.color/RgbPrimaries.Companion.Srgb.<get-Srgb>|<get-Srgb>(){}[0]
+    }
+}
+
 final class codes.side.color/WhitePoint { // codes.side.color/WhitePoint|null[0]
     constructor <init>(kotlin/Double, kotlin/Double) // codes.side.color/WhitePoint.<init>|<init>(kotlin.Double;kotlin.Double){}[0]
 
@@ -172,6 +231,27 @@ final class codes.side.color/WhitePoint { // codes.side.color/WhitePoint|null[0]
     }
 }
 
+open class codes.side.color/RgbColorSpace : codes.side.color/ColorSpace { // codes.side.color/RgbColorSpace|null[0]
+    final val B // codes.side.color/RgbColorSpace.B|{}B[0]
+        final fun <get-B>(): codes.side.color/ColorChannel // codes.side.color/RgbColorSpace.B.<get-B>|<get-B>(){}[0]
+    final val G // codes.side.color/RgbColorSpace.G|{}G[0]
+        final fun <get-G>(): codes.side.color/ColorChannel // codes.side.color/RgbColorSpace.G.<get-G>|<get-G>(){}[0]
+    final val R // codes.side.color/RgbColorSpace.R|{}R[0]
+        final fun <get-R>(): codes.side.color/ColorChannel // codes.side.color/RgbColorSpace.R.<get-R>|<get-R>(){}[0]
+    final val primaries // codes.side.color/RgbColorSpace.primaries|{}primaries[0]
+        final fun <get-primaries>(): codes.side.color/RgbPrimaries // codes.side.color/RgbColorSpace.primaries.<get-primaries>|<get-primaries>(){}[0]
+    final val transfer // codes.side.color/RgbColorSpace.transfer|{}transfer[0]
+        final fun <get-transfer>(): codes.side.color/TransferFunction // codes.side.color/RgbColorSpace.transfer.<get-transfer>|<get-transfer>(){}[0]
+    open val gamut // codes.side.color/RgbColorSpace.gamut|{}gamut[0]
+        open fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/RgbColorSpace.gamut.<get-gamut>|<get-gamut>(){}[0]
+    open val whitePoint // codes.side.color/RgbColorSpace.whitePoint|{}whitePoint[0]
+        open fun <get-whitePoint>(): codes.side.color/WhitePoint // codes.side.color/RgbColorSpace.whitePoint.<get-whitePoint>|<get-whitePoint>(){}[0]
+
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/RgbColorSpace.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    open fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/RgbColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    open fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/RgbColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
 sealed class codes.side.color/ChannelKind { // codes.side.color/ChannelKind|null[0]
     final class Hue : codes.side.color/ChannelKind { // codes.side.color/ChannelKind.Hue|null[0]
         constructor <init>(codes.side.color/HueFamily) // codes.side.color/ChannelKind.Hue.<init>|<init>(codes.side.color.HueFamily){}[0]
@@ -190,6 +270,12 @@ sealed class codes.side.color/ChannelKind { // codes.side.color/ChannelKind|null
         final fun toString(): kotlin/String // codes.side.color/ChannelKind.Linear.toString|toString(){}[0]
     }
 }
+
+final object codes.side.color/DisplayP3 : codes.side.color/RgbColorSpace // codes.side.color/DisplayP3|null[0]
+
+final object codes.side.color/Srgb : codes.side.color/RgbColorSpace // codes.side.color/Srgb|null[0]
+
+final object codes.side.color/SrgbLinear : codes.side.color/RgbColorSpace // codes.side.color/SrgbLinear|null[0]
 
 final object codes.side.color/XyzD50 : codes.side.color/ColorSpace { // codes.side.color/XyzD50|null[0]
     final val X // codes.side.color/XyzD50.X|{}X[0]

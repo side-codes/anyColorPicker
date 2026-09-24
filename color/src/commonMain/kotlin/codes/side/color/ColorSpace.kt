@@ -57,6 +57,9 @@ public abstract class ColorSpace protected constructor(
     /** The reference white; D65 unless the space says otherwise. */
     public open val whitePoint: WhitePoint get() = base?.whitePoint ?: WhitePoint.D65
 
+    /** The RGB gamut "in gamut" is measured against, or null for a space with none (Lab, Oklab, XYZ). */
+    public open val gamut: RgbGamut? get() = null
+
     /** How faithfully this space's conversions describe color. */
     public open val exactness: Exactness get() = Exactness.Exact
 
@@ -109,6 +112,38 @@ public abstract class ColorSpace protected constructor(
 
     override fun toString(): String = id
 
+    /**
+     * The ways an app defines a space. Each [id] starts with `--`, as a CSS custom color space's
+     * does, so an app's space never passes for one of the library's: spaces are equal when their
+     * ids are.
+     */
+    public companion object {
+        /**
+         * An RGB space from its primaries and white. Its matrices are derived from the
+         * chromaticities, and a white other than D65 is adapted with Bradford.
+         */
+        public fun rgb(
+            id: String,
+            primaries: RgbPrimaries,
+            whitePoint: WhitePoint,
+            transfer: TransferFunction,
+        ): RgbColorSpace = RgbColorSpace.derive(appId(id), primaries, whitePoint, transfer)
+
+        private fun appId(id: String): String {
+            require(id.length > 2 && id.startsWith("--")) { "An app's color space id starts with --, and $id does not" }
+            return id
+        }
+    }
+}
+
+/** An RGB gamut to test or map colors against. */
+public class RgbGamut internal constructor(
+    /** The RGB space whose `0..1` cube this gamut is. */
+    public val space: RgbColorSpace,
+    /** Peak luminance relative to diffuse white; `1.0` for standard dynamic range. */
+    public val peakLuminance: Double = 1.0,
+) {
+    override fun toString(): String = "RgbGamut(${space.id})"
 }
 
 internal const val XYZ_D65_ID: String = "xyz-d65"

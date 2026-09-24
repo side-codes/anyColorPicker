@@ -56,6 +56,7 @@ public final class codes/side/color/ColorConverter {
 }
 
 public abstract class codes/side/color/ColorSpace {
+	public static final field Companion Lcodes/side/color/ColorSpace$Companion;
 	protected fun <init> (Ljava/lang/String;Ljava/util/List;Lcodes/side/color/ColorSpace;)V
 	public final fun color ([DDI)Lcodes/side/color/ColorValue;
 	public static synthetic fun color$default (Lcodes/side/color/ColorSpace;[DDIILjava/lang/Object;)Lcodes/side/color/ColorValue;
@@ -65,12 +66,17 @@ public abstract class codes/side/color/ColorSpace {
 	public final fun getBase ()Lcodes/side/color/ColorSpace;
 	public final fun getChannels ()Ljava/util/List;
 	public fun getExactness ()Lcodes/side/color/Exactness;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
 	public final fun getId ()Ljava/lang/String;
 	public fun getWhitePoint ()Lcodes/side/color/WhitePoint;
 	public final fun hashCode ()I
 	public fun powerless ([D)I
 	public abstract fun toBase ([D[D)V
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/ColorSpace$Companion {
+	public final fun rgb (Ljava/lang/String;Lcodes/side/color/RgbPrimaries;Lcodes/side/color/WhitePoint;Lcodes/side/color/TransferFunction;)Lcodes/side/color/RgbColorSpace;
 }
 
 public final class codes/side/color/ColorValue {
@@ -92,6 +98,10 @@ public final class codes/side/color/ColorValue {
 }
 
 public final class codes/side/color/ColorValue$Companion {
+}
+
+public final class codes/side/color/DisplayP3 : codes/side/color/RgbColorSpace {
+	public static final field INSTANCE Lcodes/side/color/DisplayP3;
 }
 
 public final class codes/side/color/Exactness : java/lang/Enum {
@@ -119,6 +129,66 @@ public final class codes/side/color/HueFamily$Companion {
 	public final fun getCieLab ()Lcodes/side/color/HueFamily;
 	public final fun getOklab ()Lcodes/side/color/HueFamily;
 	public final fun rgbHexcone (Lcodes/side/color/ColorSpace;)Lcodes/side/color/HueFamily;
+}
+
+public class codes/side/color/RgbColorSpace : codes/side/color/ColorSpace {
+	public fun fromBase ([D[D)V
+	public final fun getB ()Lcodes/side/color/ColorChannel;
+	public final fun getG ()Lcodes/side/color/ColorChannel;
+	public fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getPrimaries ()Lcodes/side/color/RgbPrimaries;
+	public final fun getR ()Lcodes/side/color/ColorChannel;
+	public final fun getTransfer ()Lcodes/side/color/TransferFunction;
+	public fun getWhitePoint ()Lcodes/side/color/WhitePoint;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/RgbColorSpace;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/RgbGamut {
+	public final fun getPeakLuminance ()D
+	public final fun getSpace ()Lcodes/side/color/RgbColorSpace;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/RgbPrimaries {
+	public static final field Companion Lcodes/side/color/RgbPrimaries$Companion;
+	public fun <init> (DDDDDD)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBlueX ()D
+	public final fun getBlueY ()D
+	public final fun getGreenX ()D
+	public final fun getGreenY ()D
+	public final fun getRedX ()D
+	public final fun getRedY ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/RgbPrimaries$Companion {
+	public final fun getDisplayP3 ()Lcodes/side/color/RgbPrimaries;
+	public final fun getSrgb ()Lcodes/side/color/RgbPrimaries;
+}
+
+public final class codes/side/color/Srgb : codes/side/color/RgbColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Srgb;
+}
+
+public final class codes/side/color/SrgbLinear : codes/side/color/RgbColorSpace {
+	public static final field INSTANCE Lcodes/side/color/SrgbLinear;
+}
+
+public abstract class codes/side/color/TransferFunction {
+	public static final field Companion Lcodes/side/color/TransferFunction$Companion;
+	protected fun <init> ()V
+	public abstract fun decode (D)D
+	public abstract fun encode (D)D
+}
+
+public final class codes/side/color/TransferFunction$Companion {
+	public final fun gamma (D)Lcodes/side/color/TransferFunction;
+	public final fun getLinear ()Lcodes/side/color/TransferFunction;
+	public final fun getSrgb ()Lcodes/side/color/TransferFunction;
 }
 
 public final class codes/side/color/WhitePoint {
