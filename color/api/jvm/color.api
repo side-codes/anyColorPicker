@@ -133,6 +133,8 @@ public final class codes/side/color/CssKt {
 	public static synthetic fun parseCss$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 	public static final fun parseCssOrNull (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;)Lcodes/side/color/ColorValue;
 	public static synthetic fun parseCssOrNull$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public static final fun toCssString (Lcodes/side/color/ColorValue;IZ)Ljava/lang/String;
+	public static synthetic fun toCssString$default (Lcodes/side/color/ColorValue;IZILjava/lang/Object;)Ljava/lang/String;
 }
 
 public final class codes/side/color/DisplayP3 : codes/side/color/RgbColorSpace {

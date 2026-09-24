@@ -1,6 +1,7 @@
 package codes.side.color
 
 import codes.side.color.internal.CssColorParser
+import codes.side.color.internal.cssString
 
 /**
  * Text that is not a CSS color this library reads. [index] is where in the text the problem starts:
@@ -41,3 +42,24 @@ public fun ColorValue.Companion.parseCssOrNull(text: String, knownSpaces: Collec
         null
     }
 
+/**
+ * This color as CSS, in its own space and never mapped into a gamut, so extended values survive:
+ * sRGB, display-p3 and XYZ as `color(srgb …)`, `color(display-p3 …)` and `color(xyz-d65 …)`; HSL,
+ * HWB, Lab, LCH, Oklab and OkLCh as their own functions; the library's HSV, Okhsl, Okhsv and CMYK,
+ * and an app's spaces, as `color(--name …)`, which [parseCss] reads back.
+ *
+ * A missing component is written `none`. Alpha is left out when it is 1.
+ *
+ * Numbers are rounded to [precision] digits, counted from the first digit before the decimal point,
+ * or from the point when there is none, as color.js does: 53.2408 → 53.241, 0.123456 → 0.12346, and
+ * a float residue such as 3e-17 → 0.
+ *
+ * [legacy] writes sRGB as `rgb()` or `rgba()` with components out of 255, and HSL as `hsl()` or
+ * `hsla()`, in the comma syntax older readers want. It has no `none`, so a missing component or
+ * alpha is written 0, and a reader clamps sRGB components to `0..255`. Other spaces have no comma
+ * syntax and are written as usual.
+ */
+public fun ColorValue.toCssString(precision: Int = 5, legacy: Boolean = false): String {
+    require(precision in 1..17) { "Precision is 1 to 17 digits, was $precision" }
+    return cssString(this, precision, legacy)
+}
