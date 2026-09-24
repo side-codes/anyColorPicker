@@ -18,7 +18,7 @@ In order to create a new feature request or bug report just file an issue. To fi
 - Send pull requests targeting **master** (fork the repository if you don't have write access).
 - CI (`build.yml`) must pass before a pull request can be merged.
 
-Versioning follows [Semantic Versioning](https://semver.org): a minor or patch release adds to the public API and never removes or changes what an earlier release published. CI enforces it with `scripts/check-api-removals.sh`, which compares `colorpicker/api/` against the dumps at the last release tag; run it before proposing an API change.
+Versioning follows [Semantic Versioning](https://semver.org): public API is added only in a minor release and removed or changed incompatibly only in a major one, and a patch leaves it alone. CI runs `scripts/check-api-removals.sh`, which fails when a declaration in the API dumps at the last release tag is missing from `colorpicker/api/`; run it before proposing an API change. It catches removed declarations and changed signatures, not a class losing a supertype, so that still needs a reviewer's eye.
 
 Our code style is defined via the [`.editorconfig`](.editorconfig) file at the repository root; most IDEs (including IntelliJ IDEA and Android Studio) pick it up automatically.
 
