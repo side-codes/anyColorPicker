@@ -58,14 +58,18 @@ public class ColorConverter internal constructor(
 
     private fun checkBounds(srcSize: Int, srcOffset: Int, dstSize: Int, dstOffset: Int, count: Int, sameArray: Boolean) {
         require(count >= 0 && srcOffset >= 0 && dstOffset >= 0) { "Negative count or offset" }
-        val srcEnd = srcOffset + count * sourceSize
-        val dstEnd = dstOffset + count * targetSize
+        // Long, so an absurd count cannot wrap around and pass.
+        val srcEnd = srcOffset + count.toLong() * sourceSize
+        val dstEnd = dstOffset + count.toLong() * targetSize
         require(srcEnd <= srcSize) { "Source holds fewer than $count ${source.id} colors" }
         require(dstEnd <= dstSize) { "Destination has room for fewer than $count ${target.id} colors" }
-        if (sameArray && dstEnd > srcOffset && srcEnd > dstOffset) {
-            // Each color is read whole before it is written, so writing never overtakes reading
-            // when it starts no later and moves no faster.
-            require(dstOffset <= srcOffset && targetSize <= sourceSize) {
+        if (sameArray && count > 1 && dstEnd > srcOffset && srcEnd > dstOffset) {
+            // Each color is read whole before it is written, so a color's write may reach no further
+            // than the next color's read: dstOffset − srcOffset ≤ (k + 1)(sourceSize − targetSize) for
+            // every k up to count − 2, tightest at the first k or the last.
+            val step = (sourceSize - targetSize).toLong()
+            val bound = if (step >= 0) step else (count - 1) * step
+            require(dstOffset - srcOffset <= bound) {
                 "Converting in place from $srcOffset to $dstOffset would overwrite ${source.id} colors not yet read"
             }
         }
