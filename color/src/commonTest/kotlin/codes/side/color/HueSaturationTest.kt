@@ -121,4 +121,13 @@ class HueSaturationTest {
         assertFalse(Hsl.H.kind == p3Hsl.H.kind)
         assertFailsWith<IllegalArgumentException> { ColorSpace.hsv("hsv", DisplayP3) }
     }
+
+    @Test
+    fun hwbTurnsGreyAsCssSaysWhenWhitenessOrBlacknessIsMissing() {
+        // CSS Color 4 §4.4: with W + B within 0.001 of 100, both present sets B to 100 − W, a missing
+        // B sets W to 100, and a missing W sets B to 100.
+        assertComponents(doubleArrayOf(0.4, 0.4, 0.4), Hwb(120.0, 40.0, 59.9995).to(Srgb), 1e-12)
+        assertComponents(doubleArrayOf(1.0, 1.0, 1.0), Hwb(120.0, 99.9995, null).to(Srgb), 1e-12)
+        assertComponents(doubleArrayOf(0.0, 0.0, 0.0), Hwb(120.0, null, 99.9995).to(Srgb), 1e-12)
+    }
 }

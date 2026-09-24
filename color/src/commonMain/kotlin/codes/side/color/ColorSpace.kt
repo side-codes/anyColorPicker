@@ -73,8 +73,9 @@ public abstract class ColorSpace protected constructor(
     public open fun powerless(components: DoubleArray): Int = 0
 
     // Before a conversion out of this space: the [powerless] components and every colorfulness
-    // component of [components] set to 0, leaving the grey the color is taken for.
-    internal open fun makeAchromatic(components: DoubleArray, powerless: Int) {
+    // component of [components] set to 0, leaving the grey the color is taken for. [missing] marks
+    // which components are `none`, for a space whose rule depends on it.
+    internal open fun makeAchromatic(components: DoubleArray, powerless: Int, missing: Int) {
         channels.forEachIndexed { i, channel ->
             if (powerless and (1 shl i) != 0 || channel.analogous == AnalogousCategory.Colorfulness) components[i] = 0.0
         }

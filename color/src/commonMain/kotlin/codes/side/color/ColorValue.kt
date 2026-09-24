@@ -81,7 +81,7 @@ public class ColorValue internal constructor(
         // Only what was missing to begin with carries forward: CSS carries before it handles powerless
         // components (§13.3), and a polar target makes the grey's hue missing on its own.
         val powerlessHere = space.powerless(buffer) and missing.inv()
-        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere)
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere, missing)
         space.converterTo(target).convert(buffer, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
         var outMissing = carriedMissing(target)
