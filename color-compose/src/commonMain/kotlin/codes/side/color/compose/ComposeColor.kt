@@ -32,20 +32,26 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces as ComposeSpaces
  *
  * Compose packs sRGB into 8 bits a channel, so `Color(0xFF336699)` is exactly 0.2, 0.4, 0.6.
  *
- * @throws IllegalArgumentException for [Color.Unspecified], and for Compose's HDR spaces
- * `Bt2020Hlg` and `Bt2020Pq`, which ColorValue does not model.
+ * @throws IllegalArgumentException for [Color.Unspecified], for Compose's HDR spaces
+ * `Bt2020Hlg` and `Bt2020Pq`, which ColorValue does not model, and for a color holding NaN.
  */
 public fun Color.toColorValue(): ColorValue = toColorValueOrNull() ?: throw IllegalArgumentException(
-    if (isUnspecified) "Color.Unspecified has no color" else "${colorSpace.name} is an HDR space, which ColorValue does not model",
+    when {
+        isUnspecified -> "Color.Unspecified has no color"
+        red.isNaN() || green.isNaN() || blue.isNaN() -> "$this holds NaN"
+        else -> "${colorSpace.name} is an HDR space, which ColorValue does not model"
+    },
 )
 
-/** As [toColorValue], but null for [Color.Unspecified] and Compose's HDR spaces. */
+/** As [toColorValue], but null for [Color.Unspecified], Compose's HDR spaces, and a color holding NaN. */
 public fun Color.toColorValueOrNull(): ColorValue? {
     if (isUnspecified) return null
     if (colorSpace == ComposeSpaces.Srgb) {
         val argb = toArgb()
         return Srgb((argb shr 16 and 0xFF) / 255.0, (argb shr 8 and 0xFF) / 255.0, (argb and 0xFF) / 255.0, (argb ushr 24) / 255.0)
     }
+    // Compose clamps a component into its space's range, which a NaN passes through.
+    if (red.isNaN() || green.isNaN() || blue.isNaN()) return null
     val space = when (colorSpace) {
         ComposeSpaces.ExtendedSrgb -> Srgb
         ComposeSpaces.LinearSrgb, ComposeSpaces.LinearExtendedSrgb -> SrgbLinear
@@ -72,5 +78,9 @@ public fun Color.toColorValueOrNull(): ColorValue? {
 public fun ColorValue.toComposeColor(gamut: RgbGamut = Srgb.gamut, mapping: GamutMapping = GamutMapping.Css()): Color {
     val space = requireNotNull(ComposeColorSpaces.composeOf(gamut.space)) { "Compose has no color space for ${gamut.space.id}" }
     val rgb = toGamut(gamut, mapping).components()
+    // 8 bits a channel, rounded in Double as toHexString rounds rather than in Compose's Float.
+    if (space == ComposeSpaces.Srgb) return Color((byte(alpha) shl 24) or (byte(rgb[0]) shl 16) or (byte(rgb[1]) shl 8) or byte(rgb[2]))
     return Color(rgb[0].toFloat(), rgb[1].toFloat(), rgb[2].toFloat(), alpha.toFloat(), space)
 }
+
+private fun byte(value: Double): Int = (value.coerceIn(0.0, 1.0) * 255.0).roundToInt()

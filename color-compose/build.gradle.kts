@@ -1,9 +1,11 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
-// The bridge has no composables. The Compose plugins are here for wasm alone: ui-graphics imports
-// Skiko there, and only the Compose Gradle plugin puts skiko.mjs where the browser tests' webpack
-// finds it. That plugin requires the Compose compiler, which requires the runtime on the classpath.
+// The bridge has no composables, but it is compiled by the Compose compiler for good: the compiler
+// gives ComposeColorSpaces a $stable field that Compose consumers read at run time, so removing it
+// would break them. The Compose Gradle plugin also puts skiko.mjs where the wasm browser tests'
+// webpack finds it, as ui-graphics imports Skiko there; it requires the compiler, and the compiler
+// requires the runtime on the classpath.
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
