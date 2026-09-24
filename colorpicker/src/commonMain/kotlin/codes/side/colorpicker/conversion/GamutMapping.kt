@@ -1,5 +1,6 @@
 package codes.side.colorpicker.conversion
 
+import codes.side.colorpicker.model.RgbColor
 import kotlin.math.hypot
 
 /**
@@ -72,4 +73,23 @@ internal fun gamutMapToSrgb(origin: OkLab): LinearRgb {
     }
 
     return clipped
+}
+
+/**
+ * [linear] as the sRGB color a display shows, carrying [alpha]. A color already inside the gamut
+ * keeps its arithmetic exactly; only one outside pays for the trip through Oklab that the mapping
+ * is defined in.
+ */
+internal fun gamutMappedRgbColor(linear: LinearRgb, alpha: Float): RgbColor {
+    val shown = if (linear.isInGamut()) {
+        linear.clipToUnit()
+    } else {
+        gamutMapToSrgb(linearSrgbToOklab(linear))
+    }
+    return RgbColor(
+        red = delinearize(shown.r).toFloat().coerceIn(0f, 1f),
+        green = delinearize(shown.g).toFloat().coerceIn(0f, 1f),
+        blue = delinearize(shown.b).toFloat().coerceIn(0f, 1f),
+        alpha = alpha,
+    )
 }

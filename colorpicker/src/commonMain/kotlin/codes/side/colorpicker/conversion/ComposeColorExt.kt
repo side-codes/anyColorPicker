@@ -43,19 +43,23 @@ public fun OkhslColor.toComposeColor(): Color = toRgb().toComposeColor()
 public fun OkhsvColor.toComposeColor(): Color = toRgb().toComposeColor()
 
 /**
- * Converts this Compose [Color] to an [RgbColor], converting to the sRGB color space
- * first if needed (clamping any out-of-gamut channels to `0..1`).
+ * Converts this Compose [Color] to an [RgbColor].
+ *
+ * An sRGB color is read as it is. One in any other space goes through CIE XYZ, and if sRGB cannot
+ * show it, it is mapped as [LabColor.toRgb] maps: lightness and hue hold and chroma gives way,
+ * where clipping each channel would move all three.
  *
  * @throws IllegalArgumentException if this is [Color.Unspecified].
  */
 public fun Color.toRgbColor(): RgbColor {
     require(this != Color.Unspecified) { "Cannot convert Color.Unspecified to RgbColor" }
-    val srgb = convert(ColorSpaces.Srgb)
-    return RgbColor(
-        red = srgb.red.coerceIn(0f, 1f),
-        green = srgb.green.coerceIn(0f, 1f),
-        blue = srgb.blue.coerceIn(0f, 1f),
-        alpha = srgb.alpha.coerceIn(0f, 1f),
+    if (colorSpace == ColorSpaces.Srgb) {
+        return RgbColor(red = red, green = green, blue = blue, alpha = alpha)
+    }
+    val xyz = convert(ColorSpaces.CieXyz)
+    return gamutMappedRgbColor(
+        linear = xyzD50ToLinearSrgb(xyz.red.toDouble(), xyz.green.toDouble(), xyz.blue.toDouble()),
+        alpha = alpha.coerceIn(0f, 1f),
     )
 }
 

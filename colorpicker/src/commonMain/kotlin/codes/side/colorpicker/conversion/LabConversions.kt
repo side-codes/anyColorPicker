@@ -47,31 +47,15 @@ public fun LabColor.toRgb(): RgbColor {
     val yr = if (lD > 8.0) fy.pow(3) else lD / KAPPA
     val zr = if (fz3 > EPSILON) fz3 else (116.0 * fz - 16.0) / KAPPA
 
-    val x = xr * XN
-    val y = yr * YN
-    val z = zr * ZN
-
-    val linear = LinearRgb(
-        r = 3.1338561 * x - 1.6168667 * y - 0.4906146 * z,
-        g = -0.9787684 * x + 1.9161415 * y + 0.0334540 * z,
-        b = 0.0719453 * x - 0.2289914 * y + 1.4052427 * z,
-    )
-
-    // Colors sRGB can already show keep the arithmetic above exactly; only the rest pay
-    // for the trip through Oklab that the mapping is defined in.
-    val shown = if (linear.isInGamut()) {
-        linear.clipToUnit()
-    } else {
-        gamutMapToSrgb(linearSrgbToOklab(linear))
-    }
-
-    return RgbColor(
-        red = delinearize(shown.r).toFloat().coerceIn(0f, 1f),
-        green = delinearize(shown.g).toFloat().coerceIn(0f, 1f),
-        blue = delinearize(shown.b).toFloat().coerceIn(0f, 1f),
-        alpha = alpha,
-    )
+    return gamutMappedRgbColor(xyzD50ToLinearSrgb(xr * XN, yr * YN, zr * ZN), alpha)
 }
+
+/** CIE XYZ relative to the D50 white above, as linear-light sRGB; unclamped. */
+internal fun xyzD50ToLinearSrgb(x: Double, y: Double, z: Double): LinearRgb = LinearRgb(
+    r = 3.1338561 * x - 1.6168667 * y - 0.4906146 * z,
+    g = -0.9787684 * x + 1.9161415 * y + 0.0334540 * z,
+    b = 0.0719453 * x - 0.2289914 * y + 1.4052427 * z,
+)
 
 /** Converts this sRGB color to CIELAB (D50 reference white). Alpha is carried over unchanged. */
 public fun RgbColor.toLab(): LabColor {
