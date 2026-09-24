@@ -78,15 +78,13 @@ public class ColorValue internal constructor(
         if (target == space) return this
         val buffer = DoubleArray(MAX_COMPONENTS)
         for (i in space.channels.indices) buffer[i] = component(i)
-        var sourceMissing = missing
+        // Only what was missing to begin with carries forward: CSS carries before it handles powerless
+        // components (§13.3), and a polar target makes the grey's hue missing on its own.
         val powerlessHere = space.powerless(buffer) and missing.inv()
-        if (powerlessHere != 0) {
-            sourceMissing = sourceMissing or powerlessHere
-            space.makeAchromatic(buffer, powerlessHere)
-        }
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere)
         space.converterTo(target).convert(buffer, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
-        var outMissing = carriedMissing(target, sourceMissing)
+        var outMissing = carriedMissing(target)
         val powerless = target.powerless(out)
         if (powerless != 0) {
             outMissing = outMissing or powerless
@@ -157,11 +155,10 @@ public class ColorValue internal constructor(
 
     // CSS's carrying forward: a missing component stays missing where the target has an analogous
     // channel. And when every source component without an analog in the target is missing, every
-    // target component without one in the source is missing too (issue 10210). [missingHere] is this
-    // color's mask with its powerless hue added.
-    private fun carriedMissing(target: ColorSpace, missingHere: Int): Int {
+    // target component without one in the source is missing too (issue 10210).
+    private fun carriedMissing(target: ColorSpace): Int {
         val sourceChannels = space.channels
-        val sourceMissing = missingHere and ((1 shl sourceChannels.size) - 1)
+        val sourceMissing = missing and ((1 shl sourceChannels.size) - 1)
         if (sourceMissing == 0) return 0
         val targetCategories = target.channels.mapNotNull { it.analogous }.toSet()
         val sourceCategories = sourceChannels.mapNotNull { it.analogous }.toSet()

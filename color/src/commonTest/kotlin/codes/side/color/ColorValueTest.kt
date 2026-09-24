@@ -170,6 +170,14 @@ class ColorValueTest {
     }
 
     @Test
+    fun aHueMadePowerlessIsNotCarriedForward() {
+        // Carrying forward comes before powerless handling (CSS Color 4 §13.3): only what was missing
+        // to begin with carries, and a rectangular target has no hue to take a missing one.
+        assertEquals(Lab(50.0, 0.0, 0.0), Lch(50.0, null, 30.0).to(Lab))
+        assertEquals(0, Hsl(120.0, null, null).to(Srgb).missingMask)
+    }
+
+    @Test
     fun aConversionThatOverflowsSaturatesInsteadOfThrowing() {
         // Bradford's first two rows sum past Double.MAX_VALUE.
         val high = XyzD65(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE).to(XyzD50)
