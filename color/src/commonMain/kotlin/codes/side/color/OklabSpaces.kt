@@ -1,5 +1,6 @@
 package codes.side.color
 
+import codes.side.color.internal.ColorRules
 import codes.side.color.internal.LMS_TO_OKLAB
 import codes.side.color.internal.LMS_TO_XYZ_D65
 import codes.side.color.internal.MatrixStep
@@ -49,8 +50,5 @@ public object Oklab : ColorSpace(
         colorOf(arrayOf(l, a, b), alpha)
 }
 
-// OkLCh's hue is powerless at or below this Oklab chroma; Okhsl and Okhsv share it.
-internal const val OKLCH_POWERLESS_CHROMA: Double = 0.000004
-
 /** OkLCh, the polar form of [Oklab]. CSS `oklch()`; its hue is powerless at C ≤ 0.000004. */
-public object OkLch : PolarColorSpace("oklch", Oklab, 0.4, OKLCH_POWERLESS_CHROMA, HueFamily.Oklab)
+public object OkLch : PolarColorSpace("oklch", Oklab, 0.4, ColorRules.OKLCH_POWERLESS_CHROMA, HueFamily.Oklab)

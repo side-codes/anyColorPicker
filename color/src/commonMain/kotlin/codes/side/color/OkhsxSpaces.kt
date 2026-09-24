@@ -1,7 +1,9 @@
 package codes.side.color
 
+import codes.side.color.internal.ColorRules
+import codes.side.color.internal.LMS_TO_SRGB_LINEAR
 import codes.side.color.internal.cuspLightness
-import codes.side.color.internal.highestLinearSrgb
+import codes.side.color.internal.highestLinear
 import codes.side.color.internal.maxChroma
 import codes.side.color.internal.maxSaturation
 import kotlin.math.PI
@@ -58,9 +60,9 @@ public object Okhsl : ColorSpace(
         val a = cos(radians)
         val b = sin(radians)
         val l = toeInverse(lightness)
-        val sMax = maxSaturation(a, b)
-        val lCusp = cuspLightness(a, b, sMax)
-        val cMax = maxChroma(l, a, b, sMax, lCusp)
+        val sMax = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+        val lCusp = cuspLightness(LMS_TO_SRGB_LINEAR, a, b, sMax)
+        val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
         val c0 = lowChroma(l)
         val cMid = midChroma(l, a, b, sMax, lCusp, cMax)
         val chroma = if (saturation < MID) {
@@ -93,9 +95,9 @@ public object Okhsl : ColorSpace(
         }
         val a = src[1] / chroma
         val b = src[2] / chroma
-        val sMax = maxSaturation(a, b)
-        val lCusp = cuspLightness(a, b, sMax)
-        val cMax = maxChroma(l, a, b, sMax, lCusp)
+        val sMax = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+        val lCusp = cuspLightness(LMS_TO_SRGB_LINEAR, a, b, sMax)
+        val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
         val c0 = lowChroma(l)
         val cMid = midChroma(l, a, b, sMax, lCusp, cMax)
         if (chroma > cMax) chroma = cMax
@@ -182,8 +184,8 @@ public object Okhsv : ColorSpace(
         val radians = hue * PI / 180.0
         val a = cos(radians)
         val b = sin(radians)
-        val sMax = maxSaturation(a, b)
-        val tMax = cuspT(sMax, cuspLightness(a, b, sMax))
+        val sMax = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+        val tMax = cuspT(sMax, cuspLightness(LMS_TO_SRGB_LINEAR, a, b, sMax))
         val k = 1.0 - S0 / sMax
         val lv = 1.0 - saturation * S0 / (S0 + tMax - tMax * k * saturation)
         val cv = saturation * tMax * S0 / (S0 + tMax - tMax * k * saturation)
@@ -194,7 +196,7 @@ public object Okhsv : ColorSpace(
         val lNew = toeInverse(l)
         c = c * lNew / l
         l = lNew
-        val scaleL = cbrt(1.0 / max(highestLinearSrgb(lvt, a * cvt, b * cvt), 0.0))
+        val scaleL = cbrt(1.0 / max(highestLinear(LMS_TO_SRGB_LINEAR, lvt, a * cvt, b * cvt), 0.0))
         l *= scaleL
         c *= scaleL
         dst[0] = l
@@ -215,9 +217,9 @@ public object Okhsv : ColorSpace(
         }
         val a = if (chroma == 0.0) 1.0 else src[1] / chroma
         val b = if (chroma == 0.0) 0.0 else src[2] / chroma
-        val sMax = maxSaturation(a, b)
-        val lCusp = cuspLightness(a, b, sMax)
-        val cMax = maxChroma(l, a, b, sMax, lCusp)
+        val sMax = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+        val lCusp = cuspLightness(LMS_TO_SRGB_LINEAR, a, b, sMax)
+        val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
         if (chroma > cMax) chroma = cMax
         val tMax = cuspT(sMax, lCusp)
         val k = 1.0 - S0 / sMax
@@ -226,7 +228,7 @@ public object Okhsv : ColorSpace(
         val cv = t * chroma
         val lvt = toeInverse(lv)
         val cvt = cv * lvt / lv
-        val scaleL = cbrt(1.0 / max(highestLinearSrgb(lvt, a * cvt, b * cvt), 0.0))
+        val scaleL = cbrt(1.0 / max(highestLinear(LMS_TO_SRGB_LINEAR, lvt, a * cvt, b * cvt), 0.0))
         l = toe(l / scaleL)
         dst[0] = if (chroma == 0.0) 0.0 else hue
         dst[1] = ((S0 + tMax) * cv / (tMax * S0 + tMax * k * cv)).coerceIn(0.0, 1.0)
@@ -267,5 +269,5 @@ private fun okPowerless(space: ColorSpace, components: DoubleArray): Int {
     val lab = DoubleArray(4)
     components.copyInto(lab, 0, 0, 3)
     space.toBase(lab, lab)
-    return if (hypot(lab[1], lab[2]) <= OKLCH_POWERLESS_CHROMA) 1 else 0
+    return if (hypot(lab[1], lab[2]) <= ColorRules.OKLCH_POWERLESS_CHROMA) 1 else 0
 }

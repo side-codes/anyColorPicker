@@ -5,12 +5,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class GeneratedConstantsTest {
+class ColorConstantsTest {
 
     @Test
     fun theSrgbMatrixIsCssRationals() {
-        // CSS Color 4 publishes lin_sRGB_to_XYZ as these fractions; the generator derives them from
-        // the primaries, so each literal must be the correctly rounded fraction, bit for bit.
+        // CSS Color 4 publishes lin_sRGB_to_XYZ as these fractions, so each literal must be the
+        // correctly rounded fraction, bit for bit.
         val css = doubleArrayOf(
             506752.0 / 1228815.0, 87881.0 / 245763.0, 12673.0 / 70218.0,
             87098.0 / 409605.0, 175762.0 / 245763.0, 12673.0 / 175545.0,
@@ -40,9 +40,16 @@ class GeneratedConstantsTest {
     }
 
     @Test
-    fun theOkhslShortcutIsTheProductOfItsParts() {
-        val product = multiply(XYZ_D65_TO_SRGB_LINEAR, LMS_TO_XYZ_D65)
-        for (i in 0 until 9) assertTrue(abs(product[i] - LMS_TO_SRGB_LINEAR[i]) <= 1e-15, "element $i")
+    fun theShortcutsAreTheProductsOfTheirParts() {
+        val shortcuts = listOf(
+            LMS_TO_SRGB_LINEAR to multiply(XYZ_D65_TO_SRGB_LINEAR, LMS_TO_XYZ_D65),
+            SRGB_LINEAR_TO_LMS to multiply(XYZ_D65_TO_LMS, SRGB_LINEAR_TO_XYZ_D65),
+            LMS_TO_DISPLAY_P3_LINEAR to multiply(XYZ_D65_TO_DISPLAY_P3_LINEAR, LMS_TO_XYZ_D65),
+            DISPLAY_P3_LINEAR_TO_LMS to multiply(XYZ_D65_TO_LMS, DISPLAY_P3_LINEAR_TO_XYZ_D65),
+        )
+        for ((shortcut, product) in shortcuts) {
+            for (i in 0 until 9) assertTrue(abs(product[i] - shortcut[i]) <= 1e-15, "element $i")
+        }
     }
 
     @Test

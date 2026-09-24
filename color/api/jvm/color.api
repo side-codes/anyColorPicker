@@ -124,6 +124,19 @@ public final class codes/side/color/ColorValue {
 public final class codes/side/color/ColorValue$Companion {
 }
 
+public final class codes/side/color/CssColorParseException : java/lang/IllegalArgumentException {
+	public final fun getIndex ()I
+}
+
+public final class codes/side/color/CssKt {
+	public static final fun parseCss (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;)Lcodes/side/color/ColorValue;
+	public static synthetic fun parseCss$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public static final fun parseCssOrNull (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;)Lcodes/side/color/ColorValue;
+	public static synthetic fun parseCssOrNull$default (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Ljava/util/Collection;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public static final fun toCssString (Lcodes/side/color/ColorValue;IZ)Ljava/lang/String;
+	public static synthetic fun toCssString$default (Lcodes/side/color/ColorValue;IZILjava/lang/Object;)Ljava/lang/String;
+}
+
 public final class codes/side/color/DisplayP3 : codes/side/color/RgbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/DisplayP3;
 }
@@ -138,6 +151,63 @@ public final class codes/side/color/Exactness : java/lang/Enum {
 }
 
 public abstract interface annotation class codes/side/color/ExperimentalColorSpaceApi : java/lang/annotation/Annotation {
+}
+
+public final class codes/side/color/GamutMapper {
+	public final fun convert ([DI[DII)V
+	public final fun convert ([D[D)V
+	public final fun convert ([FI[FII)V
+	public final fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getMethod ()Lcodes/side/color/GamutMapping;
+	public final fun getSource ()Lcodes/side/color/ColorSpace;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract class codes/side/color/GamutMapping {
+}
+
+public final class codes/side/color/GamutMapping$ChromaReduction : codes/side/color/GamutMapping {
+	public static final field INSTANCE Lcodes/side/color/GamutMapping$ChromaReduction;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMapping$Clip : codes/side/color/GamutMapping {
+	public static final field INSTANCE Lcodes/side/color/GamutMapping$Clip;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMapping$Css : codes/side/color/GamutMapping {
+	public fun <init> ()V
+	public fun <init> (DD)V
+	public synthetic fun <init> (DDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEpsilon ()D
+	public final fun getJnd ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMappingKt {
+	public static final fun isInGamut (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;D)Z
+	public static synthetic fun isInGamut$default (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;DILjava/lang/Object;)Z
+	public static final fun toGamut (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;)Lcodes/side/color/ColorValue;
+	public static synthetic fun toGamut$default (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/HexAlpha : java/lang/Enum {
+	public static final field First Lcodes/side/color/HexAlpha;
+	public static final field Last Lcodes/side/color/HexAlpha;
+	public static final field None Lcodes/side/color/HexAlpha;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/color/HexAlpha;
+	public static fun values ()[Lcodes/side/color/HexAlpha;
+}
+
+public final class codes/side/color/HexKt {
+	public static final fun parseHex (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Lcodes/side/color/HexAlpha;)Lcodes/side/color/ColorValue;
+	public static final fun parseHexOrNull (Lcodes/side/color/ColorValue$Companion;Ljava/lang/String;Lcodes/side/color/HexAlpha;)Lcodes/side/color/ColorValue;
+	public static final fun toHexString (Lcodes/side/color/ColorValue;Lcodes/side/color/HexAlpha;Lcodes/side/color/GamutMapping;)Ljava/lang/String;
+	public static synthetic fun toHexString$default (Lcodes/side/color/ColorValue;Lcodes/side/color/HexAlpha;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Ljava/lang/String;
 }
 
 public final class codes/side/color/Hsl : codes/side/color/HslColorSpace {
@@ -288,8 +358,12 @@ public class codes/side/color/RgbColorSpace : codes/side/color/ColorSpace {
 }
 
 public final class codes/side/color/RgbGamut {
+	public final fun cusp (D)Lcodes/side/color/ColorValue;
 	public final fun getPeakLuminance ()D
 	public final fun getSpace ()Lcodes/side/color/RgbColorSpace;
+	public final fun mapper (Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;)Lcodes/side/color/GamutMapper;
+	public static synthetic fun mapper$default (Lcodes/side/color/RgbGamut;Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Lcodes/side/color/GamutMapper;
+	public final fun maxChroma (DD)D
 	public fun toString ()Ljava/lang/String;
 }
 

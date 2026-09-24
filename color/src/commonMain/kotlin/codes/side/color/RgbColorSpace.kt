@@ -1,7 +1,9 @@
 package codes.side.color
 
+import codes.side.color.internal.LMS_TO_XYZ_D65
 import codes.side.color.internal.MatrixStep
 import codes.side.color.internal.Step
+import codes.side.color.internal.XYZ_D65_TO_LMS
 import codes.side.color.internal.invert
 import codes.side.color.internal.multiply
 import codes.side.color.internal.runSteps
@@ -108,6 +110,8 @@ public open class RgbColorSpace internal constructor(
     public val transfer: TransferFunction,
     toXyzD65: DoubleArray,
     fromXyzD65: DoubleArray,
+    internal val lmsToLinear: DoubleArray,
+    internal val linearToLms: DoubleArray,
     linearTwin: RgbColorSpace?,
 ) : ColorSpace(id, rgbChannels(), linearTwin ?: XyzD65) {
 
@@ -160,7 +164,18 @@ public open class RgbColorSpace internal constructor(
     internal companion object {
         fun derive(id: String, primaries: RgbPrimaries, white: WhitePoint, transfer: TransferFunction): RgbColorSpace {
             val toXyz = multiply(bradford(white, WhitePoint.D65), rgbToXyz(primaries, white))
-            return RgbColorSpace(id, primaries, white, transfer, toXyz, invert(toXyz), null)
+            val fromXyz = invert(toXyz)
+            return RgbColorSpace(
+                id,
+                primaries,
+                white,
+                transfer,
+                toXyz,
+                fromXyz,
+                multiply(fromXyz, LMS_TO_XYZ_D65),
+                multiply(XYZ_D65_TO_LMS, toXyz),
+                null,
+            )
         }
 
         // The matrix taking linear RGB to XYZ under the space's own white: the primaries' XYZ

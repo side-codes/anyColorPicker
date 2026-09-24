@@ -1,6 +1,10 @@
 package codes.side.color
 
+import codes.side.color.internal.DISPLAY_P3_LINEAR_TO_LMS
 import codes.side.color.internal.DISPLAY_P3_LINEAR_TO_XYZ_D65
+import codes.side.color.internal.LMS_TO_DISPLAY_P3_LINEAR
+import codes.side.color.internal.LMS_TO_SRGB_LINEAR
+import codes.side.color.internal.SRGB_LINEAR_TO_LMS
 import codes.side.color.internal.SRGB_LINEAR_TO_XYZ_D65
 import codes.side.color.internal.XYZ_D65_TO_DISPLAY_P3_LINEAR
 import codes.side.color.internal.XYZ_D65_TO_SRGB_LINEAR
@@ -13,6 +17,8 @@ public object SrgbLinear : RgbColorSpace(
     TransferFunction.Linear,
     SRGB_LINEAR_TO_XYZ_D65,
     XYZ_D65_TO_SRGB_LINEAR,
+    LMS_TO_SRGB_LINEAR,
+    SRGB_LINEAR_TO_LMS,
     null,
 )
 
@@ -24,6 +30,8 @@ public object Srgb : RgbColorSpace(
     TransferFunction.Srgb,
     SRGB_LINEAR_TO_XYZ_D65,
     XYZ_D65_TO_SRGB_LINEAR,
+    LMS_TO_SRGB_LINEAR,
+    SRGB_LINEAR_TO_LMS,
     SrgbLinear,
 )
 
@@ -35,5 +43,7 @@ public object DisplayP3 : RgbColorSpace(
     TransferFunction.Srgb,
     DISPLAY_P3_LINEAR_TO_XYZ_D65,
     XYZ_D65_TO_DISPLAY_P3_LINEAR,
+    LMS_TO_DISPLAY_P3_LINEAR,
+    DISPLAY_P3_LINEAR_TO_LMS,
     null,
 )

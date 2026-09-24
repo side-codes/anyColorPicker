@@ -1,6 +1,7 @@
 package codes.side.color
 
 import androidx.compose.runtime.Immutable
+import codes.side.color.internal.ColorRules
 import codes.side.color.internal.MAX_COMPONENTS
 import kotlin.math.abs
 
@@ -65,6 +66,8 @@ public class ColorValue internal constructor(
     /**
      * This color in [target].
      *
+     * As CSS Color 4 §11.2 prepares a color for conversion, a powerless hue of this color counts as
+     * missing and its colorfulness as 0 first, so a near-grey converts as the grey it is taken for.
      * A missing component counts as 0 in the arithmetic, and stays missing where [target] has an
      * analogous channel. A hue that comes out powerless becomes missing and its colorfulness 0.
      * Nothing is clamped or mapped into a gamut, except into Okhsl and Okhsv, which describe sRGB
@@ -75,6 +78,10 @@ public class ColorValue internal constructor(
         if (target == space) return this
         val buffer = DoubleArray(MAX_COMPONENTS)
         for (i in space.channels.indices) buffer[i] = component(i)
+        // Only what was missing to begin with carries forward: CSS carries before it handles powerless
+        // components (§13.3), and a polar target makes the grey's hue missing on its own.
+        val powerlessHere = space.powerless(buffer) and missing.inv()
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere)
         space.converterTo(target).convert(buffer, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
         var outMissing = carriedMissing(target)
@@ -96,10 +103,10 @@ public class ColorValue internal constructor(
     public fun isEquivalentTo(other: ColorValue): Boolean {
         val a = to(Oklab)
         val b = other.to(Oklab)
-        return abs(a.c0 - b.c0) <= EQUIVALENCE_EPSILON &&
-            abs(a.c1 - b.c1) <= EQUIVALENCE_EPSILON &&
-            abs(a.c2 - b.c2) <= EQUIVALENCE_EPSILON &&
-            abs(alpha - other.alpha) <= EQUIVALENCE_EPSILON
+        return abs(a.c0 - b.c0) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(a.c1 - b.c1) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(a.c2 - b.c2) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(alpha - other.alpha) <= ColorRules.EQUIVALENCE_EPSILON
     }
 
     override fun equals(other: Any?): Boolean {
@@ -174,8 +181,6 @@ public class ColorValue internal constructor(
     public companion object {
         /** The bit in [missingMask] marking alpha as `none`. */
         public const val MISSING_ALPHA: Int = 1 shl 4
-
-        private const val EQUIVALENCE_EPSILON = 1e-5
 
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,

@@ -2,6 +2,8 @@ package codes.side.color
 
 import codes.side.color.internal.MAX_COMPONENTS
 import codes.side.color.internal.Step
+import codes.side.color.internal.cssName
+import codes.side.color.internal.isDashedName
 
 /** How faithfully a space's conversions describe color. */
 public enum class Exactness {
@@ -65,9 +67,18 @@ public abstract class ColorSpace protected constructor(
     /**
      * The components that are powerless for these values, as a bit mask over [channels]: a hue
      * whose colorfulness is at or below the space's threshold. A conversion into this space makes
-     * them missing; a value constructed with them keeps them.
+     * them missing; a value constructed with them keeps them, and a conversion out of this space
+     * treats them as missing and the color as the grey it is taken for.
      */
     public open fun powerless(components: DoubleArray): Int = 0
+
+    // Before a conversion out of this space: the [powerless] components and every colorfulness
+    // component of [components] set to 0, leaving the grey the color is taken for.
+    internal open fun makeAchromatic(components: DoubleArray, powerless: Int) {
+        channels.forEachIndexed { i, channel ->
+            if (powerless and (1 shl i) != 0 || channel.analogous == AnalogousCategory.Colorfulness) components[i] = 0.0
+        }
+    }
 
     /**
      * A color in this space. [missing] marks components that are `none`, one bit per channel,
@@ -105,9 +116,10 @@ public abstract class ColorSpace protected constructor(
     override fun toString(): String = id
 
     /**
-     * The ways an app defines a space. Each [id] starts with `--`, as a CSS custom color space's
-     * does, so an app's space never passes for one of the library's: spaces are equal when their
-     * ids are.
+     * The ways an app defines a space. Each [id] is a CSS custom name, `--` and then letters,
+     * digits, `-` and `_`, so an app's space never passes for one of the library's (spaces are equal
+     * when their ids are) and `toCssString` writes it as text `parseCss` reads. `--hsv`, `--okhsl`,
+     * `--okhsv` and `--cmyk` are taken: they are how the library writes its own spaces.
      */
     public companion object {
         /**
@@ -144,20 +156,11 @@ public abstract class ColorSpace protected constructor(
         ): PolarColorSpace = PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
 
         private fun appId(id: String): String {
-            require(id.length > 2 && id.startsWith("--")) { "An app's color space id starts with --, and $id does not" }
+            require(isDashedName(id)) { "An app's color space id is -- and then letters, digits, - and _, and $id is not" }
+            require(ColorSpaces.all.none { cssName(it) == id }) { "$id is how the library writes its own space" }
             return id
         }
     }
-}
-
-/** An RGB gamut to test or map colors against. */
-public class RgbGamut internal constructor(
-    /** The RGB space whose `0..1` cube this gamut is. */
-    public val space: RgbColorSpace,
-    /** Peak luminance relative to diffuse white; `1.0` for standard dynamic range. */
-    public val peakLuminance: Double = 1.0,
-) {
-    override fun toString(): String = "RgbGamut(${space.id})"
 }
 
 internal const val XYZ_D65_ID: String = "xyz-d65"
