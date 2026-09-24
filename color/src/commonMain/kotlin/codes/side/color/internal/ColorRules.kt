@@ -23,7 +23,7 @@ internal object ColorRules {
     /** HSV's hue is powerless at or below this |(S/100)·(V/100)|: for S·V ≥ 0, HWB's rule restated, as W + B = 100·(1 − S·V). */
     const val HSV_POWERLESS_SATURATION_TIMES_VALUE: Double = 1e-5
 
-    /** How far apart two colors' Oklab L, a, b and alpha may be and still be equivalent (issue 13157). */
+    /** How far apart equivalent colors' Oklab L, a, b and alpha may be (CSS Color 4 §12); in one space, a component may differ by this much of its channel's reference range. */
     const val EQUIVALENCE_EPSILON: Double = 1e-5
 
     /** The binary-search gamut mapping's just-noticeable difference, in ΔEOK. */
