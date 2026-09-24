@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -56,20 +57,23 @@ kotlin {
         }
     }
 
-    sourceSets {
-        // Everything but Android draws through Skiko, so the one platform-specific thing the
-        // library needs — handing a pixel array to the toolkit as an image — has a single
-        // implementation there and an Android one beside it.
-        val skikoMain by creating {
-            dependsOn(commonMain.get())
+    // Everything but Android draws through Skiko, so the one platform-specific thing the
+    // library needs — handing a pixel array to the toolkit as an image — has a single
+    // implementation in skikoMain and an Android one beside it. It is a group in the default
+    // template rather than a dependsOn edge: an explicit dependsOn switches the template off,
+    // and iosMain, appleMain and nativeMain go with it.
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("skiko") {
+                withJvm()
+                withWasmJs()
+                withIos()
+            }
         }
-        // Named one target at a time rather than through iosMain: the hierarchy template owns
-        // that node, and hanging another parent off it leaves the iOS compilations seeing only
-        // commonMain, so the actual below goes missing at link time rather than at configuration.
-        listOf("jvmMain", "wasmJsMain", "iosArm64Main", "iosSimulatorArm64Main").forEach {
-            getByName(it).dependsOn(skikoMain)
-        }
+    }
 
+    sourceSets {
         commonMain.dependencies {
             // api: types from these modules appear in the library's public API
             // (@Composable/@Immutable/@Stable from runtime; Modifier, Color, Shape,
