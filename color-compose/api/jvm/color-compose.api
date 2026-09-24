@@ -1,0 +1,22 @@
+public final class codes/side/color/compose/ComposeColorKt {
+	public static final fun toColorValue-8_81llA (J)Lcodes/side/color/ColorValue;
+	public static final fun toColorValueOrNull-8_81llA (J)Lcodes/side/color/ColorValue;
+	public static final fun toComposeColor (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;)J
+	public static synthetic fun toComposeColor$default (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)J
+}
+
+public final class codes/side/color/compose/ComposeColorSpaces {
+	public static final field $stable I
+	public static final field INSTANCE Lcodes/side/color/compose/ComposeColorSpaces;
+	public final fun getAces ()Lcodes/side/color/RgbColorSpace;
+	public final fun getAcescg ()Lcodes/side/color/RgbColorSpace;
+	public final fun getAdobeRgb ()Lcodes/side/color/RgbColorSpace;
+	public final fun getAll ()Ljava/util/List;
+	public final fun getBt2020 ()Lcodes/side/color/RgbColorSpace;
+	public final fun getBt709 ()Lcodes/side/color/RgbColorSpace;
+	public final fun getDciP3 ()Lcodes/side/color/RgbColorSpace;
+	public final fun getNtsc1953 ()Lcodes/side/color/RgbColorSpace;
+	public final fun getProPhotoRgb ()Lcodes/side/color/RgbColorSpace;
+	public final fun getSmpteC ()Lcodes/side/color/RgbColorSpace;
+}
+

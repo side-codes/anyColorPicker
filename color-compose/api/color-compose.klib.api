@@ -1,0 +1,37 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, wasmJs]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <codes.side:color-compose>
+final object codes.side.color.compose/ComposeColorSpaces { // codes.side.color.compose/ComposeColorSpaces|null[0]
+    final val Aces // codes.side.color.compose/ComposeColorSpaces.Aces|{}Aces[0]
+        final fun <get-Aces>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.Aces.<get-Aces>|<get-Aces>(){}[0]
+    final val Acescg // codes.side.color.compose/ComposeColorSpaces.Acescg|{}Acescg[0]
+        final fun <get-Acescg>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.Acescg.<get-Acescg>|<get-Acescg>(){}[0]
+    final val AdobeRgb // codes.side.color.compose/ComposeColorSpaces.AdobeRgb|{}AdobeRgb[0]
+        final fun <get-AdobeRgb>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.AdobeRgb.<get-AdobeRgb>|<get-AdobeRgb>(){}[0]
+    final val Bt2020 // codes.side.color.compose/ComposeColorSpaces.Bt2020|{}Bt2020[0]
+        final fun <get-Bt2020>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.Bt2020.<get-Bt2020>|<get-Bt2020>(){}[0]
+    final val Bt709 // codes.side.color.compose/ComposeColorSpaces.Bt709|{}Bt709[0]
+        final fun <get-Bt709>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.Bt709.<get-Bt709>|<get-Bt709>(){}[0]
+    final val DciP3 // codes.side.color.compose/ComposeColorSpaces.DciP3|{}DciP3[0]
+        final fun <get-DciP3>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.DciP3.<get-DciP3>|<get-DciP3>(){}[0]
+    final val Ntsc1953 // codes.side.color.compose/ComposeColorSpaces.Ntsc1953|{}Ntsc1953[0]
+        final fun <get-Ntsc1953>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.Ntsc1953.<get-Ntsc1953>|<get-Ntsc1953>(){}[0]
+    final val ProPhotoRgb // codes.side.color.compose/ComposeColorSpaces.ProPhotoRgb|{}ProPhotoRgb[0]
+        final fun <get-ProPhotoRgb>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.ProPhotoRgb.<get-ProPhotoRgb>|<get-ProPhotoRgb>(){}[0]
+    final val SmpteC // codes.side.color.compose/ComposeColorSpaces.SmpteC|{}SmpteC[0]
+        final fun <get-SmpteC>(): codes.side.color/RgbColorSpace // codes.side.color.compose/ComposeColorSpaces.SmpteC.<get-SmpteC>|<get-SmpteC>(){}[0]
+    final val all // codes.side.color.compose/ComposeColorSpaces.all|{}all[0]
+        final fun <get-all>(): kotlin.collections/List<codes.side.color/RgbColorSpace> // codes.side.color.compose/ComposeColorSpaces.all.<get-all>|<get-all>(){}[0]
+}
+
+final val codes.side.color.compose/codes_side_color_compose_ComposeColorSpaces$stableprop // codes.side.color.compose/codes_side_color_compose_ComposeColorSpaces$stableprop|#static{}codes_side_color_compose_ComposeColorSpaces$stableprop[0]
+
+final fun (androidx.compose.ui.graphics/Color).codes.side.color.compose/toColorValue(): codes.side.color/ColorValue // codes.side.color.compose/toColorValue|toColorValue@androidx.compose.ui.graphics.Color(){}[0]
+final fun (androidx.compose.ui.graphics/Color).codes.side.color.compose/toColorValueOrNull(): codes.side.color/ColorValue? // codes.side.color.compose/toColorValueOrNull|toColorValueOrNull@androidx.compose.ui.graphics.Color(){}[0]
+final fun (codes.side.color/ColorValue).codes.side.color.compose/toComposeColor(codes.side.color/RgbGamut = ..., codes.side.color/GamutMapping = ...): androidx.compose.ui.graphics/Color // codes.side.color.compose/toComposeColor|toComposeColor@codes.side.color.ColorValue(codes.side.color.RgbGamut;codes.side.color.GamutMapping){}[0]
+final fun codes.side.color.compose/codes_side_color_compose_ComposeColorSpaces$stableprop_getter(): kotlin/Int // codes.side.color.compose/codes_side_color_compose_ComposeColorSpaces$stableprop_getter|codes_side_color_compose_ComposeColorSpaces$stableprop_getter(){}[0]
