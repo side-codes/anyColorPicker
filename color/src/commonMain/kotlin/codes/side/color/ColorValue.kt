@@ -1,6 +1,7 @@
 package codes.side.color
 
 import androidx.compose.runtime.Immutable
+import codes.side.color.internal.ColorRules
 import codes.side.color.internal.MAX_COMPONENTS
 import kotlin.math.abs
 
@@ -96,10 +97,10 @@ public class ColorValue internal constructor(
     public fun isEquivalentTo(other: ColorValue): Boolean {
         val a = to(Oklab)
         val b = other.to(Oklab)
-        return abs(a.c0 - b.c0) <= EQUIVALENCE_EPSILON &&
-            abs(a.c1 - b.c1) <= EQUIVALENCE_EPSILON &&
-            abs(a.c2 - b.c2) <= EQUIVALENCE_EPSILON &&
-            abs(alpha - other.alpha) <= EQUIVALENCE_EPSILON
+        return abs(a.c0 - b.c0) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(a.c1 - b.c1) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(a.c2 - b.c2) <= ColorRules.EQUIVALENCE_EPSILON &&
+            abs(alpha - other.alpha) <= ColorRules.EQUIVALENCE_EPSILON
     }
 
     override fun equals(other: Any?): Boolean {
@@ -174,8 +175,6 @@ public class ColorValue internal constructor(
     public companion object {
         /** The bit in [missingMask] marking alpha as `none`. */
         public const val MISSING_ALPHA: Int = 1 shl 4
-
-        private const val EQUIVALENCE_EPSILON = 1e-5
 
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,

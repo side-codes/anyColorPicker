@@ -1,5 +1,6 @@
 package codes.side.color
 
+import codes.side.color.internal.ColorRules
 import codes.side.color.internal.D50_XYZ
 import kotlin.math.cbrt
 
@@ -51,4 +52,4 @@ public object Lab : ColorSpace(
 }
 
 /** CIE LCH, the polar form of [Lab]. CSS `lch()`; its hue is powerless at C ≤ 0.0015. */
-public object Lch : PolarColorSpace("lch", Lab, 150.0, 0.0015, HueFamily.CieLab)
+public object Lch : PolarColorSpace("lch", Lab, 150.0, ColorRules.LCH_POWERLESS_CHROMA, HueFamily.CieLab)

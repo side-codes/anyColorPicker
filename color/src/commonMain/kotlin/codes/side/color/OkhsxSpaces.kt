@@ -1,5 +1,6 @@
 package codes.side.color
 
+import codes.side.color.internal.ColorRules
 import codes.side.color.internal.cuspLightness
 import codes.side.color.internal.highestLinearSrgb
 import codes.side.color.internal.maxChroma
@@ -267,5 +268,5 @@ private fun okPowerless(space: ColorSpace, components: DoubleArray): Int {
     val lab = DoubleArray(4)
     components.copyInto(lab, 0, 0, 3)
     space.toBase(lab, lab)
-    return if (hypot(lab[1], lab[2]) <= OKLCH_POWERLESS_CHROMA) 1 else 0
+    return if (hypot(lab[1], lab[2]) <= ColorRules.OKLCH_POWERLESS_CHROMA) 1 else 0
 }

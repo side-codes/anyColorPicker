@@ -3,8 +3,8 @@ name: Build & Test
 on:
   push:
     branches: [ master, main ]
+  # Any base branch, so work stacked on a feature branch is built and tested too.
   pull_request:
-    branches: [ master, main ]
 
 concurrency:
   group: build-${{ github.ref }}

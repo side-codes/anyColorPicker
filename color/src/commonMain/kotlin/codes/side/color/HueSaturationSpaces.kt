@@ -1,5 +1,6 @@
 package codes.side.color
 
+import codes.side.color.internal.ColorRules
 import kotlin.math.max
 import kotlin.math.min
 
@@ -46,7 +47,8 @@ public open class HslColorSpace internal constructor(id: String, over: RgbColorS
     }
 
     /** The hue is powerless at S ≤ 0.001. */
-    override fun powerless(components: DoubleArray): Int = if (components[1] <= 0.001) 1 else 0
+    override fun powerless(components: DoubleArray): Int =
+        if (components[1] <= ColorRules.HSL_POWERLESS_SATURATION) 1 else 0
 
     public operator fun invoke(h: Double?, s: Double?, l: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, s, l), alpha)
@@ -103,7 +105,8 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
     }
 
     /** The hue is powerless at W + B ≥ 99.999. */
-    override fun powerless(components: DoubleArray): Int = if (components[1] + components[2] >= 99.999) 1 else 0
+    override fun powerless(components: DoubleArray): Int =
+        if (components[1] + components[2] >= ColorRules.HWB_POWERLESS_WHITENESS_PLUS_BLACKNESS) 1 else 0
 
     public operator fun invoke(h: Double?, w: Double?, b: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, w, b), alpha)
@@ -161,7 +164,7 @@ public open class HsvColorSpace internal constructor(id: String, over: RgbColorS
     }
 
     override fun powerless(components: DoubleArray): Int =
-        if (components[1] / 100.0 * (components[2] / 100.0) <= 1e-5) 1 else 0
+        if (components[1] / 100.0 * (components[2] / 100.0) <= ColorRules.HSV_POWERLESS_SATURATION_TIMES_VALUE) 1 else 0
 
     public operator fun invoke(h: Double?, s: Double?, v: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, s, v), alpha)
