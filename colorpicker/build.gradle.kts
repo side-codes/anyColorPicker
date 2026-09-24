@@ -1,5 +1,3 @@
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -111,57 +109,10 @@ kotlin {
     }
 }
 
-// ---- Maven Central publication ----
-//
-// Publishing goes through the Central Portal (central.sonatype.com). Uploading to the old
-// OSSRH Staging API only stages a deployment: something still has to close and release it,
-// which nothing here used to do. publishAndReleaseToMavenCentral does both in one task.
-//
-// Credentials are Central Portal *user tokens* — an OSSRH token returns 401. The plugin
-// reads them from mavenCentralUsername / mavenCentralPassword, which CI supplies as
-// ORG_GRADLE_PROJECT_* environment variables.
-
+// Published as the root build script sets up every module with the publish plugin.
 mavenPublishing {
-    // Bundles all five publications (kotlinMultiplatform, android, jvm and the two iOS
-    // targets) into one deployment, with the Dokka HTML as the -javadoc jar.
-    configure(KotlinMultiplatform(javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml")))
-
-    publishToMavenCentral(automaticRelease = true)
-
-    // Signing keys only exist on CI; without this guard every sign* task fails with
-    // "no configured signatory" and blocks publishToMavenLocal for contributors.
-    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
-        signAllPublications()
-    }
-
     pom {
         name.set("anyColorPicker")
         description.set("Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3")
-        inceptionYear.set("2020")
-        url.set("https://github.com/side-codes/anyColorPicker")
-        licenses {
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                distribution.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set("smelfungus")
-                name.set("Illia Achour")
-                email.set("ilyaachour@gmail.com")
-            }
-            developer {
-                id.set("N7k")
-                name.set("Maksim Novik")
-                email.set("nvk.mse@gmail.com")
-            }
-        }
-        scm {
-            connection.set("scm:git:git://github.com/side-codes/anyColorPicker.git")
-            developerConnection.set("scm:git:ssh://git@github.com/side-codes/anyColorPicker.git")
-            url.set("https://github.com/side-codes/anyColorPicker")
-        }
     }
 }

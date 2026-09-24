@@ -9,3 +9,4 @@ build/
 .cxx
 .claude/
 .kotlin/
+/tools/reference/node_modules/

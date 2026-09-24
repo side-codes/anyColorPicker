@@ -24,7 +24,8 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "anyColorPicker Sample"
-            packageVersion = providers.gradleProperty("VERSION_NAME").get()
+            // Installers take MAJOR.MINOR.BUILD only, so a -SNAPSHOT suffix is dropped.
+            packageVersion = providers.gradleProperty("VERSION_NAME").get().substringBefore('-')
         }
     }
 }

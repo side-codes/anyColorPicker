@@ -1,0 +1,122 @@
+package codes.side.color
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
+
+// Expected values are color.js 0.7.1 outputs for the same inputs.
+class RgbSpacesTest {
+
+    @Test
+    fun srgbWhiteIsD65() {
+        assertComponents(doubleArrayOf(0.9504559270516717, 1.0, 1.0890577507598784), Srgb(1.0, 1.0, 1.0).to(XyzD65), 1e-15)
+    }
+
+    @Test
+    fun srgbWhiteInD50IsTheD50White() {
+        assertComponents(doubleArrayOf(0.9642956764295678, 1.0, 0.8251046025104604), Srgb(1.0, 1.0, 1.0).to(XyzD50), 1e-15)
+    }
+
+    @Test
+    fun srgbDecodesToLinear() {
+        assertComponents(
+            doubleArrayOf(0.033104766570885055, 0.13286832155381798, 0.31854677812509186),
+            Srgb(0.2, 0.4, 0.6).to(SrgbLinear),
+            1e-15,
+        )
+    }
+
+    @Test
+    fun displayP3RedIsOutsideSrgb() {
+        assertComponents(
+            doubleArrayOf(1.0930663624351615, -0.22674197356975417, -0.15013458093711937),
+            DisplayP3(1.0, 0.0, 0.0).to(Srgb),
+            1e-12,
+        )
+    }
+
+    @Test
+    fun srgbRedInDisplayP3() {
+        assertComponents(
+            doubleArrayOf(0.9174875573251656, 0.20028680774084717, 0.13856059121111408),
+            Srgb(1.0, 0.0, 0.0).to(DisplayP3),
+            1e-12,
+        )
+    }
+
+    @Test
+    fun transferCurvesMirrorNegativeValues() {
+        for (curve in listOf(TransferFunction.Srgb, TransferFunction.Linear, TransferFunction.gamma(2.2))) {
+            for (x in doubleArrayOf(0.001, 0.03, 0.2, 0.7, 1.4)) {
+                assertEquals(-curve.decode(x), curve.decode(-x))
+                assertEquals(-curve.encode(x), curve.encode(-x))
+                assertNear(x, curve.encode(curve.decode(x)), 1e-15, "round trip at $x")
+            }
+        }
+    }
+
+    @Test
+    fun aGammaMustBePositiveAndFinite() {
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(0.0) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(-1.0) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(Double.NaN) }
+        assertFailsWith<IllegalArgumentException> { TransferFunction.gamma(Double.POSITIVE_INFINITY) }
+    }
+
+    @Test
+    fun aFactoryBuiltSrgbAgreesWithTheLibrarys() {
+        val built = ColorSpace.rgb("--my-srgb", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.Srgb)
+        val expected = Srgb(0.2, 0.4, 0.6).to(XyzD65).components()
+        assertComponents(expected, built(0.2, 0.4, 0.6).to(XyzD65), 1e-15)
+    }
+
+    @Test
+    fun aFactoryBuiltSpaceWithAnotherWhiteIsAdaptedWithBradford() {
+        // An sRGB-primaried space whose white is D50 still maps its own white to D50, which XYZ-D65
+        // holds as the Bradford image of D50; every adaptation method maps white to white, so a
+        // saturated color is what actually tells Bradford apart from another method.
+        val built = ColorSpace.rgb("--srgb-d50", RgbPrimaries.Srgb, WhitePoint.D50, TransferFunction.Linear)
+        val white = built(1.0, 1.0, 1.0).to(XyzD50)
+        assertComponents(doubleArrayOf(0.9642956764295676, 1.0, 0.8251046025104602), white, 1e-12)
+
+        // CSS Color 4's lin_ProPhoto_to_XYZ (D50), first column: linear ProPhoto red converted to XYZ-D50.
+        val proPhotoLinear = ColorSpace.rgb(
+            "--prophoto-linear",
+            RgbPrimaries(0.734699, 0.265301, 0.159597, 0.840403, 0.036598, 0.000105),
+            WhitePoint.D50,
+            TransferFunction.Linear,
+        )
+        val red = proPhotoLinear(1.0, 0.0, 0.0).to(XyzD50)
+        assertComponents(doubleArrayOf(0.79776664490064230, 0.28807482881940130, 0.0), red, 1e-12)
+    }
+
+    @Test
+    fun primariesMustBeUsableChromaticities() {
+        assertFailsWith<IllegalArgumentException> { RgbPrimaries(0.64, 0.0, 0.30, 0.60, 0.15, 0.06) }
+        assertFailsWith<IllegalArgumentException> { RgbPrimaries(0.64, 0.33, 0.30, Double.NaN, 0.15, 0.06) }
+        // Collinear primaries span no volume.
+        assertFailsWith<IllegalArgumentException> {
+            ColorSpace.rgb("--flat", RgbPrimaries(0.2, 0.2, 0.3, 0.3, 0.4, 0.4), WhitePoint.D65, TransferFunction.Linear)
+        }
+    }
+
+    @Test
+    fun anAppSpaceCannotTakeALibraryId() {
+        // Spaces are equal by id, so one called srgb would be taken for Srgb and never converted.
+        assertFailsWith<IllegalArgumentException> { ColorSpace.rgb("srgb", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.Srgb) }
+        assertFailsWith<IllegalArgumentException> { ColorSpace.rgb("--", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.Srgb) }
+    }
+
+    @Test
+    fun p3ToSrgbFusesIntoOneMatrixBetweenTheCurves() {
+        assertTrue(DisplayP3.converterTo(Srgb).toString().contains("3 steps"), DisplayP3.converterTo(Srgb).toString())
+    }
+
+    @Test
+    fun rgbGamutBelongsToItsSpace() {
+        assertEquals(Srgb, Srgb.gamut.space)
+        assertEquals(1.0, Srgb.gamut.peakLuminance)
+        assertEquals(DisplayP3, DisplayP3.gamut.space)
+    }
+}
