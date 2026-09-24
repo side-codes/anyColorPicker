@@ -156,6 +156,20 @@ class ColorValueTest {
     }
 
     @Test
+    fun aPowerlessHueConvertsAsTheGreyItIsTakenFor() {
+        // CSS Color 4 §11.2: before converting, a powerless hue is missing and its colorfulness 0.
+        assertComponents(doubleArrayOf(0.5, 0.5, 0.5), Hsl(120.0, 0.001, 50.0).to(Srgb), 1e-15)
+        assertComponents(doubleArrayOf(0.4, 0.4, 0.4), Hsv(120.0, 0.001, 40.0).to(Srgb), 1e-15)
+        // HWB's grey short of W + B = 100 is W, as browsers give it.
+        assertComponents(doubleArrayOf(0.49999, 0.49999, 0.49999), Hwb(180.0, 49.999, 50.0).to(Srgb), 1e-15)
+        assertComponents(doubleArrayOf(0.5, 0.5, 0.5), Hwb(180.0, 60.0, 60.0).to(Srgb), 1e-15)
+        val grey = Lch(20.0, 0.0015, 180.0).to(OkLch)
+        assertTrue(grey.isMissing(OkLch.H))
+        assertEquals(0.0, grey[OkLch.C])
+        assertTrue(Lch(20.0, 0.00151, 180.0).to(Lab)[Lab.A]!! < 0.0)
+    }
+
+    @Test
     fun aConversionThatOverflowsSaturatesInsteadOfThrowing() {
         // Bradford's first two rows sum past Double.MAX_VALUE.
         val high = XyzD65(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE).to(XyzD50)

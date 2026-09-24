@@ -108,6 +108,13 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
     override fun powerless(components: DoubleArray): Int =
         if (components[1] + components[2] >= ColorRules.HWB_POWERLESS_WHITENESS_PLUS_BLACKNESS) 1 else 0
 
+    // HWB has no colorfulness to zero: short of W + B = 100, what is left of the hue goes to
+    // blackness, so the grey is W, as browsers give it (WPT). From 100 up hwbToRgb's own grey stands.
+    override fun makeAchromatic(components: DoubleArray, powerless: Int) {
+        components[0] = 0.0
+        if (components[1] + components[2] < 100.0) components[2] = 100.0 - components[1]
+    }
+
     public operator fun invoke(h: Double?, w: Double?, b: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, w, b), alpha)
 }
