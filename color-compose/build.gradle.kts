@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidKmpLibrary)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.mavenPublish)
 }
 
 group = "codes.side"
@@ -61,5 +63,13 @@ kotlin {
 afterEvaluate {
     tasks.named("unpackSkikoWasmRuntime") {
         setOnlyIf { true }
+    }
+}
+
+// Published as the root build script sets up every module with the publish plugin.
+mavenPublishing {
+    pom {
+        name.set("anyColorPicker color for Compose")
+        description.set("Converts between anyColorPicker's ColorValue and Compose Multiplatform's Color, with explicit gamut mapping")
     }
 }
