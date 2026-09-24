@@ -56,9 +56,12 @@ class HueSaturationTest {
     }
 
     @Test
-    fun hwbTakesHslsHueForANegativeSaturation() {
-        // The same color as the HSL case: HWB reads its hue through HSL, half turn included.
-        assertComponents(doubleArrayOf(160.0, -50.0, 120.0), Srgb(-0.2, -0.5, -0.4).to(Hwb), 1e-12)
+    fun hwbKeepsItsHueWhereHslTurnsIt() {
+        // CSS's rgbToHue: W and B carry no sign to undo HSL's half turn, so HWB takes the hue as is.
+        val color = Srgb(-0.2, -0.5, -0.4)
+        val hwb = color.to(Hwb)
+        assertComponents(doubleArrayOf(340.0, -50.0, 120.0), hwb, 1e-12)
+        assertComponents(color.components(), hwb.to(Srgb), 1e-12)
     }
 
     @Test

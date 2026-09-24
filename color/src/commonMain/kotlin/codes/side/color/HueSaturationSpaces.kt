@@ -95,9 +95,9 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
         val blue = src[2]
         val highest = max(red, max(green, blue))
         val lowest = min(red, min(green, blue))
+        // CSS's rgbToHue, without HSL's half turn for a negative saturation: whiteness and blackness
+        // carry no sign to turn back, so a turned hue would be another color.
         var hue = hexconeHue(red, green, blue, highest, lowest)
-        // HSL's half turn, so HSL and HWB read one hue off the same color.
-        if (hslSaturation(highest, lowest) < 0.0) hue += 180.0
         if (hue >= 360.0) hue -= 360.0
         dst[0] = hue
         dst[1] = lowest * 100.0
