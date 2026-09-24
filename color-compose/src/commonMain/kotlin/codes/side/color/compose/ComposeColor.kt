@@ -20,15 +20,15 @@ import androidx.compose.ui.graphics.colorspace.ColorSpaces as ComposeSpaces
  * This Compose color as a [ColorValue], its components copied into the matching space, never
  * converted through Compose's Float arithmetic:
  *
- * | Compose | ColorValue |
- * |---|---|
- * | `Srgb`, `ExtendedSrgb` | [Srgb] |
- * | `LinearSrgb`, `LinearExtendedSrgb` | [SrgbLinear] |
- * | `DisplayP3` | [DisplayP3] |
- * | `CieXyz` | [XyzD50], Compose's connection space |
- * | `CieLab` | [Lab] |
- * | `Oklab` | [Oklab] |
- * | any other RGB space | its [ComposeColorSpaces] space |
+ * | Compose                            | ColorValue                           |
+ * |------------------------------------|--------------------------------------|
+ * | `Srgb`, `ExtendedSrgb`             | [Srgb]                               |
+ * | `LinearSrgb`, `LinearExtendedSrgb` | [SrgbLinear]                         |
+ * | `DisplayP3`                        | [DisplayP3]                          |
+ * | `CieXyz`                           | [XyzD50], Compose's connection space |
+ * | `CieLab`                           | [Lab]                                |
+ * | `Oklab`                            | [Oklab]                              |
+ * | any other RGB space                | its [ComposeColorSpaces] space       |
  *
  * Compose packs sRGB into 8 bits a channel, so `Color(0xFF336699)` is exactly 0.2, 0.4, 0.6.
  *
