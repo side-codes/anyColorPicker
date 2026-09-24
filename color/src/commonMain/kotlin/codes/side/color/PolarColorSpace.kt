@@ -57,6 +57,7 @@ private fun polarChannels(of: ColorSpace, chromaReference: Double, hueFamily: Hu
         ColorChannel(
             id = lightness.id,
             referenceRange = lightness.referenceRange,
+            kind = lightness.kind,
             gamutBound = lightness.gamutBound,
             limit = lightness.limit,
             analogous = lightness.analogous,

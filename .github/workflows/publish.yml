@@ -23,8 +23,8 @@ concurrency:
 
 jobs:
   publish:
-    # macOS is required: the iOS targets can only be built on an Apple host, and all five
-    # publications have to go up in one deployment.
+    # macOS is required: the iOS targets can only be built on an Apple host, and every module's
+    # six publications have to go up in one deployment.
     runs-on: macos-15
     timeout-minutes: 60
     # Widened from the workflow-level `contents: read` solely to create the GitHub
@@ -81,7 +81,7 @@ jobs:
       - name: Check nothing the last release published was removed
         run: bash scripts/check-api-removals.sh
 
-      # Uploads one deployment holding all five publications to the Central Portal and
+      # Uploads one deployment holding every module's six publications to the Central Portal and
       # releases it. The previous OSSRH Staging API upload only *staged* a deployment;
       # nothing closed or released it, so nothing ever reached Maven Central.
       # A snapshot is the safe rehearsal: it exercises the Portal token, the signing key
@@ -92,6 +92,8 @@ jobs:
         run: |
           VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
           if [ "${{ inputs.snapshot }}" = "true" ]; then
+            # VERSION_NAME may be a snapshot already; it must not publish as -SNAPSHOT-SNAPSHOT.
+            VERSION="${VERSION%-SNAPSHOT}"
             echo "Publishing snapshot ${VERSION}-SNAPSHOT"
             ./gradlew publishToMavenCentral -PVERSION_NAME="${VERSION}-SNAPSHOT" --no-configuration-cache
           else

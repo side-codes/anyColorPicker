@@ -27,6 +27,17 @@ final enum class codes.side.color/AnalogousCategory : kotlin/Enum<codes.side.col
     final fun values(): kotlin/Array<codes.side.color/AnalogousCategory> // codes.side.color/AnalogousCategory.values|values#static(){}[0]
 }
 
+final enum class codes.side.color/CssSyntax : kotlin/Enum<codes.side.color/CssSyntax> { // codes.side.color/CssSyntax|null[0]
+    enum entry Legacy // codes.side.color/CssSyntax.Legacy|null[0]
+    enum entry Modern // codes.side.color/CssSyntax.Modern|null[0]
+
+    final val entries // codes.side.color/CssSyntax.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/CssSyntax> // codes.side.color/CssSyntax.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/CssSyntax // codes.side.color/CssSyntax.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/CssSyntax> // codes.side.color/CssSyntax.values|values#static(){}[0]
+}
+
 final enum class codes.side.color/Exactness : kotlin/Enum<codes.side.color/Exactness> { // codes.side.color/Exactness|null[0]
     enum entry Approximate // codes.side.color/Exactness.Approximate|null[0]
     enum entry Exact // codes.side.color/Exactness.Exact|null[0]
@@ -69,7 +80,7 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
 
     abstract fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
     abstract fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
-    final fun color(kotlin/DoubleArray, kotlin/Double = ..., kotlin/Int = ...): codes.side.color/ColorValue // codes.side.color/ColorSpace.color|color(kotlin.DoubleArray;kotlin.Double;kotlin.Int){}[0]
+    final fun color(kotlin/DoubleArray, kotlin/Double? = ..., kotlin/Int = ...): codes.side.color/ColorValue // codes.side.color/ColorSpace.color|color(kotlin.DoubleArray;kotlin.Double?;kotlin.Int){}[0]
     final fun converterTo(codes.side.color/ColorSpace): codes.side.color/ColorConverter // codes.side.color/ColorSpace.converterTo|converterTo(codes.side.color.ColorSpace){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ColorSpace.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // codes.side.color/ColorSpace.hashCode|hashCode(){}[0]
@@ -184,10 +195,7 @@ final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
     final fun with(codes.side.color/ColorChannel, kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.with|with(codes.side.color.ColorChannel;kotlin.Double?){}[0]
     final fun withAlpha(kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.withAlpha|withAlpha(kotlin.Double?){}[0]
 
-    final object Companion { // codes.side.color/ColorValue.Companion|null[0]
-        final const val MISSING_ALPHA // codes.side.color/ColorValue.Companion.MISSING_ALPHA|{}MISSING_ALPHA[0]
-            final fun <get-MISSING_ALPHA>(): kotlin/Int // codes.side.color/ColorValue.Companion.MISSING_ALPHA.<get-MISSING_ALPHA>|<get-MISSING_ALPHA>(){}[0]
-    }
+    final object Companion // codes.side.color/ColorValue.Companion|null[0]
 }
 
 final class codes.side.color/CssColorParseException : kotlin/IllegalArgumentException { // codes.side.color/CssColorParseException|null[0]
@@ -528,7 +536,7 @@ final object codes.side.color/XyzD65 : codes.side.color/ColorSpace { // codes.si
 }
 
 final fun (codes.side.color/ColorValue).codes.side.color/isInGamut(codes.side.color/RgbGamut, kotlin/Double = ...): kotlin/Boolean // codes.side.color/isInGamut|isInGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;kotlin.Double){}[0]
-final fun (codes.side.color/ColorValue).codes.side.color/toCssString(kotlin/Int = ..., kotlin/Boolean = ...): kotlin/String // codes.side.color/toCssString|toCssString@codes.side.color.ColorValue(kotlin.Int;kotlin.Boolean){}[0]
+final fun (codes.side.color/ColorValue).codes.side.color/toCssString(kotlin/Int = ..., codes.side.color/CssSyntax = ...): kotlin/String // codes.side.color/toCssString|toCssString@codes.side.color.ColorValue(kotlin.Int;codes.side.color.CssSyntax){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toGamut(codes.side.color/RgbGamut, codes.side.color/GamutMapping = ...): codes.side.color/ColorValue // codes.side.color/toGamut|toGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;codes.side.color.GamutMapping){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toHexString(codes.side.color/HexAlpha, codes.side.color/GamutMapping = ...): kotlin/String // codes.side.color/toHexString|toHexString@codes.side.color.ColorValue(codes.side.color.HexAlpha;codes.side.color.GamutMapping){}[0]
 final fun (codes.side.color/ColorValue.Companion).codes.side.color/parseCss(kotlin/String, kotlin.collections/Collection<codes.side.color/ColorSpace> = ...): codes.side.color/ColorValue // codes.side.color/parseCss|parseCss@codes.side.color.ColorValue.Companion(kotlin.String;kotlin.collections.Collection<codes.side.color.ColorSpace>){}[0]

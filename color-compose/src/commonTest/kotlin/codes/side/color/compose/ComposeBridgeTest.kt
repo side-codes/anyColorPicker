@@ -1,11 +1,14 @@
 package codes.side.color.compose
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.Rgb
+import androidx.compose.ui.graphics.colorspace.connect
 import codes.side.color.ColorSpace
 import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.GamutMapping
+import codes.side.color.HexAlpha
 import codes.side.color.Lab
 import codes.side.color.OkLch
 import codes.side.color.Oklab
@@ -18,6 +21,7 @@ import codes.side.color.XyzD50
 import codes.side.color.parseCss
 import codes.side.color.toCssString
 import codes.side.color.toGamut
+import codes.side.color.toHexString
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.test.Test
@@ -63,17 +67,15 @@ class ComposeBridgeTest {
 
     @Test
     fun rebuiltSpacesConvertAsComposeDoes() {
-        // Compose converts in Float through its own D50 and returns half floats, so 2e-3 is its precision.
+        // Compose converts in Float through its own D50: at most 1.15e-4 from these conversions.
         val steps = listOf(0.0f, 0.25f, 0.5f, 0.75f, 1.0f)
         for (composeSpace in rebuilt + listOf(ComposeSpaces.DisplayP3, ComposeSpaces.LinearSrgb, ComposeSpaces.ExtendedSrgb)) {
+            val connector = composeSpace.connect(ComposeSpaces.CieXyz)
             for (r in steps) for (g in steps) for (b in steps) {
-                val color = Color(r, g, b, 1f, composeSpace)
-                val expected = color.convert(ComposeSpaces.CieXyz)
-                val actual = color.toColorValue().to(XyzD50).components()
+                val expected = connector.transform(r, g, b)
+                val actual = Color(r, g, b, 1f, composeSpace).toColorValue().to(XyzD50).components()
                 val at = "${composeSpace.name} ($r, $g, $b)"
-                assertTrue(abs(expected.red - actual[0]) <= 2e-3, "$at x: Compose ${expected.red}, here ${actual[0]}")
-                assertTrue(abs(expected.green - actual[1]) <= 2e-3, "$at y: Compose ${expected.green}, here ${actual[1]}")
-                assertTrue(abs(expected.blue - actual[2]) <= 2e-3, "$at z: Compose ${expected.blue}, here ${actual[2]}")
+                for (i in 0..2) assertTrue(abs(expected[i] - actual[i]) <= 2e-4, "$at [$i]: Compose ${expected[i]}, here ${actual[i]}")
             }
         }
     }
@@ -95,10 +97,45 @@ class ComposeBridgeTest {
     fun srgbIsTheDefaultAndMapsFirst() {
         assertEquals(Color(0xFF336699), Srgb(0.2, 0.4, 0.6).toComposeColor())
         val vivid = OkLch(0.7, 0.4, 30.0)
-        val mapped = vivid.toGamut(Srgb.gamut).components()
-        assertEquals(Color(mapped[0].toFloat(), mapped[1].toFloat(), mapped[2].toFloat()), vivid.toComposeColor())
-        val clipped = vivid.toGamut(Srgb.gamut, GamutMapping.Clip).components()
-        assertEquals(Color(clipped[0].toFloat(), clipped[1].toFloat(), clipped[2].toFloat()), vivid.toComposeColor(mapping = GamutMapping.Clip))
+        assertEquals(Color(vivid.toHexString(HexAlpha.First).substring(1).toLong(16)), vivid.toComposeColor())
+        assertEquals(
+            Color(vivid.toHexString(HexAlpha.First, GamutMapping.Clip).substring(1).toLong(16)),
+            vivid.toComposeColor(mapping = GamutMapping.Clip),
+        )
+    }
+
+    @Test
+    fun aComposeColorHoldingNaNHasNoValue() {
+        // Compose clamps components into their space's range, which a NaN passes through.
+        val color = Color(Float.NaN, 0.5f, 0.5f, 1f, ComposeSpaces.LinearSrgb)
+        assertNull(color.toColorValueOrNull())
+        val error = assertFailsWith<IllegalArgumentException> { color.toColorValue() }
+        assertTrue("NaN" in error.message.orEmpty(), error.message)
+    }
+
+    @Test
+    fun srgbRoundsToEightBitsAsTheHexStringDoes() {
+        // Beside each half step, where rounding in Float and in Double part ways.
+        for (step in 0 until 255) {
+            for (nudge in listOf(-1e-9, 1e-9)) {
+                val v = (step + 0.5 + nudge) / 255.0
+                val color = Srgb(v, v, v, alpha = v)
+                assertEquals(Color(color.toHexString(HexAlpha.First).substring(1).toLong(16)), color.toComposeColor(), "$v")
+            }
+        }
+    }
+
+    @Test
+    fun parametricTransferMatchesSrgbAndMirrors() {
+        // Either side of d but not at it: ICC takes d itself on the power segment, CSS's sRGB on the
+        // linear one, 2.3e-9 apart.
+        val curve = ParametricTransfer(checkNotNull((ComposeSpaces.Srgb as Rgb).transferParameters))
+        for (x in listOf(0.02, 0.04, 0.041, 0.2, 0.5, 1.0, 1.5)) {
+            assertEquals(TransferFunction.Srgb.decode(x), curve.decode(x), 1e-12, "decode $x")
+            assertEquals(-curve.decode(x), curve.decode(-x), "decode -$x")
+            assertEquals(-curve.encode(x), curve.encode(-x), "encode -$x")
+            assertEquals(x, curve.encode(curve.decode(x)), 1e-12, "round trip $x")
+        }
     }
 
     @Test

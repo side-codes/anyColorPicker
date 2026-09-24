@@ -9,11 +9,19 @@ import kotlinx.serialization.json.JsonObject
 // pinned sources that each file's `source` names. Decoding is strict: a field this schema does not
 // know fails the tests rather than being skipped.
 
-/** CSS Color 4's own source: its named-color table, in 8-bit sRGB. */
+/** CSS Color 4's own source: its named-color table, in 8-bit sRGB, and §12's worked examples of equivalent colors. */
 @Serializable
-internal data class CssReference(val source: JsonObject, val namedColors: List<NamedColor>) {
+internal data class CssReference(
+    val source: JsonObject,
+    val namedColors: List<NamedColor>,
+    val equivalentColors: List<EquivalentColors>,
+) {
     @Serializable
     data class NamedColor(val name: String, val rgb: List<Int>)
+
+    /** Two colors §12 compares, where it compares them ([example] is the example's id, or `note`), and its answer. */
+    @Serializable
+    data class EquivalentColors(val example: String, val first: String, val second: String, val equivalent: Boolean)
 }
 
 /** web-platform-tests' css/css-color/parsing: its parsing lists, and the relative colors that only convert. */

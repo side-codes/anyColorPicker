@@ -118,5 +118,41 @@ class LabAndOklabTest {
         assertTrue(Oklab(1e200, 0.0, 0.0).to(XyzD65).components().contentEquals(doubleArrayOf(0.0, 0.0, 0.0)))
     }
 
+    @Test
+    fun aPolarSpaceNeedsAUsableChromaReferenceAndThreshold() {
+        for (reference in listOf(Double.POSITIVE_INFINITY, Double.NaN, 0.0, -1.0)) {
+            assertFailsWith<IllegalArgumentException>("$reference") { ColorSpace.polar("--p", Lab, reference, 0.0015, HueFamily.CieLab) }
+        }
+        for (threshold in listOf(Double.POSITIVE_INFINITY, Double.NaN, -1.0)) {
+            assertFailsWith<IllegalArgumentException>("$threshold") { ColorSpace.polar("--p", Lab, 150.0, threshold, HueFamily.CieLab) }
+        }
+    }
+
+    @Test
+    fun aPolarSpaceKeepsItsLightnessKind() {
+        val polar = ColorSpace.polar("--angled-polar", AngledLightness, 1.0, 0.0, HueFamily("--angled"))
+        assertEquals(AngledLightness.channels[0].kind, polar.L.kind)
+    }
+
     private fun hex(r: Int, g: Int, b: Int): ColorValue = Srgb(r / 255.0, g / 255.0, b / 255.0)
+
+    // A space whose first channel is not a plain quantity, to see its kind carried into the polar form.
+    @OptIn(ExperimentalColorSpaceApi::class)
+    private object AngledLightness : ColorSpace(
+        "--angled",
+        listOf(
+            ColorChannel("l", 0.0..360.0, kind = ChannelKind.Hue(HueFamily("--angled"))),
+            ColorChannel("a", -1.0..1.0),
+            ColorChannel("b", -1.0..1.0),
+        ),
+        XyzD65,
+    ) {
+        override fun toBase(src: DoubleArray, dst: DoubleArray) {
+            src.copyInto(dst, 0, 0, 3)
+        }
+
+        override fun fromBase(src: DoubleArray, dst: DoubleArray) {
+            src.copyInto(dst, 0, 0, 3)
+        }
+    }
 }

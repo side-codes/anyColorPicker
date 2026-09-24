@@ -154,5 +154,22 @@
     {"name":"whitesmoke","rgb":[245,245,245]},
     {"name":"yellow","rgb":[255,255,0]},
     {"name":"yellowgreen","rgb":[154,205,50]}
+  ],
+  "equivalentColors": [
+    {"example":"ex-equivalent-same-space","first":"red","second":"rgb(255, 0, 0)","equivalent":true},
+    {"example":"ex-equivalent-srgb-function","first":"red","second":"color(srgb 1 0 0)","equivalent":true},
+    {"example":"ex-equivalent-alpha","first":"#ff000080","second":"rgb(255 0 0 / 50%)","equivalent":false},
+    {"example":"ex-equivalent-powerless-hsl","first":"hsl(0 0% 50%)","second":"hsl(200 0% 50%)","equivalent":true},
+    {"example":"ex-equivalent-powerless-hwb","first":"white","second":"hwb(120 100% 0%)","equivalent":true},
+    {"example":"ex-equivalent-powerless-oklch","first":"oklch(50% 0 40)","second":"oklch(50% 0 200)","equivalent":true},
+    {"example":"ex-equivalent-powerless-epsilon","first":"lch(50% 0.001 30)","second":"lch(50% 0.001 200)","equivalent":true},
+    {"example":"ex-equivalent-hue-normalization","first":"lch(50% 30 0)","second":"lch(50% 30 360)","equivalent":true},
+    {"example":"ex-equivalent-missing-vs-zero","first":"rgb(none 128 0)","second":"rgb(0 128 0)","equivalent":false},
+    {"example":"ex-equivalent-missing-cross-space","first":"oklch(50% 0 none)","second":"oklab(50% 0 0)","equivalent":false},
+    {"example":"ex-equivalent-oklab","first":"red","second":"color(srgb-linear 1 0 0)","equivalent":true},
+    {"example":"ex-equivalent-oklab-epsilon","first":"color(display-p3 1 1 1)","second":"white","equivalent":true},
+    {"example":"ex-equivalent-different-lightness","first":"lab(50% 0 0)","second":"oklab(0.5 0 0)","equivalent":false},
+    {"example":"note","first":"red","second":"color(srgb 1 0 0)","equivalent":true},
+    {"example":"note","first":"red","second":"color(display-p3 0.91748756 0.20028681 0.13856059)","equivalent":true}
   ]
 }

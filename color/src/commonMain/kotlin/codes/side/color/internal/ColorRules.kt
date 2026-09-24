@@ -3,7 +3,10 @@ package codes.side.color.internal
 /**
  * Every threshold the library takes from CSS Color 4, in one place, as the Editor's Draft of [DRAFT]
  * has them. The draft is still moving; when it changes one of these, the value and the date move
- * together, and the WPT boundary tests say which.
+ * together, and the WPT boundary tests say which. Public KDoc quotes several of them, and moves with
+ * them: LCH's and OkLCh's hue thresholds in LabSpaces.kt and OklabSpaces.kt, HSL's, HWB's and HSV's
+ * in HueSaturationSpaces.kt, Okhsl's and Okhsv's in OkhsxSpaces.kt, the epsilon in
+ * [codes.side.color.ColorValue.isEquivalentTo], and isInGamut's tolerance in GamutMapping.kt.
  */
 internal object ColorRules {
     const val DRAFT: String = "2026-09-13"
@@ -23,7 +26,7 @@ internal object ColorRules {
     /** HSV's hue is powerless at or below this |(S/100)·(V/100)|: for S·V ≥ 0, HWB's rule restated, as W + B = 100·(1 − S·V). */
     const val HSV_POWERLESS_SATURATION_TIMES_VALUE: Double = 1e-5
 
-    /** How far apart two colors' Oklab L, a, b and alpha may be and still be equivalent (issue 13157). */
+    /** How far apart equivalent colors' Oklab L, a, b and alpha may be (CSS Color 4 §12); in one space, a component may differ by this much of its channel's reference range. */
     const val EQUIVALENCE_EPSILON: Double = 1e-5
 
     /** The binary-search gamut mapping's just-noticeable difference, in ΔEOK. */

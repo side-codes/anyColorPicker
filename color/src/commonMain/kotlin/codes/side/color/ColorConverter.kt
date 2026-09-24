@@ -9,8 +9,10 @@ import codes.side.color.internal.fuse
  * A prepared conversion from [source] to [target]: the route through their nearest shared base,
  * with consecutive matrices multiplied into one. Immutable and safe to share between threads.
  *
- * Components are complete here, with no `none`; [ColorValue.to] handles missing ones. Bulk calls
- * take colors packed one after another, each at its space's channel count.
+ * Components are complete here, with no `none`; [ColorValue.to] handles missing ones. It handles
+ * powerless ones too, taking a source's powerless hue as missing and the color as the grey it is
+ * taken for, as CSS Color 4 §11.2 prepares a conversion; a converter converts the components it is
+ * given. Bulk calls take colors packed one after another, each at its space's channel count.
  */
 public class ColorConverter internal constructor(
     public val source: ColorSpace,
@@ -57,7 +59,7 @@ public class ColorConverter internal constructor(
         }
     }
 
-    /** Runs the conversion on [v], a buffer of [MAX_COMPONENTS] holding a source color, which it leaves holding the target color. */
+    /** Runs the conversion on [v], a buffer of at least [MAX_COMPONENTS] holding a source color, which it leaves holding the target color. */
     internal fun convertInPlace(v: DoubleArray) {
         for (step in steps) step.apply(v)
     }

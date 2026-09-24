@@ -45,8 +45,8 @@ apiValidation {
 subprojects {
     plugins.withId("com.vanniktech.maven.publish") {
         extensions.configure<MavenPublishBaseExtension> {
-            // Bundles all five publications (kotlinMultiplatform, android, jvm and the two iOS
-            // targets) into one deployment, with the Dokka HTML as the -javadoc jar.
+            // Bundles each module's six publications (kotlinMultiplatform, android, jvm, wasmJs and
+            // the two iOS targets) into one deployment, with the Dokka HTML as the -javadoc jar.
             configure(KotlinMultiplatform(javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml")))
 
             publishToMavenCentral(automaticRelease = true)

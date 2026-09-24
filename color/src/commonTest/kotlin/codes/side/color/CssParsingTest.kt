@@ -279,7 +279,7 @@ class CssParsingTest {
             }
         } else {
             assertSame(expected.space, actual.space, text)
-            assertEquals(expected.missingMask and ColorValue.MISSING_ALPHA.inv(), actual.missingMask and ColorValue.MISSING_ALPHA.inv(), text)
+            assertEquals(expected.missingMask, actual.missingMask, text)
             assertComponents(expected.components(), actual, 1e-4)
             assertEquals(expected.isAlphaMissing, actual.isAlphaMissing, text)
         }

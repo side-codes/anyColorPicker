@@ -24,8 +24,9 @@ public enum class Exactness {
  * nearest space both ends share before descending. [toBase] and [fromBase] take components in
  * arrays of at least four elements, which may be the same array.
  *
- * Two spaces are equal when their ids are. The library's spaces are singletons; an app builds its
- * own with the factories on [Companion].
+ * Two spaces are equal when their ids are: the id is a space's identity, so a space defined by
+ * parameters, such as viewing conditions, puts them in its id. The library's spaces are singletons;
+ * an app builds its own with the factories on [Companion].
  */
 @SubclassOptInRequired(ExperimentalColorSpaceApi::class)
 public abstract class ColorSpace protected constructor(
@@ -68,27 +69,39 @@ public abstract class ColorSpace protected constructor(
      * The components that are powerless for these values, as a bit mask over [channels]: a hue
      * whose colorfulness is at or below the space's threshold. A conversion into this space makes
      * them missing; a value constructed with them keeps them, and a conversion out of this space
-     * treats them as missing and the color as the grey it is taken for.
+     * treats them as missing and the color as the grey it is taken for. That conversion zeroes these
+     * components and every channel tagged [AnalogousCategory.Colorfulness], so a space tags its
+     * colorfulness channel for its grey to be the one it is taken for.
      */
     public open fun powerless(components: DoubleArray): Int = 0
 
     // Before a conversion out of this space: the [powerless] components and every colorfulness
-    // component of [components] set to 0, leaving the grey the color is taken for.
-    internal open fun makeAchromatic(components: DoubleArray, powerless: Int) {
+    // component of [components] set to 0, leaving the grey the color is taken for. [missing] marks
+    // which components are `none`, for a space whose rule depends on it.
+    internal open fun makeAchromatic(components: DoubleArray, powerless: Int, missing: Int) {
         channels.forEachIndexed { i, channel ->
             if (powerless and (1 shl i) != 0 || channel.analogous == AnalogousCategory.Colorfulness) components[i] = 0.0
         }
     }
 
+    // Whether [powerless] converts to [base] first, as Okhsl's and Okhsv's does. ColorValue.to then
+    // converts once, asking [powerlessOfBase] of the result, and goes on from the base.
+    internal open val powerlessFromBase: Boolean get() = false
+
+    // [powerless], answered from the color's components in [base].
+    internal open fun powerlessOfBase(base: DoubleArray): Int = 0
+
     /**
-     * A color in this space. [missing] marks components that are `none`, one bit per channel,
-     * plus [ColorValue.MISSING_ALPHA] for alpha.
+     * A color in this space. [missing] marks components that are `none`, one bit per channel, and a
+     * null [alpha] marks alpha as `none`.
      *
      * @throws IllegalArgumentException if a component is not finite or lies outside its channel's
-     * [ColorChannel.limit], or alpha is outside `0..1`.
+     * [ColorChannel.limit], alpha is outside `0..1`, or [missing] names no channel of this space.
      */
-    public fun color(components: DoubleArray, alpha: Double = 1.0, missing: Int = 0): ColorValue =
-        ColorValue.create(this, components, alpha, missing)
+    public fun color(components: DoubleArray, alpha: Double? = 1.0, missing: Int = 0): ColorValue {
+        require(missing and ((1 shl channels.size) - 1).inv() == 0) { "Missing mask $missing names no channel of $id" }
+        return ColorValue.create(this, components, alpha ?: 0.0, if (alpha == null) missing or ColorValue.ALPHA_MISSING else missing)
+    }
 
     private val converters = ConverterCache(this)
 
@@ -100,7 +113,7 @@ public abstract class ColorSpace protected constructor(
     internal open fun stepsFromBase(): List<Step> = listOf(Step { v -> fromBase(v, v) })
 
     internal fun colorOf(components: Array<Double?>, alpha: Double?): ColorValue {
-        var missing = if (alpha == null) ColorValue.MISSING_ALPHA else 0
+        var missing = if (alpha == null) ColorValue.ALPHA_MISSING else 0
         val values = DoubleArray(components.size) { i ->
             val value = components[i]
             if (value == null) missing = missing or (1 shl i)
@@ -146,6 +159,9 @@ public abstract class ColorSpace protected constructor(
          * The cylindrical form of [of], a space whose channels are lightness and two opponent
          * axes, as LCH is of Lab. Its hue is powerless at chroma ≤ [powerlessChroma], and 100%
          * chroma is [chromaReference].
+         *
+         * @throws IllegalArgumentException if [chromaReference] is not finite and positive, or
+         * [powerlessChroma] not finite and at least 0.
          */
         public fun polar(
             id: String,
@@ -153,7 +169,11 @@ public abstract class ColorSpace protected constructor(
             chromaReference: Double,
             powerlessChroma: Double,
             hueFamily: HueFamily,
-        ): PolarColorSpace = PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
+        ): PolarColorSpace {
+            require(chromaReference > 0.0 && chromaReference.isFinite()) { "The chroma reference must be finite and positive, was $chromaReference" }
+            require(powerlessChroma >= 0.0 && powerlessChroma.isFinite()) { "The powerless chroma must be finite and not negative, was $powerlessChroma" }
+            return PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
+        }
 
         private fun appId(id: String): String {
             require(isDashedName(id)) { "An app's color space id is -- and then letters, digits, - and _, and $id is not" }

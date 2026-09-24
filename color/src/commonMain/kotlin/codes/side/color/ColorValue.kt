@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import codes.side.color.internal.ColorRules
 import codes.side.color.internal.MAX_COMPONENTS
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A color: components in one [space], an [alpha], and which of them are `none`.
@@ -13,7 +15,7 @@ import kotlin.math.abs
  * Hues are wrapped into `0..<360`.
  *
  * Equality is exact: same space, same component bits (−0.0 counts as 0.0), same missing
- * components, same alpha. [isEquivalentTo] answers whether two values show the same color.
+ * components, same alpha. [isEquivalentTo] is CSS Color 4's test for equivalent colors.
  */
 @Immutable
 public class ColorValue internal constructor(
@@ -26,11 +28,11 @@ public class ColorValue internal constructor(
     /** Opacity in `0..1`; `0.0` when missing. */
     public val alpha: Double,
 ) {
-    /** One bit per channel set when that component is `none`, plus [MISSING_ALPHA]. */
-    public val missingMask: Int get() = missing
+    /** One bit per channel, set when that component is `none`. Alpha's is [isAlphaMissing]. */
+    public val missingMask: Int get() = missing and ALPHA_MISSING.inv()
 
     /** True when alpha is `none`. */
-    public val isAlphaMissing: Boolean get() = missing and MISSING_ALPHA != 0
+    public val isAlphaMissing: Boolean get() = missing and ALPHA_MISSING != 0
 
     /** [channel]'s value, or null when it is `none`. */
     public operator fun get(channel: ColorChannel): Double? {
@@ -56,7 +58,7 @@ public class ColorValue internal constructor(
 
     /** A copy with alpha set to [value], or to `none` when [value] is null. */
     public fun withAlpha(value: Double?): ColorValue {
-        val newMissing = if (value == null) missing or MISSING_ALPHA else missing and MISSING_ALPHA.inv()
+        val newMissing = if (value == null) missing or ALPHA_MISSING else missing and ALPHA_MISSING.inv()
         return create(space, components(), value ?: 0.0, newMissing)
     }
 
@@ -80,9 +82,7 @@ public class ColorValue internal constructor(
         for (i in space.channels.indices) buffer[i] = component(i)
         // Only what was missing to begin with carries forward: CSS carries before it handles powerless
         // components (§13.3), and a polar target makes the grey's hue missing on its own.
-        val powerlessHere = space.powerless(buffer) and missing.inv()
-        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere)
-        space.converterTo(target).convert(buffer, buffer)
+        convertInto(target, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
         var outMissing = carriedMissing(target)
         val powerless = target.powerless(out)
@@ -93,20 +93,69 @@ public class ColorValue internal constructor(
             }
         }
         for (j in out.indices) if (outMissing and (1 shl j) != 0) out[j] = 0.0
-        return create(target, out, alpha, outMissing or (missing and MISSING_ALPHA))
+        return create(target, out, alpha, outMissing or (missing and ALPHA_MISSING))
+    }
+
+    // [buffer], this color's components, converted into [target] after CSS Color 4 §11.2's preparation.
+    private fun convertInto(target: ColorSpace, buffer: DoubleArray) {
+        if (space.powerlessFromBase) {
+            val base = buffer.copyOf()
+            space.toBase(base, base)
+            if (space.powerlessOfBase(base) and missing.inv() == 0) {
+                base.copyInto(buffer)
+                checkNotNull(space.base).converterTo(target).convert(buffer, buffer)
+                return
+            }
+        }
+        val powerlessHere = space.powerless(buffer) and missing.inv()
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere, missing)
+        space.converterTo(target).convert(buffer, buffer)
     }
 
     /**
-     * True when this and [other] show the same color: both converted to Oklab, with missing
-     * components as 0, agree within 1e-5 on L, a, b and alpha. CSS Color 4 §12 (issue 13157).
+     * True when this and [other] are CSS Color 4's equivalent colors (§12). A powerless hue counts as
+     * missing first, and [Hsl] and [Hwb] colors are compared as [Srgb], as CSS reads `hsl()` and
+     * `hwb()`. In one space every component must match: a missing one only another missing one, a
+     * number within 1e-5 of its channel's reference range, a hue around the circle, alpha within 1e-5.
+     * Across spaces any missing component makes two colors different; otherwise both are compared in
+     * Oklab, L, a, b and alpha within 1e-5.
      */
     public fun isEquivalentTo(other: ColorValue): Boolean {
-        val a = to(Oklab)
-        val b = other.to(Oklab)
-        return abs(a.c0 - b.c0) <= ColorRules.EQUIVALENCE_EPSILON &&
-            abs(a.c1 - b.c1) <= ColorRules.EQUIVALENCE_EPSILON &&
-            abs(a.c2 - b.c2) <= ColorRules.EQUIVALENCE_EPSILON &&
-            abs(alpha - other.alpha) <= ColorRules.EQUIVALENCE_EPSILON
+        val a = comparable()
+        val b = other.comparable()
+        if (a.space == b.space) return a.matches(b)
+        if (a.missing != 0 || b.missing != 0) return false
+        val labA = a.to(Oklab)
+        val labB = b.to(Oklab)
+        val epsilon = ColorRules.EQUIVALENCE_EPSILON
+        return abs(labA.c0 - labB.c0) <= epsilon &&
+            abs(labA.c1 - labB.c1) <= epsilon &&
+            abs(labA.c2 - labB.c2) <= epsilon &&
+            abs(a.alpha - b.alpha) <= epsilon
+    }
+
+    // §12's first step, powerless components made missing, and its reading of hsl() and hwb() as sRGB.
+    private fun comparable(): ColorValue {
+        if (space == Hsl || space == Hwb) return to(Srgb)
+        val buffer = DoubleArray(MAX_COMPONENTS)
+        for (i in space.channels.indices) buffer[i] = component(i)
+        val powerless = space.powerless(buffer) and missing.inv()
+        if (powerless == 0) return this
+        space.makeAchromatic(buffer, powerless, missing)
+        return create(space, buffer.copyOf(space.channels.size), alpha, missing or powerless)
+    }
+
+    // Component by component, in one space: a missing component equals only another missing one.
+    private fun matches(other: ColorValue): Boolean {
+        if (missing != other.missing) return false
+        val epsilon = ColorRules.EQUIVALENCE_EPSILON
+        space.channels.forEachIndexed { i, channel ->
+            if (missing and (1 shl i) != 0) return@forEachIndexed
+            var difference = abs(component(i) - other.component(i))
+            if (channel.isHue) difference = min(difference, 360.0 - difference)
+            if (difference > epsilon * max(1.0, abs(channel.referenceRange.endInclusive))) return false
+        }
+        return isAlphaMissing || abs(alpha - other.alpha) <= epsilon
     }
 
     override fun equals(other: Any?): Boolean {
@@ -179,8 +228,8 @@ public class ColorValue internal constructor(
     }
 
     public companion object {
-        /** The bit in [missingMask] marking alpha as `none`. */
-        public const val MISSING_ALPHA: Int = 1 shl 4
+        // Where the stored mask keeps a missing alpha: past any channel's bit, and never in [missingMask].
+        internal const val ALPHA_MISSING: Int = 1 shl 31
 
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,
@@ -188,7 +237,7 @@ public class ColorValue internal constructor(
         internal fun create(space: ColorSpace, components: DoubleArray, alpha: Double, missing: Int): ColorValue {
             val count = space.channels.size
             require(components.size == count) { "${space.id} takes $count components, got ${components.size}" }
-            require(missing and ((1 shl count) - 1 or MISSING_ALPHA).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
+            require(missing and ((1 shl count) - 1 or ALPHA_MISSING).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
             val values = DoubleArray(MAX_COMPONENTS)
             for (i in 0 until count) {
                 if (missing and (1 shl i) != 0) continue
@@ -200,7 +249,7 @@ public class ColorValue internal constructor(
                 if (channel.isHue) value = wrapHue(value)
                 values[i] = value + 0.0
             }
-            val storedAlpha = if (missing and MISSING_ALPHA != 0) {
+            val storedAlpha = if (missing and ALPHA_MISSING != 0) {
                 0.0
             } else {
                 require(alpha.isFinite() && alpha in 0.0..1.0) { "Alpha must be in 0..1, was $alpha" }

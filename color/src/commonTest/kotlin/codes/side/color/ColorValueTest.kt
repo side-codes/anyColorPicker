@@ -91,7 +91,7 @@ class ColorValueTest {
         assertTrue(color.isAlphaMissing)
         assertEquals(0.0, color.alpha)
         assertEquals(0.0, color.components()[1])
-        assertEquals((1 shl 1) or ColorValue.MISSING_ALPHA, color.missingMask)
+        assertEquals(1 shl 1, color.missingMask)
     }
 
     @Test
@@ -195,5 +195,17 @@ class ColorValueTest {
     @Test
     fun missingAlphaStaysMissingThroughAConversion() {
         assertTrue(XyzD65(0.3, 0.4, 0.5, alpha = null).to(XyzD50).isAlphaMissing)
+    }
+
+    @Test
+    fun alphaIsOutsideTheMissingMask() {
+        val color = Srgb.color(doubleArrayOf(1.0, 0.5, 0.0), alpha = null, missing = 1 shl 1)
+        assertTrue(color.isAlphaMissing)
+        assertEquals(1 shl 1, color.missingMask)
+        assertEquals(Srgb(1.0, null, 0.0, alpha = null), color)
+        assertFailsWith<IllegalArgumentException> { Srgb.color(doubleArrayOf(1.0, 0.5, 0.0), missing = 1 shl 3) }
+        assertFailsWith<IllegalArgumentException> { Srgb.color(doubleArrayOf(1.0, 0.5, 0.0), missing = 1 shl 31) }
+        assertFailsWith<IllegalArgumentException> { Srgb.color(doubleArrayOf(1.0, 0.5, 0.0), alpha = Double.NaN) }
+        assertFailsWith<IllegalArgumentException> { Srgb.color(doubleArrayOf(1.0, 0.5, 0.0), alpha = 2.0) }
     }
 }

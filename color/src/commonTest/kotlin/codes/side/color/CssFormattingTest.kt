@@ -74,13 +74,20 @@ class CssFormattingTest {
 
     @Test
     fun legacyUsesTheCommaSyntaxForSrgbAndHsl() {
-        assertEquals("rgb(255, 127.5, 0)", Srgb(1.0, 0.5, 0.0).toCssString(legacy = true))
-        assertEquals("rgba(255, 127.5, 0, 0.5)", Srgb(1.0, 0.5, 0.0, alpha = 0.5).toCssString(legacy = true))
-        assertEquals("rgba(0, 127.5, 0, 0)", Srgb(null, 0.5, 0.0, alpha = null).toCssString(legacy = true))
-        assertEquals("rgb(306, -25.5, 0)", Srgb(1.2, -0.1, 0.0).toCssString(legacy = true))
-        assertEquals("hsl(120, 50%, 25%)", Hsl(120.0, 50.0, 25.0).toCssString(legacy = true))
-        assertEquals("hsla(0, 50%, 25%, 0.25)", Hsl(null, 50.0, 25.0, alpha = 0.25).toCssString(legacy = true))
-        assertEquals("oklch(0.7 0.15 140)", OkLch(0.7, 0.15, 140.0).toCssString(legacy = true))
+        assertEquals("rgb(255, 127.5, 0)", Srgb(1.0, 0.5, 0.0).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("rgba(255, 127.5, 0, 0.5)", Srgb(1.0, 0.5, 0.0, alpha = 0.5).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("rgba(0, 127.5, 0, 0)", Srgb(null, 0.5, 0.0, alpha = null).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("rgb(306, -25.5, 0)", Srgb(1.2, -0.1, 0.0).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("hsl(120, 50%, 25%)", Hsl(120.0, 50.0, 25.0).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("hsla(0, 50%, 25%, 0.25)", Hsl(null, 50.0, 25.0, alpha = 0.25).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("oklch(0.7 0.15 140)", OkLch(0.7, 0.15, 140.0).toCssString(syntax = CssSyntax.Legacy))
+    }
+
+    @Test
+    fun tiesRoundUpAsColorJsRoundsThem() {
+        assertEquals("oklab(0.5 -0.12 0.13)", Oklab(0.5, -0.125, 0.125).toCssString(precision = 2))
+        assertEquals("oklab(0.5 0 0)", Oklab(0.5, -0.004, 0.004).toCssString(precision = 2))
+        assertEquals("oklab(0.5 -0.99999 1)", Oklab(0.5, -0.999995, 0.999995).toCssString(precision = 5))
     }
 
     @Test
@@ -96,7 +103,7 @@ class CssFormattingTest {
                 if (space == Srgb || space == Hsl) {
                     // The comma syntax writes a missing component or alpha as 0.
                     val filled = space.color(color.components(), color.alpha)
-                    assertRoundTrip(filled, color.toCssString(precision = 17, legacy = true), known, relative = 1e-15)
+                    assertRoundTrip(filled, color.toCssString(precision = 17, syntax = CssSyntax.Legacy), known, relative = 1e-15)
                 }
             }
         }
@@ -113,8 +120,9 @@ class CssFormattingTest {
             val range = channel.referenceRange
             range.start + random.nextDouble() * (range.endInclusive - range.start) * (if (clamped) 1.0 else 1.5)
         }
-        if (random.nextInt(5) == 0) missing = missing or ColorValue.MISSING_ALPHA
-        return space.color(components, random.nextDouble(), missing)
+        val alphaMissing = random.nextInt(5) == 0
+        val alpha = random.nextDouble()
+        return space.color(components, if (alphaMissing) null else alpha, missing)
     }
 
     private fun assertRoundTrip(color: ColorValue, text: String, known: List<ColorSpace>, relative: Double) {
