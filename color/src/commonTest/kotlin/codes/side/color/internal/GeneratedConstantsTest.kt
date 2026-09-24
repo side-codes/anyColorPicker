@@ -40,9 +40,16 @@ class GeneratedConstantsTest {
     }
 
     @Test
-    fun theOkhslShortcutIsTheProductOfItsParts() {
-        val product = multiply(XYZ_D65_TO_SRGB_LINEAR, LMS_TO_XYZ_D65)
-        for (i in 0 until 9) assertTrue(abs(product[i] - LMS_TO_SRGB_LINEAR[i]) <= 1e-15, "element $i")
+    fun theShortcutsAreTheProductsOfTheirParts() {
+        val shortcuts = listOf(
+            LMS_TO_SRGB_LINEAR to multiply(XYZ_D65_TO_SRGB_LINEAR, LMS_TO_XYZ_D65),
+            SRGB_LINEAR_TO_LMS to multiply(XYZ_D65_TO_LMS, SRGB_LINEAR_TO_XYZ_D65),
+            LMS_TO_DISPLAY_P3_LINEAR to multiply(XYZ_D65_TO_DISPLAY_P3_LINEAR, LMS_TO_XYZ_D65),
+            DISPLAY_P3_LINEAR_TO_LMS to multiply(XYZ_D65_TO_LMS, DISPLAY_P3_LINEAR_TO_XYZ_D65),
+        )
+        for ((shortcut, product) in shortcuts) {
+            for (i in 0 until 9) assertTrue(abs(product[i] - shortcut[i]) <= 1e-15, "element $i")
+        }
     }
 
     @Test

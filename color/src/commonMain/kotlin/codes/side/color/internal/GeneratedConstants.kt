@@ -81,9 +81,30 @@ internal val OKLAB_TO_LMS: DoubleArray = doubleArrayOf(
     1.0, -0.0894841775298119, -1.2914855480194092,
 )
 
-/** Oklab's LMS straight to linear sRGB: [XYZ_D65_TO_SRGB_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly. Okhsl and Okhsv find the sRGB gamut through it. Row-major. */
+/** Oklab's LMS straight to linear sRGB: [XYZ_D65_TO_SRGB_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly. sRGB's gamut, and Okhsl and Okhsv with it, is found through it. Row-major. */
 internal val LMS_TO_SRGB_LINEAR: DoubleArray = doubleArrayOf(
     4.076741636075958, -3.307711539258062, 0.2309699031821045,
     -1.268437973285032, 2.6097573492876887, -0.34131937600265727,
     -0.004196076138675557, -0.7034186179359363, 1.7076146940746117,
+)
+
+/** Linear sRGB straight to Oklab's LMS: [XYZ_D65_TO_LMS] × [SRGB_LINEAR_TO_XYZ_D65], multiplied exactly. Row-major. */
+internal val SRGB_LINEAR_TO_LMS: DoubleArray = doubleArrayOf(
+    0.412221469470763, 0.5363325372617348, 0.0514459932675022,
+    0.21190349581782522, 0.6806995506452344, 0.10739695353694055,
+    0.08830245919005643, 0.2817188391361215, 0.6299787016738221,
+)
+
+/** Oklab's LMS straight to linear Display P3: [XYZ_D65_TO_DISPLAY_P3_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly. Row-major. */
+internal val LMS_TO_DISPLAY_P3_LINEAR: DoubleArray = doubleArrayOf(
+    3.1277689713618737, -2.257135762591638, 0.1293667912297652,
+    -1.0910090184377979, 2.413331710306922, -0.3223226918691248,
+    -0.02601080193857049, -0.5080413317041669, 1.5340521336427373,
+)
+
+/** Linear Display P3 straight to Oklab's LMS: [XYZ_D65_TO_LMS] × [DISPLAY_P3_LINEAR_TO_XYZ_D65], multiplied exactly. Row-major. */
+internal val DISPLAY_P3_LINEAR_TO_LMS: DoubleArray = doubleArrayOf(
+    0.48137985274995443, 0.46211837101131803, 0.056501776238727555,
+    0.22883194181124475, 0.6532168193835676, 0.11795123880518778,
+    0.08394575232299319, 0.22416527097756642, 0.6918889766994404,
 )

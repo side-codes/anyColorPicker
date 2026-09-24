@@ -288,8 +288,10 @@ public class codes/side/color/RgbColorSpace : codes/side/color/ColorSpace {
 }
 
 public final class codes/side/color/RgbGamut {
+	public final fun cusp (D)Lcodes/side/color/ColorValue;
 	public final fun getPeakLuminance ()D
 	public final fun getSpace ()Lcodes/side/color/RgbColorSpace;
+	public final fun maxChroma (DD)D
 	public fun toString ()Ljava/lang/String;
 }
 

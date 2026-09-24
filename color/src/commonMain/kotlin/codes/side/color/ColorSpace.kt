@@ -150,14 +150,4 @@ public abstract class ColorSpace protected constructor(
     }
 }
 
-/** An RGB gamut to test or map colors against. */
-public class RgbGamut internal constructor(
-    /** The RGB space whose `0..1` cube this gamut is. */
-    public val space: RgbColorSpace,
-    /** Peak luminance relative to diffuse white; `1.0` for standard dynamic range. */
-    public val peakLuminance: Double = 1.0,
-) {
-    override fun toString(): String = "RgbGamut(${space.id})"
-}
-
 internal const val XYZ_D65_ID: String = "xyz-d65"

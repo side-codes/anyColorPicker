@@ -181,6 +181,8 @@ final class codes.side.color/RgbGamut { // codes.side.color/RgbGamut|null[0]
     final val space // codes.side.color/RgbGamut.space|{}space[0]
         final fun <get-space>(): codes.side.color/RgbColorSpace // codes.side.color/RgbGamut.space.<get-space>|<get-space>(){}[0]
 
+    final fun cusp(kotlin/Double): codes.side.color/ColorValue // codes.side.color/RgbGamut.cusp|cusp(kotlin.Double){}[0]
+    final fun maxChroma(kotlin/Double, kotlin/Double): kotlin/Double // codes.side.color/RgbGamut.maxChroma|maxChroma(kotlin.Double;kotlin.Double){}[0]
     final fun toString(): kotlin/String // codes.side.color/RgbGamut.toString|toString(){}[0]
 }
 

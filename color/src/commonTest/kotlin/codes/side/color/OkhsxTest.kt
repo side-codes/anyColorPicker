@@ -1,5 +1,6 @@
 package codes.side.color
 
+import codes.side.color.internal.LMS_TO_SRGB_LINEAR
 import codes.side.color.internal.cuspLightness
 import codes.side.color.internal.maxChroma
 import codes.side.color.internal.maxSaturation
@@ -46,7 +47,7 @@ class OkhsxTest {
             val a = cos(degrees * PI / 180.0)
             val b = sin(degrees * PI / 180.0)
             val scanned = scannedEdge(2.0) { s -> linearSrgb(1.0, s * a, s * b).all { it >= 0.0 } }
-            assertNear(scanned, maxSaturation(a, b), 1e-12, "at $degrees°")
+            assertNear(scanned, maxSaturation(LMS_TO_SRGB_LINEAR, a, b), 1e-12, "at $degrees°")
         }
     }
 
@@ -57,11 +58,11 @@ class OkhsxTest {
         for (degrees in doubleArrayOf(29.0, 110.0, 200.0, 264.1, 330.0)) {
             val a = cos(degrees * PI / 180.0)
             val b = sin(degrees * PI / 180.0)
-            val sMax = maxSaturation(a, b)
-            val lCusp = cuspLightness(a, b, sMax)
+            val sMax = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+            val lCusp = cuspLightness(LMS_TO_SRGB_LINEAR, a, b, sMax)
             for (l in doubleArrayOf(0.3, lCusp, lCusp + 0.01, 0.99)) {
                 val scanned = scannedEdge(0.5) { c -> linearSrgb(l, c * a, c * b).all { it in 0.0..1.0 } }
-                assertNear(scanned, maxChroma(l, a, b, sMax, lCusp), 1e-12, "at $degrees°, L $l")
+                assertNear(scanned, maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp), 1e-12, "at $degrees°, L $l")
             }
         }
     }
@@ -71,8 +72,8 @@ class OkhsxTest {
         for (degrees in 0 until 360 step 15) {
             val a = cos(degrees * PI / 180.0)
             val b = sin(degrees * PI / 180.0)
-            val s = maxSaturation(a, b)
-            val l = cuspLightness(a, b, s)
+            val s = maxSaturation(LMS_TO_SRGB_LINEAR, a, b)
+            val l = cuspLightness(LMS_TO_SRGB_LINEAR, a, b, s)
             val rgb = linearSrgb(l, l * s * a, l * s * b)
             assertNear(0.0, rgb.min(), 1e-12, "lowest channel at $degrees°")
             assertNear(1.0, rgb.max(), 1e-12, "highest channel at $degrees°")
@@ -88,7 +89,7 @@ class OkhsxTest {
         val a = lab[Oklab.A]!!
         val b = lab[Oklab.B]!!
         val chroma = hypot(a, b)
-        assertNear(chroma / lab[Oklab.L]!!, maxSaturation(a / chroma, b / chroma), 1e-12)
+        assertNear(chroma / lab[Oklab.L]!!, maxSaturation(LMS_TO_SRGB_LINEAR, a / chroma, b / chroma), 1e-12)
         val hue = atan2(b, a) * 180.0 / PI + 360.0
         assertComponents(doubleArrayOf(hue, 1.0, 1.0), blue.to(Okhsv), 1e-12)
         for (space in listOf(Okhsl, Okhsv)) {

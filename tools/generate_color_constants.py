@@ -104,7 +104,10 @@ MATRICES = [
     ("LMS_TO_XYZ_D65", "Oklab's LMS to XYZ-D65, CSS's published matrix.", LMS_TO_XYZ_D65),
     ("LMS_TO_OKLAB", "Cube-rooted LMS to Oklab, CSS's published matrix.", LMS_TO_OKLAB),
     ("OKLAB_TO_LMS", "Oklab to cube-rooted LMS, CSS's published matrix.", OKLAB_TO_LMS),
-    ("LMS_TO_SRGB_LINEAR", "Oklab's LMS straight to linear sRGB: [XYZ_D65_TO_SRGB_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly. Okhsl and Okhsv find the sRGB gamut through it.", multiply(inverse(SRGB_LINEAR_TO_XYZ_D65), LMS_TO_XYZ_D65)),
+    ("LMS_TO_SRGB_LINEAR", "Oklab's LMS straight to linear sRGB: [XYZ_D65_TO_SRGB_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly. sRGB's gamut, and Okhsl and Okhsv with it, is found through it.", multiply(inverse(SRGB_LINEAR_TO_XYZ_D65), LMS_TO_XYZ_D65)),
+    ("SRGB_LINEAR_TO_LMS", "Linear sRGB straight to Oklab's LMS: [XYZ_D65_TO_LMS] × [SRGB_LINEAR_TO_XYZ_D65], multiplied exactly.", multiply(XYZ_D65_TO_LMS, SRGB_LINEAR_TO_XYZ_D65)),
+    ("LMS_TO_DISPLAY_P3_LINEAR", "Oklab's LMS straight to linear Display P3: [XYZ_D65_TO_DISPLAY_P3_LINEAR] × [LMS_TO_XYZ_D65], multiplied exactly.", multiply(inverse(DISPLAY_P3_LINEAR_TO_XYZ_D65), LMS_TO_XYZ_D65)),
+    ("DISPLAY_P3_LINEAR_TO_LMS", "Linear Display P3 straight to Oklab's LMS: [XYZ_D65_TO_LMS] × [DISPLAY_P3_LINEAR_TO_XYZ_D65], multiplied exactly.", multiply(XYZ_D65_TO_LMS, DISPLAY_P3_LINEAR_TO_XYZ_D65)),
 ]
 
 VECTORS = [
