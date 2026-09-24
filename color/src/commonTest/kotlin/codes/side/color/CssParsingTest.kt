@@ -136,9 +136,19 @@ class CssParsingTest {
 
     @Test
     fun twoSpacesWrittenAlikeAreRefused() {
-        val impostor = ColorSpace.hsv("--hsv", Srgb)
-        assertFailsWith<IllegalArgumentException> { ColorValue.parseCss("red", ColorSpaces.all + impostor) }
+        val twins = listOf(ColorSpace.hsv("--twin", Srgb), ColorSpace.hsv("--twin", DisplayP3))
+        assertFailsWith<IllegalArgumentException> { ColorValue.parseCss("red", ColorSpaces.all + twins) }
         assertSame(Hsv, ColorValue.parseCss("color(--hsv 1 2 3)", ColorSpaces.all + ColorSpaces.all).space)
+    }
+
+    @Test
+    fun anAppSpacesIdIsACssNameTheLibraryDoesNotUse() {
+        for (id in listOf("--my hsv", "--a.b", "--x/y", "--a(b)", "--a,b", "--a:b", "--hsv", "--okhsl", "--okhsv", "--cmyk")) {
+            assertFailsWith<IllegalArgumentException>(id) { ColorSpace.hsv(id, Srgb) }
+        }
+        val space = ColorSpace.hsv("--my_hsv-2é", Srgb)
+        val color = space.color(doubleArrayOf(10.0, 20.0, 30.0))
+        assertEquals(color, ColorValue.parseCss(color.toCssString(), ColorSpaces.all + space))
     }
 
     @Test

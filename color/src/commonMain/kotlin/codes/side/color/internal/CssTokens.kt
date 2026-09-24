@@ -144,6 +144,10 @@ private fun nameEnd(text: String, start: Int): Int {
     return i
 }
 
+/** True when [name] is a CSS custom name: `--` and then letters, digits, `-`, `_` or characters past ASCII. */
+internal fun isDashedName(name: String): Boolean =
+    name.length > 2 && name.startsWith("--") && (2 until name.length).all { name[it].isNameChar() }
+
 private fun Char.isAsciiDigit(): Boolean = this in '0'..'9'
 
 private fun Char.isNameStart(): Boolean = this in 'a'..'z' || this in 'A'..'Z' || this == '_' || code >= 0x80

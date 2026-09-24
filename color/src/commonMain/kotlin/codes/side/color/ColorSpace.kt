@@ -2,6 +2,8 @@ package codes.side.color
 
 import codes.side.color.internal.MAX_COMPONENTS
 import codes.side.color.internal.Step
+import codes.side.color.internal.cssName
+import codes.side.color.internal.isDashedName
 
 /** How faithfully a space's conversions describe color. */
 public enum class Exactness {
@@ -105,9 +107,10 @@ public abstract class ColorSpace protected constructor(
     override fun toString(): String = id
 
     /**
-     * The ways an app defines a space. Each [id] starts with `--`, as a CSS custom color space's
-     * does, so an app's space never passes for one of the library's: spaces are equal when their
-     * ids are.
+     * The ways an app defines a space. Each [id] is a CSS custom name, `--` and then letters,
+     * digits, `-` and `_`, so an app's space never passes for one of the library's (spaces are equal
+     * when their ids are) and `toCssString` writes it as text `parseCss` reads. `--hsv`, `--okhsl`,
+     * `--okhsv` and `--cmyk` are taken: they are how the library writes its own spaces.
      */
     public companion object {
         /**
@@ -144,7 +147,8 @@ public abstract class ColorSpace protected constructor(
         ): PolarColorSpace = PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
 
         private fun appId(id: String): String {
-            require(id.length > 2 && id.startsWith("--")) { "An app's color space id starts with --, and $id does not" }
+            require(isDashedName(id)) { "An app's color space id is -- and then letters, digits, - and _, and $id is not" }
+            require(ColorSpaces.all.none { cssName(it) == id }) { "$id is how the library writes its own space" }
             return id
         }
     }
