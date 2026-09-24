@@ -65,6 +65,7 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
     open fun toString(): kotlin/String // codes.side.color/ColorSpace.toString|toString(){}[0]
 
     final object Companion { // codes.side.color/ColorSpace.Companion|null[0]
+        final fun polar(kotlin/String, codes.side.color/ColorSpace, kotlin/Double, kotlin/Double, codes.side.color/HueFamily): codes.side.color/PolarColorSpace // codes.side.color/ColorSpace.Companion.polar|polar(kotlin.String;codes.side.color.ColorSpace;kotlin.Double;kotlin.Double;codes.side.color.HueFamily){}[0]
         final fun rgb(kotlin/String, codes.side.color/RgbPrimaries, codes.side.color/WhitePoint, codes.side.color/TransferFunction): codes.side.color/RgbColorSpace // codes.side.color/ColorSpace.Companion.rgb|rgb(kotlin.String;codes.side.color.RgbPrimaries;codes.side.color.WhitePoint;codes.side.color.TransferFunction){}[0]
     }
 }
@@ -138,6 +139,7 @@ final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ColorValue.equals|equals(kotlin.Any?){}[0]
     final fun get(codes.side.color/ColorChannel): kotlin/Double? // codes.side.color/ColorValue.get|get(codes.side.color.ColorChannel){}[0]
     final fun hashCode(): kotlin/Int // codes.side.color/ColorValue.hashCode|hashCode(){}[0]
+    final fun isEquivalentTo(codes.side.color/ColorValue): kotlin/Boolean // codes.side.color/ColorValue.isEquivalentTo|isEquivalentTo(codes.side.color.ColorValue){}[0]
     final fun isMissing(codes.side.color/ColorChannel): kotlin/Boolean // codes.side.color/ColorValue.isMissing|isMissing(codes.side.color.ColorChannel){}[0]
     final fun to(codes.side.color/ColorSpace): codes.side.color/ColorValue // codes.side.color/ColorValue.to|to(codes.side.color.ColorSpace){}[0]
     final fun toString(): kotlin/String // codes.side.color/ColorValue.toString|toString(){}[0]
@@ -231,6 +233,20 @@ final class codes.side.color/WhitePoint { // codes.side.color/WhitePoint|null[0]
     }
 }
 
+open class codes.side.color/PolarColorSpace : codes.side.color/ColorSpace { // codes.side.color/PolarColorSpace|null[0]
+    final val C // codes.side.color/PolarColorSpace.C|{}C[0]
+        final fun <get-C>(): codes.side.color/ColorChannel // codes.side.color/PolarColorSpace.C.<get-C>|<get-C>(){}[0]
+    final val H // codes.side.color/PolarColorSpace.H|{}H[0]
+        final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/PolarColorSpace.H.<get-H>|<get-H>(){}[0]
+    final val L // codes.side.color/PolarColorSpace.L|{}L[0]
+        final fun <get-L>(): codes.side.color/ColorChannel // codes.side.color/PolarColorSpace.L.<get-L>|<get-L>(){}[0]
+
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/PolarColorSpace.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    open fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/PolarColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/PolarColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
+    open fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/PolarColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
 open class codes.side.color/RgbColorSpace : codes.side.color/ColorSpace { // codes.side.color/RgbColorSpace|null[0]
     final val B // codes.side.color/RgbColorSpace.B|{}B[0]
         final fun <get-B>(): codes.side.color/ColorChannel // codes.side.color/RgbColorSpace.B.<get-B>|<get-B>(){}[0]
@@ -272,6 +288,38 @@ sealed class codes.side.color/ChannelKind { // codes.side.color/ChannelKind|null
 }
 
 final object codes.side.color/DisplayP3 : codes.side.color/RgbColorSpace // codes.side.color/DisplayP3|null[0]
+
+final object codes.side.color/Lab : codes.side.color/ColorSpace { // codes.side.color/Lab|null[0]
+    final val A // codes.side.color/Lab.A|{}A[0]
+        final fun <get-A>(): codes.side.color/ColorChannel // codes.side.color/Lab.A.<get-A>|<get-A>(){}[0]
+    final val B // codes.side.color/Lab.B|{}B[0]
+        final fun <get-B>(): codes.side.color/ColorChannel // codes.side.color/Lab.B.<get-B>|<get-B>(){}[0]
+    final val L // codes.side.color/Lab.L|{}L[0]
+        final fun <get-L>(): codes.side.color/ColorChannel // codes.side.color/Lab.L.<get-L>|<get-L>(){}[0]
+    final val whitePoint // codes.side.color/Lab.whitePoint|{}whitePoint[0]
+        final fun <get-whitePoint>(): codes.side.color/WhitePoint // codes.side.color/Lab.whitePoint.<get-whitePoint>|<get-whitePoint>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Lab.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/Lab.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Lab.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
+final object codes.side.color/Lch : codes.side.color/PolarColorSpace // codes.side.color/Lch|null[0]
+
+final object codes.side.color/OkLch : codes.side.color/PolarColorSpace // codes.side.color/OkLch|null[0]
+
+final object codes.side.color/Oklab : codes.side.color/ColorSpace { // codes.side.color/Oklab|null[0]
+    final val A // codes.side.color/Oklab.A|{}A[0]
+        final fun <get-A>(): codes.side.color/ColorChannel // codes.side.color/Oklab.A.<get-A>|<get-A>(){}[0]
+    final val B // codes.side.color/Oklab.B|{}B[0]
+        final fun <get-B>(): codes.side.color/ColorChannel // codes.side.color/Oklab.B.<get-B>|<get-B>(){}[0]
+    final val L // codes.side.color/Oklab.L|{}L[0]
+        final fun <get-L>(): codes.side.color/ColorChannel // codes.side.color/Oklab.L.<get-L>|<get-L>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Oklab.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/Oklab.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Oklab.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
 
 final object codes.side.color/Srgb : codes.side.color/RgbColorSpace // codes.side.color/Srgb|null[0]
 

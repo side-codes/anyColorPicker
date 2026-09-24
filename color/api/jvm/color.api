@@ -76,6 +76,7 @@ public abstract class codes/side/color/ColorSpace {
 }
 
 public final class codes/side/color/ColorSpace$Companion {
+	public final fun polar (Ljava/lang/String;Lcodes/side/color/ColorSpace;DDLcodes/side/color/HueFamily;)Lcodes/side/color/PolarColorSpace;
 	public final fun rgb (Ljava/lang/String;Lcodes/side/color/RgbPrimaries;Lcodes/side/color/WhitePoint;Lcodes/side/color/TransferFunction;)Lcodes/side/color/RgbColorSpace;
 }
 
@@ -90,6 +91,7 @@ public final class codes/side/color/ColorValue {
 	public final fun getSpace ()Lcodes/side/color/ColorSpace;
 	public fun hashCode ()I
 	public final fun isAlphaMissing ()Z
+	public final fun isEquivalentTo (Lcodes/side/color/ColorValue;)Z
 	public final fun isMissing (Lcodes/side/color/ColorChannel;)Z
 	public final fun to (Lcodes/side/color/ColorSpace;)Lcodes/side/color/ColorValue;
 	public fun toString ()Ljava/lang/String;
@@ -129,6 +131,48 @@ public final class codes/side/color/HueFamily$Companion {
 	public final fun getCieLab ()Lcodes/side/color/HueFamily;
 	public final fun getOklab ()Lcodes/side/color/HueFamily;
 	public final fun rgbHexcone (Lcodes/side/color/ColorSpace;)Lcodes/side/color/HueFamily;
+}
+
+public final class codes/side/color/Lab : codes/side/color/ColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Lab;
+	public fun fromBase ([D[D)V
+	public final fun getA ()Lcodes/side/color/ColorChannel;
+	public final fun getB ()Lcodes/side/color/ColorChannel;
+	public final fun getL ()Lcodes/side/color/ColorChannel;
+	public fun getWhitePoint ()Lcodes/side/color/WhitePoint;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/Lab;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/Lch : codes/side/color/PolarColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Lch;
+}
+
+public final class codes/side/color/OkLch : codes/side/color/PolarColorSpace {
+	public static final field INSTANCE Lcodes/side/color/OkLch;
+}
+
+public final class codes/side/color/Oklab : codes/side/color/ColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Oklab;
+	public fun fromBase ([D[D)V
+	public final fun getA ()Lcodes/side/color/ColorChannel;
+	public final fun getB ()Lcodes/side/color/ColorChannel;
+	public final fun getL ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/Oklab;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun toBase ([D[D)V
+}
+
+public class codes/side/color/PolarColorSpace : codes/side/color/ColorSpace {
+	public fun fromBase ([D[D)V
+	public final fun getC ()Lcodes/side/color/ColorChannel;
+	public final fun getH ()Lcodes/side/color/ColorChannel;
+	public final fun getL ()Lcodes/side/color/ColorChannel;
+	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun invoke$default (Lcodes/side/color/PolarColorSpace;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public fun powerless ([D)I
+	public fun toBase ([D[D)V
 }
 
 public class codes/side/color/RgbColorSpace : codes/side/color/ColorSpace {

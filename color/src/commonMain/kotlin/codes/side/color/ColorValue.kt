@@ -2,6 +2,7 @@ package codes.side.color
 
 import androidx.compose.runtime.Immutable
 import codes.side.color.internal.MAX_COMPONENTS
+import kotlin.math.abs
 
 /**
  * A color: components in one [space], an [alpha], and which of them are `none`.
@@ -88,6 +89,19 @@ public class ColorValue internal constructor(
         return create(target, out, alpha, outMissing or (missing and MISSING_ALPHA))
     }
 
+    /**
+     * True when this and [other] show the same color: both converted to Oklab, with missing
+     * components as 0, agree within 1e-5 on L, a, b and alpha. CSS Color 4 §12 (issue 13157).
+     */
+    public fun isEquivalentTo(other: ColorValue): Boolean {
+        val a = to(Oklab)
+        val b = other.to(Oklab)
+        return abs(a.c0 - b.c0) <= EQUIVALENCE_EPSILON &&
+            abs(a.c1 - b.c1) <= EQUIVALENCE_EPSILON &&
+            abs(a.c2 - b.c2) <= EQUIVALENCE_EPSILON &&
+            abs(alpha - other.alpha) <= EQUIVALENCE_EPSILON
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ColorValue) return false
@@ -160,6 +174,8 @@ public class ColorValue internal constructor(
     public companion object {
         /** The bit in [missingMask] marking alpha as `none`. */
         public const val MISSING_ALPHA: Int = 1 shl 4
+
+        private const val EQUIVALENCE_EPSILON = 1e-5
 
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,

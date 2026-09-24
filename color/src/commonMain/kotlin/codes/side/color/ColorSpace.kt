@@ -129,6 +129,19 @@ public abstract class ColorSpace protected constructor(
             transfer: TransferFunction,
         ): RgbColorSpace = RgbColorSpace.derive(appId(id), primaries, whitePoint, transfer)
 
+        /**
+         * The cylindrical form of [of], a space whose channels are lightness and two opponent
+         * axes, as LCH is of Lab. Its hue is powerless at chroma ≤ [powerlessChroma], and 100%
+         * chroma is [chromaReference].
+         */
+        public fun polar(
+            id: String,
+            of: ColorSpace,
+            chromaReference: Double,
+            powerlessChroma: Double,
+            hueFamily: HueFamily,
+        ): PolarColorSpace = PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
+
         private fun appId(id: String): String {
             require(id.length > 2 && id.startsWith("--")) { "An app's color space id starts with --, and $id does not" }
             return id
