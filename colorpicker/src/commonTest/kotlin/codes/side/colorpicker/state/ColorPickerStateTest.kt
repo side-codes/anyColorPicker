@@ -702,6 +702,30 @@ class ColorPickerStateTest {
         assertNull(ColorPickerStateSaver.restore(floatArrayOf(0f, 120f)))
     }
 
+    @Test
+    fun saverKeepsTheRememberedHues() {
+        val state = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+        state.updateFromRgb(RgbColor(0.5f, 0.5f, 0.5f))
+        val restored = assertNotNull(ColorPickerStateSaver.restore(saveToArray(state)))
+        assertEquals(200f, restored.hslColor.hue, "HSL")
+        assertEquals(state.okhslColor.hue, restored.okhslColor.hue, "Okhsl")
+    }
+
+    @Test
+    fun saverRestoresTheSixElementForm() {
+        // The form 1.2.0 saves in: a state an app saved before upgrading has to restore after it.
+        val restored = assertNotNull(
+            ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f)),
+        )
+        assertEquals(RgbColor(0.5f, 0.5f, 0.5f), restored.pickerColor)
+    }
+
+    @Test
+    fun saverRestoreRememberedHueOutOfRangeReturnsNull() {
+        assertNull(ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f, 400f, 0f)))
+        assertNull(ColorPickerStateSaver.restore(floatArrayOf(1f, 0.5f, 0.5f, 0.5f, 1f, 0f, 0f, Float.NaN)))
+    }
+
     // ---- Hue through a neutral ----
 
     @Test

@@ -71,8 +71,10 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
     // written to; this is for when another space writes the neutral, which is where it would
     // otherwise be lost. HSL's hue and Oklab's are different angles, so they are kept apart;
     // Okhsl, Okhsv and OkLCh all share the second.
-    private var rememberedHslHue by mutableStateOf(0f)
-    private var rememberedOkHue by mutableStateOf(0f)
+    internal var rememberedHslHue by mutableStateOf(0f)
+        private set
+    internal var rememberedOkHue by mutableStateOf(0f)
+        private set
 
     private var authoritative: PickerColor
         get() = authoritativeColor
@@ -112,6 +114,12 @@ public class ColorPickerState(initialColor: PickerColor = HslColor()) {
                 ?.let { HslColor(hue = it, saturation = 1f, lightness = 0.5f).toRgb().toOklch().hue }
         if (hslHue != null) rememberedHslHue = hslHue
         if (okHue != null) rememberedOkHue = okHue
+    }
+
+    /** Puts back hues a saver kept, over the ones construction took from the initial colour. */
+    internal fun restoreRememberedHues(hslHue: Float, okHue: Float) {
+        rememberedHslHue = hslHue
+        rememberedOkHue = okHue
     }
 
     init {
