@@ -1,8 +1,29 @@
 # Changelog
 
+## 1.2.1
+
+### Fixed
+
+- **A grey reports the last hue chosen, whichever space it was chosen in.** A neutral color has no hue to convert, so `ColorPickerState` hands back the last one chosen, but only a write in the same family counted. HSL at 200° dragged to white read hue 0 in Okhsl, and HSL at 200° followed by red from an RGB field still read 200 once the color went grey. Every write records the hue for both families.
+- **`rememberSaveableColorPickerState` keeps the remembered hues.** A grey remembering hue 200 came back from a configuration change or process death reading 0. State saved by 1.2.0 still restores.
+- **A wide-gamut Compose `Color` is gamut-mapped, not clipped.** `Color.toRgbColor()`, and every `Color.to*Color()` built on it, clipped each channel into sRGB, so Display P3 red arrived as `#FF0000`, 0.28° of Oklab hue away. It takes the CSS Color 4 mapping LAB, Oklab and OkLCh already used and arrives as `#FF0B0C`, hue intact. sRGB colors read exactly as before.
+- **The Kotlin default hierarchy template applies.** `iosMain`, `appleMain` and `nativeMain` exist again, and the published metadata carries them. No API changes.
+
+### Dependencies
+
+Built with Kotlin 2.4.20 and Compose Multiplatform 1.12.1, up from 2.4.10 and 1.12.0; both reach consumers through the published dependencies.
+
+### Compatibility
+
+1.2.0 is not binary-compatible with 1.1.x. Thirty declarations changed their JVM signature: the hex functions, the `ColorPickerColors` and `ColorPickerShapes` constructors and `copy`, `ColorPickerDefaults.colors()` and `shapes()`, `ColorSlider`, `ColorPickerDialog`, and every 1.1.1 slider and picker. A library compiled against 1.1.x has to be rebuilt against 1.2.x; an app compiling its own code needs only the source changes listed under 1.2.0.
+
+From 1.2.1 on, CI fails a release that removes anything an earlier release published, unless it is a new major version.
+
 ## 1.2.0
 
 ### Breaking changes
+
+1.2.0 is also binary-incompatible with 1.1.x; see [Compatibility under 1.2.1](#compatibility).
 
 **Hex strings name their alpha ordering.** `#FF000080` is a half-transparent red to a
 stylesheet and an opaque navy to `android.graphics.Color`, and nothing in the string says

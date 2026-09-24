@@ -589,6 +589,10 @@ state.hslColor
 state.rgbColor
 state.cmykColor
 state.labColor
+state.oklabColor
+state.oklchColor
+state.okhslColor
+state.okhsvColor
 state.argbInt
 state.pickerColor // the authoritative color, in whichever space was last written
 
@@ -606,6 +610,18 @@ state.updateKey(0.2f)
 state.updateLabLightness(50f)
 state.updateLabA(20f)
 state.updateLabB(-30f)
+state.updateOklabLightness(0.6f)
+state.updateOklabA(0.1f)
+state.updateOklabB(-0.1f)
+state.updateOklchLightness(0.6f)
+state.updateOklchChroma(0.15f)
+state.updateOklchHue(250f)
+state.updateOkhslHue(250f)
+state.updateOkhslSaturation(0.8f)
+state.updateOkhslLightness(0.6f)
+state.updateOkhsvHue(250f)
+state.updateOkhsvSaturation(0.8f)
+state.updateOkhsvValue(0.9f)
 state.updateAlpha(0.5f) // keeps the current origin space
 
 // Whole-color updates (the written space becomes the origin)
@@ -613,6 +629,10 @@ state.updateFromHsl(HslColor(hue = 0f, saturation = 1f, lightness = 0.5f))
 state.updateFromRgb(RgbColor(1f, 0f, 0f))
 state.updateFromCmyk(cmykColor)
 state.updateFromLab(labColor)
+state.updateFromOklab(oklabColor)
+state.updateFromOklch(oklchColor)
+state.updateFromOkhsl(okhslColor)
+state.updateFromOkhsv(okhsvColor)
 state.updateFromArgbInt(0xFFFF0000.toInt())
 
 // True while the user is dragging a slider
@@ -621,7 +641,7 @@ state.isInteracting
 
 `ColorPickerState` has a public constructor, so it can also be created and held outside of composition (e.g. in a ViewModel).
 
-Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color.
+Use `rememberSaveableColorPickerState()` to keep the state across configuration changes and process death on platforms that provide saved-instance-state support (primarily Android). On other platforms it behaves like `rememberColorPickerState` within the composition. The saver preserves the authoritative color space, not just the visible color, and the hue a grey reports in each family.
 
 ## 🏗️ Architecture: Zero-Drift Color Conversions
 
