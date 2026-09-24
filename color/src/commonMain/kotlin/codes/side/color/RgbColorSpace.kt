@@ -47,12 +47,15 @@ public class RgbPrimaries(
 /**
  * An RGB space's transfer curve. [decode] takes an encoded value to linear light and [encode] goes
  * back. Both mirror for negative input, `f(-x) = -f(x)`, so extended-range values survive.
+ * Implementing one needs [ExperimentalColorSpaceApi], which keeps the right to add members to it.
  */
+@SubclassOptInRequired(ExperimentalColorSpaceApi::class)
 public abstract class TransferFunction protected constructor() {
     public abstract fun decode(encoded: Double): Double
 
     public abstract fun encode(linear: Double): Double
 
+    @OptIn(ExperimentalColorSpaceApi::class)
     public companion object {
         /** No curve: the values are linear already. */
         public val Linear: TransferFunction = object : TransferFunction() {

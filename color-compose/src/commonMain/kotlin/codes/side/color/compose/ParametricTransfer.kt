@@ -1,6 +1,7 @@
 package codes.side.color.compose
 
 import androidx.compose.ui.graphics.colorspace.TransferParameters
+import codes.side.color.ExperimentalColorSpaceApi
 import codes.side.color.TransferFunction
 import kotlin.math.abs
 import kotlin.math.pow
@@ -10,6 +11,7 @@ import kotlin.math.pow
  * `c·x + f` below, mirrored for negative values. Built from the parameters rather than Compose's own
  * `eotf` and `oetf`, which clamp to the space's range.
  */
+@OptIn(ExperimentalColorSpaceApi::class)
 internal class ParametricTransfer(parameters: TransferParameters) : TransferFunction() {
     private val g = parameters.gamma
     private val a = parameters.a
