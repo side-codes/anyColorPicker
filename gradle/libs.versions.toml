@@ -8,6 +8,8 @@ androidx-lifecycle = "2.11.0"
 androidx-compose-ui = "1.12.1"
 kotlinx-coroutines = "1.11.0"
 kotlinx-collections-immutable = "0.5.2"
+kotlinx-serialization = "1.11.0"
+kotlinx-resources = "0.16.2"
 binary-compatibility-validator = "0.18.2"
 dokka = "2.2.0"
 screenshot = "0.0.1-alpha16"
@@ -32,11 +34,15 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 androidx-compose-runtime-annotation = { group = "androidx.compose.runtime", name = "runtime-annotation", version.ref = "androidx-compose-ui" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-resources = { group = "com.goncalossilva", name = "resources", version.ref = "kotlinx-resources" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinxResources = { id = "com.goncalossilva.resources", version.ref = "kotlinx-resources" }
 androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 binaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }

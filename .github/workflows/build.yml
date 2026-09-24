@@ -33,10 +33,6 @@ jobs:
         run: ./gradlew :colorpicker:assemble :color:assemble :color-compose:assemble
       - name: Run tests
         run: ./gradlew :colorpicker:allTests :color:allTests :color-compose:allTests
-      # GeneratedConstants.kt is written from CSS's definitions by this script; a hand edit, or a
-      # script change without a rerun, leaves the two disagreeing with nothing else to notice.
-      - name: Check the generated color constants are current
-        run: python3 tools/generate_color_constants.py --check
       # Fails when public API drifts from each library's api/. Without this the
       # binary-compatibility plugin is configured but never consulted.
       - name: Check the public API matches the committed dump

@@ -11,7 +11,7 @@ class ReferenceVectorsTest {
     fun wptConversionsMatchBrowsers() {
         // WPT prints 6 to 8 significant digits, so each channel is compared within 2e-6 of its range.
         val report = StringBuilder()
-        for ((source, spaceId, serialized) in WPT_CONVERSIONS) {
+        for ((source, spaceId, serialized) in WPT.conversions) {
             val target = ColorSpaces.all.first { it.id == spaceId }
             var converted = ColorValue.parseCss(source).to(target)
             // The result is a CSS function's value, whose lightness clamps as parsing clamps it.
@@ -42,9 +42,10 @@ class ReferenceVectorsTest {
     @Test
     fun conversionsMatchColorJs() {
         val report = StringBuilder()
-        for (line in COLORJS_CONVERSIONS.flatMap { it.lines() }.filter { it.isNotBlank() }) {
-            val (source, target) = line.split(" > ").map { reference(it.trim()) }
-            report.compare(source.to(target.space), target, line) { 1e-9 * max(1.0, abs(it.referenceRange.endInclusive)) }
+        for (case in COLORJS.conversions) {
+            val source = reference(case.from)
+            val target = reference(case.to)
+            report.compare(source.to(target.space), target, "$case") { 1e-9 * max(1.0, abs(it.referenceRange.endInclusive)) }
         }
         assertTrue(report.isEmpty(), report.toString())
     }
@@ -54,27 +55,17 @@ class ReferenceVectorsTest {
         // color.js's Okhsl and Okhsv rest on a fitted cusp and a one-step edge; here they are solved,
         // which is 3.9e-5 and 4.6e-7 apart at worst away from the hues around pure blue.
         val report = StringBuilder()
-        for (line in COLORJS_OKHSX.flatMap { it.lines() }.filter { it.isNotBlank() }) {
-            val (rgb, okhsl, okhsv) = line.split(" > ").map { part -> part.trim().split(" ").map { if (it == "none") null else it.toDouble() } }
+        for (case in COLORJS.okhsx) {
+            val (rgb, okhsl, okhsv) = case
             val color = Srgb(rgb[0], rgb[1], rgb[2])
-            report.compare(color.to(Okhsl), Okhsl(okhsl[0], okhsl[1], okhsl[2]), line) { if (it.isHue) 1e-9 else 5e-5 }
-            report.compare(color.to(Okhsv), Okhsv(okhsv[0], okhsv[1], okhsv[2]), line) { if (it.isHue) 1e-9 else 1e-6 }
+            report.compare(color.to(Okhsl), Okhsl(okhsl[0], okhsl[1], okhsl[2]), "$case") { if (it.isHue) 1e-9 else 5e-5 }
+            report.compare(color.to(Okhsv), Okhsv(okhsv[0], okhsv[1], okhsv[2]), "$case") { if (it.isHue) 1e-9 else 1e-6 }
         }
         assertTrue(report.isEmpty(), report.toString())
     }
 
-    // `space c0 c1 c2`, with `none` for a missing component.
-    private fun reference(text: String): ColorValue {
-        val parts = text.split(" ")
-        val space = ColorSpaces.all.first { it.id == parts[0] }
-        var missing = 0
-        val components = DoubleArray(space.channels.size) { i ->
-            val value = parts[i + 1]
-            if (value == "none") missing = missing or (1 shl i)
-            if (value == "none") 0.0 else value.toDouble()
-        }
-        return space.color(components, missing = missing)
-    }
+    private fun reference(value: ColorJsReference.Components): ColorValue =
+        ColorSpaces.all.first { it.id == value.space }.colorOf(value.components.toTypedArray(), 1.0)
 
     private fun StringBuilder.compare(actual: ColorValue, expected: ColorValue, at: String, tolerance: (ColorChannel) -> Double) {
         for (channel in expected.space.channels) {

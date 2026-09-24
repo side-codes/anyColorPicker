@@ -6,6 +6,9 @@ plugins {
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
+    // Tests only: they decode their reference data from JSON files under src/commonTest/resources.
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kotlinxResources)
 }
 
 group = "codes.side"
@@ -43,6 +46,8 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.resources)
         }
     }
 }
