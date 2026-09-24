@@ -140,6 +140,37 @@ public final class codes/side/color/Exactness : java/lang/Enum {
 public abstract interface annotation class codes/side/color/ExperimentalColorSpaceApi : java/lang/annotation/Annotation {
 }
 
+public abstract class codes/side/color/GamutMapping {
+}
+
+public final class codes/side/color/GamutMapping$ChromaReduction : codes/side/color/GamutMapping {
+	public static final field INSTANCE Lcodes/side/color/GamutMapping$ChromaReduction;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMapping$Clip : codes/side/color/GamutMapping {
+	public static final field INSTANCE Lcodes/side/color/GamutMapping$Clip;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMapping$Css : codes/side/color/GamutMapping {
+	public fun <init> ()V
+	public fun <init> (DD)V
+	public synthetic fun <init> (DDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEpsilon ()D
+	public final fun getJnd ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/color/GamutMappingKt {
+	public static final fun isInGamut (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;D)Z
+	public static synthetic fun isInGamut$default (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;DILjava/lang/Object;)Z
+	public static final fun toGamut (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;)Lcodes/side/color/ColorValue;
+	public static synthetic fun toGamut$default (Lcodes/side/color/ColorValue;Lcodes/side/color/RgbGamut;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Hsl : codes/side/color/HslColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Hsl;
 }

@@ -73,6 +73,29 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
     }
 }
 
+abstract class codes.side.color/GamutMapping { // codes.side.color/GamutMapping|null[0]
+    final class Css : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.Css|null[0]
+        constructor <init>(kotlin/Double = ..., kotlin/Double = ...) // codes.side.color/GamutMapping.Css.<init>|<init>(kotlin.Double;kotlin.Double){}[0]
+
+        final val epsilon // codes.side.color/GamutMapping.Css.epsilon|{}epsilon[0]
+            final fun <get-epsilon>(): kotlin/Double // codes.side.color/GamutMapping.Css.epsilon.<get-epsilon>|<get-epsilon>(){}[0]
+        final val jnd // codes.side.color/GamutMapping.Css.jnd|{}jnd[0]
+            final fun <get-jnd>(): kotlin/Double // codes.side.color/GamutMapping.Css.jnd.<get-jnd>|<get-jnd>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/GamutMapping.Css.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // codes.side.color/GamutMapping.Css.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // codes.side.color/GamutMapping.Css.toString|toString(){}[0]
+    }
+
+    final object ChromaReduction : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.ChromaReduction|null[0]
+        final fun toString(): kotlin/String // codes.side.color/GamutMapping.ChromaReduction.toString|toString(){}[0]
+    }
+
+    final object Clip : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.Clip|null[0]
+        final fun toString(): kotlin/String // codes.side.color/GamutMapping.Clip.toString|toString(){}[0]
+    }
+}
+
 abstract class codes.side.color/TransferFunction { // codes.side.color/TransferFunction|null[0]
     constructor <init>() // codes.side.color/TransferFunction.<init>|<init>(){}[0]
 
@@ -471,3 +494,6 @@ final object codes.side.color/XyzD65 : codes.side.color/ColorSpace { // codes.si
     final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/XyzD65.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
     final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/XyzD65.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
 }
+
+final fun (codes.side.color/ColorValue).codes.side.color/isInGamut(codes.side.color/RgbGamut, kotlin/Double = ...): kotlin/Boolean // codes.side.color/isInGamut|isInGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;kotlin.Double){}[0]
+final fun (codes.side.color/ColorValue).codes.side.color/toGamut(codes.side.color/RgbGamut, codes.side.color/GamutMapping = ...): codes.side.color/ColorValue // codes.side.color/toGamut|toGamut@codes.side.color.ColorValue(codes.side.color.RgbGamut;codes.side.color.GamutMapping){}[0]
