@@ -68,6 +68,13 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The API removal check reads the dumps at the last release tag.
+          fetch-depth: 0
+      # publish.yml runs this on macOS, whose awk, sort and comm are BSD's. Running it here
+      # too means a difference shows on a pull request rather than first on a release tag.
+      - name: Check nothing the last release published was removed
+        run: bash scripts/check-api-removals.sh
       - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
