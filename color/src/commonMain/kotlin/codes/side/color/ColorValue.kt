@@ -82,9 +82,7 @@ public class ColorValue internal constructor(
         for (i in space.channels.indices) buffer[i] = component(i)
         // Only what was missing to begin with carries forward: CSS carries before it handles powerless
         // components (§13.3), and a polar target makes the grey's hue missing on its own.
-        val powerlessHere = space.powerless(buffer) and missing.inv()
-        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere, missing)
-        space.converterTo(target).convert(buffer, buffer)
+        convertInto(target, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
         var outMissing = carriedMissing(target)
         val powerless = target.powerless(out)
@@ -96,6 +94,22 @@ public class ColorValue internal constructor(
         }
         for (j in out.indices) if (outMissing and (1 shl j) != 0) out[j] = 0.0
         return create(target, out, alpha, outMissing or (missing and ALPHA_MISSING))
+    }
+
+    // [buffer], this color's components, converted into [target] after CSS Color 4 §11.2's preparation.
+    private fun convertInto(target: ColorSpace, buffer: DoubleArray) {
+        if (space.powerlessFromBase) {
+            val base = buffer.copyOf()
+            space.toBase(base, base)
+            if (space.powerlessOfBase(base) and missing.inv() == 0) {
+                base.copyInto(buffer)
+                checkNotNull(space.base).converterTo(target).convert(buffer, buffer)
+                return
+            }
+        }
+        val powerlessHere = space.powerless(buffer) and missing.inv()
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere, missing)
+        space.converterTo(target).convert(buffer, buffer)
     }
 
     /**

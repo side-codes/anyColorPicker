@@ -119,6 +119,10 @@ public object Okhsl : ColorSpace(
     /** The hue is powerless where the Oklab chroma is at or below OkLCh's 0.000004. */
     override fun powerless(components: DoubleArray): Int = okPowerless(this, components)
 
+    override val powerlessFromBase: Boolean get() = true
+
+    override fun powerlessOfBase(base: DoubleArray): Int = okPowerlessOfLab(base)
+
     public operator fun invoke(h: Double?, s: Double?, l: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, s, l), alpha)
 
@@ -238,6 +242,10 @@ public object Okhsv : ColorSpace(
     /** The hue is powerless where the Oklab chroma is at or below OkLCh's 0.000004. */
     override fun powerless(components: DoubleArray): Int = okPowerless(this, components)
 
+    override val powerlessFromBase: Boolean get() = true
+
+    override fun powerlessOfBase(base: DoubleArray): Int = okPowerlessOfLab(base)
+
     public operator fun invoke(h: Double?, s: Double?, v: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, s, v), alpha)
 }
@@ -269,5 +277,8 @@ private fun okPowerless(space: ColorSpace, components: DoubleArray): Int {
     val lab = DoubleArray(4)
     components.copyInto(lab, 0, 0, 3)
     space.toBase(lab, lab)
-    return if (hypot(lab[1], lab[2]) <= ColorRules.OKLCH_POWERLESS_CHROMA) 1 else 0
+    return okPowerlessOfLab(lab)
 }
+
+// Where OkLCh's hue would be powerless: Oklab chroma at or below OkLCh's threshold.
+private fun okPowerlessOfLab(lab: DoubleArray): Int = if (hypot(lab[1], lab[2]) <= ColorRules.OKLCH_POWERLESS_CHROMA) 1 else 0

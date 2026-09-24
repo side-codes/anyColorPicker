@@ -10,7 +10,9 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
+import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -185,7 +187,63 @@ class OkhsxTest {
         }
     }
 
+    @Test
+    fun aSpaceWhosePowerlessTestReadsItsBaseConvertsOnce() {
+        val space = CountingSpace()
+        space.color(doubleArrayOf(0.5, 0.1, 30.0)).to(Srgb)
+        assertEquals(1, space.toBaseCalls)
+    }
+
+    @Test
+    fun okhslAndOkhsvGiveWhatTheirConvertersGive() {
+        val random = Random(20260929)
+        for (space in listOf(Okhsl, Okhsv)) {
+            for (target in ColorSpaces.all) {
+                if (target == space) continue
+                repeat(20) {
+                    val components = doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(0.05, 1.0), random.nextDouble(0.05, 0.95))
+                    val converted = DoubleArray(target.channels.size)
+                    space.converterTo(target).convert(components, converted)
+                    assertContentEquals(converted, space.color(components).to(target).components(), "${space.id} → ${target.id}")
+                }
+            }
+        }
+    }
+
     private fun linearSrgb(l: Double, a: Double, b: Double): DoubleArray = Oklab(l, a, b).to(SrgbLinear).components()
+
+    // OkLCh under another id, counting its conversions to Oklab, whose powerless test reads Oklab.
+    @OptIn(ExperimentalColorSpaceApi::class)
+    private class CountingSpace : ColorSpace(
+        "--counting",
+        listOf(
+            ColorChannel("l", 0.0..1.0),
+            ColorChannel("c", 0.0..0.4, analogous = AnalogousCategory.Colorfulness),
+            ColorChannel("h", 0.0..360.0, kind = ChannelKind.Hue(HueFamily("--counting")), analogous = AnalogousCategory.Hue),
+        ),
+        Oklab,
+    ) {
+        var toBaseCalls = 0
+
+        override fun toBase(src: DoubleArray, dst: DoubleArray) {
+            toBaseCalls++
+            OkLch.toBase(src, dst)
+        }
+
+        override fun fromBase(src: DoubleArray, dst: DoubleArray) {
+            OkLch.fromBase(src, dst)
+        }
+
+        override val powerlessFromBase: Boolean get() = true
+
+        override fun powerlessOfBase(base: DoubleArray): Int = if (hypot(base[1], base[2]) <= 1e-6) 1 shl 2 else 0
+
+        override fun powerless(components: DoubleArray): Int {
+            val base = components.copyOf()
+            toBase(base, base)
+            return powerlessOfBase(base)
+        }
+    }
 
     // The end of the last stretch of 0..[limit] that [inside] holds: sampled finely enough to see
     // the split stretch past pure blue, then bisected.

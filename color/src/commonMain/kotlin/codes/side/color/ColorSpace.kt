@@ -81,6 +81,13 @@ public abstract class ColorSpace protected constructor(
         }
     }
 
+    // Whether [powerless] converts to [base] first, as Okhsl's and Okhsv's does. ColorValue.to then
+    // converts once, asking [powerlessOfBase] of the result, and goes on from the base.
+    internal open val powerlessFromBase: Boolean get() = false
+
+    // [powerless], answered from the color's components in [base].
+    internal open fun powerlessOfBase(base: DoubleArray): Int = 0
+
     /**
      * A color in this space. [missing] marks components that are `none`, one bit per channel, and a
      * null [alpha] marks alpha as `none`.
