@@ -4,6 +4,7 @@ import codes.side.color.internal.cuspLightness
 import codes.side.color.internal.maxChroma
 import codes.side.color.internal.maxSaturation
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
@@ -144,13 +145,23 @@ class OkhsxTest {
     }
 
     @Test
-    fun farOutsideSrgbTheConversionStaysInRange() {
-        // Past the saturation formula's pole there is no finite value; chroma comes down to sRGB's
-        // edge first, and construction rejects anything outside 0..1.
+    fun farPastThePoleTheChromaStillStopsAtSrgbsEdge() {
+        // Unreduced, a chroma past the saturation formula's pole reads as a negative saturation,
+        // which the 0..1 range turns into grey rather than the most colorful sRGB color there.
         for (chroma in doubleArrayOf(0.3, 0.5, 1.0, 3.0)) {
-            for (hue in doubleArrayOf(0.0, 100.0, 110.0, 250.0, 264.1)) {
-                OkLch(0.97, chroma, hue).to(Okhsl)
-                OkLch(0.97, chroma, hue).to(Okhsv)
+            for (hue in doubleArrayOf(30.0, 100.0, 110.0, 250.0, 264.1)) {
+                val color = OkLch(0.97, chroma, hue)
+                val at = "chroma $chroma, $hue°"
+                assertNear(1.0, color.to(Okhsl)[Okhsl.S]!!, 1e-9, "okhsl s at $at")
+                for (space in listOf(Okhsl, Okhsv)) {
+                    val reduced = color.to(space)
+                    val back = reduced.to(OkLch)
+                    assertNear(0.97, back[OkLch.L]!!, 1e-9, "${space.id} lightness at $at")
+                    assertNear(hue, back[OkLch.H]!!, 1e-9, "${space.id} hue at $at")
+                    val rgb = reduced.to(Srgb).components()
+                    assertTrue(rgb.all { it in -1e-9..1.0 + 1e-9 }, "${space.id} at $at lands in sRGB: ${rgb.toList()}")
+                    assertTrue(rgb.any { abs(it) <= 1e-9 || abs(it - 1.0) <= 1e-9 }, "${space.id} at $at sits on sRGB's edge: ${rgb.toList()}")
+                }
             }
         }
     }
