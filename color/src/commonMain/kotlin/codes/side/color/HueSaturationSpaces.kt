@@ -141,7 +141,7 @@ public open class HsvColorSpace internal constructor(id: String, over: RgbColorS
         val saturation = src[1] / 100.0
         val value = src[2] / 100.0
         fun f(n: Double): Double {
-            val k = (n + hue / 60.0) % 6.0
+            val k = (n + hue / 60.0).mod(6.0)
             return value - value * saturation * max(0.0, min(k, min(4.0 - k, 1.0)))
         }
         dst[0] = f(5.0)
@@ -186,7 +186,7 @@ private fun hueChannel(over: RgbColorSpace): ColorChannel = ColorChannel(
 // CSS Color 4 hslToRgb, with saturation and lightness as fractions.
 private fun hslToRgb(hue: Double, saturation: Double, lightness: Double, dst: DoubleArray) {
     fun f(n: Double): Double {
-        val k = (n + hue / 30.0) % 12.0
+        val k = (n + hue / 30.0).mod(12.0)
         val a = saturation * min(lightness, 1.0 - lightness)
         return lightness - a * max(-1.0, min(k - 3.0, min(9.0 - k, 1.0)))
     }

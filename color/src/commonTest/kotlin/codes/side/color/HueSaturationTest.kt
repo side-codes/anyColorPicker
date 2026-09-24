@@ -89,6 +89,21 @@ class HueSaturationTest {
     }
 
     @Test
+    fun preparedConvertersTakeHuesOutsideOneTurn() {
+        // A converter gets components unwrapped; −90° is 270°, −360° is 0° and 450° is 90°.
+        for (space in listOf(Hsl, Hwb, Hsv)) {
+            val converter = space.converterTo(Srgb)
+            for ((given, wrapped) in listOf(-90.0 to 270.0, -360.0 to 0.0, 450.0 to 90.0)) {
+                val out = DoubleArray(4)
+                val expected = DoubleArray(4)
+                converter.convert(doubleArrayOf(given, 20.0, 30.0, 0.0), out)
+                converter.convert(doubleArrayOf(wrapped, 20.0, 30.0, 0.0), expected)
+                for (i in 0..2) assertNear(expected[i], out[i], 1e-12, "${space.id} at $given°")
+            }
+        }
+    }
+
+    @Test
     fun hueFamiliesFollowTheRgbSpace() {
         assertEquals(Hsl.H.kind, Hsv.H.kind)
         assertEquals(Hsl.H.kind, Hwb.H.kind)
