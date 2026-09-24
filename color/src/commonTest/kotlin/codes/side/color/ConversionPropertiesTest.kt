@@ -23,11 +23,13 @@ class ConversionPropertiesTest {
     )
 
     @Test
-    fun exactSpacesRoundTripThroughEachOther() {
-        val exact = ColorSpaces.all.filter { it.exactness == Exactness.Exact }
+    fun everySpaceRoundTripsInsideSrgb() {
+        // All fifteen, exact and approximate: Okhsl and Okhsv are fitted against sRGB, but the
+        // round trip only needs toBase and fromBase to be algebraic inverses, which they measure
+        // within 5e-14 here, well inside this test's 1e-9.
         repeat(200) {
             val color = randomSrgb(0.0)
-            for (space in exact) {
+            for (space in ColorSpaces.all) {
                 val back = color.to(space).to(Srgb)
                 assertComponents(color.components(), back, 1e-9)
             }
@@ -56,6 +58,39 @@ class ConversionPropertiesTest {
                 val color = space.color(components)
                 for (target in ColorSpaces.all) color.to(target)
             }
+        }
+    }
+
+    @Test
+    fun analogousCategoriesAreCssColor4s() {
+        val reds = AnalogousCategory.Reds
+        val greens = AnalogousCategory.Greens
+        val blues = AnalogousCategory.Blues
+        val lightness = AnalogousCategory.Lightness
+        val colorfulness = AnalogousCategory.Colorfulness
+        val hue = AnalogousCategory.Hue
+        val opponentA = AnalogousCategory.OpponentA
+        val opponentB = AnalogousCategory.OpponentB
+        val expected = mapOf(
+            "xyz-d65" to listOf(reds, greens, blues),
+            "xyz-d50" to listOf(reds, greens, blues),
+            "srgb-linear" to listOf(reds, greens, blues),
+            "srgb" to listOf(reds, greens, blues),
+            "display-p3" to listOf(reds, greens, blues),
+            "lab" to listOf(lightness, opponentA, opponentB),
+            "lch" to listOf(lightness, colorfulness, hue),
+            "oklab" to listOf(lightness, opponentA, opponentB),
+            "oklch" to listOf(lightness, colorfulness, hue),
+            "hsl" to listOf(hue, colorfulness, lightness),
+            "hwb" to listOf(hue, null, null),
+            "hsv" to listOf(hue, colorfulness, null),
+            "okhsl" to listOf(hue, colorfulness, lightness),
+            "okhsv" to listOf(hue, colorfulness, null),
+            "cmyk" to listOf(null, null, null, null),
+        )
+        assertEquals(expected.keys, ColorSpaces.all.map { it.id }.toSet())
+        for (space in ColorSpaces.all) {
+            assertEquals(expected.getValue(space.id), space.channels.map { it.analogous }, space.id)
         }
     }
 

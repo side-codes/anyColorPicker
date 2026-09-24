@@ -11,6 +11,7 @@ import kotlin.math.hypot
 import kotlin.math.sin
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 // Expected values are color.js 0.7.1 outputs, at hues where its fitted cusp sits within 1e-7 of
@@ -163,6 +164,14 @@ class OkhsxTest {
                     assertTrue(rgb.any { abs(it) <= 1e-9 || abs(it - 1.0) <= 1e-9 }, "${space.id} at $at sits on sRGB's edge: ${rgb.toList()}")
                 }
             }
+        }
+    }
+
+    @Test
+    fun okhsxHueIsPowerlessAtOkLchsThreshold() {
+        for (space in listOf(Okhsl, Okhsv)) {
+            assertTrue(Oklab(0.5, 0.0000039, 0.0).to(space).isMissing(space.channels[0]), space.id)
+            assertFalse(Oklab(0.5, 0.0000041, 0.0).to(space).isMissing(space.channels[0]), space.id)
         }
     }
 
