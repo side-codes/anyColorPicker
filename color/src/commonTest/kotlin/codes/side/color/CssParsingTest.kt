@@ -96,6 +96,15 @@ class CssParsingTest {
     }
 
     @Test
+    fun aPercentageOfAHundredIsItsOwnNumber() {
+        // p × 100 / 100 lands an ulp off for about one percentage in seven.
+        val hsl = ColorValue.parseCss("hsl(0 13.436424411240122% 84.74337369372327%)")
+        assertEquals(13.436424411240122, hsl[Hsl.S])
+        assertEquals(84.74337369372327, hsl[Hsl.L])
+        assertEquals(43.27670679050534, ColorValue.parseCss("lab(43.27670679050534% 0 0)")[Lab.L])
+    }
+
+    @Test
     fun componentsClampToTheirChannelsLimit() {
         assertComponents(doubleArrayOf(0.0, 1.0, 0.0), ColorValue.parseCss("color(--okhsl 0 1.5 -0.5)"), 0.0)
         assertComponents(doubleArrayOf(50.0, 0.0, 20.0), ColorValue.parseCss("lch(50 -10 20)"), 0.0)

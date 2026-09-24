@@ -148,7 +148,9 @@ internal class CssColorParser(private val text: String, knownSpaces: Collection<
                 Kind.Number -> if (rgb) value.number / 255.0 else value.number
                 Kind.Percentage -> {
                     if (channel.isHue) fail(value.token, "A hue takes a number or an angle, not a percentage")
-                    finiteOrLargest(value.number * channel.referenceRange.endInclusive / 100.0)
+                    // Where 100% is 100, p% is p: multiplying and dividing lands an ulp off for many p.
+                    val end = channel.referenceRange.endInclusive
+                    if (end == 100.0) value.number else finiteOrLargest(value.number * end / 100.0)
                 }
                 Kind.Angle -> {
                     if (!channel.isHue) fail(value.token, "Only a hue takes an angle")

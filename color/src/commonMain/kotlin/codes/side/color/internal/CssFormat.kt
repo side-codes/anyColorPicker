@@ -2,6 +2,7 @@ package codes.side.color.internal
 
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
+import codes.side.color.Hwb
 import codes.side.color.Srgb
 import kotlin.math.abs
 import kotlin.math.floor
@@ -21,8 +22,14 @@ internal fun cssString(color: ColorValue, precision: Int, legacy: Boolean): Stri
         val alpha = cssNumber(color.alpha, precision)
         return if (alpha == "1") "$name(${values.joinToString(", ")})" else "${name}a(${values.joinToString(", ")}, $alpha)"
     }
+    // hsl() and hwb() take numbers too, but browsers only from 2024; CSS writes percentages.
+    val percentages = space == Hsl || space == Hwb
     val body = components.indices.joinToString(" ") { i ->
-        if (color.missingMask and (1 shl i) != 0) "none" else cssNumber(components[i], precision)
+        when {
+            color.missingMask and (1 shl i) != 0 -> "none"
+            percentages && i > 0 -> "${cssNumber(components[i], precision)}%"
+            else -> cssNumber(components[i], precision)
+        }
     }
     val alpha = if (color.isAlphaMissing) " / none" else cssNumber(color.alpha, precision).let { if (it == "1") "" else " / $it" }
     val name = cssName(space)

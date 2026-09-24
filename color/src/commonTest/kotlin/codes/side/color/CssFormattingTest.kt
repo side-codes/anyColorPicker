@@ -18,8 +18,8 @@ class CssFormattingTest {
         assertEquals("color(display-p3 1 0.5 0)", DisplayP3(1.0, 0.5, 0.0).toCssString())
         assertEquals("color(xyz-d65 0.1 0.2 0.3)", XyzD65(0.1, 0.2, 0.3).toCssString())
         assertEquals("color(xyz-d50 0.1 0.2 0.3)", XyzD50(0.1, 0.2, 0.3).toCssString())
-        assertEquals("hsl(120 50 25)", Hsl(120.0, 50.0, 25.0).toCssString())
-        assertEquals("hwb(120 10 20)", Hwb(120.0, 10.0, 20.0).toCssString())
+        assertEquals("hsl(120 50% 25%)", Hsl(120.0, 50.0, 25.0).toCssString())
+        assertEquals("hwb(120 10% 20%)", Hwb(120.0, 10.0, 20.0).toCssString())
         assertEquals("lab(53.241 80.093 67.203)", Lab(53.2408, 80.0925, 67.2032).toCssString())
         assertEquals("lch(53.241 104.55 39.999)", Lch(53.2408, 104.5518, 39.9990).toCssString())
         assertEquals("oklab(0.62796 0.22486 0.12585)", Oklab(0.627955, 0.224863, 0.125846).toCssString())
@@ -30,6 +30,14 @@ class CssFormattingTest {
         assertEquals("color(--cmyk 0 0 0 1)", Cmyk(0.0, 0.0, 0.0, 1.0).toCssString())
         val space = ColorSpace.polar("--my-lch", Lab, chromaReference = 150.0, powerlessChroma = 0.0015, hueFamily = HueFamily.CieLab)
         assertEquals("color(--my-lch 50 20 30)", space(50.0, 20.0, 30.0).toCssString())
+    }
+
+    @Test
+    fun hslAndHwbWritePercentagesAsTheDraftAndOlderBrowsersWant() {
+        // Browsers took numbers in hsl() and hwb() only from Chrome 121, Firefox 122 and Safari 18.
+        assertEquals("hsl(120 50% none)", Hsl(120.0, 50.0, null).toCssString())
+        assertEquals("hwb(none 10% 20% / 0.5)", Hwb(null, 10.0, 20.0, alpha = 0.5).toCssString())
+        assertEquals("color(--hsv 120 50 25)", Hsv(120.0, 50.0, 25.0).toCssString())
     }
 
     @Test
