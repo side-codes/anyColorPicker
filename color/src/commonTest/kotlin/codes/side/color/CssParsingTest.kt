@@ -15,13 +15,13 @@ class CssParsingTest {
 
     @Test
     fun wptValidColorsParseAsBrowsersResolveThem() {
-        for ((text, serialized) in WPT_VALID) assertParsesLike(text, serialized)
+        for ((text, serialized) in WPT.valid) assertParsesLike(text, serialized)
     }
 
     @Test
     fun wptColorFunctionParsesInEverySupportedSpace() {
         for (space in listOf("srgb", "srgb-linear", "display-p3", "xyz", "xyz-d50", "xyz-d65")) {
-            for ((text, serialized) in WPT_VALID_COLOR_FUNCTION) {
+            for ((text, serialized) in WPT.validColorFunction) {
                 assertParsesLike(text.replace("{space}", space), serialized.replace("{space}", space))
             }
         }
@@ -30,7 +30,7 @@ class CssParsingTest {
     @Test
     fun wptColorFunctionRefusesTheSpacesNotYetSupported() {
         for (space in listOf("a98-rgb", "rec2020", "prophoto-rgb", "display-p3-linear")) {
-            for ((text, _) in WPT_VALID_COLOR_FUNCTION) {
+            for ((text, _) in WPT.validColorFunction) {
                 val error = assertFailsWith<CssColorParseException>(text) { ColorValue.parseCss(text.replace("{space}", space)) }
                 assertTrue("not supported" in error.message.orEmpty(), error.message)
             }
@@ -39,7 +39,7 @@ class CssParsingTest {
 
     @Test
     fun wptInvalidColorsAreRefused() {
-        for (text in WPT_INVALID) {
+        for (text in WPT.invalid) {
             assertFailsWith<CssColorParseException>("'$text' parsed") { ColorValue.parseCss(text) }
         }
     }
@@ -231,7 +231,7 @@ class CssParsingTest {
             val text = CharArray(random.nextInt(0, 24)) { alphabet[random.nextInt(alphabet.length)] }.concatToString()
             parseOrParseError(text)
         }
-        val valid = WPT_VALID.map { it.first }
+        val valid = WPT.valid.map { it.color }
         repeat(20_000) {
             val chars = valid[random.nextInt(valid.size)].toCharArray().toMutableList()
             repeat(random.nextInt(1, 4)) {

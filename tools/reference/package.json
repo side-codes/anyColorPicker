@@ -1,9 +1,9 @@
 {
   "private": true,
   "type": "module",
-  "description": "Writes the color core's reference test data from web-platform-tests and color.js",
+  "description": "Exports the color module's reference test data from web-platform-tests and color.js as JSON",
   "scripts": {
-    "generate": "node generate.mjs"
+    "export": "node export.mjs"
   },
   "dependencies": {
     "colorjs.io": "0.7.1"
