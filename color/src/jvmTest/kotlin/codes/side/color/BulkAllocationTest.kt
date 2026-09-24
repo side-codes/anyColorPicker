@@ -32,9 +32,11 @@ class BulkAllocationTest {
 
     @Test
     fun gamutMappersAllocateNothingPerColor() {
-        // Mostly far outside both gamuts, so every method runs its reduction.
+        // Mostly far outside both gamuts, so every method runs its reduction. Ten thousand colors,
+        // because the first mapper measured can carry a one-off of up to 2 KB when other tests have
+        // run in the same JVM, which settles to the call's 80 bytes on the calls after it.
         val threads = ManagementFactory.getThreadMXBean() as ThreadMXBean
-        val count = 2_000
+        val count = 10_000
         val report = StringBuilder()
         for (from in listOf(OkLch, Srgb, Okhsl, Cmyk)) {
             for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
