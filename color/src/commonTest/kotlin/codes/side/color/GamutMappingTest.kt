@@ -162,6 +162,34 @@ class GamutMappingTest {
     }
 
     @Test
+    fun aMissingComponentResolvesOnceThroughOkLch() {
+        // CSS maps from the color in OkLCh, where a missing Lab a counts as 0; carried into Oklab, it
+        // would replace the color's own Oklab a with 0 and turn the hue.
+        for (method in methods) {
+            val expected = Lab(50.0, 0.0, -80.0).toGamut(Srgb.gamut, method).components()
+            assertComponents(expected, Lab(50.0, null, -80.0).toGamut(Srgb.gamut, method), 1e-9)
+        }
+        assertEquals(DisplayP3(0.0, 0.5, 0.5).isInGamut(Srgb.gamut), DisplayP3(null, 0.5, 0.5).isInGamut(Srgb.gamut))
+    }
+
+    @Test
+    fun aGreyRoundedPastWhiteStaysFinite() {
+        val grey = OkLch(0.9999999999999998, 0.0, 0.0)
+        assertComponents(doubleArrayOf(1.0, 1.0, 1.0), grey.toGamut(Srgb.gamut, GamutMapping.ChromaReduction), 1e-12)
+        val out = DoubleArray(3)
+        Srgb.gamut.mapper(OkLch, GamutMapping.ChromaReduction).convert(doubleArrayOf(0.9999999999999998, 0.0, 0.0), out)
+        assertTrue(out.all { it.isFinite() }, out.contentToString())
+    }
+
+    @Test
+    fun anEpsilonBelowOneUlpOfChromaStillEnds() {
+        for (jnd in listOf(0.0, 0.02)) {
+            val mapped = OkLch(0.7, 0.35, 30.0).toGamut(Srgb.gamut, GamutMapping.Css(jnd = jnd, epsilon = 1e-20))
+            assertTrue(mapped.isInGamut(Srgb.gamut), "$mapped")
+        }
+    }
+
+    @Test
     fun missingComponentsCountAsZeroAndAMissingAlphaStays() {
         val mapped = OkLch(0.7, 0.4, null, alpha = null).toGamut(Srgb.gamut)
         assertEquals(ColorValue.MISSING_ALPHA, mapped.missingMask)

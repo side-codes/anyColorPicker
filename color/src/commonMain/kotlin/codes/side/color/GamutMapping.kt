@@ -56,6 +56,8 @@ public abstract class GamutMapping internal constructor() {
             var minInGamut = true
             while (max - min > epsilon) {
                 val current = (min + max) / 2.0
+                // Adjacent doubles: an epsilon below one ulp of the chroma would never be reached.
+                if (current <= min || current >= max) break
                 val currentA = current * hueA
                 val currentB = current * hueB
                 toLinear(gamut.lmsToLinear, l, currentA, currentB, out)
@@ -98,6 +100,11 @@ public abstract class GamutMapping internal constructor() {
         override fun reduce(gamut: RgbGamut, l: Double, a: Double, b: Double, out: DoubleArray) {
             if (whiteOrBlack(l, out)) return
             val chroma = hypot(a, b)
+            // A grey outside the cube is only rounding a hair past black or white; it has no hue to keep.
+            if (chroma == 0.0) {
+                clamp(out)
+                return
+            }
             val hueA = a / chroma
             val hueB = b / chroma
             val kept = chromaWithin(gamut.lmsToLinear, l, hueA, hueB, chroma)
@@ -121,28 +128,38 @@ public abstract class GamutMapping internal constructor() {
 /**
  * Whether [gamut] holds this color: every channel of it in [gamut]'s space within [tolerance] of
  * `0..1`. The default, 7.5e-5, is color.js's and ColorAide's; CSS leaves it open. Missing components
- * count as 0.
+ * resolve as [toGamut] resolves them.
  */
 public fun ColorValue.isInGamut(gamut: RgbGamut, tolerance: Double = ColorRules.IN_GAMUT_TOLERANCE): Boolean {
     require(tolerance >= 0.0) { "Tolerance must not be negative, was $tolerance" }
-    return to(gamut.space).components().all { it in -tolerance..1.0 + tolerance }
+    return resolved().to(gamut.space).components().all { it in -tolerance..1.0 + tolerance }
 }
 
 /**
  * This color brought into [gamut] by [method], as a color of the gamut's own RGB space. A color the
- * gamut holds comes back converted and nothing else. Missing components count as 0 first, and the
- * result has none, except a missing alpha.
+ * gamut holds comes back converted and nothing else.
+ *
+ * Missing components resolve as CSS resolves them for gamut mapping, through the color in OkLCh: a
+ * missing lightness carries into OkLCh's and counts as 0, which is black, and any other counts as 0
+ * in the conversion. The result has none, except a missing alpha.
  */
 public fun ColorValue.toGamut(gamut: RgbGamut, method: GamutMapping = GamutMapping.Css()): ColorValue {
+    val color = resolved()
     val space = gamut.space
     val alphaMask = if (isAlphaMissing) ColorValue.MISSING_ALPHA else 0
-    val direct = to(space).components()
+    val direct = color.to(space).components()
     if (direct.all { it in 0.0..1.0 }) return space.color(direct, alpha, alphaMask)
-    val lab = to(Oklab).components()
+    val lab = color.to(Oklab).components()
     val linear = DoubleArray(3)
     method.map(gamut, lab[0], lab[1], lab[2], linear)
     return space.color(DoubleArray(3) { space.transfer.encode(linear[it]) }, alpha, alphaMask)
 }
+
+// Resolved once, in OkLCh, so the gamut check and the mapping see one color: converted separately into
+// RGB and into Oklab, a missing Lab a would count as 0 in one and replace Oklab's a with 0 in the other.
+// A complete color needs no detour.
+private fun ColorValue.resolved(): ColorValue =
+    if (missingMask and ColorValue.MISSING_ALPHA.inv() == 0) this else to(OkLch)
 
 // Linear RGB of the Oklab color (l, a, b) through LMS → linear RGB matrix [t], into out[0..2].
 internal fun toLinear(t: DoubleArray, l: Double, a: Double, b: Double, out: DoubleArray) {
