@@ -1,7 +1,7 @@
-// Exports the color module's reference test data as JSON: web-platform-tests' CSS color parsing lists
-// and the conversions in them, and seeded colors converted by color.js. Both sources are pinned, so a
-// rerun writes the same files. The tests decode them with kotlinx.serialization; nothing here writes
-// Kotlin.
+// Exports the color module's reference test data as JSON: CSS Color 4's named-color table from its
+// own Bikeshed source, web-platform-tests' CSS color parsing lists and the conversions in them, and
+// seeded colors converted by color.js. Every source is pinned, so a rerun writes the same files. The
+// tests decode them with kotlinx.serialization; nothing here writes Kotlin.
 //
 //   cd tools/reference
 //   npm ci
@@ -9,15 +9,35 @@
 import Color from "colorjs.io";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
+// The last commit to CSS Color 4's source on 2026-09-13, the Editor's Draft the library follows.
+const CSS_COMMIT = "11ab50923a2a289647bd869fcea346bc2543a0fb";
+const CSS_PATH = "css-color-4/Overview.bs";
 const WPT_COMMIT = "5a5b2b591b39c59d5bca77819db305474dcfd18a";
 const WPT_PATH = "css/css-color/parsing";
 const WPT = `https://raw.githubusercontent.com/web-platform-tests/wpt/${WPT_COMMIT}/${WPT_PATH}`;
 const OUT = new URL("../../color/src/commonTest/resources/reference/", import.meta.url);
 
-async function wptFile(name) {
-    const response = await fetch(`${WPT}/${name}`);
-    if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`);
+async function fetchText(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
     return response.text();
+}
+
+const wptFile = name => fetchText(`${WPT}/${name}`);
+
+// ---- CSS Color 4 ----
+
+// The named-color table: each row gives a name, its hex and its decimal, and the two must agree.
+async function cssNamedColors() {
+    const source = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
+    const rows = /<th scope=row><dfn>([a-z]+)<\/dfn><td>#([0-9a-f]{6})<td>(\d+) (\d+) (\d+)/g;
+    const colors = [];
+    for (const [, name, hex, ...decimal] of source.matchAll(rows)) {
+        const rgb = decimal.map(Number);
+        if (rgb.map(v => v.toString(16).padStart(2, "0")).join("") !== hex) throw new Error(`${name}: #${hex} is not ${decimal.join(" ")}`);
+        colors.push({ name, rgb });
+    }
+    return colors;
 }
 
 // ---- web-platform-tests: parsing ----
@@ -212,6 +232,17 @@ function writeJson(name, data) {
 
 mkdirSync(OUT, { recursive: true });
 
+const namedColors = await cssNamedColors();
+writeJson("css-color-4.json", {
+    source: {
+        repository: "https://github.com/w3c/csswg-drafts",
+        commit: CSS_COMMIT,
+        path: CSS_PATH,
+        license: "W3C-20150513",
+    },
+    namedColors,
+});
+
 const parsing = await wptParsing();
 const conversions = await wptConversions();
 writeJson("wpt.json", {
@@ -239,5 +270,6 @@ writeJson("colorjs.json", {
     okhsx,
 });
 
+console.log(`CSS Color 4: ${namedColors.length} named colors`);
 console.log(`WPT: ${parsing.valid.length} valid, ${parsing.validColorFunction.length} color() templates, ${parsing.invalid.length} invalid, ${conversions.length} conversions`);
 console.log(`color.js ${colorJsVersion}: ${colorJs.length} conversions, ${okhsx.length} Okhsl/Okhsv colors`);

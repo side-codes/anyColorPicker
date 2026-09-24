@@ -72,10 +72,15 @@ class CssParsingTest {
 
     @Test
     fun namedColorsAreCssColor4s() {
-        assertEquals(148, NAMED_COLORS.size)
+        // CSS Color 4's table exactly: every name it lists with its value, and no name it does not.
+        val css = CSS.namedColors.associate { (name, rgb) -> name to (rgb[0] shl 16 or (rgb[1] shl 8) or rgb[2]) }
+        val differences = (css.keys + NAMED_COLORS.keys).filter { css[it] != NAMED_COLORS[it] }
+        assertTrue(differences.isEmpty(), differences.joinToString("\n") { "$it: ${NAMED_COLORS[it]?.toString(16)} here, ${css[it]?.toString(16)} in CSS" })
+        for ((name, rgb) in CSS.namedColors) {
+            assertEquals(Srgb(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0), ColorValue.parseCss(name), name)
+        }
         assertEquals(Srgb(0x66 / 255.0, 0x33 / 255.0, 0x99 / 255.0), ColorValue.parseCss("RebeccaPurple"))
         assertEquals(Srgb(0.0, 0.0, 0.0, 0.0), ColorValue.parseCss("transparent"))
-        assertEquals(ColorValue.parseCss("#F0F8FF"), ColorValue.parseCss("aliceblue"))
     }
 
     @Test

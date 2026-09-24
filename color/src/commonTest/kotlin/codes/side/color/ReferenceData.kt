@@ -9,6 +9,13 @@ import kotlinx.serialization.json.JsonObject
 // pinned sources that each file's `source` names. Decoding is strict: a field this schema does not
 // know fails the tests rather than being skipped.
 
+/** CSS Color 4's own source: its named-color table, in 8-bit sRGB. */
+@Serializable
+internal data class CssReference(val source: JsonObject, val namedColors: List<NamedColor>) {
+    @Serializable
+    data class NamedColor(val name: String, val rgb: List<Int>)
+}
+
 /** web-platform-tests' css/css-color/parsing: its parsing lists, and the relative colors that only convert. */
 @Serializable
 internal data class WptReference(
@@ -46,6 +53,8 @@ internal data class ColorJsReference(
     @Serializable
     data class Okhsx(val srgb: List<Double>, val okhsl: List<Double?>, val okhsv: List<Double?>)
 }
+
+internal val CSS: CssReference by lazy { reference("css-color-4.json") }
 
 internal val WPT: WptReference by lazy { reference("wpt.json") }
 
