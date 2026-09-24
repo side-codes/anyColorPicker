@@ -56,6 +56,12 @@ class HueSaturationTest {
     }
 
     @Test
+    fun hwbTakesHslsHueForANegativeSaturation() {
+        // The same color as the HSL case: HWB reads its hue through HSL, half turn included.
+        assertComponents(doubleArrayOf(160.0, -50.0, 120.0), Srgb(-0.2, -0.5, -0.4).to(Hwb), 1e-12)
+    }
+
+    @Test
     fun greysHaveNoHue() {
         for (space in listOf(Hsl, Hwb, Hsv)) {
             val grey = Srgb(0.4, 0.4, 0.4).to(space)

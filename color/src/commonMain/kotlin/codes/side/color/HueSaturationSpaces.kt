@@ -32,12 +32,8 @@ public open class HslColorSpace internal constructor(id: String, over: RgbColorS
         val blue = src[2]
         val highest = max(red, max(green, blue))
         val lowest = min(red, min(green, blue))
-        val lightness = (highest + lowest) / 2.0
-        var saturation = 0.0
         var hue = hexconeHue(red, green, blue, highest, lowest)
-        if (highest != lowest && lightness != 0.0 && lightness != 1.0) {
-            saturation = (highest - lightness) / min(lightness, 1.0 - lightness)
-        }
+        var saturation = hslSaturation(highest, lowest)
         // Far out of gamut the formula goes negative; CSS rotates the hue instead (issue 9222).
         if (saturation < 0.0) {
             hue += 180.0
@@ -46,7 +42,7 @@ public open class HslColorSpace internal constructor(id: String, over: RgbColorS
         if (hue >= 360.0) hue -= 360.0
         dst[0] = hue
         dst[1] = saturation * 100.0
-        dst[2] = lightness * 100.0
+        dst[2] = (highest + lowest) / 2.0 * 100.0
     }
 
     /** The hue is powerless at S ≤ 0.001. */
@@ -97,14 +93,9 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
         val blue = src[2]
         val highest = max(red, max(green, blue))
         val lowest = min(red, min(green, blue))
-        val lightness = (highest + lowest) / 2.0
         var hue = hexconeHue(red, green, blue, highest, lowest)
-        val saturation = if (highest != lowest && lightness != 0.0 && lightness != 1.0) {
-            (highest - lightness) / min(lightness, 1.0 - lightness)
-        } else {
-            0.0
-        }
-        if (saturation < 0.0) hue += 180.0
+        // HSL's half turn, so HSL and HWB read one hue off the same color.
+        if (hslSaturation(highest, lowest) < 0.0) hue += 180.0
         if (hue >= 360.0) hue -= 360.0
         dst[0] = hue
         dst[1] = lowest * 100.0
@@ -202,6 +193,14 @@ private fun hslToRgb(hue: Double, saturation: Double, lightness: Double, dst: Do
     dst[0] = f(0.0)
     dst[1] = f(8.0)
     dst[2] = f(4.0)
+}
+
+// CSS rgbToHsl's saturation as a fraction: 0 for a grey and at lightness 0 or 1, and negative far out
+// of gamut, where HSL turns the hue half a turn instead.
+private fun hslSaturation(highest: Double, lowest: Double): Double {
+    val lightness = (highest + lowest) / 2.0
+    if (highest == lowest || lightness == 0.0 || lightness == 1.0) return 0.0
+    return (highest - lightness) / min(lightness, 1.0 - lightness)
 }
 
 // The hexcone hue CSS's rgbToHsl computes; 0 where there is none, which the powerless rule catches.
