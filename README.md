@@ -204,8 +204,8 @@ LAB, Oklab and OkLCh can describe colors sRGB cannot show. Converting one to RGB
 clamp each channel independently, which would shift lightness and hue as a side effect. It
 runs the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping): binary
 search down the chroma axis, comparing each candidate against its clipped form, and stop
-once the two are within a just-noticeable difference. Lightness and hue survive, chroma
-pays, and the result matches what a browser would render.
+once the two are within a just-noticeable difference. Lightness and hue survive and chroma
+pays.
 
 The search runs in Oklab whatever space the color came from, as CSS specifies, so what
 survives is Oklab's lightness and hue, not CIELAB's. L* lands within about 3 where clipping
