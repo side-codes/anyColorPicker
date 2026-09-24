@@ -1,6 +1,6 @@
-// Exports the color module's reference test data as JSON: CSS Color 4's named-color table from its
-// own Bikeshed source, web-platform-tests' CSS color parsing lists and the conversions in them, and
-// seeded colors converted by color.js. Every source is pinned, so a rerun writes the same files. The
+// Exports the color module's reference test data as JSON: CSS Color 4's named-color table and its
+// worked examples of equivalent colors from its own Bikeshed source, web-platform-tests' CSS color
+// parsing lists and the conversions in them, and seeded colors converted by color.js. Every source is pinned, so a rerun writes the same files. The
 // tests decode them with kotlinx.serialization; nothing here writes Kotlin.
 //
 //   cd tools/reference
@@ -28,8 +28,7 @@ const wptFile = name => fetchText(`${WPT}/${name}`);
 // ---- CSS Color 4 ----
 
 // The named-color table: each row gives a name, its hex and its decimal, and the two must agree.
-async function cssNamedColors() {
-    const source = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
+function cssNamedColors(source) {
     const rows = /<th scope=row><dfn>([a-z]+)<\/dfn><td>#([0-9a-f]{6})<td>(\d+) (\d+) (\d+)/g;
     const colors = [];
     for (const [, name, hex, ...decimal] of source.matchAll(rows)) {
@@ -38,6 +37,24 @@ async function cssNamedColors() {
         colors.push({ name, rgb });
     }
     return colors;
+}
+
+// §12, Comparing <color> Values: each worked example compares the first two colors it quotes, and
+// says "are <em>not</em>" when they are not equivalent; its notes add positive pairs of their own.
+function cssEquivalentColors(source) {
+    const start = source.indexOf('<h2 id="comparing-color-values">');
+    const section = source.slice(start, source.indexOf("<h2", start + 1));
+    const pairs = [];
+    for (const [, example, body] of section.matchAll(/<div class="example" id="(ex-equivalent-[\w-]+)">([\s\S]*?)<\/div>/g)) {
+        const colors = [...body.matchAll(/''([^']+)''/g)].map(m => m[1]);
+        if (colors.length < 2) throw new Error(`${example} quotes fewer than two colors`);
+        const equivalent = !/are\s+<em>not<\/em>\s+\[=equivalent colors=\]/.test(body);
+        pairs.push({ example, first: colors[0], second: colors[1], equivalent });
+    }
+    for (const [, first, second] of section.matchAll(/''([^']+)''\s+and\s+''([^']+)''—are \[=equivalent colors=\]/g)) {
+        pairs.push({ example: "note", first, second, equivalent: true });
+    }
+    return pairs;
 }
 
 // ---- web-platform-tests: parsing ----
@@ -232,7 +249,9 @@ function writeJson(name, data) {
 
 mkdirSync(OUT, { recursive: true });
 
-const namedColors = await cssNamedColors();
+const cssSource = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
+const namedColors = cssNamedColors(cssSource);
+const equivalentColors = cssEquivalentColors(cssSource);
 writeJson("css-color-4.json", {
     source: {
         repository: "https://github.com/w3c/csswg-drafts",
@@ -241,6 +260,7 @@ writeJson("css-color-4.json", {
         license: "W3C-20150513",
     },
     namedColors,
+    equivalentColors,
 });
 
 const parsing = await wptParsing();
@@ -270,6 +290,6 @@ writeJson("colorjs.json", {
     okhsx,
 });
 
-console.log(`CSS Color 4: ${namedColors.length} named colors`);
+console.log(`CSS Color 4: ${namedColors.length} named colors, ${equivalentColors.length} equivalent-color examples`);
 console.log(`WPT: ${parsing.valid.length} valid, ${parsing.validColorFunction.length} color() templates, ${parsing.invalid.length} invalid, ${conversions.length} conversions`);
 console.log(`color.js ${colorJsVersion}: ${colorJs.length} conversions, ${okhsx.length} Okhsl/Okhsv colors`);
