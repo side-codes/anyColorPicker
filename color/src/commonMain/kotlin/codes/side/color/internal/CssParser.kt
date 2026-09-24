@@ -258,7 +258,7 @@ private fun dashedSpaces(spaces: Collection<ColorSpace>): Map<String, ColorSpace
         val name = cssName(space)
         if (!name.startsWith("--")) continue
         val existing = byName.put(name, space)
-        require(existing == null || existing === space) { "Two different known spaces are both written $name" }
+        require(existing == null || existing === space) { "Two different instances among the known spaces are both written $name" }
     }
     return byName
 }

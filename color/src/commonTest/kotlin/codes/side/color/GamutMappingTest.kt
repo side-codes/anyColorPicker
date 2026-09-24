@@ -199,6 +199,12 @@ class GamutMappingTest {
     }
 
     @Test
+    fun equalCssMappingsHashAlike() {
+        assertEquals(GamutMapping.Css(jnd = 0.0), GamutMapping.Css(jnd = -0.0))
+        assertEquals(GamutMapping.Css(jnd = 0.0).hashCode(), GamutMapping.Css(jnd = -0.0).hashCode())
+    }
+
+    @Test
     fun cssParametersAreChecked() {
         assertEquals(GamutMapping.Css(), GamutMapping.Css(jnd = 0.02, epsilon = 1e-4))
         assertFailsWith<IllegalArgumentException> { GamutMapping.Css(jnd = -1.0) }

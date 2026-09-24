@@ -30,7 +30,7 @@ public class CssColorParseException internal constructor(
  * rec2020, a98-rgb, prophoto-rgb and display-p3-linear are not supported.
  *
  * @throws CssColorParseException if [text] is not a color this reads.
- * @throws IllegalArgumentException if two different [knownSpaces] would be written with one name.
+ * @throws IllegalArgumentException if two different instances among [knownSpaces] are written with one name.
  */
 public fun ColorValue.Companion.parseCss(text: String, knownSpaces: Collection<ColorSpace> = ColorSpaces.all): ColorValue =
     CssColorParser(text, knownSpaces).parse()

@@ -149,6 +149,9 @@ public abstract class ColorSpace protected constructor(
          * The cylindrical form of [of], a space whose channels are lightness and two opponent
          * axes, as LCH is of Lab. Its hue is powerless at chroma ≤ [powerlessChroma], and 100%
          * chroma is [chromaReference].
+         *
+         * @throws IllegalArgumentException if [chromaReference] is not finite and positive, or
+         * [powerlessChroma] not finite and at least 0.
          */
         public fun polar(
             id: String,
@@ -156,7 +159,11 @@ public abstract class ColorSpace protected constructor(
             chromaReference: Double,
             powerlessChroma: Double,
             hueFamily: HueFamily,
-        ): PolarColorSpace = PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
+        ): PolarColorSpace {
+            require(chromaReference > 0.0 && chromaReference.isFinite()) { "The chroma reference must be finite and positive, was $chromaReference" }
+            require(powerlessChroma >= 0.0 && powerlessChroma.isFinite()) { "The powerless chroma must be finite and not negative, was $powerlessChroma" }
+            return PolarColorSpace(appId(id), of, chromaReference, powerlessChroma, hueFamily)
+        }
 
         private fun appId(id: String): String {
             require(isDashedName(id)) { "An app's color space id is -- and then letters, digits, - and _, and $id is not" }

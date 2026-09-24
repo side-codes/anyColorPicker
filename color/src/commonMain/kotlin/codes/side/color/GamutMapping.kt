@@ -31,9 +31,12 @@ public abstract class GamutMapping internal constructor() {
      * [jnd] of accuracy traded for staying vivid.
      */
     public class Css(
-        public val jnd: Double = ColorRules.GAMUT_MAPPING_JND,
-        public val epsilon: Double = ColorRules.GAMUT_MAPPING_EPSILON,
+        jnd: Double = ColorRules.GAMUT_MAPPING_JND,
+        epsilon: Double = ColorRules.GAMUT_MAPPING_EPSILON,
     ) : GamutMapping() {
+        // −0.0 is stored as 0.0, which it equals, so equal mappings hash alike.
+        public val jnd: Double = jnd + 0.0
+        public val epsilon: Double = epsilon
 
         init {
             require(jnd >= 0.0 && jnd.isFinite()) { "The JND must be finite and not negative, was $jnd" }
