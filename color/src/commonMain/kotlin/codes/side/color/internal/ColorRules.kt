@@ -3,7 +3,10 @@ package codes.side.color.internal
 /**
  * Every threshold the library takes from CSS Color 4, in one place, as the Editor's Draft of [DRAFT]
  * has them. The draft is still moving; when it changes one of these, the value and the date move
- * together, and the WPT boundary tests say which.
+ * together, and the WPT boundary tests say which. Public KDoc quotes several of them, and moves with
+ * them: LCH's and OkLCh's hue thresholds in LabSpaces.kt and OklabSpaces.kt, HSL's, HWB's and HSV's
+ * in HueSaturationSpaces.kt, Okhsl's and Okhsv's in OkhsxSpaces.kt, the epsilon in
+ * [codes.side.color.ColorValue.isEquivalentTo], and isInGamut's tolerance in GamutMapping.kt.
  */
 internal object ColorRules {
     const val DRAFT: String = "2026-09-13"

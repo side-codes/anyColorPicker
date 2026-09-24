@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 
 /**
  * How a color outside an [RgbGamut] is brought inside. [Css] and [ChromaReduction] reduce chroma at
- * constant OkLCh lightness and hue, as CSS Color 4 §13.2 has it, and give white at lightness 1 or
+ * constant OkLCh lightness and hue, as CSS Color 4 §14.2 has it, and give white at lightness 1 or
  * more and black at 0 or less; [Clip] clamps each channel.
  */
 public abstract class GamutMapping internal constructor() {

@@ -24,8 +24,9 @@ public enum class Exactness {
  * nearest space both ends share before descending. [toBase] and [fromBase] take components in
  * arrays of at least four elements, which may be the same array.
  *
- * Two spaces are equal when their ids are. The library's spaces are singletons; an app builds its
- * own with the factories on [Companion].
+ * Two spaces are equal when their ids are: the id is a space's identity, so a space defined by
+ * parameters, such as viewing conditions, puts them in its id. The library's spaces are singletons;
+ * an app builds its own with the factories on [Companion].
  */
 @SubclassOptInRequired(ExperimentalColorSpaceApi::class)
 public abstract class ColorSpace protected constructor(
@@ -68,7 +69,9 @@ public abstract class ColorSpace protected constructor(
      * The components that are powerless for these values, as a bit mask over [channels]: a hue
      * whose colorfulness is at or below the space's threshold. A conversion into this space makes
      * them missing; a value constructed with them keeps them, and a conversion out of this space
-     * treats them as missing and the color as the grey it is taken for.
+     * treats them as missing and the color as the grey it is taken for. That conversion zeroes these
+     * components and every channel tagged [AnalogousCategory.Colorfulness], so a space tags its
+     * colorfulness channel for its grey to be the one it is taken for.
      */
     public open fun powerless(components: DoubleArray): Int = 0
 
