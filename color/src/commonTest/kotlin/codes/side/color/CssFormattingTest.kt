@@ -113,8 +113,9 @@ class CssFormattingTest {
             val range = channel.referenceRange
             range.start + random.nextDouble() * (range.endInclusive - range.start) * (if (clamped) 1.0 else 1.5)
         }
-        if (random.nextInt(5) == 0) missing = missing or ColorValue.MISSING_ALPHA
-        return space.color(components, random.nextDouble(), missing)
+        val alphaMissing = random.nextInt(5) == 0
+        val alpha = random.nextDouble()
+        return space.color(components, if (alphaMissing) null else alpha, missing)
     }
 
     private fun assertRoundTrip(color: ColorValue, text: String, known: List<ColorSpace>, relative: Double) {

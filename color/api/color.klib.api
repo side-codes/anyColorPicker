@@ -69,7 +69,7 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
 
     abstract fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
     abstract fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
-    final fun color(kotlin/DoubleArray, kotlin/Double = ..., kotlin/Int = ...): codes.side.color/ColorValue // codes.side.color/ColorSpace.color|color(kotlin.DoubleArray;kotlin.Double;kotlin.Int){}[0]
+    final fun color(kotlin/DoubleArray, kotlin/Double? = ..., kotlin/Int = ...): codes.side.color/ColorValue // codes.side.color/ColorSpace.color|color(kotlin.DoubleArray;kotlin.Double?;kotlin.Int){}[0]
     final fun converterTo(codes.side.color/ColorSpace): codes.side.color/ColorConverter // codes.side.color/ColorSpace.converterTo|converterTo(codes.side.color.ColorSpace){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ColorSpace.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // codes.side.color/ColorSpace.hashCode|hashCode(){}[0]
@@ -184,10 +184,7 @@ final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
     final fun with(codes.side.color/ColorChannel, kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.with|with(codes.side.color.ColorChannel;kotlin.Double?){}[0]
     final fun withAlpha(kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.withAlpha|withAlpha(kotlin.Double?){}[0]
 
-    final object Companion { // codes.side.color/ColorValue.Companion|null[0]
-        final const val MISSING_ALPHA // codes.side.color/ColorValue.Companion.MISSING_ALPHA|{}MISSING_ALPHA[0]
-            final fun <get-MISSING_ALPHA>(): kotlin/Int // codes.side.color/ColorValue.Companion.MISSING_ALPHA.<get-MISSING_ALPHA>|<get-MISSING_ALPHA>(){}[0]
-    }
+    final object Companion // codes.side.color/ColorValue.Companion|null[0]
 }
 
 final class codes.side.color/CssColorParseException : kotlin/IllegalArgumentException { // codes.side.color/CssColorParseException|null[0]

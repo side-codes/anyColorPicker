@@ -26,11 +26,11 @@ public class ColorValue internal constructor(
     /** Opacity in `0..1`; `0.0` when missing. */
     public val alpha: Double,
 ) {
-    /** One bit per channel set when that component is `none`, plus [MISSING_ALPHA]. */
-    public val missingMask: Int get() = missing
+    /** One bit per channel, set when that component is `none`. Alpha's is [isAlphaMissing]. */
+    public val missingMask: Int get() = missing and ALPHA_MISSING.inv()
 
     /** True when alpha is `none`. */
-    public val isAlphaMissing: Boolean get() = missing and MISSING_ALPHA != 0
+    public val isAlphaMissing: Boolean get() = missing and ALPHA_MISSING != 0
 
     /** [channel]'s value, or null when it is `none`. */
     public operator fun get(channel: ColorChannel): Double? {
@@ -56,7 +56,7 @@ public class ColorValue internal constructor(
 
     /** A copy with alpha set to [value], or to `none` when [value] is null. */
     public fun withAlpha(value: Double?): ColorValue {
-        val newMissing = if (value == null) missing or MISSING_ALPHA else missing and MISSING_ALPHA.inv()
+        val newMissing = if (value == null) missing or ALPHA_MISSING else missing and ALPHA_MISSING.inv()
         return create(space, components(), value ?: 0.0, newMissing)
     }
 
@@ -93,7 +93,7 @@ public class ColorValue internal constructor(
             }
         }
         for (j in out.indices) if (outMissing and (1 shl j) != 0) out[j] = 0.0
-        return create(target, out, alpha, outMissing or (missing and MISSING_ALPHA))
+        return create(target, out, alpha, outMissing or (missing and ALPHA_MISSING))
     }
 
     /**
@@ -179,8 +179,8 @@ public class ColorValue internal constructor(
     }
 
     public companion object {
-        /** The bit in [missingMask] marking alpha as `none`. */
-        public const val MISSING_ALPHA: Int = 1 shl 4
+        // Where the stored mask keeps a missing alpha: past any channel's bit, and never in [missingMask].
+        internal const val ALPHA_MISSING: Int = 1 shl 31
 
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,
@@ -188,7 +188,7 @@ public class ColorValue internal constructor(
         internal fun create(space: ColorSpace, components: DoubleArray, alpha: Double, missing: Int): ColorValue {
             val count = space.channels.size
             require(components.size == count) { "${space.id} takes $count components, got ${components.size}" }
-            require(missing and ((1 shl count) - 1 or MISSING_ALPHA).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
+            require(missing and ((1 shl count) - 1 or ALPHA_MISSING).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
             val values = DoubleArray(MAX_COMPONENTS)
             for (i in 0 until count) {
                 if (missing and (1 shl i) != 0) continue
@@ -200,7 +200,7 @@ public class ColorValue internal constructor(
                 if (channel.isHue) value = wrapHue(value)
                 values[i] = value + 0.0
             }
-            val storedAlpha = if (missing and MISSING_ALPHA != 0) {
+            val storedAlpha = if (missing and ALPHA_MISSING != 0) {
                 0.0
             } else {
                 require(alpha.isFinite() && alpha in 0.0..1.0) { "Alpha must be in 0..1, was $alpha" }

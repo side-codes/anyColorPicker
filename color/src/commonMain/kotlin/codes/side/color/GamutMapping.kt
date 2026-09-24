@@ -146,20 +146,19 @@ public fun ColorValue.isInGamut(gamut: RgbGamut, tolerance: Double = ColorRules.
 public fun ColorValue.toGamut(gamut: RgbGamut, method: GamutMapping = GamutMapping.Css()): ColorValue {
     val color = resolved()
     val space = gamut.space
-    val alphaMask = if (isAlphaMissing) ColorValue.MISSING_ALPHA else 0
+    val keptAlpha = if (isAlphaMissing) null else alpha
     val direct = color.to(space).components()
-    if (direct.all { it in 0.0..1.0 }) return space.color(direct, alpha, alphaMask)
+    if (direct.all { it in 0.0..1.0 }) return space.color(direct, keptAlpha)
     val lab = color.to(Oklab).components()
     val linear = DoubleArray(3)
     method.map(gamut, lab[0], lab[1], lab[2], linear)
-    return space.color(DoubleArray(3) { space.transfer.encode(linear[it]) }, alpha, alphaMask)
+    return space.color(DoubleArray(3) { space.transfer.encode(linear[it]) }, keptAlpha)
 }
 
 // Resolved once, in OkLCh, so the gamut check and the mapping see one color: converted separately into
 // RGB and into Oklab, a missing Lab a would count as 0 in one and replace Oklab's a with 0 in the other.
 // A complete color needs no detour.
-private fun ColorValue.resolved(): ColorValue =
-    if (missingMask and ColorValue.MISSING_ALPHA.inv() == 0) this else to(OkLch)
+private fun ColorValue.resolved(): ColorValue = if (missingMask == 0) this else to(OkLch)
 
 // Linear RGB of the Oklab color (l, a, b) through LMS → linear RGB matrix [t], into out[0..2].
 internal fun toLinear(t: DoubleArray, l: Double, a: Double, b: Double, out: DoubleArray) {

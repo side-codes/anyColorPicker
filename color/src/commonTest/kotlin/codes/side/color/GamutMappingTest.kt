@@ -192,7 +192,8 @@ class GamutMappingTest {
     @Test
     fun missingComponentsCountAsZeroAndAMissingAlphaStays() {
         val mapped = OkLch(0.7, 0.4, null, alpha = null).toGamut(Srgb.gamut)
-        assertEquals(ColorValue.MISSING_ALPHA, mapped.missingMask)
+        assertEquals(0, mapped.missingMask)
+        assertTrue(mapped.isAlphaMissing)
         assertComponents(OkLch(0.7, 0.4, 0.0).toGamut(Srgb.gamut).components(), mapped, 0.0)
         assertEquals(0.5, OkLch(0.7, 0.4, 30.0, alpha = 0.5).toGamut(Srgb.gamut).alpha)
     }

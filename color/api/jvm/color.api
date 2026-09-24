@@ -72,8 +72,8 @@ public final class codes/side/color/ColorConverter {
 public abstract class codes/side/color/ColorSpace {
 	public static final field Companion Lcodes/side/color/ColorSpace$Companion;
 	protected fun <init> (Ljava/lang/String;Ljava/util/List;Lcodes/side/color/ColorSpace;)V
-	public final fun color ([DDI)Lcodes/side/color/ColorValue;
-	public static synthetic fun color$default (Lcodes/side/color/ColorSpace;[DDIILjava/lang/Object;)Lcodes/side/color/ColorValue;
+	public final fun color ([DLjava/lang/Double;I)Lcodes/side/color/ColorValue;
+	public static synthetic fun color$default (Lcodes/side/color/ColorSpace;[DLjava/lang/Double;IILjava/lang/Object;)Lcodes/side/color/ColorValue;
 	public final fun converterTo (Lcodes/side/color/ColorSpace;)Lcodes/side/color/ColorConverter;
 	public final fun equals (Ljava/lang/Object;)Z
 	public abstract fun fromBase ([D[D)V
@@ -104,7 +104,6 @@ public final class codes/side/color/ColorSpaces {
 
 public final class codes/side/color/ColorValue {
 	public static final field Companion Lcodes/side/color/ColorValue$Companion;
-	public static final field MISSING_ALPHA I
 	public final fun components ()[D
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun get (Lcodes/side/color/ColorChannel;)Ljava/lang/Double;

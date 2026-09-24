@@ -82,14 +82,16 @@ public abstract class ColorSpace protected constructor(
     }
 
     /**
-     * A color in this space. [missing] marks components that are `none`, one bit per channel,
-     * plus [ColorValue.MISSING_ALPHA] for alpha.
+     * A color in this space. [missing] marks components that are `none`, one bit per channel, and a
+     * null [alpha] marks alpha as `none`.
      *
      * @throws IllegalArgumentException if a component is not finite or lies outside its channel's
-     * [ColorChannel.limit], or alpha is outside `0..1`.
+     * [ColorChannel.limit], alpha is outside `0..1`, or [missing] names no channel of this space.
      */
-    public fun color(components: DoubleArray, alpha: Double = 1.0, missing: Int = 0): ColorValue =
-        ColorValue.create(this, components, alpha, missing)
+    public fun color(components: DoubleArray, alpha: Double? = 1.0, missing: Int = 0): ColorValue {
+        require(missing and ((1 shl channels.size) - 1).inv() == 0) { "Missing mask $missing names no channel of $id" }
+        return ColorValue.create(this, components, alpha ?: 0.0, if (alpha == null) missing or ColorValue.ALPHA_MISSING else missing)
+    }
 
     private val converters = ConverterCache(this)
 
@@ -101,7 +103,7 @@ public abstract class ColorSpace protected constructor(
     internal open fun stepsFromBase(): List<Step> = listOf(Step { v -> fromBase(v, v) })
 
     internal fun colorOf(components: Array<Double?>, alpha: Double?): ColorValue {
-        var missing = if (alpha == null) ColorValue.MISSING_ALPHA else 0
+        var missing = if (alpha == null) ColorValue.ALPHA_MISSING else 0
         val values = DoubleArray(components.size) { i ->
             val value = components[i]
             if (value == null) missing = missing or (1 shl i)

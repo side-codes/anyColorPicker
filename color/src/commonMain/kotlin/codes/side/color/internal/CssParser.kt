@@ -162,10 +162,10 @@ internal class CssColorParser(private val text: String, knownSpaces: Collection<
             channel.limit?.let { number = number.coerceIn(it) }
             components[i] = number
         }
-        var alphaValue = 1.0
+        var alphaValue: Double? = 1.0
         when (alpha?.kind) {
             null -> {}
-            Kind.None -> missing = missing or ColorValue.MISSING_ALPHA
+            Kind.None -> alphaValue = null
             Kind.Number -> alphaValue = alpha.number.coerceIn(0.0, 1.0)
             Kind.Percentage -> alphaValue = (alpha.number / 100.0).coerceIn(0.0, 1.0)
             Kind.Angle -> fail(alpha.token, "Alpha takes a number or a percentage, not an angle")
