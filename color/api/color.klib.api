@@ -6,3 +6,215 @@
 // - Show declarations: true
 
 // Library unique name: <codes.side:color>
+open annotation class codes.side.color/ExperimentalColorSpaceApi : kotlin/Annotation { // codes.side.color/ExperimentalColorSpaceApi|null[0]
+    constructor <init>() // codes.side.color/ExperimentalColorSpaceApi.<init>|<init>(){}[0]
+}
+
+final enum class codes.side.color/AnalogousCategory : kotlin/Enum<codes.side.color/AnalogousCategory> { // codes.side.color/AnalogousCategory|null[0]
+    enum entry Blues // codes.side.color/AnalogousCategory.Blues|null[0]
+    enum entry Colorfulness // codes.side.color/AnalogousCategory.Colorfulness|null[0]
+    enum entry Greens // codes.side.color/AnalogousCategory.Greens|null[0]
+    enum entry Hue // codes.side.color/AnalogousCategory.Hue|null[0]
+    enum entry Lightness // codes.side.color/AnalogousCategory.Lightness|null[0]
+    enum entry OpponentA // codes.side.color/AnalogousCategory.OpponentA|null[0]
+    enum entry OpponentB // codes.side.color/AnalogousCategory.OpponentB|null[0]
+    enum entry Reds // codes.side.color/AnalogousCategory.Reds|null[0]
+
+    final val entries // codes.side.color/AnalogousCategory.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/AnalogousCategory> // codes.side.color/AnalogousCategory.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/AnalogousCategory> // codes.side.color/AnalogousCategory.values|values#static(){}[0]
+}
+
+final enum class codes.side.color/Exactness : kotlin/Enum<codes.side.color/Exactness> { // codes.side.color/Exactness|null[0]
+    enum entry Approximate // codes.side.color/Exactness.Approximate|null[0]
+    enum entry Exact // codes.side.color/Exactness.Exact|null[0]
+    enum entry NonColorimetric // codes.side.color/Exactness.NonColorimetric|null[0]
+
+    final val entries // codes.side.color/Exactness.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/Exactness> // codes.side.color/Exactness.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/Exactness // codes.side.color/Exactness.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/Exactness> // codes.side.color/Exactness.values|values#static(){}[0]
+}
+
+abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null[0]
+    constructor <init>(kotlin/String, kotlin.collections/List<codes.side.color/ColorChannel>, codes.side.color/ColorSpace?) // codes.side.color/ColorSpace.<init>|<init>(kotlin.String;kotlin.collections.List<codes.side.color.ColorChannel>;codes.side.color.ColorSpace?){}[0]
+
+    final val base // codes.side.color/ColorSpace.base|{}base[0]
+        final fun <get-base>(): codes.side.color/ColorSpace? // codes.side.color/ColorSpace.base.<get-base>|<get-base>(){}[0]
+    final val channels // codes.side.color/ColorSpace.channels|{}channels[0]
+        final fun <get-channels>(): kotlin.collections/List<codes.side.color/ColorChannel> // codes.side.color/ColorSpace.channels.<get-channels>|<get-channels>(){}[0]
+    final val id // codes.side.color/ColorSpace.id|{}id[0]
+        final fun <get-id>(): kotlin/String // codes.side.color/ColorSpace.id.<get-id>|<get-id>(){}[0]
+    open val exactness // codes.side.color/ColorSpace.exactness|{}exactness[0]
+        open fun <get-exactness>(): codes.side.color/Exactness // codes.side.color/ColorSpace.exactness.<get-exactness>|<get-exactness>(){}[0]
+    open val whitePoint // codes.side.color/ColorSpace.whitePoint|{}whitePoint[0]
+        open fun <get-whitePoint>(): codes.side.color/WhitePoint // codes.side.color/ColorSpace.whitePoint.<get-whitePoint>|<get-whitePoint>(){}[0]
+
+    abstract fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    abstract fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorSpace.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun color(kotlin/DoubleArray, kotlin/Double = ..., kotlin/Int = ...): codes.side.color/ColorValue // codes.side.color/ColorSpace.color|color(kotlin.DoubleArray;kotlin.Double;kotlin.Int){}[0]
+    final fun converterTo(codes.side.color/ColorSpace): codes.side.color/ColorConverter // codes.side.color/ColorSpace.converterTo|converterTo(codes.side.color.ColorSpace){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ColorSpace.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/ColorSpace.hashCode|hashCode(){}[0]
+    open fun powerless(kotlin/DoubleArray): kotlin/Int // codes.side.color/ColorSpace.powerless|powerless(kotlin.DoubleArray){}[0]
+    open fun toString(): kotlin/String // codes.side.color/ColorSpace.toString|toString(){}[0]
+}
+
+final class codes.side.color/ColorChannel { // codes.side.color/ColorChannel|null[0]
+    constructor <init>(kotlin/String, kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>, codes.side.color/ChannelKind = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., codes.side.color/AnalogousCategory? = ..., kotlin/Int = ...) // codes.side.color/ColorChannel.<init>|<init>(kotlin.String;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>;codes.side.color.ChannelKind;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;codes.side.color.AnalogousCategory?;kotlin.Int){}[0]
+
+    final val analogous // codes.side.color/ColorChannel.analogous|{}analogous[0]
+        final fun <get-analogous>(): codes.side.color/AnalogousCategory? // codes.side.color/ColorChannel.analogous.<get-analogous>|<get-analogous>(){}[0]
+    final val gamutBound // codes.side.color/ColorChannel.gamutBound|{}gamutBound[0]
+        final fun <get-gamutBound>(): kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? // codes.side.color/ColorChannel.gamutBound.<get-gamutBound>|<get-gamutBound>(){}[0]
+    final val id // codes.side.color/ColorChannel.id|{}id[0]
+        final fun <get-id>(): kotlin/String // codes.side.color/ColorChannel.id.<get-id>|<get-id>(){}[0]
+    final val index // codes.side.color/ColorChannel.index|{}index[0]
+        final fun <get-index>(): kotlin/Int // codes.side.color/ColorChannel.index.<get-index>|<get-index>(){}[0]
+    final val isHue // codes.side.color/ColorChannel.isHue|{}isHue[0]
+        final fun <get-isHue>(): kotlin/Boolean // codes.side.color/ColorChannel.isHue.<get-isHue>|<get-isHue>(){}[0]
+    final val kind // codes.side.color/ColorChannel.kind|{}kind[0]
+        final fun <get-kind>(): codes.side.color/ChannelKind // codes.side.color/ColorChannel.kind.<get-kind>|<get-kind>(){}[0]
+    final val limit // codes.side.color/ColorChannel.limit|{}limit[0]
+        final fun <get-limit>(): kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? // codes.side.color/ColorChannel.limit.<get-limit>|<get-limit>(){}[0]
+    final val precision // codes.side.color/ColorChannel.precision|{}precision[0]
+        final fun <get-precision>(): kotlin/Int // codes.side.color/ColorChannel.precision.<get-precision>|<get-precision>(){}[0]
+    final val referenceRange // codes.side.color/ColorChannel.referenceRange|{}referenceRange[0]
+        final fun <get-referenceRange>(): kotlin.ranges/ClosedFloatingPointRange<kotlin/Double> // codes.side.color/ColorChannel.referenceRange.<get-referenceRange>|<get-referenceRange>(){}[0]
+    final val space // codes.side.color/ColorChannel.space|{}space[0]
+        final fun <get-space>(): codes.side.color/ColorSpace // codes.side.color/ColorChannel.space.<get-space>|<get-space>(){}[0]
+
+    final fun toString(): kotlin/String // codes.side.color/ColorChannel.toString|toString(){}[0]
+}
+
+final class codes.side.color/ColorConverter { // codes.side.color/ColorConverter|null[0]
+    final val source // codes.side.color/ColorConverter.source|{}source[0]
+        final fun <get-source>(): codes.side.color/ColorSpace // codes.side.color/ColorConverter.source.<get-source>|<get-source>(){}[0]
+    final val target // codes.side.color/ColorConverter.target|{}target[0]
+        final fun <get-target>(): codes.side.color/ColorSpace // codes.side.color/ColorConverter.target.<get-target>|<get-target>(){}[0]
+
+    final fun convert(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/ColorConverter.convert|convert(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun convert(kotlin/DoubleArray, kotlin/Int, kotlin/DoubleArray, kotlin/Int, kotlin/Int) // codes.side.color/ColorConverter.convert|convert(kotlin.DoubleArray;kotlin.Int;kotlin.DoubleArray;kotlin.Int;kotlin.Int){}[0]
+    final fun convert(kotlin/FloatArray, kotlin/Int, kotlin/FloatArray, kotlin/Int, kotlin/Int) // codes.side.color/ColorConverter.convert|convert(kotlin.FloatArray;kotlin.Int;kotlin.FloatArray;kotlin.Int;kotlin.Int){}[0]
+    final fun toString(): kotlin/String // codes.side.color/ColorConverter.toString|toString(){}[0]
+}
+
+final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
+    final val alpha // codes.side.color/ColorValue.alpha|{}alpha[0]
+        final fun <get-alpha>(): kotlin/Double // codes.side.color/ColorValue.alpha.<get-alpha>|<get-alpha>(){}[0]
+    final val isAlphaMissing // codes.side.color/ColorValue.isAlphaMissing|{}isAlphaMissing[0]
+        final fun <get-isAlphaMissing>(): kotlin/Boolean // codes.side.color/ColorValue.isAlphaMissing.<get-isAlphaMissing>|<get-isAlphaMissing>(){}[0]
+    final val missingMask // codes.side.color/ColorValue.missingMask|{}missingMask[0]
+        final fun <get-missingMask>(): kotlin/Int // codes.side.color/ColorValue.missingMask.<get-missingMask>|<get-missingMask>(){}[0]
+    final val space // codes.side.color/ColorValue.space|{}space[0]
+        final fun <get-space>(): codes.side.color/ColorSpace // codes.side.color/ColorValue.space.<get-space>|<get-space>(){}[0]
+
+    final fun components(): kotlin/DoubleArray // codes.side.color/ColorValue.components|components(){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ColorValue.equals|equals(kotlin.Any?){}[0]
+    final fun get(codes.side.color/ColorChannel): kotlin/Double? // codes.side.color/ColorValue.get|get(codes.side.color.ColorChannel){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/ColorValue.hashCode|hashCode(){}[0]
+    final fun isMissing(codes.side.color/ColorChannel): kotlin/Boolean // codes.side.color/ColorValue.isMissing|isMissing(codes.side.color.ColorChannel){}[0]
+    final fun to(codes.side.color/ColorSpace): codes.side.color/ColorValue // codes.side.color/ColorValue.to|to(codes.side.color.ColorSpace){}[0]
+    final fun toString(): kotlin/String // codes.side.color/ColorValue.toString|toString(){}[0]
+    final fun with(codes.side.color/ColorChannel, kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.with|with(codes.side.color.ColorChannel;kotlin.Double?){}[0]
+    final fun withAlpha(kotlin/Double?): codes.side.color/ColorValue // codes.side.color/ColorValue.withAlpha|withAlpha(kotlin.Double?){}[0]
+
+    final object Companion { // codes.side.color/ColorValue.Companion|null[0]
+        final const val MISSING_ALPHA // codes.side.color/ColorValue.Companion.MISSING_ALPHA|{}MISSING_ALPHA[0]
+            final fun <get-MISSING_ALPHA>(): kotlin/Int // codes.side.color/ColorValue.Companion.MISSING_ALPHA.<get-MISSING_ALPHA>|<get-MISSING_ALPHA>(){}[0]
+    }
+}
+
+final class codes.side.color/HueFamily { // codes.side.color/HueFamily|null[0]
+    constructor <init>(kotlin/String) // codes.side.color/HueFamily.<init>|<init>(kotlin.String){}[0]
+
+    final val id // codes.side.color/HueFamily.id|{}id[0]
+        final fun <get-id>(): kotlin/String // codes.side.color/HueFamily.id.<get-id>|<get-id>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/HueFamily.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/HueFamily.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // codes.side.color/HueFamily.toString|toString(){}[0]
+
+    final object Companion { // codes.side.color/HueFamily.Companion|null[0]
+        final val CieLab // codes.side.color/HueFamily.Companion.CieLab|{}CieLab[0]
+            final fun <get-CieLab>(): codes.side.color/HueFamily // codes.side.color/HueFamily.Companion.CieLab.<get-CieLab>|<get-CieLab>(){}[0]
+        final val Oklab // codes.side.color/HueFamily.Companion.Oklab|{}Oklab[0]
+            final fun <get-Oklab>(): codes.side.color/HueFamily // codes.side.color/HueFamily.Companion.Oklab.<get-Oklab>|<get-Oklab>(){}[0]
+
+        final fun rgbHexcone(codes.side.color/ColorSpace): codes.side.color/HueFamily // codes.side.color/HueFamily.Companion.rgbHexcone|rgbHexcone(codes.side.color.ColorSpace){}[0]
+    }
+}
+
+final class codes.side.color/WhitePoint { // codes.side.color/WhitePoint|null[0]
+    constructor <init>(kotlin/Double, kotlin/Double) // codes.side.color/WhitePoint.<init>|<init>(kotlin.Double;kotlin.Double){}[0]
+
+    final val x // codes.side.color/WhitePoint.x|{}x[0]
+        final fun <get-x>(): kotlin/Double // codes.side.color/WhitePoint.x.<get-x>|<get-x>(){}[0]
+    final val xyzX // codes.side.color/WhitePoint.xyzX|{}xyzX[0]
+        final fun <get-xyzX>(): kotlin/Double // codes.side.color/WhitePoint.xyzX.<get-xyzX>|<get-xyzX>(){}[0]
+    final val xyzZ // codes.side.color/WhitePoint.xyzZ|{}xyzZ[0]
+        final fun <get-xyzZ>(): kotlin/Double // codes.side.color/WhitePoint.xyzZ.<get-xyzZ>|<get-xyzZ>(){}[0]
+    final val y // codes.side.color/WhitePoint.y|{}y[0]
+        final fun <get-y>(): kotlin/Double // codes.side.color/WhitePoint.y.<get-y>|<get-y>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/WhitePoint.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/WhitePoint.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // codes.side.color/WhitePoint.toString|toString(){}[0]
+
+    final object Companion { // codes.side.color/WhitePoint.Companion|null[0]
+        final val D50 // codes.side.color/WhitePoint.Companion.D50|{}D50[0]
+            final fun <get-D50>(): codes.side.color/WhitePoint // codes.side.color/WhitePoint.Companion.D50.<get-D50>|<get-D50>(){}[0]
+        final val D65 // codes.side.color/WhitePoint.Companion.D65|{}D65[0]
+            final fun <get-D65>(): codes.side.color/WhitePoint // codes.side.color/WhitePoint.Companion.D65.<get-D65>|<get-D65>(){}[0]
+    }
+}
+
+sealed class codes.side.color/ChannelKind { // codes.side.color/ChannelKind|null[0]
+    final class Hue : codes.side.color/ChannelKind { // codes.side.color/ChannelKind.Hue|null[0]
+        constructor <init>(codes.side.color/HueFamily) // codes.side.color/ChannelKind.Hue.<init>|<init>(codes.side.color.HueFamily){}[0]
+
+        final val family // codes.side.color/ChannelKind.Hue.family|{}family[0]
+            final fun <get-family>(): codes.side.color/HueFamily // codes.side.color/ChannelKind.Hue.family.<get-family>|<get-family>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ChannelKind.Hue.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // codes.side.color/ChannelKind.Hue.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // codes.side.color/ChannelKind.Hue.toString|toString(){}[0]
+    }
+
+    final object Linear : codes.side.color/ChannelKind { // codes.side.color/ChannelKind.Linear|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/ChannelKind.Linear.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // codes.side.color/ChannelKind.Linear.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // codes.side.color/ChannelKind.Linear.toString|toString(){}[0]
+    }
+}
+
+final object codes.side.color/XyzD50 : codes.side.color/ColorSpace { // codes.side.color/XyzD50|null[0]
+    final val X // codes.side.color/XyzD50.X|{}X[0]
+        final fun <get-X>(): codes.side.color/ColorChannel // codes.side.color/XyzD50.X.<get-X>|<get-X>(){}[0]
+    final val Y // codes.side.color/XyzD50.Y|{}Y[0]
+        final fun <get-Y>(): codes.side.color/ColorChannel // codes.side.color/XyzD50.Y.<get-Y>|<get-Y>(){}[0]
+    final val Z // codes.side.color/XyzD50.Z|{}Z[0]
+        final fun <get-Z>(): codes.side.color/ColorChannel // codes.side.color/XyzD50.Z.<get-Z>|<get-Z>(){}[0]
+    final val whitePoint // codes.side.color/XyzD50.whitePoint|{}whitePoint[0]
+        final fun <get-whitePoint>(): codes.side.color/WhitePoint // codes.side.color/XyzD50.whitePoint.<get-whitePoint>|<get-whitePoint>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/XyzD50.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/XyzD50.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/XyzD50.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
+
+final object codes.side.color/XyzD65 : codes.side.color/ColorSpace { // codes.side.color/XyzD65|null[0]
+    final val X // codes.side.color/XyzD65.X|{}X[0]
+        final fun <get-X>(): codes.side.color/ColorChannel // codes.side.color/XyzD65.X.<get-X>|<get-X>(){}[0]
+    final val Y // codes.side.color/XyzD65.Y|{}Y[0]
+        final fun <get-Y>(): codes.side.color/ColorChannel // codes.side.color/XyzD65.Y.<get-Y>|<get-Y>(){}[0]
+    final val Z // codes.side.color/XyzD65.Z|{}Z[0]
+        final fun <get-Z>(): codes.side.color/ColorChannel // codes.side.color/XyzD65.Z.<get-Z>|<get-Z>(){}[0]
+
+    final fun fromBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/XyzD65.fromBase|fromBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun invoke(kotlin/Double?, kotlin/Double?, kotlin/Double?, kotlin/Double? = ...): codes.side.color/ColorValue // codes.side.color/XyzD65.invoke|invoke(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+    final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/XyzD65.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+}
