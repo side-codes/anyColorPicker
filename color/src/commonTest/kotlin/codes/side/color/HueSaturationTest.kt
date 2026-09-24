@@ -56,6 +56,13 @@ class HueSaturationTest {
     }
 
     @Test
+    fun hsvWithOneNegativeOfSAndVIsNotPowerless() {
+        // S·V below zero is a color, not a grey: HSV's hexcone does not collapse there as HWB's does.
+        assertComponents(doubleArrayOf(0.75, 0.5, 0.75), Hsv(120.0, -50.0, 50.0).to(Srgb), 1e-15)
+        assertComponents(doubleArrayOf(-0.2, -0.4, -0.2), Hsv(120.0, 50.0, -40.0).to(Srgb), 1e-15)
+    }
+
+    @Test
     fun hwbKeepsItsHueWhereHslTurnsIt() {
         // CSS's rgbToHue: W and B carry no sign to undo HSL's half turn, so HWB takes the hue as is.
         val color = Srgb(-0.2, -0.5, -0.4)

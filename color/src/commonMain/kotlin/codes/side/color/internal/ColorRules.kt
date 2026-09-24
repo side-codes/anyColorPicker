@@ -20,7 +20,7 @@ internal object ColorRules {
     /** HWB's hue is powerless at or above this whiteness plus blackness, in percent. */
     const val HWB_POWERLESS_WHITENESS_PLUS_BLACKNESS: Double = 99.999
 
-    /** HSV's hue is powerless at or below this (S/100)·(V/100): HWB's rule restated, as W + B = 100·(1 − S·V). */
+    /** HSV's hue is powerless at or below this |(S/100)·(V/100)|: for S·V ≥ 0, HWB's rule restated, as W + B = 100·(1 − S·V). */
     const val HSV_POWERLESS_SATURATION_TIMES_VALUE: Double = 1e-5
 
     /** How far apart two colors' Oklab L, a, b and alpha may be and still be equivalent (issue 13157). */
