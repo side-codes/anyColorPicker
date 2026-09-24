@@ -30,13 +30,15 @@ class GamutGeometryTest {
     fun maxChromaIsTheLastChromaTheGamutHolds() {
         // 264.1° splits sRGB's chroma in two at L 0.42, and 245.2° Rec. 2020's.
         val cases = listOf(
-            Srgb.gamut to listOf(29.0 to 0.3, 110.0 to 0.9, 200.0 to 0.6, 264.1 to 0.42, 264.1 to 0.6, 330.0 to 0.5),
-            DisplayP3.gamut to listOf(29.0 to 0.3, 142.0 to 0.8, 264.1 to 0.42, 330.0 to 0.7),
-            rec2020 to listOf(60.0 to 0.8, 245.2 to 0.3, 245.2 to 0.5, 300.0 to 0.4),
+            Triple(Srgb.gamut, listOf(29.0 to 0.3, 110.0 to 0.9, 200.0 to 0.6, 264.1 to 0.42, 264.1 to 0.6, 330.0 to 0.5), 0.6),
+            Triple(DisplayP3.gamut, listOf(29.0 to 0.3, 142.0 to 0.8, 264.1 to 0.42, 330.0 to 0.7), 0.6),
+            Triple(rec2020, listOf(60.0 to 0.8, 245.2 to 0.3, 245.2 to 0.5, 300.0 to 0.4), 0.6),
+            // ProPhoto reaches far past the others' chroma, so its scan runs further.
+            Triple(proPhoto, listOf(30.0 to 0.5, 150.0 to 0.7, 264.1 to 0.3, 330.0 to 0.6), 2.0),
         )
-        for ((gamut, points) in cases) {
+        for ((gamut, points, limit) in cases) {
             for ((hue, lightness) in points) {
-                val scanned = scannedEdge(0.6) { c -> OkLch(lightness, c, hue).to(gamut.space).components().all { it in 0.0..1.0 } }
+                val scanned = scannedEdge(limit) { c -> OkLch(lightness, c, hue).to(gamut.space).components().all { it in 0.0..1.0 } }
                 assertNear(scanned, gamut.maxChroma(lightness, hue), 1e-9, "$gamut at $hue°, L $lightness")
             }
         }
@@ -54,8 +56,11 @@ class GamutGeometryTest {
     fun lightnessNextToBlackOrWhiteGivesSmallFiniteChroma() {
         for (gamut in gamuts) {
             for (lightness in doubleArrayOf(1e-9, 1.0 - 1e-9)) {
-                val chroma = gamut.maxChroma(lightness, 30.0)
-                assertTrue(chroma.isFinite() && chroma in 0.0..1e-3, "$gamut at L $lightness: $chroma")
+                for (step in 0 until 72) {
+                    val hue = step * 5.0
+                    val chroma = gamut.maxChroma(lightness, hue)
+                    assertTrue(chroma.isFinite() && chroma > 0.0 && chroma <= 1e-3, "$gamut at L $lightness, $hue°: $chroma")
+                }
             }
         }
     }

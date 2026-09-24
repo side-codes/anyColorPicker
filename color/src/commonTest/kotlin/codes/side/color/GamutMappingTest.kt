@@ -1,6 +1,9 @@
 package codes.side.color
 
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.min
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -140,6 +143,12 @@ class GamutMappingTest {
                 val at = "css to $gamut at L $lightness, $hue°"
                 assertNear(lightness, back[OkLch.L]!!, 0.02, "$at lightness")
                 assertTrue(back[OkLch.C]!! >= edge - 0.02, "$at chroma ${back[OkLch.C]} against the edge $edge")
+                // The clip CSS returns lies within the JND of a color at this hue and more than the
+                // edge's chroma, so its hue turns by no more than the angle the JND spans there.
+                val turn = asin(min(1.0, 0.02 / edge)) * 180.0 / PI
+                assertTrue(hueDifference(hue, back[OkLch.H]!!) <= turn + 1e-6, "$at hue ${back[OkLch.H]}, allowed $turn°")
+                val exact = color.toGamut(gamut, GamutMapping.ChromaReduction).to(OkLch)
+                assertTrue(hueDifference(hue, exact[OkLch.H]!!) <= 1e-6, "chroma reduction to $gamut at L $lightness, $hue°: hue ${exact[OkLch.H]}")
             }
         }
     }
