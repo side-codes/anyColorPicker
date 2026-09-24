@@ -34,6 +34,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The API removal check reads the dumps at the last release tag.
+          fetch-depth: 0
       - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
@@ -72,6 +75,11 @@ jobs:
 
       - name: Check the public API matches the committed dump
         run: ./gradlew apiCheck
+
+      # apiCheck compares against the dump in the working tree, which apiDump rewrites along with
+      # the change. This compares against the last release, so a removal cannot ride along.
+      - name: Check nothing the last release published was removed
+        run: bash scripts/check-api-removals.sh
 
       # Uploads one deployment holding all five publications to the Central Portal and
       # releases it. The previous OSSRH Staging API upload only *staged* a deployment;
