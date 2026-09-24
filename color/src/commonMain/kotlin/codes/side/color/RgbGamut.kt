@@ -53,5 +53,9 @@ public class RgbGamut internal constructor(
         return OkLch(lightness, lightness * sMax, hue)
     }
 
+    /** A prepared bulk mapping from [from] into this gamut's encoded RGB, with [method]. */
+    public fun mapper(from: ColorSpace, method: GamutMapping = GamutMapping.Css()): GamutMapper =
+        GamutMapper(from, this, method)
+
     override fun toString(): String = "RgbGamut(${space.id})"
 }

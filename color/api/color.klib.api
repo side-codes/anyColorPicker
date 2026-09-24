@@ -178,6 +178,20 @@ final class codes.side.color/ColorValue { // codes.side.color/ColorValue|null[0]
     }
 }
 
+final class codes.side.color/GamutMapper { // codes.side.color/GamutMapper|null[0]
+    final val gamut // codes.side.color/GamutMapper.gamut|{}gamut[0]
+        final fun <get-gamut>(): codes.side.color/RgbGamut // codes.side.color/GamutMapper.gamut.<get-gamut>|<get-gamut>(){}[0]
+    final val method // codes.side.color/GamutMapper.method|{}method[0]
+        final fun <get-method>(): codes.side.color/GamutMapping // codes.side.color/GamutMapper.method.<get-method>|<get-method>(){}[0]
+    final val source // codes.side.color/GamutMapper.source|{}source[0]
+        final fun <get-source>(): codes.side.color/ColorSpace // codes.side.color/GamutMapper.source.<get-source>|<get-source>(){}[0]
+
+    final fun convert(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/GamutMapper.convert|convert(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
+    final fun convert(kotlin/DoubleArray, kotlin/Int, kotlin/DoubleArray, kotlin/Int, kotlin/Int) // codes.side.color/GamutMapper.convert|convert(kotlin.DoubleArray;kotlin.Int;kotlin.DoubleArray;kotlin.Int;kotlin.Int){}[0]
+    final fun convert(kotlin/FloatArray, kotlin/Int, kotlin/FloatArray, kotlin/Int, kotlin/Int) // codes.side.color/GamutMapper.convert|convert(kotlin.FloatArray;kotlin.Int;kotlin.FloatArray;kotlin.Int;kotlin.Int){}[0]
+    final fun toString(): kotlin/String // codes.side.color/GamutMapper.toString|toString(){}[0]
+}
+
 final class codes.side.color/HueFamily { // codes.side.color/HueFamily|null[0]
     constructor <init>(kotlin/String) // codes.side.color/HueFamily.<init>|<init>(kotlin.String){}[0]
 
@@ -205,6 +219,7 @@ final class codes.side.color/RgbGamut { // codes.side.color/RgbGamut|null[0]
         final fun <get-space>(): codes.side.color/RgbColorSpace // codes.side.color/RgbGamut.space.<get-space>|<get-space>(){}[0]
 
     final fun cusp(kotlin/Double): codes.side.color/ColorValue // codes.side.color/RgbGamut.cusp|cusp(kotlin.Double){}[0]
+    final fun mapper(codes.side.color/ColorSpace, codes.side.color/GamutMapping = ...): codes.side.color/GamutMapper // codes.side.color/RgbGamut.mapper|mapper(codes.side.color.ColorSpace;codes.side.color.GamutMapping){}[0]
     final fun maxChroma(kotlin/Double, kotlin/Double): kotlin/Double // codes.side.color/RgbGamut.maxChroma|maxChroma(kotlin.Double;kotlin.Double){}[0]
     final fun toString(): kotlin/String // codes.side.color/RgbGamut.toString|toString(){}[0]
 }

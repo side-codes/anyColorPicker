@@ -140,6 +140,16 @@ public final class codes/side/color/Exactness : java/lang/Enum {
 public abstract interface annotation class codes/side/color/ExperimentalColorSpaceApi : java/lang/annotation/Annotation {
 }
 
+public final class codes/side/color/GamutMapper {
+	public final fun convert ([DI[DII)V
+	public final fun convert ([D[D)V
+	public final fun convert ([FI[FII)V
+	public final fun getGamut ()Lcodes/side/color/RgbGamut;
+	public final fun getMethod ()Lcodes/side/color/GamutMapping;
+	public final fun getSource ()Lcodes/side/color/ColorSpace;
+	public fun toString ()Ljava/lang/String;
+}
+
 public abstract class codes/side/color/GamutMapping {
 }
 
@@ -322,6 +332,8 @@ public final class codes/side/color/RgbGamut {
 	public final fun cusp (D)Lcodes/side/color/ColorValue;
 	public final fun getPeakLuminance ()D
 	public final fun getSpace ()Lcodes/side/color/RgbColorSpace;
+	public final fun mapper (Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;)Lcodes/side/color/GamutMapper;
+	public static synthetic fun mapper$default (Lcodes/side/color/RgbGamut;Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Lcodes/side/color/GamutMapper;
 	public final fun maxChroma (DD)D
 	public fun toString ()Ljava/lang/String;
 }
