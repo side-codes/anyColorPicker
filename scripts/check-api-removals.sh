@@ -70,5 +70,7 @@ check colorpicker/api/jvm/colorpicker.api jvm_keys
 check colorpicker/api/colorpicker.klib.api klib_keys
 check color/api/jvm/color.api jvm_keys
 check color/api/color.klib.api klib_keys
+check color-compose/api/jvm/color-compose.api jvm_keys
+check color-compose/api/color-compose.klib.api klib_keys
 [ "$status" -eq 0 ] && echo "No declaration published in $ref is missing."
 exit "$status"

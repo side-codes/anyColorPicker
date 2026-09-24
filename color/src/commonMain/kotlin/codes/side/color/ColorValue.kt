@@ -66,6 +66,8 @@ public class ColorValue internal constructor(
     /**
      * This color in [target].
      *
+     * As CSS Color 4 §11.2 prepares a color for conversion, a powerless hue of this color counts as
+     * missing and its colorfulness as 0 first, so a near-grey converts as the grey it is taken for.
      * A missing component counts as 0 in the arithmetic, and stays missing where [target] has an
      * analogous channel. A hue that comes out powerless becomes missing and its colorfulness 0.
      * Nothing is clamped or mapped into a gamut, except into Okhsl and Okhsv, which describe sRGB
@@ -76,6 +78,10 @@ public class ColorValue internal constructor(
         if (target == space) return this
         val buffer = DoubleArray(MAX_COMPONENTS)
         for (i in space.channels.indices) buffer[i] = component(i)
+        // Only what was missing to begin with carries forward: CSS carries before it handles powerless
+        // components (§13.3), and a polar target makes the grey's hue missing on its own.
+        val powerlessHere = space.powerless(buffer) and missing.inv()
+        if (powerlessHere != 0) space.makeAchromatic(buffer, powerlessHere)
         space.converterTo(target).convert(buffer, buffer)
         val out = DoubleArray(target.channels.size) { finite(buffer[it]) }
         var outMissing = carriedMissing(target)

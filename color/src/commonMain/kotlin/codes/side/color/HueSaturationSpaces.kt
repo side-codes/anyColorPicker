@@ -1,6 +1,7 @@
 package codes.side.color
 
 import codes.side.color.internal.ColorRules
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -95,9 +96,9 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
         val blue = src[2]
         val highest = max(red, max(green, blue))
         val lowest = min(red, min(green, blue))
+        // CSS's rgbToHue, without HSL's half turn for a negative saturation: whiteness and blackness
+        // carry no sign to turn back, so a turned hue would be another color.
         var hue = hexconeHue(red, green, blue, highest, lowest)
-        // HSL's half turn, so HSL and HWB read one hue off the same color.
-        if (hslSaturation(highest, lowest) < 0.0) hue += 180.0
         if (hue >= 360.0) hue -= 360.0
         dst[0] = hue
         dst[1] = lowest * 100.0
@@ -108,14 +109,21 @@ public open class HwbColorSpace internal constructor(id: String, over: RgbColorS
     override fun powerless(components: DoubleArray): Int =
         if (components[1] + components[2] >= ColorRules.HWB_POWERLESS_WHITENESS_PLUS_BLACKNESS) 1 else 0
 
+    // HWB has no colorfulness to zero: short of W + B = 100, what is left of the hue goes to
+    // blackness, so the grey is W, as browsers give it (WPT). From 100 up hwbToRgb's own grey stands.
+    override fun makeAchromatic(components: DoubleArray, powerless: Int) {
+        components[0] = 0.0
+        if (components[1] + components[2] < 100.0) components[2] = 100.0 - components[1]
+    }
+
     public operator fun invoke(h: Double?, w: Double?, b: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, w, b), alpha)
 }
 
 /**
  * HSV over an RGB space. S and V run 0–100, in step with HSL and HWB. CSS has no `hsv()`, so the
- * powerless rule, (S/100)·(V/100) ≤ 1e-5, is the library's: it is HWB's W + B ≥ 99.999 restated,
- * since W + B = 100·(1 − S·V).
+ * powerless rule, |(S/100)·(V/100)| ≤ 1e-5, is the library's: for S·V ≥ 0 it is HWB's
+ * W + B ≥ 99.999 restated, since W + B = 100·(1 − S·V). A negative S·V is a color, not a grey.
  *
  * A color whose channels are all negative has a negative S. HSL turns such a hue half a turn
  * instead, which works only because HSL's hexcone is symmetric under that turn; HSV's is not, and a
@@ -164,7 +172,7 @@ public open class HsvColorSpace internal constructor(id: String, over: RgbColorS
     }
 
     override fun powerless(components: DoubleArray): Int =
-        if (components[1] / 100.0 * (components[2] / 100.0) <= ColorRules.HSV_POWERLESS_SATURATION_TIMES_VALUE) 1 else 0
+        if (abs(components[1] / 100.0 * (components[2] / 100.0)) <= ColorRules.HSV_POWERLESS_SATURATION_TIMES_VALUE) 1 else 0
 
     public operator fun invoke(h: Double?, s: Double?, v: Double?, alpha: Double? = 1.0): ColorValue =
         colorOf(arrayOf(h, s, v), alpha)

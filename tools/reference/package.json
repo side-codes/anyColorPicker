@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Exports the color module's reference test data from the CSS Color 4 source, web-platform-tests and color.js as JSON",
+  "scripts": {
+    "export": "node export.mjs"
+  },
+  "dependencies": {
+    "colorjs.io": "0.7.1"
+  }
+}

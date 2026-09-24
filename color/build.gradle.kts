@@ -4,6 +4,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKmpLibrary)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.mavenPublish)
+    // Tests only: they decode their reference data from JSON files under src/commonTest/resources.
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kotlinxResources)
 }
 
 group = "codes.side"
@@ -41,6 +46,16 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.resources)
         }
+    }
+}
+
+// Published as the root build script sets up every module with the publish plugin.
+mavenPublishing {
+    pom {
+        name.set("anyColorPicker color")
+        description.set("Kotlin Multiplatform color model: CSS Color 4 spaces, conversions, gamut mapping and CSS color strings, without Compose")
     }
 }
