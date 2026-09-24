@@ -25,6 +25,12 @@ import kotlin.math.hypot
 private const val JND = 0.02
 private const val EPSILON = 0.0001
 
+// Linear channels closer than this are one grey that rounding split, and HSL and OkLCh would
+// each read a hue out of the difference. CIELAB's matrix lands a neutral an ulp or two off the
+// diagonal; a wide-gamut Compose grey, through Compose's float matrix and then this one, up to
+// about 1e-6. A thirtieth of the smallest 8-bit step, which falls at the black end of the curve.
+private const val GREY_SPREAD = 1e-5
+
 /**
  * Maps [origin] to the closest color sRGB can display, in linear light. Colors already
  * inside the gamut pass through untouched.
@@ -78,13 +84,20 @@ internal fun gamutMapToSrgb(origin: OkLab): LinearRgb {
 /**
  * [linear] as the sRGB color a display shows, carrying [alpha]. A color already inside the gamut
  * keeps its arithmetic exactly; only one outside pays for the trip through Oklab that the mapping
- * is defined in.
+ * is defined in. A grey comes out an exact grey, whatever rounding the matrix left in it.
  */
 internal fun gamutMappedRgbColor(linear: LinearRgb, alpha: Float): RgbColor {
-    val shown = if (linear.isInGamut()) {
-        linear.clipToUnit()
+    val spread = maxOf(linear.r, linear.g, linear.b) - minOf(linear.r, linear.g, linear.b)
+    val settled = if (spread < GREY_SPREAD) {
+        val grey = (linear.r + linear.g + linear.b) / 3.0
+        LinearRgb(grey, grey, grey)
     } else {
-        gamutMapToSrgb(linearSrgbToOklab(linear))
+        linear
+    }
+    val shown = if (settled.isInGamut()) {
+        settled.clipToUnit()
+    } else {
+        gamutMapToSrgb(linearSrgbToOklab(settled))
     }
     return RgbColor(
         red = delinearize(shown.r).toFloat().coerceIn(0f, 1f),

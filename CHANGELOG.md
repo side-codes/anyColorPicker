@@ -6,7 +6,7 @@
 
 - **A grey reports the last hue chosen, whichever space it was chosen in.** A neutral color has no hue to convert, so `ColorPickerState` hands back the last one chosen, but only a write in the same family counted. HSL at 200° dragged to white read hue 0 in Okhsl, and HSL at 200° followed by red from an RGB field still read 200 once the color went grey. Every write records the hue for both families.
 - **`rememberSaveableColorPickerState` keeps the remembered hues.** A grey remembering hue 200 came back from a configuration change or process death reading 0. State saved by 1.2.0 still restores.
-- **A wide-gamut Compose `Color` is gamut-mapped, not clipped.** `Color.toRgbColor()`, and every `Color.to*Color()` built on it, clipped each channel into sRGB, so Display P3 red arrived as `#FF0000`, 0.28° of Oklab hue away. It takes the CSS Color 4 mapping LAB, Oklab and OkLCh already used and arrives as `#FF0B0C`, hue intact. sRGB colors read exactly as before.
+- **A wide-gamut Compose `Color` is gamut-mapped, not clipped.** `Color.toRgbColor()`, and every `Color.to*Color()` built on it, clipped each channel into sRGB, so Display P3 red arrived as `#FF0000`, 0.28° of Oklab hue away. It takes the CSS Color 4 mapping LAB, Oklab and OkLCh already used and arrives as `#FF0B0B`, hue intact. sRGB colors read exactly as before.
 - **The Kotlin default hierarchy template applies.** `iosMain`, `appleMain` and `nativeMain` exist again, and the published metadata carries them. No API changes.
 
 ### Dependencies

@@ -47,15 +47,26 @@ public fun LabColor.toRgb(): RgbColor {
     val yr = if (lD > 8.0) fy.pow(3) else lD / KAPPA
     val zr = if (fz3 > EPSILON) fz3 else (116.0 * fz - 16.0) / KAPPA
 
-    return gamutMappedRgbColor(xyzD50ToLinearSrgb(xr * XN, yr * YN, zr * ZN), alpha)
+    return gamutMappedRgbColor(relativeXyzToLinearSrgb(xr, yr, zr), alpha)
 }
 
-/** CIE XYZ relative to the D50 white above, as linear-light sRGB; unclamped. */
-internal fun xyzD50ToLinearSrgb(x: Double, y: Double, z: Double): LinearRgb = LinearRgb(
-    r = 3.1338561 * x - 1.6168667 * y - 0.4906146 * z,
-    g = -0.9787684 * x + 1.9161415 * y + 0.0334540 * z,
-    b = 0.0719453 * x - 0.2289914 * y + 1.4052427 * z,
-)
+/**
+ * D50 CIE XYZ divided by its white, so the white is `1, 1, 1`, as linear-light sRGB; unclamped.
+ *
+ * Taken relative so that a caller whose D50 was computed to other digits divides by its own white
+ * and still lands a neutral on the neutral axis. Compose derives D50 from its chromaticity and
+ * gets 0.964212 and 0.825188 where the matrices below were built against [XN] and [ZN].
+ */
+internal fun relativeXyzToLinearSrgb(xr: Double, yr: Double, zr: Double): LinearRgb {
+    val x = xr * XN
+    val y = yr * YN
+    val z = zr * ZN
+    return LinearRgb(
+        r = 3.1338561 * x - 1.6168667 * y - 0.4906146 * z,
+        g = -0.9787684 * x + 1.9161415 * y + 0.0334540 * z,
+        b = 0.0719453 * x - 0.2289914 * y + 1.4052427 * z,
+    )
+}
 
 /** Converts this sRGB color to CIELAB (D50 reference white). Alpha is carried over unchanged. */
 public fun RgbColor.toLab(): LabColor {

@@ -2,6 +2,8 @@ package codes.side.colorpicker.conversion
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
+import androidx.compose.ui.graphics.colorspace.Illuminant
+import androidx.compose.ui.graphics.colorspace.adapt
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
@@ -56,12 +58,22 @@ public fun Color.toRgbColor(): RgbColor {
     if (colorSpace == ColorSpaces.Srgb) {
         return RgbColor(red = red, green = green, blue = blue, alpha = alpha)
     }
-    val xyz = convert(ColorSpaces.CieXyz)
+    // Float XYZ from the space itself. convert(ColorSpaces.CieXyz) would hand it back as a Color,
+    // which keeps components in half floats and clamps them to ±2.
+    val xyz = colorSpace.adapt(Illuminant.D50).toXyz(red, green, blue)
     return gamutMappedRgbColor(
-        linear = xyzD50ToLinearSrgb(xyz.red.toDouble(), xyz.green.toDouble(), xyz.blue.toDouble()),
+        linear = relativeXyzToLinearSrgb(
+            xr = xyz[0] / ComposeD50X,
+            yr = xyz[1].toDouble(),
+            zr = xyz[2] / ComposeD50Z,
+        ),
         alpha = alpha.coerceIn(0f, 1f),
     )
 }
+
+// The D50 white Compose adapts to, from the chromaticity it defines, as XYZ with Y = 1.
+private val ComposeD50X: Double = Illuminant.D50.x.toDouble() / Illuminant.D50.y
+private val ComposeD50Z: Double = (1.0 - Illuminant.D50.x - Illuminant.D50.y) / Illuminant.D50.y
 
 /** Converts this Compose [Color] to an [HslColor]; see [Color.toRgbColor] for sRGB handling. */
 public fun Color.toHslColor(): HslColor = toRgbColor().toHsl()

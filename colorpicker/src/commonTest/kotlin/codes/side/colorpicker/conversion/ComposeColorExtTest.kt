@@ -80,6 +80,16 @@ class ComposeColorExtTest {
     }
 
     @Test
+    fun aDisplayP3GreyStaysNeutral() {
+        // A grey carries no hue, so neither HSL nor OkLCh may find one in the conversion's rounding.
+        for (v in listOf(0.2f, 0.5f, 0.9f, 0.99f, 0.995f)) {
+            val rgb = Color(red = v, green = v, blue = v, colorSpace = ColorSpaces.DisplayP3).toRgbColor()
+            assertEquals(0f, rgb.toHsl().saturation, "HSL saturation at $v: $rgb")
+            assertEquals(0f, rgb.toOklch().chroma, "OkLCh chroma at $v: $rgb")
+        }
+    }
+
+    @Test
     fun aDisplayP3ColorInsideSrgbIsOnlyConverted() {
         val p3 = Color(red = 0.6f, green = 0.4f, blue = 0.3f, colorSpace = ColorSpaces.DisplayP3)
         val expected = p3.convert(ColorSpaces.Srgb)
