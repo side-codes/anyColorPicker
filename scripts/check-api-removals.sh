@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fails when a declaration published in a release is missing from the working API dumps.
 #
-# apiCheck compares against colorpicker/api/, which apiDump rewrites along with any change, so a
+# apiCheck compares against each module's api/, which apiDump rewrites along with any change, so a
 # removal dumped in the same commit passes it. This compares against the dumps as they were at a
 # release tag instead. A major version bump is allowed to remove things.
 #
@@ -68,5 +68,7 @@ check() {
 
 check colorpicker/api/jvm/colorpicker.api jvm_keys
 check colorpicker/api/colorpicker.klib.api klib_keys
+check color/api/jvm/color.api jvm_keys
+check color/api/color.klib.api klib_keys
 [ "$status" -eq 0 ] && echo "No declaration published in $ref is missing."
 exit "$status"

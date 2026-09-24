@@ -31,6 +31,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "anyColorPicker"
 
+include(":color")
 include(":colorpicker")
 include(":screenshot-tests")
 include(":sample:shared")
