@@ -5,12 +5,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class GeneratedConstantsTest {
+class ColorConstantsTest {
 
     @Test
     fun theSrgbMatrixIsCssRationals() {
-        // CSS Color 4 publishes lin_sRGB_to_XYZ as these fractions; the generator derives them from
-        // the primaries, so each literal must be the correctly rounded fraction, bit for bit.
+        // CSS Color 4 publishes lin_sRGB_to_XYZ as these fractions, so each literal must be the
+        // correctly rounded fraction, bit for bit.
         val css = doubleArrayOf(
             506752.0 / 1228815.0, 87881.0 / 245763.0, 12673.0 / 70218.0,
             87098.0 / 409605.0, 175762.0 / 245763.0, 12673.0 / 175545.0,
