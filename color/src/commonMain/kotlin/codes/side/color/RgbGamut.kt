@@ -53,8 +53,12 @@ public class RgbGamut internal constructor(
         return OkLch(lightness, lightness * sMax, hue)
     }
 
-    /** A prepared bulk mapping from [from] into this gamut's encoded RGB, with [method]. */
-    public fun mapper(from: ColorSpace, method: GamutMapping = GamutMapping.Css()): GamutMapper =
+    /**
+     * A prepared bulk mapping from [from] into this gamut's encoded RGB, with [method]. The default is
+     * [GamutMapping.ChromaReduction], the method for planes and gradients: being exact, it keeps a
+     * ramp's chroma smooth where [GamutMapping.Css]'s search stops anywhere within its epsilon.
+     */
+    public fun mapper(from: ColorSpace, method: GamutMapping = GamutMapping.ChromaReduction): GamutMapper =
         GamutMapper(from, this, method)
 
     override fun toString(): String = "RgbGamut(${space.id})"

@@ -3,6 +3,7 @@ package codes.side.color
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
+import kotlin.test.assertSame
 
 class GamutMapperTest {
 
@@ -38,8 +39,13 @@ class GamutMapperTest {
     @Test
     fun oneColorMapsInPlace() {
         val color = doubleArrayOf(0.7, 0.35, 30.0)
-        Srgb.gamut.mapper(OkLch).convert(color, color)
+        Srgb.gamut.mapper(OkLch, GamutMapping.Css()).convert(color, color)
         assertComponents(OkLch(0.7, 0.35, 30.0).toGamut(Srgb.gamut).components(), Srgb(color[0], color[1], color[2]), 0.0)
+    }
+
+    @Test
+    fun aMapperReducesChromaUnlessToldOtherwise() {
+        assertSame(GamutMapping.ChromaReduction, Srgb.gamut.mapper(OkLch).method)
     }
 
     @Test
