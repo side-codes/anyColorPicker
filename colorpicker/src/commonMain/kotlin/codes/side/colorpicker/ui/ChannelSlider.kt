@@ -1,0 +1,163 @@
+package codes.side.colorpicker.ui
+
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import codes.side.color.ColorChannel
+import codes.side.colorpicker.state.ColorPickerState
+import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.theme.ColorPickerColors
+import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerShapes
+import kotlin.math.roundToInt
+
+/**
+ * A slider for one [channel] of any color space, the library's or an app's. It shows the channel's
+ * value in [state] and edits it there, leaving the color in [channel]'s space.
+ *
+ * The thumb sits at [ColorPickerState.displayValue], so a grey's hue slider shows the hue last chosen.
+ * A value outside [range], such as OkLCh chroma 0.5 or extended sRGB, pins the thumb to that end while
+ * the label keeps its true number; it changes only when the user moves the slider. The right end of a
+ * hue reads just below 360, so a thumb dragged there stays there rather than wrapping to 0.
+ *
+ * With [ColoringMode.Contextual], each point of the track is the color the slider would make there.
+ * With [ColoringMode.Independent], the other channels sit at fixed anchors, clear colors of middle
+ * lightness, and a hue stays at the displayed one. Either way the track is computed in [channel]'s
+ * space and brought into sRGB by chroma reduction, and the thumb is painted opaque, with the color
+ * under it, so it stays visible at alpha 0.
+ *
+ * Arrow keys move by [ColorChannel.step] and Page Up and Page Down by [ColorChannel.pageStep], held to
+ * [range], and a screen reader's increments move by [ColorChannel.step]. The track and the left and
+ * right arrows are mirrored in right-to-left layouts, as Material's slider is.
+ *
+ * @param range the values the track spans, within [ColorChannel.limit].
+ * @param coloringMode [ColoringMode.Independent] by default for a space with a hue, else
+ * [ColoringMode.Contextual].
+ * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
+ * that changes the value.
+ * @param label slot above the track's start; the channel's name by default. See [SliderLabel].
+ * @param valueLabel slot above the track's end; the value in the channel's usual units by default.
+ * See [SliderValueLabel].
+ * @param semanticLabel what a screen reader calls the slider; `null` omits it.
+ * @param semanticValueText how a screen reader announces the value; `null` leaves Material's reading
+ * of the thumb's position.
+ * @param thumb optional replacement for the thumb; see [ColorSlider].
+ * @param thumbWidth how much room the track leaves for the thumb; see [ColorSlider].
+ * @param thumbTrackGap clearance between the thumb and each track end.
+ * @throws IllegalArgumentException if [range] is not a finite span of increasing values within
+ * [ColorChannel.limit].
+ */
+@Composable
+public fun ChannelSlider(
+    state: ColorPickerState,
+    channel: ColorChannel,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    range: ClosedFloatingPointRange<Double> = channel.referenceRange,
+    coloringMode: ColoringMode = defaultColoringMode(channel.space),
+    onValueChangeFinished: () -> Unit = {},
+    label: (@Composable () -> Unit)? = { SliderLabel(channelLabel(channel)) },
+    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(channelValueText(channel, state.displayValue(channel))) },
+    semanticLabel: String? = channelSpokenLabel(channel),
+    semanticValueText: String? = channelValueText(channel, state.displayValue(channel)),
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+) {
+    requireSliderRange(channel, range)
+    val displayed = state.displayComponents(channel.space)
+    val value = displayed[channel.index]
+    val held = heldComponents(channel, displayed, coloringMode)
+    val heldKey = held.toList()
+    val stops = remember(channel, range, heldKey) { trackStops(channel, held, range) }
+    val shown = value.coerceIn(range.start, range.endInclusive)
+    val thumbColor = remember(channel, heldKey, shown) { trackColorAt(channel, held, shown) }
+    val fraction = fractionOf(value, range)
+    val interaction = remember(state) { SliderInteractionGuard(state) }
+    val currentFinished by rememberUpdatedState(onValueChangeFinished)
+    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    // A key press moves from the value the state holds now, not the one this composition read.
+    fun step(direction: Int, page: Boolean) {
+        val current = state.displayValue(channel)
+        val next = clampToRange(channel, range, current + direction * if (page) channel.pageStep else channel.step)
+        if (next == current) return
+        state.edit(channel, next)
+        currentFinished()
+    }
+
+    ColorSliderImpl(
+        value = fraction,
+        onValueChange = {
+            interaction.begin()
+            state.edit(channel, channelValueAt(channel, range, it.toDouble()))
+        },
+        stops = stops,
+        thumbColor = thumbColor,
+        modifier = modifier,
+        sliderModifier = Modifier
+            .channelKeys(enabled, mirrored, ::step)
+            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(fraction, 0f..1f, accessibilitySteps(range, channel.step)) },
+        label = label,
+        valueLabel = valueLabel,
+        onValueChangeFinished = {
+            interaction.end()
+            currentFinished()
+        },
+        enabled = enabled,
+        semanticLabel = semanticLabel,
+        semanticValueText = semanticValueText,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
+    )
+}
+
+/**
+ * The steps a slider over [range] reports to accessibility services. Compose moves a slider by a
+ * (steps + 1)th of its range per screen reader increment, so a range [step] fits into n times takes
+ * n − 1.
+ */
+internal fun accessibilitySteps(range: ClosedFloatingPointRange<Double>, step: Double): Int =
+    (((range.endInclusive - range.start) / step).roundToInt() - 1).coerceAtLeast(0)
+
+// Arrow keys by the channel's step and Page Up and Page Down by its page step, ahead of Material's own
+// handler, which moves a hundredth of the track whatever the channel. Right and left swap in
+// right-to-left layouts, as the track does. The key up is kept too: Material reports the end of a
+// step there, and this slider has already reported it.
+private fun Modifier.channelKeys(
+    enabled: Boolean,
+    mirrored: Boolean,
+    onStep: (direction: Int, page: Boolean) -> Unit,
+): Modifier = onPreviewKeyEvent { event ->
+    if (!enabled) return@onPreviewKeyEvent false
+    val (direction, page) = when (event.key) {
+        Key.DirectionRight -> (if (mirrored) -1 else 1) to false
+        Key.DirectionLeft -> (if (mirrored) 1 else -1) to false
+        Key.DirectionUp -> 1 to false
+        Key.DirectionDown -> -1 to false
+        Key.PageUp -> 1 to true
+        Key.PageDown -> -1 to true
+        else -> return@onPreviewKeyEvent false
+    }
+    if (event.type == KeyEventType.KeyDown) onStep(direction, page)
+    true
+}
