@@ -18,23 +18,33 @@ class CssParsingTest {
         for ((text, serialized) in WPT.valid) assertParsesLike(text, serialized)
     }
 
+    // The predefined spaces WPT writes color() in: those the parser reads, and those it refuses.
+    private val supportedSpaces = listOf("srgb", "srgb-linear", "display-p3", "xyz", "xyz-d50", "xyz-d65")
+    private val notYetSupported = listOf("a98-rgb", "rec2020", "prophoto-rgb", "display-p3-linear")
+
+    private fun spaceOf(case: WptReference.Serialized): String = case.color.removePrefix("color(").substringBefore(' ')
+
     @Test
     fun wptColorFunctionParsesInEverySupportedSpace() {
-        for (space in listOf("srgb", "srgb-linear", "display-p3", "xyz", "xyz-d50", "xyz-d65")) {
-            for ((text, serialized) in WPT.validColorFunction) {
-                assertParsesLike(text.replace("{space}", space), serialized.replace("{space}", space))
-            }
-        }
+        val cases = WPT.validColorFunction.filter { spaceOf(it) in supportedSpaces }
+        assertEquals(supportedSpaces.toSet(), cases.map(::spaceOf).toSet())
+        for ((text, serialized) in cases) assertParsesLike(text, serialized)
     }
 
     @Test
     fun wptColorFunctionRefusesTheSpacesNotYetSupported() {
-        for (space in listOf("a98-rgb", "rec2020", "prophoto-rgb", "display-p3-linear")) {
-            for ((text, _) in WPT.validColorFunction) {
-                val error = assertFailsWith<CssColorParseException>(text) { ColorValue.parseCss(text.replace("{space}", space)) }
-                assertTrue("not supported" in error.message.orEmpty(), error.message)
-            }
+        val cases = WPT.validColorFunction.filter { spaceOf(it) in notYetSupported }
+        assertEquals(notYetSupported.toSet(), cases.map(::spaceOf).toSet())
+        for ((text, _) in cases) {
+            val error = assertFailsWith<CssColorParseException>(text) { ColorValue.parseCss(text) }
+            assertTrue("not supported" in error.message.orEmpty(), error.message)
         }
+    }
+
+    @Test
+    fun wptColorFunctionNamesNoSpaceLeftUnchecked() {
+        val unchecked = WPT.validColorFunction.map(::spaceOf).filter { it !in supportedSpaces && it !in notYetSupported }
+        assertEquals(emptyList(), unchecked.distinct())
     }
 
     @Test

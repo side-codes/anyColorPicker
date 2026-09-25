@@ -45,7 +45,7 @@ internal data class WptReference(
     val source: JsonObject,
     /** Colors and how a browser serializes them. */
     val valid: List<Serialized>,
-    /** The same for `color()`, with `{space}` standing for each predefined space. */
+    /** The same for `color()`, in each predefined space WPT writes it in. */
     val validColorFunction: List<Serialized>,
     /** Text that is not a color. */
     val invalid: List<String>,

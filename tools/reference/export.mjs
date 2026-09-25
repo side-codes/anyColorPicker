@@ -10,6 +10,7 @@
 import Color from "colorjs.io";
 import { JSDOM } from "jsdom";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import vm from "node:vm";
 
 // The last commit to CSS Color 4's source on 2026-09-13, the Editor's Draft the library follows.
 const CSS_COMMIT = "11ab50923a2a289647bd869fcea346bc2543a0fb";
@@ -24,8 +25,6 @@ async function fetchText(url) {
     if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
     return response.text();
 }
-
-const wptFile = name => fetchText(`${WPT}/${name}`);
 
 // ---- CSS Color 4 ----
 //
@@ -97,73 +96,66 @@ function cssWorkedExamples(document) {
     });
 }
 
-// ---- web-platform-tests: parsing ----
+// ---- web-platform-tests ----
 //
-// Cases that need calc(), sign(), currentcolor or light-dark() are left out: they need a cascade or
-// math functions the parser does not have.
+// Each test file is loaded as a page and its inline scripts are run against a harness that records
+// what it is asked to test, so the tests' own lists and loops expand themselves. testharness.js and
+// the support scripts are not loaded; the four functions the files call stand in for them.
 
-const skipped = value => ["calc(", "sign(", "currentcolor", "light-dark"].some(u => value.toLowerCase().includes(u));
-
-async function wptParsing() {
-    const valid = [];
-    for (const name of ["color-valid-rgb.html", "color-valid-hsl.html", "color-valid-hwb.html", "color-valid-lab.html"]) {
-        for (const [, color, serialized] of (await wptFile(name)).matchAll(/^\s*\["([^"]*)", "([^"]*)"/gm)) {
-            if (!skipped(color) && !skipped(serialized)) valid.push({ color, serialized });
-        }
+// Every value a file tests for the `color` property, as { kind, value, expected }: kind is "valid",
+// "invalid" or "computed", and expected is the serialization the test wants, if it names one.
+async function wptTests(name) {
+    const dom = new JSDOM(await fetchText(`${WPT}/${name}`), { runScripts: "outside-only" });
+    const tests = [];
+    const record = kind => (property, value, expected) => {
+        if (property === "color") tests.push({ kind, value, expected });
+    };
+    Object.assign(dom.window, {
+        test_valid_value: record("valid"),
+        test_invalid_value: record("invalid"),
+        fuzzy_test_computed_color: (value, expected) => tests.push({ kind: "computed", value, expected }),
+        // Tests of currentcolor and of other properties, which only convert where the color property does.
+        fuzzy_test_computed_color_using_currentcolor: () => {},
+        fuzzy_test_computed_color_property: () => {},
+    });
+    const context = dom.getInternalVMContext();
+    for (const script of dom.window.document.querySelectorAll("script:not([src])")) {
+        new vm.Script(script.textContent, { filename: `${WPT_PATH}/${name}` }).runInContext(context);
     }
-    const general = await wptFile("color-valid.html");
-    for (const [, color, serialized] of general.matchAll(/test_valid_value\("color", "([^"]*)", "([^"]*)"\)/g)) {
-        if (!skipped(color)) valid.push({ color, serialized });
-    }
-    for (const [, color] of general.matchAll(/test_valid_value\("color", "([^"]*)"\);/g)) {
-        if (!skipped(color)) valid.push({ color, serialized: color });
-    }
-
-    // color(): the file loops one template over every predefined space; {space} stands for it.
-    const validColorFunction = [];
-    const colorFunction = await wptFile("color-valid-color-function.html");
-    for (const [, color, serialized] of colorFunction.matchAll(/test_valid_value\("color", `([^`]*)`, `([^`]*)`\)/g)) {
-        if (!skipped(color)) {
-            validColorFunction.push({
-                color: color.replaceAll("${colorSpace}", "{space}"),
-                serialized: serialized.replaceAll("${resultColorSpace}", "{space}"),
-            });
-        }
-    }
-
-    const invalid = [];
-    for (const name of ["color-invalid.html", "color-invalid-rgb.html", "color-invalid-hsl.html", "color-invalid-hwb.html"]) {
-        const text = await wptFile(name);
-        invalid.push(...[...text.matchAll(/test_invalid_value\("color", "([^"]*)"\)/g)].map(m => m[1]));
-        invalid.push(...[...text.matchAll(/^\s*\["([^"]*)", "[^"]*"\]/gm)].map(m => m[1]));
-    }
-    for (const name of ["color-invalid-hex-color.html", "color-invalid-named-color.html"]) {
-        invalid.push(...[...(await wptFile(name)).matchAll(/^\s*\["([^"]*)", "[^"]*"\]/gm)].map(m => m[1]));
-    }
-    invalid.push(...[...(await wptFile("color-invalid-color-function.html")).matchAll(/test_invalid_value\("color", "([^"]*)"\);/g)].map(m => m[1]));
-    const kept = invalid.filter(value => !skipped(value));
-
-    // Templates looped over lists of spaces, written out once per space.
-    const RGB_SPACES = ["srgb", "srgb-linear", "a98-rgb", "rec2020", "prophoto-rgb"];
-    const XYZ_SPACES = ["xyz", "xyz-d50", "xyz-d65"];
-    const LOOPED = { "RGB_SPACES": RGB_SPACES, "XYZ_SPACES": XYZ_SPACES, "[...RGB_SPACES, ...XYZ_SPACES]": [...RGB_SPACES, ...XYZ_SPACES] };
-    for (const name of ["color-invalid-lab.html", "color-invalid-color-function.html"]) {
-        const loops = /for \(const colorSpace of (\[[^\]]*\]|\[\.\.\.RGB_SPACES, \.\.\.XYZ_SPACES\]|RGB_SPACES|XYZ_SPACES)\) \{([\s\S]*?)\n\}/g;
-        for (const [, list, body] of (await wptFile(name)).matchAll(loops)) {
-            const spaces = LOOPED[list] ?? [...list.matchAll(/"([^"]+)"/g)].map(m => m[1]);
-            for (const [, template] of body.matchAll(/test_invalid_value\("color", `([^`]*)`\)/g)) {
-                for (const space of spaces) {
-                    const value = template.replaceAll("${colorSpace}", space);
-                    if (!skipped(value)) kept.push(value);
-                }
-            }
-        }
-    }
-    return { valid, validColorFunction, invalid: kept };
+    return tests;
 }
 
-// ---- web-platform-tests: conversions ----
-//
+// The values the named files test with the harness function [kind].
+async function wptValues(names, kind) {
+    const tests = [];
+    for (const name of names) tests.push(...(await wptTests(name)).filter(test => test.kind === kind));
+    if (tests.some(test => typeof test.expected !== "string" && test.expected !== undefined)) {
+        throw new Error(`${names}: a test accepts more than one serialization`);
+    }
+    return tests;
+}
+
+// Cases that need calc(), sign(), currentcolor or light-dark() are left out: they need a cascade or
+// math functions the parser does not have.
+const skipped = value => ["calc(", "sign(", "currentcolor", "light-dark"].some(u => value.toLowerCase().includes(u));
+
+// A color and how a browser serializes it; a test that names no serialization expects the color back.
+const serialized = ({ value, expected }) => ({ color: value, serialized: expected ?? value });
+
+async function wptParsing() {
+    const valid = (await wptValues(["color-valid-rgb.html", "color-valid-hsl.html", "color-valid-hwb.html", "color-valid-lab.html", "color-valid.html"], "valid"))
+        .map(serialized)
+        .filter(test => !skipped(test.color) && !skipped(test.serialized));
+    const validColorFunction = (await wptValues(["color-valid-color-function.html"], "valid"))
+        .map(serialized)
+        .filter(test => !skipped(test.color) && !skipped(test.serialized));
+    const invalid = (await wptValues([
+        "color-invalid.html", "color-invalid-rgb.html", "color-invalid-hsl.html", "color-invalid-hwb.html",
+        "color-invalid-hex-color.html", "color-invalid-named-color.html", "color-invalid-color-function.html", "color-invalid-lab.html",
+    ], "invalid")).map(test => test.value).filter(value => !skipped(value));
+    return { valid, validColorFunction, invalid };
+}
+
 // A relative color F(from X c1 c2 c3) whose channels are F's own, in order, is X converted into F's
 // space: the rest of relative color syntax (calc(), reordered channels) is not conversion. X already
 // in F's space tests how channel keywords resolve, not conversion, and is left out too.
@@ -188,28 +180,25 @@ function spaceOf(color) {
 
 async function wptConversions() {
     const cases = [];
-    for (const file of ["color-computed-relative-color.html", "color-computed-powerless.html", "color-computed-none.html"]) {
-        const text = await wptFile(file);
-        const calls = /(?:fuzzy_)?test_computed_(?:color|value)\((?:\s*`color`\s*,)?\s*`([^`]*)`\s*,\s*`([^`]*)`/g;
-        for (const [, source, serialized] of text.matchAll(calls)) {
-            let space, color;
-            const fn = /^(\w+)\(from (.+) (\S+ \S+ \S+)( \/ alpha)?\)$/.exec(source.trim());
-            const colorFunction = /^color\(from (.+) ([\w-]+) (\S+ \S+ \S+)( \/ alpha)?\)$/.exec(source.trim());
-            if (colorFunction) {
-                const [, inner, name, channels] = colorFunction;
-                if (!(name in COLOR_SPACES) || channels !== (name.startsWith("xyz") ? "x y z" : "r g b")) continue;
-                [color, space] = [inner, COLOR_SPACES[name]];
-            } else if (fn) {
-                const [, name, inner, channels] = fn;
-                if (FUNCTION_CHANNELS[name] !== channels) continue;
-                [color, space] = [inner, FUNCTION_SPACES[name]];
-            } else {
-                continue;
-            }
-            if ([color, serialized].some(t => UNSUPPORTED.some(u => t.includes(u)))) continue;
-            if (spaceOf(color) === space) continue;
-            cases.push({ color, space, serialized });
+    const tests = await wptValues(["color-computed-relative-color.html", "color-computed-powerless.html", "color-computed-none.html"], "computed");
+    for (const { value: source, expected: serialized } of tests) {
+        let space, color;
+        const fn = /^(\w+)\(from (.+) (\S+ \S+ \S+)( \/ alpha)?\)$/.exec(source.trim());
+        const colorFunction = /^color\(from (.+) ([\w-]+) (\S+ \S+ \S+)( \/ alpha)?\)$/.exec(source.trim());
+        if (colorFunction) {
+            const [, inner, name, channels] = colorFunction;
+            if (!(name in COLOR_SPACES) || channels !== (name.startsWith("xyz") ? "x y z" : "r g b")) continue;
+            [color, space] = [inner, COLOR_SPACES[name]];
+        } else if (fn) {
+            const [, name, inner, channels] = fn;
+            if (FUNCTION_CHANNELS[name] !== channels) continue;
+            [color, space] = [inner, FUNCTION_SPACES[name]];
+        } else {
+            continue;
         }
+        if ([color, serialized].some(t => UNSUPPORTED.some(u => t.includes(u)))) continue;
+        if (spaceOf(color) === space) continue;
+        cases.push({ color, space, serialized });
     }
     return cases;
 }
@@ -338,5 +327,5 @@ writeJson("colorjs.json", {
 });
 
 console.log(`CSS Color 4: ${namedColors.length} named colors, ${equivalentColors.length} equivalent-color examples, ${workedExamples.length} worked conversions`);
-console.log(`WPT: ${parsing.valid.length} valid, ${parsing.validColorFunction.length} color() templates, ${parsing.invalid.length} invalid, ${conversions.length} conversions`);
+console.log(`WPT: ${parsing.valid.length} valid, ${parsing.validColorFunction.length} color() cases, ${parsing.invalid.length} invalid, ${conversions.length} conversions`);
 console.log(`color.js ${colorJsVersion}: ${colorJs.length} conversions, ${okhsx.length} Okhsl/Okhsv colors`);
