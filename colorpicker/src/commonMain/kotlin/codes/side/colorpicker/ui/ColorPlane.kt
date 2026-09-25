@@ -58,16 +58,15 @@ import kotlinx.coroutines.launch
 internal const val PlaneKeyStep: Float = 0.01f
 internal const val PlaneCoarseKeyStep: Float = 0.1f
 
-/** The step and direction an arrow key asks for, or `null` if [event] is not one. */
-private fun planeKeyStep(event: KeyEvent): Pair<Float, Float>? {
+/** The direction an arrow key asks for, as (dx, dy), or `null` if [event] is not an arrow press. */
+private fun planeKeyDirection(event: KeyEvent): Pair<Int, Int>? {
     if (event.type != KeyEventType.KeyDown) return null
-    val step = if (event.isShiftPressed) PlaneCoarseKeyStep else PlaneKeyStep
     return when (event.key) {
-        Key.DirectionLeft -> -step to 0f
-        Key.DirectionRight -> step to 0f
+        Key.DirectionLeft -> -1 to 0
+        Key.DirectionRight -> 1 to 0
         // yValue grows upward, so the up arrow adds.
-        Key.DirectionUp -> 0f to step
-        Key.DirectionDown -> 0f to -step
+        Key.DirectionUp -> 0 to 1
+        Key.DirectionDown -> 0 to -1
         else -> null
     }
 }
@@ -124,6 +123,56 @@ public fun ColorPlane(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
+    ColorPlaneImpl(
+        xValue = xValue,
+        yValue = yValue,
+        onValueChange = onValueChange,
+        onStep = { dx, dy, coarse ->
+            val step = if (coarse) PlaneCoarseKeyStep else PlaneKeyStep
+            val newX = (xValue + dx * step).coerceIn(0f, 1f)
+            val newY = (yValue + dy * step).coerceIn(0f, 1f)
+            if (newX == xValue && newY == yValue) {
+                false
+            } else {
+                currentOnValueChange(newX, newY)
+                true
+            }
+        },
+        surface = surface,
+        modifier = modifier,
+        onValueChangeFinished = onValueChangeFinished,
+        enabled = enabled,
+        semanticLabel = semanticLabel,
+        semanticValueText = semanticValueText,
+        actionLabels = actionLabels,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+    )
+}
+
+/**
+ * [ColorPlane] with the size of a key or accessibility step left to [onStep], which gets the direction,
+ * whether the coarse step was asked for, and returns false when the step changes nothing.
+ */
+@Composable
+internal fun ColorPlaneImpl(
+    xValue: Float,
+    yValue: Float,
+    onValueChange: (x: Float, y: Float) -> Unit,
+    onStep: (dx: Int, dy: Int, coarse: Boolean) -> Boolean,
+    surface: DrawScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    onValueChangeFinished: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    semanticLabel: String? = null,
+    semanticValueText: String? = null,
+    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+) {
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
@@ -133,15 +182,12 @@ public fun ColorPlane(
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
     val currentSurface by rememberUpdatedState(surface)
+    val currentOnStep by rememberUpdatedState(onStep)
 
     // False when the plane is already against that edge. An arrow the plane keeps is an arrow
     // focus cannot leave on, and a device driven by a D-pad alone has nothing else to press.
-    fun step(dx: Float, dy: Float): Boolean {
-        val newX = (xValue + dx).coerceIn(0f, 1f)
-        val newY = (yValue + dy).coerceIn(0f, 1f)
-        if (newX == xValue && newY == yValue) return false
-
-        currentOnValueChange(newX, newY)
+    fun step(dx: Int, dy: Int, coarse: Boolean): Boolean {
+        if (!currentOnStep(dx, dy, coarse)) return false
         currentOnFinished?.invoke()
         return true
     }
@@ -174,24 +220,24 @@ public fun ColorPlane(
                 if (enabled && actionLabels != null) {
                     customActions = listOf(
                         CustomAccessibilityAction(actionLabels.increaseX) {
-                            step(PlaneCoarseKeyStep, 0f)
+                            step(1, 0, coarse = true)
                         },
                         CustomAccessibilityAction(actionLabels.decreaseX) {
-                            step(-PlaneCoarseKeyStep, 0f)
+                            step(-1, 0, coarse = true)
                         },
                         CustomAccessibilityAction(actionLabels.increaseY) {
-                            step(0f, PlaneCoarseKeyStep)
+                            step(0, 1, coarse = true)
                         },
                         CustomAccessibilityAction(actionLabels.decreaseY) {
-                            step(0f, -PlaneCoarseKeyStep)
+                            step(0, -1, coarse = true)
                         },
                     )
                 }
             }
             .onKeyEvent { event ->
                 if (!enabled) return@onKeyEvent false
-                val (dx, dy) = planeKeyStep(event) ?: return@onKeyEvent false
-                step(dx, dy)
+                val (dx, dy) = planeKeyDirection(event) ?: return@onKeyEvent false
+                step(dx, dy, coarse = event.isShiftPressed)
             }
             .focusRequester(focusRequester)
             .focusable(enabled, interactionSource)

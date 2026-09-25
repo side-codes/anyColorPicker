@@ -16,7 +16,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.theme.ColorPickerDefaults
-import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.ceil
 
 // M3 token defaults (from SliderTokens). The handle narrows by this much while pressed;
@@ -48,7 +46,7 @@ private val TrackInsideCornerSize = 2.dp
  */
 @Composable
 internal fun GradientTrack(
-    colors: ImmutableList<Color>,
+    stops: TrackStops,
     thumbFraction: Float,
     interactionSource: MutableInteractionSource,
     checkerboardLight: Color,
@@ -81,11 +79,7 @@ internal fun GradientTrack(
     }
 
     val layoutDirection = LocalLayoutDirection.current
-    val brush = remember(colors, layoutDirection) {
-        Brush.horizontalGradient(
-            if (layoutDirection == LayoutDirection.Rtl) colors.reversed() else colors,
-        )
-    }
+    val brush = remember(stops, layoutDirection) { stops.brush(layoutDirection) }
     val checkerboardBrush = if (showCheckerboard) {
         rememberCheckerboardBrush(
             cellSize = CheckerboardCellSize,
