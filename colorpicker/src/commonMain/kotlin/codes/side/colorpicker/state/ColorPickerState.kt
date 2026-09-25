@@ -46,7 +46,9 @@ import codes.side.colorpicker.model.RgbColor
  * chosen in each [HueFamily] and shows that ([displayValue]), and an edit that makes a grey colorful
  * writes it into the color, so a grey the user darkened or desaturated comes back in the hue they
  * had rather than red. A grey arriving without a hue, from hex, a Compose [Color] or an sRGB value,
- * leaves what is remembered alone.
+ * leaves what is remembered alone. A hue chosen in one family is carried into the others, so an
+ * Okhsl slider shows the hue last picked on an HSL one; that is this library's own, as CSS carries
+ * no hue across spaces (csswg-drafts#8484).
  *
  * Backed by snapshot state: read from any thread, write on the main thread. Create one with
  * [rememberColorPickerState] or [rememberSaveableColorPickerState], or hold one in a view model.
@@ -135,7 +137,7 @@ public class ColorPickerState(initialValue: ColorValue) {
     private fun edited(channel: ColorChannel, value: Double?): ColorValue {
         var color = current.to(channel.space)
         val hue = channel.space.hueChannel()
-        if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, displayValue(hue))
+        if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, memory.hue(hue) ?: 0.0)
         return color.with(channel, value)
     }
 

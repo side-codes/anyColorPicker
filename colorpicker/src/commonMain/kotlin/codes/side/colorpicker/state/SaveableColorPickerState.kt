@@ -1,6 +1,7 @@
 package codes.side.colorpicker.state
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
@@ -90,8 +91,9 @@ private fun restored(saved: List<*>, spaces: Map<String, ColorSpace>): ColorPick
 public fun rememberSaveableColorPickerState(
     initialValue: ColorValue,
     knownSpaces: Collection<ColorSpace> = ColorSpaces.all,
-): ColorPickerState = rememberSaveable(saver = ColorPickerState.Saver(knownSpaces + initialValue.space)) {
-    ColorPickerState(initialValue)
+): ColorPickerState {
+    val saver = remember(knownSpaces, initialValue.space) { ColorPickerState.Saver(knownSpaces + initialValue.space) }
+    return rememberSaveable(saver = saver) { ColorPickerState(initialValue) }
 }
 
 /** Like [rememberSaveableColorPickerState], starting from a Compose [Color]. */
