@@ -1,6 +1,8 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +14,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
@@ -235,6 +238,38 @@ class ControlledPickerTest {
         // Reaching idle is the assertion that the two ends do not keep rewriting each other.
         waitForIdle()
         assertEquals(0, reports)
+    }
+
+    @Test
+    fun aSlotThatWritesTheStateIsReportedLikeAnEdit() = runComposeUiTest {
+        var held by mutableStateOf<ColorValue>(teal)
+        val reported = mutableListOf<ColorValue>()
+        setContent {
+            ColorPicker(
+                held,
+                {
+                    reported += it
+                    held = it
+                },
+                space = Hsl,
+                showPlane = false,
+                // A replaced slot is handed the picker's state, and writing it is how a custom control edits.
+                channelSlider = { state, channel ->
+                    if (channel === Hsl.H) {
+                        TextButton(onClick = { state[Hsl.H] = 120.0 }) { Text("Grün") }
+                        TextButton(onClick = { state.value = Hsl(40.0, 50.0, 60.0) }) { Text("Ocker") }
+                    } else {
+                        ChannelSlider(state, channel)
+                    }
+                },
+            )
+        }
+        onNodeWithText("Grün").performClick()
+        waitForIdle()
+        onNodeWithText("Ocker").performClick()
+        waitForIdle()
+        assertEquals(listOf<ColorValue>(Hsl(120.0, 80.0, 50.0), Hsl(40.0, 50.0, 60.0)), reported)
+        assertEquals(Hsl(40.0, 50.0, 60.0), held)
     }
 
     @Test

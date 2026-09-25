@@ -292,9 +292,21 @@ class ColorPickerStateTest {
         val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
         state.onEdit = { state.emit(it) }
         state.edit(Hsl.S, 60.0)
-        state.value = Hsl(200.0, 55.0, 50.0)
+        state.write(Hsl(200.0, 55.0, 50.0))
         assertNull(state.lastEmission)
         assertEquals(Hsl(200.0, 55.0, 50.0), state.editBase)
+    }
+
+    @Test
+    fun aWriteWhileEditsAreReportedIsReported() {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        val reported = mutableListOf<ColorValue>()
+        state.onEdit = { reported += it }
+        state[Hsl.S] = 60.0
+        state.value = Hsl(40.0, 50.0, 60.0)
+        state.value = Hsl(200.0, 50.0, 50.0)
+        assertEquals(listOf(Hsl(200.0, 60.0, 50.0), Hsl(40.0, 50.0, 60.0)), reported, "a write equal to what edits build on reports nothing")
+        assertEquals(Hsl(200.0, 50.0, 50.0), state.value, "reported, not applied")
     }
 
     @Test
@@ -303,7 +315,7 @@ class ColorPickerStateTest {
         val state = ColorPickerState(red)
         state.onEdit = { state.emit(it) }
         state.editAlpha(0.5)
-        state.value = red
+        state.write(red)
         assertNull(state.lastEmission, "a caller that keeps its value has answered too")
         assertSame(red, state.editBase)
     }

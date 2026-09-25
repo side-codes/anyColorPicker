@@ -43,10 +43,12 @@ internal fun <T> rememberControlledPickerState(
         currentOnChange(currentFromValue(emitted))
     }
     val emitted = state.lastEmission
-    state.value = when {
-        emitted != null && fromValue(emitted) == external -> emitted
-        fromValue(state.value) == external -> state.value
-        else -> toValue(external)
-    }
+    state.write(
+        when {
+            emitted != null && fromValue(emitted) == external -> emitted
+            fromValue(state.value) == external -> state.value
+            else -> toValue(external)
+        },
+    )
     return state
 }

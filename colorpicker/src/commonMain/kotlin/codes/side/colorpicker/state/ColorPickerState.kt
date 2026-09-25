@@ -43,9 +43,9 @@ public class ColorPickerState(initialValue: ColorValue) {
     private val memory = HueMemory()
     private var current by mutableStateOf(initialValue)
 
-    // A value handed to the edit sink and not yet answered by a write of [value]. Edits build on it,
-    // so two key presses before the caller recomposes move two steps. Snapshot state, so a picker
-    // reconciling its caller's value recomposes after every emission, even one its caller ignores.
+    // A value handed to the edit sink and not yet answered by [write]. Edits build on it, so two key
+    // presses before the caller recomposes move two steps. Snapshot state, so a picker reconciling its
+    // caller's value recomposes after every emission, even one its caller ignores.
     private var pending by mutableStateOf<ColorValue?>(null)
 
     init {
@@ -55,15 +55,27 @@ public class ColorPickerState(initialValue: ColorValue) {
         Snapshot.withoutReadObservation { memory.learn(initialValue) }
     }
 
-    /** The color. Writing one equal to it changes nothing. */
+    /**
+     * The color. Writing one equal to it changes nothing.
+     *
+     * The state behind `ColorPicker`'s value and color forms is handed only to their slots, and there a
+     * write, like [set], is reported to the caller as an edit is, and drawn once the caller passes it
+     * back.
+     */
     public var value: ColorValue
         get() = current
         set(value) {
-            pending = null
-            if (value == current) return
-            current = value
-            memory.learn(value)
+            if (onEdit == null) write(value) else if (value != editBase) submit(value)
         }
+
+    // Takes [value] in, answering any emission: every write while no picker reports edits instead of
+    // applying them, and a picker reconciling its caller's value.
+    internal fun write(value: ColorValue) {
+        pending = null
+        if (value == current) return
+        current = value
+        memory.learn(value)
+    }
 
     /** [value] as a Compose color, mapped into sRGB with `GamutMapping.Css`. */
     public val color: Color get() = current.toComposeColor()
@@ -123,7 +135,7 @@ public class ColorPickerState(initialValue: ColorValue) {
     /** The value edits build on: the last one emitted and not yet answered, else [value]. */
     internal val editBase: ColorValue get() = pending ?: current
 
-    /** The last value emitted to the caller of a picker and not yet answered by a write of [value]. */
+    /** The last value emitted to the caller of a picker and not yet answered by [write]. */
     internal val lastEmission: ColorValue? get() = pending
 
     // Records [value] as handed to the caller of a picker that reports edits instead of applying them.
@@ -147,7 +159,7 @@ public class ColorPickerState(initialValue: ColorValue) {
 
     private fun submit(edited: ColorValue) {
         val sink = onEdit
-        if (sink != null) sink(edited) else value = edited
+        if (sink != null) sink(edited) else write(edited)
     }
 
     private fun edited(channel: ColorChannel, value: Double?): ColorValue {
