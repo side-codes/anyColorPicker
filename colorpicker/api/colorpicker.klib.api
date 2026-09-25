@@ -327,12 +327,16 @@ final class codes.side.colorpicker.model/RgbColor : codes.side.colorpicker.model
 }
 
 final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorpicker.state/ColorPickerState|null[0]
+    constructor <init>(androidx.compose.ui.graphics/Color) // codes.side.colorpicker.state/ColorPickerState.<init>|<init>(androidx.compose.ui.graphics.Color){}[0]
+    constructor <init>(codes.side.color/ColorValue) // codes.side.colorpicker.state/ColorPickerState.<init>|<init>(codes.side.color.ColorValue){}[0]
     constructor <init>(codes.side.colorpicker.model/PickerColor = ...) // codes.side.colorpicker.state/ColorPickerState.<init>|<init>(codes.side.colorpicker.model.PickerColor){}[0]
 
     final val argbInt // codes.side.colorpicker.state/ColorPickerState.argbInt|{}argbInt[0]
         final fun <get-argbInt>(): kotlin/Int // codes.side.colorpicker.state/ColorPickerState.argbInt.<get-argbInt>|<get-argbInt>(){}[0]
     final val cmykColor // codes.side.colorpicker.state/ColorPickerState.cmykColor|{}cmykColor[0]
         final fun <get-cmykColor>(): codes.side.colorpicker.model/CmykColor // codes.side.colorpicker.state/ColorPickerState.cmykColor.<get-cmykColor>|<get-cmykColor>(){}[0]
+    final val color // codes.side.colorpicker.state/ColorPickerState.color|{}color[0]
+        final fun <get-color>(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.state/ColorPickerState.color.<get-color>|<get-color>(){}[0]
     final val hslColor // codes.side.colorpicker.state/ColorPickerState.hslColor|{}hslColor[0]
         final fun <get-hslColor>(): codes.side.colorpicker.model/HslColor // codes.side.colorpicker.state/ColorPickerState.hslColor.<get-hslColor>|<get-hslColor>(){}[0]
     final val isInteracting // codes.side.colorpicker.state/ColorPickerState.isInteracting|{}isInteracting[0]
@@ -352,6 +356,13 @@ final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorp
     final val rgbColor // codes.side.colorpicker.state/ColorPickerState.rgbColor|{}rgbColor[0]
         final fun <get-rgbColor>(): codes.side.colorpicker.model/RgbColor // codes.side.colorpicker.state/ColorPickerState.rgbColor.<get-rgbColor>|<get-rgbColor>(){}[0]
 
+    final var value // codes.side.colorpicker.state/ColorPickerState.value|{}value[0]
+        final fun <get-value>(): codes.side.color/ColorValue // codes.side.colorpicker.state/ColorPickerState.value.<get-value>|<get-value>(){}[0]
+        final fun <set-value>(codes.side.color/ColorValue) // codes.side.colorpicker.state/ColorPickerState.value.<set-value>|<set-value>(codes.side.color.ColorValue){}[0]
+
+    final fun displayValue(codes.side.color/ColorChannel): kotlin/Double // codes.side.colorpicker.state/ColorPickerState.displayValue|displayValue(codes.side.color.ColorChannel){}[0]
+    final fun get(codes.side.color/ColorChannel): kotlin/Double? // codes.side.colorpicker.state/ColorPickerState.get|get(codes.side.color.ColorChannel){}[0]
+    final fun set(codes.side.color/ColorChannel, kotlin/Double?) // codes.side.colorpicker.state/ColorPickerState.set|set(codes.side.color.ColorChannel;kotlin.Double?){}[0]
     final fun updateAlpha(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateAlpha|updateAlpha(kotlin.Float){}[0]
     final fun updateBlue(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateBlue|updateBlue(kotlin.Float){}[0]
     final fun updateCyan(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateCyan|updateCyan(kotlin.Float){}[0]
@@ -387,6 +398,10 @@ final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorp
     final fun updateRed(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateRed|updateRed(kotlin.Float){}[0]
     final fun updateSaturation(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateSaturation|updateSaturation(kotlin.Float){}[0]
     final fun updateYellow(kotlin/Float) // codes.side.colorpicker.state/ColorPickerState.updateYellow|updateYellow(kotlin.Float){}[0]
+
+    final object Companion { // codes.side.colorpicker.state/ColorPickerState.Companion|null[0]
+        final fun Saver(kotlin.collections/Collection<codes.side.color/ColorSpace> = ...): androidx.compose.runtime.saveable/Saver<codes.side.colorpicker.state/ColorPickerState, kotlin/Any> // codes.side.colorpicker.state/ColorPickerState.Companion.Saver|Saver(kotlin.collections.Collection<codes.side.color.ColorSpace>){}[0]
+    }
 }
 
 final class codes.side.colorpicker.theme/ColorPickerColors { // codes.side.colorpicker.theme/ColorPickerColors|null[0]
@@ -598,7 +613,11 @@ final fun codes.side.colorpicker.model/codes_side_colorpicker_model_OklabColor$s
 final fun codes.side.colorpicker.model/codes_side_colorpicker_model_OklchColor$stableprop_getter(): kotlin/Int // codes.side.colorpicker.model/codes_side_colorpicker_model_OklchColor$stableprop_getter|codes_side_colorpicker_model_OklchColor$stableprop_getter(){}[0]
 final fun codes.side.colorpicker.model/codes_side_colorpicker_model_RgbColor$stableprop_getter(): kotlin/Int // codes.side.colorpicker.model/codes_side_colorpicker_model_RgbColor$stableprop_getter|codes_side_colorpicker_model_RgbColor$stableprop_getter(){}[0]
 final fun codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter(): kotlin/Int // codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter|codes_side_colorpicker_state_ColorPickerState$stableprop_getter(){}[0]
+final fun codes.side.colorpicker.state/rememberColorPickerState(androidx.compose.ui.graphics/Color, androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberColorPickerState|rememberColorPickerState(androidx.compose.ui.graphics.Color;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+final fun codes.side.colorpicker.state/rememberColorPickerState(codes.side.color/ColorValue, androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberColorPickerState|rememberColorPickerState(codes.side.color.ColorValue;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun codes.side.colorpicker.state/rememberColorPickerState(codes.side.colorpicker.model/PickerColor?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberColorPickerState|rememberColorPickerState(codes.side.colorpicker.model.PickerColor?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+final fun codes.side.colorpicker.state/rememberSaveableColorPickerState(androidx.compose.ui.graphics/Color, kotlin.collections/Collection<codes.side.color/ColorSpace>?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberSaveableColorPickerState|rememberSaveableColorPickerState(androidx.compose.ui.graphics.Color;kotlin.collections.Collection<codes.side.color.ColorSpace>?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
+final fun codes.side.colorpicker.state/rememberSaveableColorPickerState(codes.side.color/ColorValue, kotlin.collections/Collection<codes.side.color/ColorSpace>?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberSaveableColorPickerState|rememberSaveableColorPickerState(codes.side.color.ColorValue;kotlin.collections.Collection<codes.side.color.ColorSpace>?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun codes.side.colorpicker.state/rememberSaveableColorPickerState(codes.side.colorpicker.model/PickerColor?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberSaveableColorPickerState|rememberSaveableColorPickerState(codes.side.colorpicker.model.PickerColor?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun codes.side.colorpicker.theme/ColorPickerTheme(codes.side.colorpicker.theme/ColorPickerColors?, codes.side.colorpicker.theme/ColorPickerShapes?, codes.side.colorpicker.theme/ColorPickerDimensions?, kotlin/Function2<androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int) // codes.side.colorpicker.theme/ColorPickerTheme|ColorPickerTheme(codes.side.colorpicker.theme.ColorPickerColors?;codes.side.colorpicker.theme.ColorPickerShapes?;codes.side.colorpicker.theme.ColorPickerDimensions?;kotlin.Function2<androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun codes.side.colorpicker.theme/codes_side_colorpicker_theme_ColorPickerColors$stableprop_getter(): kotlin/Int // codes.side.colorpicker.theme/codes_side_colorpicker_theme_ColorPickerColors$stableprop_getter|codes_side_colorpicker_theme_ColorPickerColors$stableprop_getter(){}[0]

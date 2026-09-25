@@ -3,196 +3,106 @@ package codes.side.colorpicker.state
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import codes.side.colorpicker.model.CmykColor
+import androidx.compose.ui.graphics.Color
+import codes.side.color.ColorSpace
+import codes.side.color.ColorSpaces
+import codes.side.color.ColorValue
+import codes.side.color.HueFamily
+import codes.side.color.compose.toColorValue
 import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.model.LabColor
-import codes.side.colorpicker.model.OkhslColor
-import codes.side.colorpicker.model.OkhsvColor
-import codes.side.colorpicker.model.OklabColor
-import codes.side.colorpicker.model.OklchColor
 import codes.side.colorpicker.model.PickerColor
-import codes.side.colorpicker.model.RgbColor
 
-// Stable keys identifying the persisted color space. These values are part of
-// the saved-state format — never renumber or reuse them.
-private const val SPACE_KEY_HSL = 0f
-private const val SPACE_KEY_RGB = 1f
-private const val SPACE_KEY_CMYK = 2f
-private const val SPACE_KEY_LAB = 3f
-private const val SPACE_KEY_OKLAB = 4f
-private const val SPACE_KEY_OKLCH = 5f
-private const val SPACE_KEY_OKHSL = 6f
-private const val SPACE_KEY_OKHSV = 7f
+// The first element of every saved list. A later format changes it, and a list of another format
+// restores as null rather than being misread.
+private const val SAVED_FORMAT = 1
 
-private const val SAVED_ARRAY_SIZE = 8
-private const val HUELESS_SAVED_ARRAY_SIZE = 6
+// A saved state is a flat list of primitives every platform's saved state holds:
+// [SAVED_FORMAT, space id, each component, missing mask, alpha, alpha missing,
+//  then a family id and its hue for each remembered hue].
+internal fun colorPickerStateSaver(knownSpaces: Collection<ColorSpace>): Saver<ColorPickerState, Any> {
+    val spaces = spacesById(knownSpaces)
+    return Saver(
+        save = { state -> saved(state) },
+        restore = { saved -> (saved as? List<*>)?.let { restored(it, spaces) } },
+    )
+}
 
-/**
- * Encodes the authoritative space and its native components in a single FloatArray.
- *
- * Layout: `[spaceKey, c0, c1, c2, c3, c4, hslHue, okHue]`
- * - `spaceKey` = stable space key (0=HSL, 1=RGB, 2=CMYK, 3=LAB, 4=Oklab, 5=OkLCh,
- *   6=Okhsl, 7=Okhsv)
- * - HSL:   c0=hue, c1=saturation, c2=lightness, c3=alpha, c4 unused
- * - RGB:   c0=red, c1=green, c2=blue, c3=alpha, c4 unused
- * - CMYK:  c0=cyan, c1=magenta, c2=yellow, c3=key, c4=alpha
- * - LAB:   c0=l, c1=a, c2=b, c3=alpha, c4 unused
- * - Oklab: c0=l, c1=a, c2=b, c3=alpha, c4 unused
- * - OkLCh: c0=l, c1=chroma, c2=hue, c3=alpha, c4 unused
- * - Okhsl: c0=hue, c1=saturation, c2=lightness, c3=alpha, c4 unused
- * - Okhsv: c0=hue, c1=saturation, c2=value, c3=alpha, c4 unused
- * - `hslHue`, `okHue`: the hues a grey reports in each family (see [ColorPickerState])
- *
- * The six-element form without the hues is accepted too, so a state an app saved on 1.2.0
- * restores after it upgrades.
- *
- * This preserves the authoritative space across process death so the user's
- * "origin" choice survives rotation, not just the visible color.
- *
- * Restoring invalid data (unknown space key, wrong array size, or out-of-range
- * channels or hues) returns `null` per the [Saver] contract instead of throwing.
- */
-internal val ColorPickerStateSaver = Saver<ColorPickerState, FloatArray>(
-    save = { state ->
-        val components = when (val color = state.pickerColor) {
-            is HslColor -> floatArrayOf(
-                SPACE_KEY_HSL,
-                color.hue, color.saturation, color.lightness, color.alpha, 0f,
-            )
+// [knownSpaces] by id, then the library's own. Two different spaces under one id are refused, as
+// parseCss refuses them.
+private fun spacesById(knownSpaces: Collection<ColorSpace>): Map<String, ColorSpace> {
+    val spaces = LinkedHashMap<String, ColorSpace>()
+    for (space in knownSpaces) {
+        require(spaces.getOrPut(space.id) { space } === space) { "Two different color spaces have the id ${space.id}" }
+    }
+    for (space in ColorSpaces.all) spaces.getOrPut(space.id) { space }
+    return spaces
+}
 
-            is RgbColor -> floatArrayOf(
-                SPACE_KEY_RGB,
-                color.red, color.green, color.blue, color.alpha, 0f,
-            )
+private fun saved(state: ColorPickerState): ArrayList<Any> {
+    val value = state.value
+    val saved = arrayListOf<Any>(SAVED_FORMAT, value.space.id)
+    for (component in value.components()) saved.add(component)
+    saved.add(value.missingMask)
+    saved.add(value.alpha)
+    saved.add(value.isAlphaMissing)
+    for ((family, hue) in state.rememberedHues) {
+        saved.add(family.id)
+        saved.add(hue)
+    }
+    return saved
+}
 
-            is CmykColor -> floatArrayOf(
-                SPACE_KEY_CMYK,
-                color.cyan, color.magenta, color.yellow, color.key, color.alpha,
-            )
-
-            is LabColor -> floatArrayOf(
-                SPACE_KEY_LAB,
-                color.l, color.a, color.b, color.alpha, 0f,
-            )
-
-            is OklabColor -> floatArrayOf(
-                SPACE_KEY_OKLAB,
-                color.l, color.a, color.b, color.alpha, 0f,
-            )
-
-            is OklchColor -> floatArrayOf(
-                SPACE_KEY_OKLCH,
-                color.l, color.chroma, color.hue, color.alpha, 0f,
-            )
-
-            is OkhslColor -> floatArrayOf(
-                SPACE_KEY_OKHSL,
-                color.hue, color.saturation, color.lightness, color.alpha, 0f,
-            )
-
-            is OkhsvColor -> floatArrayOf(
-                SPACE_KEY_OKHSV,
-                color.hue, color.saturation, color.value, color.alpha, 0f,
-            )
-        }
-        components + floatArrayOf(state.rememberedHslHue, state.rememberedOkHue)
-    },
-    restore = { array ->
-        val color: PickerColor? = if (array.size != SAVED_ARRAY_SIZE && array.size != HUELESS_SAVED_ARRAY_SIZE) {
-            null
-        } else {
-            try {
-                when (array[0]) {
-                    SPACE_KEY_HSL -> HslColor(
-                        hue = array[1],
-                        saturation = array[2],
-                        lightness = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_RGB -> RgbColor(
-                        red = array[1],
-                        green = array[2],
-                        blue = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_CMYK -> CmykColor(
-                        cyan = array[1],
-                        magenta = array[2],
-                        yellow = array[3],
-                        key = array[4],
-                        alpha = array[5],
-                    )
-
-                    SPACE_KEY_LAB -> LabColor(
-                        l = array[1],
-                        a = array[2],
-                        b = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_OKLAB -> OklabColor(
-                        l = array[1],
-                        a = array[2],
-                        b = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_OKLCH -> OklchColor(
-                        l = array[1],
-                        chroma = array[2],
-                        hue = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_OKHSL -> OkhslColor(
-                        hue = array[1],
-                        saturation = array[2],
-                        lightness = array[3],
-                        alpha = array[4],
-                    )
-
-                    SPACE_KEY_OKHSV -> OkhsvColor(
-                        hue = array[1],
-                        saturation = array[2],
-                        value = array[3],
-                        alpha = array[4],
-                    )
-
-                    else -> null
-                }
-            } catch (_: IllegalArgumentException) {
-                null
-            }
-        }
-        val hslHue = array.getOrNull(6)
-        val okHue = array.getOrNull(7)
-        when {
-            color == null -> null
-            hslHue == null || okHue == null -> ColorPickerState(color)
-            hslHue !in 0f..360f || okHue !in 0f..360f -> null
-            else -> ColorPickerState(color).apply { restoreRememberedHues(hslHue, okHue) }
-        }
-    },
-)
+private fun restored(saved: List<*>, spaces: Map<String, ColorSpace>): ColorPickerState? {
+    if (saved.firstOrNull() != SAVED_FORMAT) return null
+    val space = spaces[saved.getOrNull(1) as? String ?: return null] ?: return null
+    val count = space.channels.size
+    val huesStart = 2 + count + 3
+    if (saved.size < huesStart || (saved.size - huesStart) % 2 != 0) return null
+    val components = DoubleArray(count)
+    for (i in 0 until count) components[i] = saved[2 + i] as? Double ?: return null
+    val missing = saved[2 + count] as? Int ?: return null
+    val alpha = saved[3 + count] as? Double ?: return null
+    val alphaMissing = saved[4 + count] as? Boolean ?: return null
+    val hues = LinkedHashMap<HueFamily, Double>()
+    for (i in huesStart until saved.size step 2) {
+        val family = saved[i] as? String ?: return null
+        val hue = saved[i + 1] as? Double ?: return null
+        if (hue !in 0.0..<360.0) return null
+        hues[HueFamily(family)] = hue
+    }
+    val value = try {
+        space.color(components, if (alphaMissing) null else alpha, missing)
+    } catch (_: IllegalArgumentException) {
+        return null
+    }
+    return ColorPickerState(value).apply { restoreHues(hues) }
+}
 
 /**
- * Like [rememberColorPickerState], but the state survives configuration changes
- * and process death (where supported by the platform).
+ * Like [rememberColorPickerState], but the state survives configuration changes and process death
+ * where the platform restores saved state. The value and the remembered hues are saved;
+ * [ColorPickerState.isInteracting] is not.
  *
- * [initialColor] is read only once, when the state is first created; passing a
- * different value on later recompositions does NOT reset the state (matching the
- * `rememberScrollState` convention). The [Saver] persists the authoritative color's
- * native channels together with its color space, so both the visible color and the
- * user's origin-space choice are restored; [ColorPickerState.isInteracting] is
- * transient and not persisted.
+ * [initialValue] is read once. Its space is known to the saver, and so is every space in
+ * [knownSpaces]; a value later edited into a space in neither restores as [initialValue].
  */
 @Composable
 public fun rememberSaveableColorPickerState(
-    initialColor: PickerColor = HslColor(),
-): ColorPickerState {
-    return rememberSaveable(saver = ColorPickerStateSaver) {
-        ColorPickerState(initialColor)
-    }
+    initialValue: ColorValue,
+    knownSpaces: Collection<ColorSpace> = ColorSpaces.all,
+): ColorPickerState = rememberSaveable(saver = ColorPickerState.Saver(knownSpaces + initialValue.space)) {
+    ColorPickerState(initialValue)
 }
+
+/** Like [rememberSaveableColorPickerState], starting from a Compose [Color]. */
+@Composable
+public fun rememberSaveableColorPickerState(
+    initialColor: Color,
+    knownSpaces: Collection<ColorSpace> = ColorSpaces.all,
+): ColorPickerState = rememberSaveableColorPickerState(initialColor.toColorValue(), knownSpaces)
+
+/** Like [rememberSaveableColorPickerState], starting from a color of the model package. */
+@Composable
+public fun rememberSaveableColorPickerState(
+    initialColor: PickerColor = HslColor(),
+): ColorPickerState = rememberSaveableColorPickerState(initialColor.toColorValue())

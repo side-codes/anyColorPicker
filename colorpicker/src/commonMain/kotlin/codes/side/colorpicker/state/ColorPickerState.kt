@@ -1,22 +1,29 @@
 package codes.side.colorpicker.state
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
-import codes.side.colorpicker.conversion.toArgbInt
-import codes.side.colorpicker.conversion.toCmyk
-import codes.side.colorpicker.conversion.toHsl
-import codes.side.colorpicker.conversion.toLab
-import codes.side.colorpicker.conversion.toOkhsl
-import codes.side.colorpicker.conversion.toOkhsv
-import codes.side.colorpicker.conversion.toOklab
-import codes.side.colorpicker.conversion.toOklch
-import codes.side.colorpicker.conversion.toRgb
-import codes.side.colorpicker.conversion.toRgbColor
-import codes.side.colorpicker.conversion.withAlpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import codes.side.color.Cmyk
+import codes.side.color.ColorChannel
+import codes.side.color.ColorSpace
+import codes.side.color.ColorSpaces
+import codes.side.color.ColorValue
+import codes.side.color.Hsl
+import codes.side.color.HueFamily
+import codes.side.color.Lab
+import codes.side.color.OkLch
+import codes.side.color.Okhsl
+import codes.side.color.Okhsv
+import codes.side.color.Oklab
+import codes.side.color.Srgb
+import codes.side.color.compose.toColorValue
+import codes.side.color.compose.toComposeColor
+import codes.side.color.toGamut
 import codes.side.colorpicker.model.CmykColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.model.LabColor
@@ -29,450 +36,246 @@ import codes.side.colorpicker.model.PickerColor
 import codes.side.colorpicker.model.RgbColor
 
 /**
- * Single source of truth for the current color.
+ * The color a picker edits, and what the picker remembers beside it.
  *
- * Holds one authoritative [PickerColor] — whichever space was last written to.
- * All other spaces are derived from it via [derivedStateOf] on demand (pure
- * conversions, no writes on read). This guarantees zero round-trip drift *within
- * the authoritative space*: repeatedly reading and re-writing channels of the
- * space last written to never re-derives the value from a conversion. Values
- * observed in the other spaces are conversions and carry ordinary conversion
- * rounding.
+ * [value] is one [ColorValue], in whichever space it was last written or edited in; reading another
+ * space converts it. The library's sliders and planes write it as the user moves them, and the app
+ * may write it at any time.
  *
- * The guarantee covers the space being written to, and nothing else. A colour written from one
- * space and read in another is a conversion, and a conversion cannot invent what the colour
- * does not carry: grey, black and white have no hue, so reading a hue off one would report red.
- * Since a user dragging lightness to zero has not chosen red, the last hue that was actually
- * chosen is kept and handed back for those, the way a painting tool does. HSL's hue angle and
- * Oklab's are different quantities and are remembered separately. Saturation is not treated the
- * same way: a grey really is unsaturated, whereas its hue is merely unknown.
+ * A grey has no hue, so a hue slider has nothing to show for one. The state remembers the last hue
+ * chosen in each [HueFamily] and shows that ([displayValue]), and an edit that makes a grey colorful
+ * writes it into the color, so a grey the user darkened or desaturated comes back in the hue they
+ * had rather than red. A grey arriving without a hue, from hex, a Compose [Color] or an sRGB value,
+ * leaves what is remembered alone.
  *
- * Backed by Compose snapshot state: reads are safe from any thread, but writes
- * (the `update*` methods) are expected on the main thread,
- * like other Compose UI state. Updates are idempotent — writing a value equal to
- * the current one produces no observable state change.
- *
- * Create instances in composition via [rememberColorPickerState] or
- * [rememberSaveableColorPickerState], or hold one directly (e.g. in a view model)
- * using this constructor.
- *
- * @param initialColor the starting color; it becomes the initial authoritative
- * value, so its runtime type also selects the initial origin space.
+ * Backed by snapshot state: read from any thread, write on the main thread. Create one with
+ * [rememberColorPickerState] or [rememberSaveableColorPickerState], or hold one in a view model.
  */
 @Stable
-public class ColorPickerState(initialColor: PickerColor = HslColor()) {
+public class ColorPickerState(initialValue: ColorValue) {
 
-    // The single authoritative value. Its runtime type is the origin space —
-    // whichever space was last written to.
-    private var authoritativeColor by mutableStateOf<PickerColor>(initialColor)
+    /** A state starting from [initialColor]: in sRGB, unless it is in another Compose color space. */
+    public constructor(initialColor: Color) : this(initialColor.toColorValue())
 
-    // Grey, black and white have no hue to convert, so a cylindrical view of one reports zero
-    // — red. Origin tracking already keeps the hue while the cylindrical space is the one being
-    // written to; this is for when another space writes the neutral, which is where it would
-    // otherwise be lost. HSL's hue and Oklab's are different angles, so they are kept apart;
-    // Okhsl, Okhsv and OkLCh all share the second.
-    internal var rememberedHslHue by mutableStateOf(0f)
-        private set
-    internal var rememberedOkHue by mutableStateOf(0f)
-        private set
-
-    private var authoritative: PickerColor
-        get() = authoritativeColor
-        set(value) {
-            authoritativeColor = value
-            rememberHueOf(value)
-        }
-
-    /**
-     * Records, for both families, the hue [color] carries, so a neutral read in either reports the
-     * last hue actually chosen, whichever space it was chosen in.
-     *
-     * A cylindrical colour gives its own family's hue directly; the other family's, and both for a
-     * space with no hue channel, come from converting it. A neutral converts to no hue, but a
-     * cylindrical colour at black or white still carries the one it was given. When that hue is
-     * new — the [initial] colour's, or not the one already remembered — the other family's is taken
-     * from it at full saturation. The same hue again keeps the other family's as it is: dragging
-     * lightness to white passes through the actual colour first, and the angle taken from that is
-     * the exact one, where the stand-in is off by the few degrees the conversion bends with saturation.
-     */
-    private fun rememberHueOf(color: PickerColor, initial: Boolean = false) {
-        val ownHslHue = (color as? HslColor)?.takeIf { it.saturation > 0f }?.hue
-        val ownOkHue = when (color) {
-            is OkhslColor -> color.hue.takeIf { color.saturation > 0f }
-            is OkhsvColor -> color.hue.takeIf { color.saturation > 0f }
-            is OklchColor -> color.hue.takeIf { color.chroma > 0f }
-            else -> null
-        }
-        val rgb = color.toRgbColor()
-        val hslHue = ownHslHue
-            ?: rgb.toHsl().takeIf { it.saturation > 0f }?.hue
-            ?: ownOkHue?.takeIf { initial || it != rememberedOkHue }
-                ?.let { OkhslColor(hue = it, saturation = 1f, lightness = 0.5f).toRgb().toHsl().hue }
-        val okHue = ownOkHue
-            ?: rgb.toOklch().takeIf { it.chroma > 0f }?.hue
-            ?: ownHslHue?.takeIf { initial || it != rememberedHslHue }
-                ?.let { HslColor(hue = it, saturation = 1f, lightness = 0.5f).toRgb().toOklch().hue }
-        if (hslHue != null) rememberedHslHue = hslHue
-        if (okHue != null) rememberedOkHue = okHue
-    }
-
-    /** Puts back hues a saver kept, over the ones construction took from the initial colour. */
-    internal fun restoreRememberedHues(hslHue: Float, okHue: Float) {
-        rememberedHslHue = hslHue
-        rememberedOkHue = okHue
-    }
+    private val memory = HueMemory()
+    private var current by mutableStateOf(initialValue)
 
     init {
-        rememberHueOf(initialColor, initial = true)
+        memory.learn(initialValue)
     }
 
-    // How many components are mid-gesture, not whether any is. A touch screen can drag two
-    // sliders at once, and a single flag would go false when the first of them finished while
-    // the second was still moving.
-    private var interactions by mutableStateOf(0)
+    /** The color. Writing one equal to it changes nothing. */
+    public var value: ColorValue
+        get() = current
+        set(value) {
+            if (value == current) return
+            current = value
+            memory.learn(value)
+        }
 
-    /**
-     * True while the user is actively dragging any of the library's sliders or planes —
-     * [codes.side.colorpicker.ui.HslPlane], [codes.side.colorpicker.ui.OkhslPlane] or
-     * [codes.side.colorpicker.ui.OkhsvPlane] — set on the first value change, cleared when the
-     * last gesture finishes or the interacting components leave composition mid-drag. Useful
-     * for deferring expensive work until the interaction ends. Programmatic `update*` calls do
-     * not affect it.
-     *
-     * Stays true while any one of several simultaneous drags is still going.
-     */
+    /** [value] as a Compose color, mapped into sRGB with `GamutMapping.Css`. */
+    public val color: Color get() = current.toComposeColor()
+
+    // How many components are mid-gesture, not whether any is: two fingers can drag two sliders at
+    // once, and a flag would clear when the first one let go.
+    private var interactions by mutableIntStateOf(0)
+
+    /** True while the user drags any of the library's sliders or planes over this state. */
     public val isInteracting: Boolean get() = interactions > 0
 
-    /** Counts one component into [isInteracting]; balanced by [endInteraction]. */
     internal fun beginInteraction() {
         interactions++
     }
 
-    /** Counts one component back out of [isInteracting]. */
     internal fun endInteraction() {
         if (interactions > 0) interactions--
     }
 
-    // ---- Derived spaces (pure computation, no writes on read) ----
+    /** [channel]'s value in its own space, or null when it is `none`, as a grey's hue is. */
+    public operator fun get(channel: ColorChannel): Double? = current.to(channel.space)[channel]
 
     /**
-     * A view of the authoritative color in one space: itself when that space is the
-     * origin, and [convert] applied to its RGB form otherwise. Routing every pair through
-     * RGB is what keeps this from being sixty-four hand-written conversions.
+     * What a slider on [channel] shows: its value; for a missing hue, the one last chosen in its
+     * family, or 0 when none has been; for any other missing component, 0, as CSS reads `none`.
      */
-    private inline fun <reified T : PickerColor> derivedSpace(
-        crossinline convert: (RgbColor) -> T,
-    ): State<T> = derivedStateOf {
-        val color = authoritative
-        color as? T ?: convert(color.toRgbColor())
-    }
-
-    // A converted neutral reports hue zero because there is no hue in it to find, not because
-    // red was chosen. Where the conversion had nothing to say, the last hue that did is used.
-    // Only where it converted: a cylindrical color written in directly carries its own hue,
-    // and overriding that would leave the space unable to say "neutral" at all — the hue the
-    // caller passed would come back as one they had picked earlier.
-    private val hslDerived = derivedStateOf {
-        authoritative as? HslColor ?: authoritative.toRgbColor().toHsl().let {
-            if (it.saturation == 0f) it.copy(hue = rememberedHslHue) else it
-        }
-    }
-    private val rgbDerived = derivedStateOf { authoritative.toRgbColor() }
-    private val cmykDerived = derivedSpace { it.toCmyk() }
-    private val labDerived = derivedSpace { it.toLab() }
-    private val oklabDerived = derivedSpace { it.toOklab() }
-    private val oklchDerived = derivedStateOf {
-        authoritative as? OklchColor ?: authoritative.toRgbColor().toOklch().let {
-            if (it.chroma == 0f) it.copy(hue = rememberedOkHue) else it
-        }
-    }
-    private val okhslDerived = derivedStateOf {
-        authoritative as? OkhslColor ?: authoritative.toRgbColor().toOkhsl().let {
-            if (it.saturation == 0f) it.copy(hue = rememberedOkHue) else it
-        }
-    }
-    private val okhsvDerived = derivedStateOf {
-        authoritative as? OkhsvColor ?: authoritative.toRgbColor().toOkhsv().let {
-            if (it.saturation == 0f) it.copy(hue = rememberedOkHue) else it
-        }
-    }
-
-    // ---- Public read access ----
-
-    /** The current color as HSL; a derived conversion unless HSL is the origin space. */
-    public val hslColor: HslColor get() = hslDerived.value
-
-    /** The current color as RGB; a derived conversion unless RGB is the origin space. */
-    public val rgbColor: RgbColor get() = rgbDerived.value
-
-    /** The current color as CMYK; a derived conversion unless CMYK is the origin space. */
-    public val cmykColor: CmykColor get() = cmykDerived.value
-
-    /** The current color as CIELAB; a derived conversion unless LAB is the origin space. */
-    public val labColor: LabColor get() = labDerived.value
+    public fun displayValue(channel: ColorChannel): Double =
+        get(channel) ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
 
     /**
-     * The current color as Oklab; a derived conversion unless Oklab is the origin space.
+     * Sets [channel] to [value], or to `none` when it is null, and leaves the color in [channel]'s
+     * space. A missing hue there takes [displayValue] first, so raising a grey's saturation brings
+     * back its remembered hue rather than red.
      *
-     * Derived views route through sRGB, so an origin the display cannot show arrives
-     * gamut-mapped. Oklab and OkLCh are the one pair where that costs something — they
-     * describe the same color exactly — and reading either from the other reports the
-     * mapped chroma rather than the origin's.
+     * Okhsl and Okhsv describe sRGB alone, so setting one of their channels brings a color from
+     * outside sRGB to sRGB's edge.
+     *
+     * @throws IllegalArgumentException if [value] is not finite or lies outside [ColorChannel.limit].
      */
-    public val oklabColor: OklabColor get() = oklabDerived.value
-
-    /**
-     * The current color as OkLCh; a derived conversion unless OkLCh is the origin space.
-     * Out-of-gamut origins arrive gamut-mapped, as for [oklabColor].
-     */
-    public val oklchColor: OklchColor get() = oklchDerived.value
-
-    /** The current color as Okhsl; a derived conversion unless Okhsl is the origin space. */
-    public val okhslColor: OkhslColor get() = okhslDerived.value
-
-    /** The current color as Okhsv; a derived conversion unless Okhsv is the origin space. */
-    public val okhsvColor: OkhsvColor get() = okhsvDerived.value
-
-    /** The current color as a packed ARGB [Int] (`0xAARRGGBB`). */
-    public val argbInt: Int get() = rgbColor.toArgbInt()
-
-    /** The authoritative color in whichever space was last written to. */
-    public val pickerColor: PickerColor get() = authoritative
-
-    // ---- HSL updates ----
-
-    /**
-     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360
-     * is stored as the equivalent 0 (see [HslColor]), so the observable range is
-     * 0..360 (exclusive).
-     */
-    public fun updateHue(hue: Float) {
-        if (hue.isNaN()) return
-        authoritative = hslColor.copy(hue = hue.coerceIn(0f, 360f))
+    public operator fun set(channel: ColorChannel, value: Double?) {
+        this.value = edited(channel, value)
     }
 
-    /** Updates the saturation channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateSaturation(saturation: Float) {
-        if (saturation.isNaN()) return
-        authoritative = hslColor.copy(saturation = saturation.coerceIn(0f, 1f))
+    // Where the library's components send an edit: into [value], unless a picker that reports edits
+    // instead of applying them has set a sink.
+    internal var onEdit: ((ColorValue) -> Unit)? = null
+
+    internal fun edit(channel: ColorChannel, value: Double?) {
+        submit(edited(channel, value))
     }
 
-    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateLightness(lightness: Float) {
-        if (lightness.isNaN()) return
-        authoritative = hslColor.copy(lightness = lightness.coerceIn(0f, 1f))
+    internal fun editAlpha(alpha: Double?) {
+        submit(current.withAlpha(alpha))
     }
 
-    /** Sets [hsl] as the authoritative color; HSL becomes the origin space. */
+    private fun submit(edited: ColorValue) {
+        val sink = onEdit
+        if (sink != null) sink(edited) else value = edited
+    }
+
+    private fun edited(channel: ColorChannel, value: Double?): ColorValue {
+        var color = current.to(channel.space)
+        val hue = channel.space.hueChannel()
+        if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, displayValue(hue))
+        return color.with(channel, value)
+    }
+
+    internal val rememberedHues: Map<HueFamily, Double> get() = memory.remembered
+
+    internal fun restoreHues(saved: Map<HueFamily, Double>) {
+        memory.restore(saved)
+    }
+
+    public companion object {
+        /**
+         * Saves a state's value and remembered hues. A saved space is found by id among [knownSpaces]
+         * and then the library's own, as `ColorValue.parseCss` finds one; a value whose space is not
+         * found restores as null, so the state starts again from its initial value.
+         *
+         * @throws IllegalArgumentException if two different spaces in [knownSpaces] share an id.
+         */
+        public fun Saver(knownSpaces: Collection<ColorSpace> = ColorSpaces.all): Saver<ColorPickerState, Any> =
+            colorPickerStateSaver(knownSpaces)
+    }
+
+    // ---- In the model package's types, which the per-channel sliders, planes and pickers use ----
+
+    /** A state starting from [initialColor]. */
+    public constructor(initialColor: PickerColor = HslColor()) : this(initialColor.toColorValue())
+
+    // The color in [space] as the model package reads it: itself in its own space, and otherwise
+    // converted from its mapping into sRGB.
+    private fun legacy(space: ColorSpace): ColorValue =
+        if (current.space == space) current else current.toGamut(Srgb.gamut).to(space)
+
+    private fun legacyHue(color: ColorValue, channel: ColorChannel): Double = color[channel] ?: memory.hue(channel) ?: 0.0
+
+    /** The color as HSL, saturation and lightness 0–1. */
+    public val hslColor: HslColor get() = legacy(Hsl).let { hslColorOf(it, legacyHue(it, Hsl.H)) }
+
+    /** The color as sRGB, mapped into its gamut. */
+    public val rgbColor: RgbColor get() = rgbColorOf(legacy(Srgb))
+
+    /** The color as CMYK. */
+    public val cmykColor: CmykColor get() = cmykColorOf(legacy(Cmyk))
+
+    /** The color as CIELAB. */
+    public val labColor: LabColor get() = labColorOf(legacy(Lab))
+
+    /** The color as Oklab. */
+    public val oklabColor: OklabColor get() = oklabColorOf(legacy(Oklab))
+
+    /** The color as OkLCh. */
+    public val oklchColor: OklchColor get() = legacy(OkLch).let { oklchColorOf(it, legacyHue(it, OkLch.H)) }
+
+    /** The color as Okhsl. */
+    public val okhslColor: OkhslColor get() = legacy(Okhsl).let { okhslColorOf(it, legacyHue(it, Okhsl.H)) }
+
+    /** The color as Okhsv. */
+    public val okhsvColor: OkhsvColor get() = legacy(Okhsv).let { okhsvColorOf(it, legacyHue(it, Okhsv.H)) }
+
+    /** The color as packed ARGB (`0xAARRGGBB`), mapped into sRGB. */
+    public val argbInt: Int get() = color.toArgb()
+
+    /** The color in its own space, as the model package's class for that space, or as sRGB. */
+    public val pickerColor: PickerColor
+        get() = when (current.space) {
+            Hsl -> hslColor
+            Cmyk -> cmykColor
+            Lab -> labColor
+            Oklab -> oklabColor
+            OkLch -> oklchColor
+            Okhsl -> okhslColor
+            Okhsv -> okhsvColor
+            else -> rgbColor
+        }
+
+    // A model-package channel write: NaN is ignored, and the value is held to [range], then scaled.
+    private fun setLegacy(channel: ColorChannel, value: Float, range: ClosedFloatingPointRange<Float>, scale: Double = 1.0) {
+        if (!value.isNaN()) set(channel, value.coerceIn(range) * scale)
+    }
+
+    public fun updateHue(hue: Float): Unit = setLegacy(Hsl.H, hue, 0f..360f)
+    public fun updateSaturation(saturation: Float): Unit = setLegacy(Hsl.S, saturation, 0f..1f, 100.0)
+    public fun updateLightness(lightness: Float): Unit = setLegacy(Hsl.L, lightness, 0f..1f, 100.0)
     public fun updateFromHsl(hsl: HslColor) {
-        authoritative = hsl
+        value = hsl.toColorValue()
     }
 
-    // ---- RGB updates ----
-
-    /** Updates the red channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateRed(red: Float) {
-        if (red.isNaN()) return
-        authoritative = rgbColor.copy(red = red.coerceIn(0f, 1f))
-    }
-
-    /** Updates the green channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateGreen(green: Float) {
-        if (green.isNaN()) return
-        authoritative = rgbColor.copy(green = green.coerceIn(0f, 1f))
-    }
-
-    /** Updates the blue channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateBlue(blue: Float) {
-        if (blue.isNaN()) return
-        authoritative = rgbColor.copy(blue = blue.coerceIn(0f, 1f))
-    }
-
-    /** Sets [rgb] as the authoritative color; RGB becomes the origin space. */
+    public fun updateRed(red: Float): Unit = setLegacy(Srgb.R, red, 0f..1f)
+    public fun updateGreen(green: Float): Unit = setLegacy(Srgb.G, green, 0f..1f)
+    public fun updateBlue(blue: Float): Unit = setLegacy(Srgb.B, blue, 0f..1f)
     public fun updateFromRgb(rgb: RgbColor) {
-        authoritative = rgb
+        value = rgb.toColorValue()
     }
 
-    // ---- CMYK updates ----
-
-    /** Updates the cyan channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateCyan(cyan: Float) {
-        if (cyan.isNaN()) return
-        authoritative = cmykColor.copy(cyan = cyan.coerceIn(0f, 1f))
-    }
-
-    /** Updates the magenta channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateMagenta(magenta: Float) {
-        if (magenta.isNaN()) return
-        authoritative = cmykColor.copy(magenta = magenta.coerceIn(0f, 1f))
-    }
-
-    /** Updates the yellow channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateYellow(yellow: Float) {
-        if (yellow.isNaN()) return
-        authoritative = cmykColor.copy(yellow = yellow.coerceIn(0f, 1f))
-    }
-
-    /** Updates the key (black) channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateKey(key: Float) {
-        if (key.isNaN()) return
-        authoritative = cmykColor.copy(key = key.coerceIn(0f, 1f))
-    }
-
-    /** Sets [cmyk] as the authoritative color; CMYK becomes the origin space. */
+    public fun updateCyan(cyan: Float): Unit = setLegacy(Cmyk.C, cyan, 0f..1f)
+    public fun updateMagenta(magenta: Float): Unit = setLegacy(Cmyk.M, magenta, 0f..1f)
+    public fun updateYellow(yellow: Float): Unit = setLegacy(Cmyk.Y, yellow, 0f..1f)
+    public fun updateKey(key: Float): Unit = setLegacy(Cmyk.K, key, 0f..1f)
     public fun updateFromCmyk(cmyk: CmykColor) {
-        authoritative = cmyk
+        value = cmyk.toColorValue()
     }
 
-    // ---- LAB updates ----
-
-    /** Updates the L (lightness) channel. NaN is ignored; values are clamped to 0..100. */
-    public fun updateLabLightness(l: Float) {
-        if (l.isNaN()) return
-        authoritative = labColor.copy(l = l.coerceIn(0f, 100f))
-    }
-
-    /** Updates the a axis. NaN is ignored; values are clamped to -128..127. */
-    public fun updateLabA(a: Float) {
-        if (a.isNaN()) return
-        authoritative = labColor.copy(a = a.coerceIn(-128f, 127f))
-    }
-
-    /** Updates the b axis. NaN is ignored; values are clamped to -128..127. */
-    public fun updateLabB(b: Float) {
-        if (b.isNaN()) return
-        authoritative = labColor.copy(b = b.coerceIn(-128f, 127f))
-    }
-
-    /** Sets [lab] as the authoritative color; LAB becomes the origin space. */
+    public fun updateLabLightness(l: Float): Unit = setLegacy(Lab.L, l, 0f..100f)
+    public fun updateLabA(a: Float): Unit = setLegacy(Lab.A, a, -128f..127f)
+    public fun updateLabB(b: Float): Unit = setLegacy(Lab.B, b, -128f..127f)
     public fun updateFromLab(lab: LabColor) {
-        authoritative = lab
+        value = lab.toColorValue()
     }
 
-    // ---- Oklab updates ----
-
-    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOklabLightness(l: Float) {
-        if (l.isNaN()) return
-        authoritative = oklabColor.copy(l = l.coerceIn(0f, 1f))
-    }
-
-    /** Updates the a axis. NaN is ignored; values are clamped to -0.4..0.4. */
-    public fun updateOklabA(a: Float) {
-        if (a.isNaN()) return
-        authoritative = oklabColor.copy(a = a.coerceIn(-OKLAB_AB_RANGE, OKLAB_AB_RANGE))
-    }
-
-    /** Updates the b axis. NaN is ignored; values are clamped to -0.4..0.4. */
-    public fun updateOklabB(b: Float) {
-        if (b.isNaN()) return
-        authoritative = oklabColor.copy(b = b.coerceIn(-OKLAB_AB_RANGE, OKLAB_AB_RANGE))
-    }
-
-    /** Sets [oklab] as the authoritative color; Oklab becomes the origin space. */
+    public fun updateOklabLightness(l: Float): Unit = setLegacy(Oklab.L, l, 0f..1f)
+    public fun updateOklabA(a: Float): Unit = setLegacy(Oklab.A, a, -OKLAB_AB_RANGE..OKLAB_AB_RANGE)
+    public fun updateOklabB(b: Float): Unit = setLegacy(Oklab.B, b, -OKLAB_AB_RANGE..OKLAB_AB_RANGE)
     public fun updateFromOklab(oklab: OklabColor) {
-        authoritative = oklab
+        value = oklab.toColorValue()
     }
 
-    // ---- OkLCh updates ----
-
-    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOklchLightness(l: Float) {
-        if (l.isNaN()) return
-        authoritative = oklchColor.copy(l = l.coerceIn(0f, 1f))
-    }
-
-    /** Updates the chroma channel. NaN is ignored; values are clamped to 0..0.4. */
-    public fun updateOklchChroma(chroma: Float) {
-        if (chroma.isNaN()) return
-        authoritative = oklchColor.copy(chroma = chroma.coerceIn(0f, OKLAB_AB_RANGE))
-    }
-
-    /**
-     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
-     * stored as the equivalent 0 (see [OklchColor]), so the observable range is 0..360
-     * (exclusive).
-     */
-    public fun updateOklchHue(hue: Float) {
-        if (hue.isNaN()) return
-        authoritative = oklchColor.copy(hue = hue.coerceIn(0f, 360f))
-    }
-
-    /** Sets [oklch] as the authoritative color; OkLCh becomes the origin space. */
+    public fun updateOklchLightness(l: Float): Unit = setLegacy(OkLch.L, l, 0f..1f)
+    public fun updateOklchChroma(chroma: Float): Unit = setLegacy(OkLch.C, chroma, 0f..OKLAB_AB_RANGE)
+    public fun updateOklchHue(hue: Float): Unit = setLegacy(OkLch.H, hue, 0f..360f)
     public fun updateFromOklch(oklch: OklchColor) {
-        authoritative = oklch
+        value = oklch.toColorValue()
     }
 
-    // ---- Okhsl updates ----
-
-    /**
-     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
-     * stored as the equivalent 0 (see [OkhslColor]), so the observable range is 0..360
-     * (exclusive).
-     */
-    public fun updateOkhslHue(hue: Float) {
-        if (hue.isNaN()) return
-        authoritative = okhslColor.copy(hue = hue.coerceIn(0f, 360f))
-    }
-
-    /** Updates the saturation channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOkhslSaturation(saturation: Float) {
-        if (saturation.isNaN()) return
-        authoritative = okhslColor.copy(saturation = saturation.coerceIn(0f, 1f))
-    }
-
-    /** Updates the lightness channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOkhslLightness(lightness: Float) {
-        if (lightness.isNaN()) return
-        authoritative = okhslColor.copy(lightness = lightness.coerceIn(0f, 1f))
-    }
-
-    /** Sets [okhsl] as the authoritative color; Okhsl becomes the origin space. */
+    public fun updateOkhslHue(hue: Float): Unit = setLegacy(Okhsl.H, hue, 0f..360f)
+    public fun updateOkhslSaturation(saturation: Float): Unit = setLegacy(Okhsl.S, saturation, 0f..1f)
+    public fun updateOkhslLightness(lightness: Float): Unit = setLegacy(Okhsl.L, lightness, 0f..1f)
     public fun updateFromOkhsl(okhsl: OkhslColor) {
-        authoritative = okhsl
+        value = okhsl.toColorValue()
     }
 
-    // ---- Okhsv updates ----
-
-    /**
-     * Updates the hue channel. NaN is ignored; values are clamped to 0..360, and 360 is
-     * stored as the equivalent 0 (see [OkhsvColor]), so the observable range is 0..360
-     * (exclusive).
-     */
-    public fun updateOkhsvHue(hue: Float) {
-        if (hue.isNaN()) return
-        authoritative = okhsvColor.copy(hue = hue.coerceIn(0f, 360f))
-    }
-
-    /** Updates the saturation channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOkhsvSaturation(saturation: Float) {
-        if (saturation.isNaN()) return
-        authoritative = okhsvColor.copy(saturation = saturation.coerceIn(0f, 1f))
-    }
-
-    /** Updates the value channel. NaN is ignored; values are clamped to 0..1. */
-    public fun updateOkhsvValue(value: Float) {
-        if (value.isNaN()) return
-        authoritative = okhsvColor.copy(value = value.coerceIn(0f, 1f))
-    }
-
-    /** Sets [okhsv] as the authoritative color; Okhsv becomes the origin space. */
+    public fun updateOkhsvHue(hue: Float): Unit = setLegacy(Okhsv.H, hue, 0f..360f)
+    public fun updateOkhsvSaturation(saturation: Float): Unit = setLegacy(Okhsv.S, saturation, 0f..1f)
+    public fun updateOkhsvValue(value: Float): Unit = setLegacy(Okhsv.V, value, 0f..1f)
     public fun updateFromOkhsv(okhsv: OkhsvColor) {
-        authoritative = okhsv
+        value = okhsv.toColorValue()
     }
 
-    // ---- Alpha update (origin space unchanged) ----
-
-    /** Updates the alpha channel of the authoritative color. NaN is ignored; values are clamped to 0..1. */
     public fun updateAlpha(alpha: Float) {
-        if (alpha.isNaN()) return
-        authoritative = authoritative.withAlpha(alpha.coerceIn(0f, 1f))
+        if (!alpha.isNaN()) value = current.withAlpha(alpha.coerceIn(0f, 1f).toDouble())
     }
 
-    // ---- ARGB Int update ----
-
-    /** Sets the color from a packed ARGB Int; RGB becomes the origin space. */
     public fun updateFromArgbInt(argb: Int) {
-        authoritative = argb.toRgbColor()
+        value = Color(argb).toColorValue()
     }
 }
