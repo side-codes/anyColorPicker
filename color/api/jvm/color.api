@@ -45,17 +45,19 @@ public final class codes/side/color/Cmyk : codes/side/color/ColorSpace {
 }
 
 public final class codes/side/color/ColorChannel {
-	public fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;I)V
-	public synthetic fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IDD)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IDDILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getAnalogous ()Lcodes/side/color/AnalogousCategory;
 	public final fun getGamutBound ()Lkotlin/ranges/ClosedFloatingPointRange;
 	public final fun getId ()Ljava/lang/String;
 	public final fun getIndex ()I
 	public final fun getKind ()Lcodes/side/color/ChannelKind;
 	public final fun getLimit ()Lkotlin/ranges/ClosedFloatingPointRange;
+	public final fun getPageStep ()D
 	public final fun getPrecision ()I
 	public final fun getReferenceRange ()Lkotlin/ranges/ClosedFloatingPointRange;
 	public final fun getSpace ()Lcodes/side/color/ColorSpace;
+	public final fun getStep ()D
 	public final fun isHue ()Z
 	public fun toString ()Ljava/lang/String;
 }

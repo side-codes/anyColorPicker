@@ -215,8 +215,12 @@ public open class RgbColorSpace internal constructor(
     }
 }
 
+// One eight-bit level a key press, and seventeen a page, whatever the space's own precision.
 private fun rgbChannels(): List<ColorChannel> = listOf(
-    ColorChannel("r", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Reds),
-    ColorChannel("g", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Greens),
-    ColorChannel("b", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Blues),
+    ColorChannel("r", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Reds, step = RGB_STEP, pageStep = RGB_PAGE_STEP),
+    ColorChannel("g", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Greens, step = RGB_STEP, pageStep = RGB_PAGE_STEP),
+    ColorChannel("b", 0.0..1.0, gamutBound = 0.0..1.0, analogous = AnalogousCategory.Blues, step = RGB_STEP, pageStep = RGB_PAGE_STEP),
 )
+
+private const val RGB_STEP = 1.0 / 255.0
+private const val RGB_PAGE_STEP = 17.0 / 255.0

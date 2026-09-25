@@ -62,6 +62,8 @@ private fun polarChannels(of: ColorSpace, chromaReference: Double, hueFamily: Hu
             limit = lightness.limit,
             analogous = lightness.analogous,
             precision = lightness.precision,
+            step = lightness.step,
+            pageStep = lightness.pageStep,
         ),
         ColorChannel(
             id = "c",

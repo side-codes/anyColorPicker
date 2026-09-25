@@ -136,7 +136,7 @@ abstract class codes.side.color/TransferFunction { // codes.side.color/TransferF
 }
 
 final class codes.side.color/ColorChannel { // codes.side.color/ColorChannel|null[0]
-    constructor <init>(kotlin/String, kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>, codes.side.color/ChannelKind = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., codes.side.color/AnalogousCategory? = ..., kotlin/Int = ...) // codes.side.color/ColorChannel.<init>|<init>(kotlin.String;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>;codes.side.color.ChannelKind;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;codes.side.color.AnalogousCategory?;kotlin.Int){}[0]
+    constructor <init>(kotlin/String, kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>, codes.side.color/ChannelKind = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? = ..., codes.side.color/AnalogousCategory? = ..., kotlin/Int = ..., kotlin/Double = ..., kotlin/Double = ...) // codes.side.color/ColorChannel.<init>|<init>(kotlin.String;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>;codes.side.color.ChannelKind;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;kotlin.ranges.ClosedFloatingPointRange<kotlin.Double>?;codes.side.color.AnalogousCategory?;kotlin.Int;kotlin.Double;kotlin.Double){}[0]
 
     final val analogous // codes.side.color/ColorChannel.analogous|{}analogous[0]
         final fun <get-analogous>(): codes.side.color/AnalogousCategory? // codes.side.color/ColorChannel.analogous.<get-analogous>|<get-analogous>(){}[0]
@@ -152,12 +152,16 @@ final class codes.side.color/ColorChannel { // codes.side.color/ColorChannel|nul
         final fun <get-kind>(): codes.side.color/ChannelKind // codes.side.color/ColorChannel.kind.<get-kind>|<get-kind>(){}[0]
     final val limit // codes.side.color/ColorChannel.limit|{}limit[0]
         final fun <get-limit>(): kotlin.ranges/ClosedFloatingPointRange<kotlin/Double>? // codes.side.color/ColorChannel.limit.<get-limit>|<get-limit>(){}[0]
+    final val pageStep // codes.side.color/ColorChannel.pageStep|{}pageStep[0]
+        final fun <get-pageStep>(): kotlin/Double // codes.side.color/ColorChannel.pageStep.<get-pageStep>|<get-pageStep>(){}[0]
     final val precision // codes.side.color/ColorChannel.precision|{}precision[0]
         final fun <get-precision>(): kotlin/Int // codes.side.color/ColorChannel.precision.<get-precision>|<get-precision>(){}[0]
     final val referenceRange // codes.side.color/ColorChannel.referenceRange|{}referenceRange[0]
         final fun <get-referenceRange>(): kotlin.ranges/ClosedFloatingPointRange<kotlin/Double> // codes.side.color/ColorChannel.referenceRange.<get-referenceRange>|<get-referenceRange>(){}[0]
     final val space // codes.side.color/ColorChannel.space|{}space[0]
         final fun <get-space>(): codes.side.color/ColorSpace // codes.side.color/ColorChannel.space.<get-space>|<get-space>(){}[0]
+    final val step // codes.side.color/ColorChannel.step|{}step[0]
+        final fun <get-step>(): kotlin/Double // codes.side.color/ColorChannel.step.<get-step>|<get-step>(){}[0]
 
     final fun toString(): kotlin/String // codes.side.color/ColorChannel.toString|toString(){}[0]
 }
