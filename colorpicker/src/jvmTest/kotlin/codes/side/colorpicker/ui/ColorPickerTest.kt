@@ -156,7 +156,7 @@ class ColorPickerTest {
         assertEquals(2, finished)
         val actions = onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNode()
             .config[SemanticsActions.CustomActions]
-        runOnUiThread { actions[0].action!!.invoke() }
+        runOnUiThread { actions[0].action() }
         assertEquals(3, finished, "and the plane's")
     }
 }

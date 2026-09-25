@@ -161,10 +161,10 @@ class ChannelPlaneTest {
             listOf("Increase saturation", "Decrease saturation", "Increase lightness", "Decrease lightness"),
             actions.map { it.label },
         )
-        runOnUiThread { assertTrue(actions[0].action!!.invoke()) }
+        runOnUiThread { assertTrue(actions[0].action()) }
         waitForIdle()
         assertNear(60.0, state[Hsl.S], message = "an action takes the page step")
-        runOnUiThread { actions[3].action!!.invoke() }
+        runOnUiThread { actions[3].action() }
         waitForIdle()
         assertNear(40.0, state[Hsl.L])
     }
