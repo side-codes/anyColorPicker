@@ -44,6 +44,31 @@ public final class codes/side/color/Cmyk : codes/side/color/ColorSpace {
 	public fun toBase ([D[D)V
 }
 
+public final class codes/side/color/CmykColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/CmykColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getC-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getK-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getM-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public static final fun getY-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-FpTRiDE (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-FpTRiDE$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/CmykViewKt {
+	public static final fun asCmyk (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toCmyk (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/ColorChannel {
 	public fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IDD)V
 	public synthetic fun <init> (Ljava/lang/String;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/ChannelKind;Lkotlin/ranges/ClosedFloatingPointRange;Lkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/color/AnalogousCategory;IDDILkotlin/jvm/internal/DefaultConstructorMarker;)V
@@ -150,6 +175,25 @@ public final class codes/side/color/DisplayP3 : codes/side/color/RgbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/DisplayP3;
 }
 
+public final class codes/side/color/DisplayP3Color {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/DisplayP3Color;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getG-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getR-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-DaZF8n8 (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-DaZF8n8$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Exactness : java/lang/Enum {
 	public static final field Approximate Lcodes/side/color/Exactness;
 	public static final field Exact Lcodes/side/color/Exactness;
@@ -223,6 +267,25 @@ public final class codes/side/color/Hsl : codes/side/color/HslColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Hsl;
 }
 
+public final class codes/side/color/HslColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/HslColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getS-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-0R-LcBE (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-0R-LcBE$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public class codes/side/color/HslColorSpace : codes/side/color/ColorSpace {
 	public fun fromBase ([D[D)V
 	public fun getGamut ()Lcodes/side/color/RgbGamut;
@@ -237,6 +300,25 @@ public class codes/side/color/HslColorSpace : codes/side/color/ColorSpace {
 
 public final class codes/side/color/Hsv : codes/side/color/HsvColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Hsv;
+}
+
+public final class codes/side/color/HsvColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/HsvColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getS-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getV-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-bawT8Dg (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-bawT8Dg$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
 public class codes/side/color/HsvColorSpace : codes/side/color/ColorSpace {
@@ -266,8 +348,36 @@ public final class codes/side/color/HueFamily$Companion {
 	public final fun rgbHexcone (Lcodes/side/color/ColorSpace;)Lcodes/side/color/HueFamily;
 }
 
+public final class codes/side/color/HueSaturationViewsKt {
+	public static final fun asHsl (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asHsv (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asHwb (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toHsl (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toHsv (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toHwb (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Hwb : codes/side/color/HwbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Hwb;
+}
+
+public final class codes/side/color/HwbColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/HwbColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public static final fun getW-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-maTm2Eo (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-maTm2Eo$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
 public class codes/side/color/HwbColorSpace : codes/side/color/ColorSpace {
@@ -294,12 +404,76 @@ public final class codes/side/color/Lab : codes/side/color/ColorSpace {
 	public fun toBase ([D[D)V
 }
 
+public final class codes/side/color/LabColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/LabColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getA-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-wKY_PFk (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-wKY_PFk$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/LabViewsKt {
+	public static final fun asLab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toLab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Lch : codes/side/color/PolarColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Lch;
 }
 
+public final class codes/side/color/LchColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/LchColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getC-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-8kjQ_X4 (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-8kjQ_X4$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/OkLch : codes/side/color/PolarColorSpace {
 	public static final field INSTANCE Lcodes/side/color/OkLch;
+}
+
+public final class codes/side/color/OkLchColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OkLchColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getC-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-t3s4fNg (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-t3s4fNg$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
 public final class codes/side/color/Okhsl : codes/side/color/ColorSpace {
@@ -316,6 +490,25 @@ public final class codes/side/color/Okhsl : codes/side/color/ColorSpace {
 	public fun toBase ([D[D)V
 }
 
+public final class codes/side/color/OkhslColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OkhslColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getS-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-K2Exx8k (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-K2Exx8k$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Okhsv : codes/side/color/ColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Okhsv;
 	public fun fromBase ([D[D)V
@@ -330,6 +523,32 @@ public final class codes/side/color/Okhsv : codes/side/color/ColorSpace {
 	public fun toBase ([D[D)V
 }
 
+public final class codes/side/color/OkhsvColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OkhsvColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getS-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getV-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-Pnnvz0Q (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-Pnnvz0Q$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/OkhsxViewsKt {
+	public static final fun asOkhsl (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asOkhsv (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toOkhsl (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toOkhsv (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Oklab : codes/side/color/ColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Oklab;
 	public fun fromBase ([D[D)V
@@ -339,6 +558,32 @@ public final class codes/side/color/Oklab : codes/side/color/ColorSpace {
 	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
 	public static synthetic fun invoke$default (Lcodes/side/color/Oklab;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/OklabColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OklabColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getA-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-R80dmeU (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-R80dmeU$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/OklabViewsKt {
+	public static final fun asOkLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asOklab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toOkLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toOklab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
 }
 
 public class codes/side/color/PolarColorSpace : codes/side/color/ColorSpace {
@@ -395,12 +640,59 @@ public final class codes/side/color/RgbPrimaries$Companion {
 	public final fun getSrgb ()Lcodes/side/color/RgbPrimaries;
 }
 
+public final class codes/side/color/RgbViewsKt {
+	public static final fun asDisplayP3 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asSrgb (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asSrgbLinear (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toDisplayP3 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toSrgb (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toSrgbLinear (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/Srgb : codes/side/color/RgbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Srgb;
 }
 
+public final class codes/side/color/SrgbColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/SrgbColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getG-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getR-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-Je7WBxA (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-Je7WBxA$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/SrgbLinear : codes/side/color/RgbColorSpace {
 	public static final field INSTANCE Lcodes/side/color/SrgbLinear;
+}
+
+public final class codes/side/color/SrgbLinearColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/SrgbLinearColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getB-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getG-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getR-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-Ifmrn04 (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-Ifmrn04$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
 public abstract class codes/side/color/TransferFunction {
@@ -445,6 +737,25 @@ public final class codes/side/color/XyzD50 : codes/side/color/ColorSpace {
 	public fun toBase ([D[D)V
 }
 
+public final class codes/side/color/XyzD50Color {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/XyzD50Color;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public static final fun getX-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getY-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getZ-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-4F-B4dY (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-4F-B4dY$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
 public final class codes/side/color/XyzD65 : codes/side/color/ColorSpace {
 	public static final field INSTANCE Lcodes/side/color/XyzD65;
 	public fun fromBase ([D[D)V
@@ -454,5 +765,31 @@ public final class codes/side/color/XyzD65 : codes/side/color/ColorSpace {
 	public final fun invoke (Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
 	public static synthetic fun invoke$default (Lcodes/side/color/XyzD65;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 	public fun toBase ([D[D)V
+}
+
+public final class codes/side/color/XyzD65Color {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/XyzD65Color;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public static final fun getX-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getY-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getZ-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-0ez_E7I (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-0ez_E7I$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/XyzViewsKt {
+	public static final fun asXyzD50 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asXyzD65 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toXyzD50 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toXyzD65 (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
 }
 
