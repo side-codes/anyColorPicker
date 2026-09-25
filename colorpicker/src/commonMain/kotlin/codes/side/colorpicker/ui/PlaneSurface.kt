@@ -10,9 +10,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import codes.side.color.ColorChannel
 import codes.side.color.Hsl
 import codes.side.color.Hsv
@@ -216,4 +219,23 @@ private fun hsvSurface(hue: Double): DrawScope.() -> Unit {
         drawRect(ramp)
         drawRect(shading)
     }
+}
+
+/**
+ * Draws [bitmap] stretched over the whole drawing area.
+ *
+ * A ShaderBrush will not do it: an ImageShader paints the bitmap at its own size and clamps
+ * outwards, so an 80-pixel box filled from a 4-pixel ramp comes back the ramp's last colour
+ * across almost all of it. Scaling needs a destination size, and the low filter quality is
+ * the bilinear read the grid sizes above are measured against.
+ */
+internal fun DrawScope.drawPlaneBitmap(bitmap: ImageBitmap) {
+    drawImage(
+        image = bitmap,
+        srcOffset = IntOffset.Zero,
+        srcSize = IntSize(bitmap.width, bitmap.height),
+        dstOffset = IntOffset.Zero,
+        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+        filterQuality = FilterQuality.Low,
+    )
 }
