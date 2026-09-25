@@ -54,7 +54,6 @@ import kotlinx.collections.immutable.ImmutableList
  * closes and the thumb sits flush against the gradient.
  * @param thumbTrackGap clearance between the thumb and each track end.
  */
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 public fun ColorSlider(
     value: Float,
@@ -62,6 +61,57 @@ public fun ColorSlider(
     gradientColors: ImmutableList<Color>,
     thumbColor: Color,
     modifier: Modifier = Modifier,
+    label: (@Composable () -> Unit)? = null,
+    valueLabel: (@Composable () -> Unit)? = null,
+    onValueChangeFinished: (() -> Unit)? = null,
+    enabled: Boolean = true,
+    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
+    showCheckerboard: Boolean = false,
+    semanticLabel: String? = null,
+    semanticValueText: String? = null,
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
+    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+) {
+    val stops = remember(gradientColors) { TrackStops(gradientColors, null) }
+    ColorSliderImpl(
+        value = value,
+        onValueChange = onValueChange,
+        stops = stops,
+        thumbColor = thumbColor,
+        modifier = modifier,
+        label = label,
+        valueLabel = valueLabel,
+        onValueChangeFinished = onValueChangeFinished,
+        enabled = enabled,
+        trackHeight = trackHeight,
+        showCheckerboard = showCheckerboard,
+        semanticLabel = semanticLabel,
+        semanticValueText = semanticValueText,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
+    )
+}
+
+/**
+ * [ColorSlider] with stops at their own positions, and [sliderModifier] applied to the Material slider
+ * itself, ahead of its own modifiers: a key handler there sees the slider's keys first, and a semantics
+ * block there overrides what the slider sets.
+ */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+internal fun ColorSliderImpl(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    stops: TrackStops,
+    thumbColor: Color,
+    modifier: Modifier = Modifier,
+    sliderModifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     valueLabel: (@Composable () -> Unit)? = null,
     onValueChangeFinished: (() -> Unit)? = null,
@@ -103,6 +153,7 @@ public fun ColorSlider(
             enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
+                .then(sliderModifier)
                 // Merged semantics only — M3 Slider's own progress semantics
                 // must survive.
                 .semantics {
@@ -112,7 +163,7 @@ public fun ColorSlider(
             interactionSource = interactionSource,
             track = {
                 GradientTrack(
-                    colors = gradientColors,
+                    stops = stops,
                     thumbFraction = value,
                     interactionSource = interactionSource,
                     checkerboardLight = colors.checkerboardLight,
