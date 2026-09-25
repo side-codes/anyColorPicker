@@ -560,7 +560,9 @@ public final class codes/side/colorpicker/ui/ColorPickerDialogKt {
 }
 
 public final class codes/side/colorpicker/ui/ColorPickerKt {
+	public static final fun ColorPicker (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lcodes/side/color/ColorSpace;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 	public static final fun ColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;Lcodes/side/color/ColorSpace;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorPicker-7TzT5BU (JLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lcodes/side/color/ColorSpace;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ColorPlaneKt {

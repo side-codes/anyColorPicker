@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import codes.side.color.AnalogousCategory
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
+import codes.side.color.ColorValue
 import codes.side.color.Okhsl
+import codes.side.color.compose.toColorValue
+import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -138,4 +142,115 @@ public fun ColorPicker(
             if (showAlpha) alphaSlider(state)
         }
     }
+}
+
+/**
+ * [ColorPicker] over a value the caller holds, fully controlled, as Compose's `Slider(value,
+ * onValueChange)` is. Every change the user makes reaches [onValueChange] in the same event, as the
+ * whole new value in [space], and the picker draws only [value]. A value passed in is never reported
+ * back.
+ *
+ * Update your value in the callback. A caller that ignores it holds the picker still, and one that
+ * clamps or rounds shows the clamp or the rounding at once. A value that arrives late (debounced, from
+ * a store, or through a coroutine) is drawn when it arrives, and a drag carries on from the finger. A
+ * caller like that is better served by holding a [ColorPickerState] and observing it.
+ *
+ * When [value] is the one the picker last reported, the picker keeps that exact value. Any other value
+ * becomes the picker's; a grey arriving without a hue keeps the hue last chosen. The remembered hues are
+ * saved across configuration changes.
+ *
+ * The remaining parameters are [ColorPicker]'s.
+ */
+@Composable
+public fun ColorPicker(
+    value: ColorValue,
+    onValueChange: (ColorValue) -> Unit,
+    modifier: Modifier = Modifier,
+    space: ColorSpace = Okhsl,
+    showPlane: Boolean = hasPlane(space),
+    showAlpha: Boolean = true,
+    enabled: Boolean = true,
+    coloringMode: ColoringMode = defaultColoringMode(space),
+    onValueChangeFinished: () -> Unit = {},
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+) {
+    val state = rememberControlledPickerState(value, space, onValueChange, toValue = { it }, fromValue = { it })
+    ColorPicker(
+        state = state,
+        modifier = modifier,
+        space = space,
+        showPlane = showPlane,
+        showAlpha = showAlpha,
+        enabled = enabled,
+        coloringMode = coloringMode,
+        onValueChangeFinished = onValueChangeFinished,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+        plane = plane,
+        channelSlider = channelSlider,
+        alphaSlider = alphaSlider,
+    )
+}
+
+/**
+ * [ColorPicker] over a Compose [Color] the caller holds, fully controlled as the [ColorValue] form is.
+ * [onColorChange] receives each change as `toComposeColor()`: brought into sRGB by CSS gamut mapping,
+ * eight bits a channel.
+ *
+ * The picker keeps the exact value behind the last color it reported, so it never steps through 8-bit
+ * sRGB itself, and an edit outside sRGB stays where the user put it. Hold a [ColorValue] instead to keep
+ * wide gamut and `none` on your side too.
+ *
+ * The remaining parameters are [ColorPicker]'s.
+ *
+ * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which
+ * [toColorValue] refuses.
+ */
+@Composable
+public fun ColorPicker(
+    color: Color,
+    onColorChange: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+    space: ColorSpace = Okhsl,
+    showPlane: Boolean = hasPlane(space),
+    showAlpha: Boolean = true,
+    enabled: Boolean = true,
+    coloringMode: ColoringMode = defaultColoringMode(space),
+    onValueChangeFinished: () -> Unit = {},
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+) {
+    val state = rememberControlledPickerState(
+        color,
+        space,
+        onColorChange,
+        toValue = { it.toColorValue() },
+        fromValue = { it.toComposeColor() },
+    )
+    ColorPicker(
+        state = state,
+        modifier = modifier,
+        space = space,
+        showPlane = showPlane,
+        showAlpha = showAlpha,
+        enabled = enabled,
+        coloringMode = coloringMode,
+        onValueChangeFinished = onValueChangeFinished,
+        colors = colors,
+        shapes = shapes,
+        thumb = thumb,
+        plane = plane,
+        channelSlider = channelSlider,
+        alphaSlider = alphaSlider,
+    )
 }
