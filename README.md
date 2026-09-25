@@ -302,8 +302,9 @@ HslColorPicker(
 ```
 
 A replacement inherits the picker's colors, shapes and dimensions through the theme, so only
-what you actually want to change has to be named. `enabled` is the exception — forward it if
-you want your slider dimmed, though the picker refuses input to a disabled slot either way:
+what you actually want to change has to be named. `enabled` reaches it the same way: in a
+disabled picker, the library's sliders and planes are disabled whether or not they were told,
+and any other control in a slot is refused the pointer:
 
 ```kotlin
 HslColorPicker(state = state, enabled = false)   // dimmed, inert, and disabled to a screen reader

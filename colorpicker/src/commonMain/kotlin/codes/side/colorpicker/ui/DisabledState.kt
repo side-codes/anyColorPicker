@@ -1,5 +1,7 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.toRect
@@ -12,6 +14,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
 import codes.side.colorpicker.theme.ColorPickerColors
+
+/**
+ * False inside a disabled picker. The library's sliders and planes read it beside their own `enabled`,
+ * so one in a replaced slot that was never given `enabled` is disabled too: dimmed, unfocusable, and
+ * offering a screen reader nothing to adjust, where [disabledInput] alone stops only the pointer.
+ */
+internal val LocalPickerEnabled: ProvidableCompositionLocal<Boolean> = compositionLocalOf { true }
 
 /**
  * Refuses pointer input for everything below this point, and says so to accessibility.

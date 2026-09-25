@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -92,8 +93,9 @@ internal fun defaultAlphaSlider(
  * leaves the color in [space].
  *
  * Each part is a slot. A replacement inherits this picker's colors, shapes and dimensions through
- * [ColorPickerTheme], and is refused input while [enabled] is false even if it was never given
- * [enabled] itself.
+ * [ColorPickerTheme]. While [enabled] is false it is refused pointer input even if it was never given
+ * [enabled] itself, and the library's sliders and planes inside it are disabled outright: dimmed, and
+ * deaf to the keyboard and a screen reader too.
  *
  * @param space the space whose channels the picker shows. Okhsl by default: its lightness is perceived
  * lightness, and its saturation is measured against the display, so every position is a color the
@@ -130,16 +132,18 @@ public fun ColorPicker(
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
-    // Provided rather than passed down, so a replaced slot inherits the picker's theme without the call
-    // site forwarding it.
+    // Provided rather than passed down, so a replaced slot inherits the picker's theme and its disabled
+    // state without the call site forwarding them.
     ColorPickerTheme(colors = colors, shapes = shapes) {
-        Column(
-            modifier = modifier.disabledInput(enabled),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (showPlane) plane(state)
-            for (channel in space.channels) key(channel) { channelSlider(state, channel) }
-            if (showAlpha) alphaSlider(state)
+        CompositionLocalProvider(LocalPickerEnabled provides (enabled && LocalPickerEnabled.current)) {
+            Column(
+                modifier = modifier.disabledInput(enabled),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                if (showPlane) plane(state)
+                for (channel in space.channels) key(channel) { channelSlider(state, channel) }
+                if (showAlpha) alphaSlider(state)
+            }
         }
     }
 }

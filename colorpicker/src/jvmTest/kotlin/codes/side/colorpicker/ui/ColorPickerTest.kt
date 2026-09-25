@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
 class ColorPickerTest {
@@ -113,6 +115,30 @@ class ColorPickerTest {
         }
         onNodeWithTag("h").performTouchInput { swipeRight() }
         assertEquals(Hsl(200.0, 80.0, 50.0), state.value)
+    }
+
+    @Test
+    fun aDisabledPickerDisablesReplacedSlotsThatNeverSawEnabled() = runComposeUiTest {
+        // Refusing the pointer is half of it: a slot that did not forward enabled would still take the
+        // arrow keys and a screen reader's steps.
+        setContent {
+            ColorPicker(
+                teal(),
+                space = Hsl,
+                enabled = false,
+                plane = { s -> ChannelPlane(s, Hsl.S, Hsl.L, Modifier.testTag("plane").size(100.dp)) },
+                channelSlider = { s, channel -> ChannelSlider(s, channel, Modifier.testTag(channel.id)) },
+                alphaSlider = { s -> AlphaSlider(s, Modifier.testTag("alpha")) },
+            )
+        }
+        for (tag in listOf("h", "alpha")) {
+            val config = sliderIn(tag).fetchSemanticsNode().config
+            assertTrue(SemanticsProperties.Disabled in config, "$tag should report itself disabled")
+            assertTrue(SemanticsProperties.Focused !in config, "$tag should take no focus")
+        }
+        val plane = onNodeWithTag("plane").fetchSemanticsNode().config
+        assertTrue(SemanticsProperties.Focused !in plane, "the plane should take no focus")
+        assertTrue(SemanticsActions.CustomActions !in plane, "the plane should offer no actions")
     }
 
     @Test

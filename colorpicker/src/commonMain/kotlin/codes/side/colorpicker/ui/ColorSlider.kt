@@ -133,8 +133,9 @@ internal fun ColorSliderImpl(
         activeTrackColor = Color.Transparent,
         inactiveTrackColor = Color.Transparent,
     )
+    val active = enabled && LocalPickerEnabled.current
 
-    Column(modifier = modifier.fillMaxWidth().disabledAppearance(enabled, colors)) {
+    Column(modifier = modifier.fillMaxWidth().disabledAppearance(active, colors)) {
         if (label != null || valueLabel != null) {
             Row(
                 modifier = Modifier
@@ -151,7 +152,7 @@ internal fun ColorSliderImpl(
             value = value,
             onValueChange = onValueChange,
             onValueChangeFinished = onValueChangeFinished,
-            enabled = enabled,
+            enabled = active,
             modifier = Modifier
                 .fillMaxWidth()
                 .then(sliderModifier)
