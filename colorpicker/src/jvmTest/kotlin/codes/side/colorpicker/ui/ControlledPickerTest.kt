@@ -273,6 +273,16 @@ class ControlledPickerTest {
     }
 
     @Test
+    fun anAlphaEditKeepsAWideGamutValueInItsSpace() = runComposeUiTest {
+        // Converting into Okhsl, which holds sRGB alone, would pull the red to sRGB's edge for an opacity change.
+        val p3Red = DisplayP3(1.0, 0.0, 0.0)
+        val reported = mutableListOf<ColorValue>()
+        setContent { ColorPicker(p3Red, { reported += it }, space = Okhsl, showPlane = false) }
+        setProgress("Alpha", 0.5f)
+        assertEquals(DisplayP3(1.0, 0.0, 0.0, 0.5), reported.single())
+    }
+
+    @Test
     fun aDisabledPickerReportsNothing() = runComposeUiTest {
         var reports = 0
         setContent { ColorPicker(teal, { reports++ }, Modifier.width(300.dp), space = Hsl, showPlane = false, enabled = false) }

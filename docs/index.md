@@ -329,6 +329,8 @@ OkhslColorPicker(color = color, onColorChange = { color = it })
 - Every change reaches the callback in the same event, as the whole new value in the picker's
   space, and the picker draws only what you pass back. Ignore the callback and the picker holds
   still; clamp or round the value and it shows the clamp or the rounding at once.
+- A change of alpha alone comes back in your value's own space, so opacity never pulls a Display P3
+  color into an Okhsl picker's sRGB.
 - A value you pass in is drawn, and never reported back to you.
 - The `Color` form keeps the exact value behind the last color it reported, so an Okhsl picker
   never steps through 8-bit sRGB, and an edit outside sRGB stays where the user put it. Hold a

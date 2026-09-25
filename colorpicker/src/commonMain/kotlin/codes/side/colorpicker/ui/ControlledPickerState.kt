@@ -15,8 +15,8 @@ import codes.side.colorpicker.state.ColorPickerState
  * [ColorPickerState], which keeps the remembered hues and the exact value behind the last report,
  * while [external] decides what is drawn.
  *
- * Each edit is converted into [space] and handed to [onChange] at once, and not applied; later edits
- * build on it until the caller answers. Each composition then takes [external] in, compared in the
+ * Each edit is converted into [space], unless it changed alpha alone, and handed to [onChange] at once,
+ * and not applied; later edits build on it until the caller answers. Each composition then takes [external] in, compared in the
  * caller's type:
  * - equal to the last emission, the state keeps the exact value it emitted, so a [T] of 8-bit sRGB
  *   does not drag an Okhsl picker through 8-bit sRGB;
@@ -38,7 +38,11 @@ internal fun <T> rememberControlledPickerState(
     val currentOnChange by rememberUpdatedState(onChange)
     val currentFromValue by rememberUpdatedState(fromValue)
     state.onEdit = { edited ->
-        val emitted = edited.to(space)
+        // An edit of alpha alone keeps the value's space, as AlphaSlider's does over a state: converting it
+        // would pull a color the picker's space cannot hold to that space's edge for an opacity change.
+        val base = state.editBase
+        val alphaOnly = edited.withAlpha(if (base.isAlphaMissing) null else base.alpha) == base
+        val emitted = if (alphaOnly) edited else edited.to(space)
         state.emit(emitted)
         currentOnChange(currentFromValue(emitted))
     }

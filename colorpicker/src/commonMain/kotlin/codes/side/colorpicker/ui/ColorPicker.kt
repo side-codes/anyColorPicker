@@ -147,8 +147,9 @@ public fun ColorPicker(
 /**
  * [ColorPicker] over a value the caller holds, fully controlled, as Compose's `Slider(value,
  * onValueChange)` is. Every change the user makes reaches [onValueChange] in the same event, as the
- * whole new value in [space], and the picker draws only [value]. A value passed in is never reported
- * back.
+ * whole new value: in [space], or in the value's own space when only alpha changed, so opacity never
+ * pulls a color [space] cannot hold to its edge. The picker draws only [value], and a value passed in
+ * is never reported back.
  *
  * Update your value in the callback. A caller that ignores it holds the picker still, and one that
  * clamps or rounds shows the clamp or the rounding at once. A value that arrives late (debounced, from
