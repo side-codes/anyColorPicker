@@ -556,7 +556,8 @@ public final class codes/side/colorpicker/ui/CmykSlidersKt {
 }
 
 public final class codes/side/colorpicker/ui/ColorPickerDialogKt {
-	public static final fun ColorPickerDialog (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcodes/side/colorpicker/model/HslColor;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZLcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorPickerDialog (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcodes/side/color/ColorSpace;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorPickerDialog-yV_wc64 (JLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Lcodes/side/color/ColorSpace;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZZLcodes/side/colorpicker/state/ColoringMode;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ColorPickerKt {
