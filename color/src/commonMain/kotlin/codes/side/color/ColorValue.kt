@@ -7,6 +7,10 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+// Where the stored mask keeps a missing alpha: past any channel's bit, and never in
+// [ColorValue.missingMask]. File-private, so Java sees no field for it.
+private const val ALPHA_MISSING: Int = 1 shl 31
+
 /**
  * A color: components in one [space], an [alpha], and which of them are `none`.
  *
@@ -34,6 +38,9 @@ public class ColorValue internal constructor(
     /** True when alpha is `none`. */
     public val isAlphaMissing: Boolean get() = missing and ALPHA_MISSING != 0
 
+    // Alpha as the factories take it: null when it is `none`.
+    internal val alphaOrNull: Double? get() = if (isAlphaMissing) null else alpha
+
     /** [channel]'s value, or null when it is `none`. */
     public operator fun get(channel: ColorChannel): Double? {
         requireOwn(channel)
@@ -52,15 +59,12 @@ public class ColorValue internal constructor(
         val components = components()
         val bit = 1 shl channel.index
         components[channel.index] = value ?: 0.0
-        val newMissing = if (value == null) missing or bit else missing and bit.inv()
-        return create(space, components, alpha, newMissing)
+        val newMissing = if (value == null) missingMask or bit else missingMask and bit.inv()
+        return create(space, components, alphaOrNull, newMissing)
     }
 
     /** A copy with alpha set to [value], or to `none` when [value] is null. */
-    public fun withAlpha(value: Double?): ColorValue {
-        val newMissing = if (value == null) missing or ALPHA_MISSING else missing and ALPHA_MISSING.inv()
-        return create(space, components(), value ?: 0.0, newMissing)
-    }
+    public fun withAlpha(value: Double?): ColorValue = create(space, components(), value, missingMask)
 
     /** The components in channel order; a missing one reads `0.0`. */
     public fun components(): DoubleArray = DoubleArray(space.channels.size) { component(it) }
@@ -93,7 +97,7 @@ public class ColorValue internal constructor(
             }
         }
         for (j in out.indices) if (outMissing and (1 shl j) != 0) out[j] = 0.0
-        return create(target, out, alpha, outMissing or (missing and ALPHA_MISSING))
+        return create(target, out, alphaOrNull, outMissing)
     }
 
     // [buffer], this color's components, converted into [target] after CSS Color 4 §11.2's preparation.
@@ -142,7 +146,7 @@ public class ColorValue internal constructor(
         val powerless = space.powerless(buffer) and missing.inv()
         if (powerless == 0) return this
         space.makeAchromatic(buffer, powerless, missing)
-        return create(space, buffer.copyOf(space.channels.size), alpha, missing or powerless)
+        return create(space, buffer.copyOf(space.channels.size), alphaOrNull, missingMask or powerless)
     }
 
     // Component by component, in one space: a missing component equals only another missing one.
@@ -228,16 +232,13 @@ public class ColorValue internal constructor(
     }
 
     public companion object {
-        // Where the stored mask keeps a missing alpha: past any channel's bit, and never in [missingMask].
-        internal const val ALPHA_MISSING: Int = 1 shl 31
-
         // Every ColorValue comes through here: the constructor stores what it is given, unchecked.
         // It is internal rather than private only so the companion needs no synthetic accessor,
         // which would otherwise show up in the public ABI.
-        internal fun create(space: ColorSpace, components: DoubleArray, alpha: Double, missing: Int): ColorValue {
+        internal fun create(space: ColorSpace, components: DoubleArray, alpha: Double?, missing: Int): ColorValue {
             val count = space.channels.size
             require(components.size == count) { "${space.id} takes $count components, got ${components.size}" }
-            require(missing and ((1 shl count) - 1 or ALPHA_MISSING).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
+            require(missing and ((1 shl count) - 1).inv() == 0) { "Missing mask $missing names no channel of ${space.id}" }
             val values = DoubleArray(MAX_COMPONENTS)
             for (i in 0 until count) {
                 if (missing and (1 shl i) != 0) continue
@@ -249,13 +250,9 @@ public class ColorValue internal constructor(
                 if (channel.isHue) value = wrapHue(value)
                 values[i] = value + 0.0
             }
-            val storedAlpha = if (missing and ALPHA_MISSING != 0) {
-                0.0
-            } else {
-                require(alpha.isFinite() && alpha in 0.0..1.0) { "Alpha must be in 0..1, was $alpha" }
-                alpha + 0.0
-            }
-            return ColorValue(space, values[0], values[1], values[2], values[3], missing, storedAlpha)
+            if (alpha == null) return ColorValue(space, values[0], values[1], values[2], values[3], missing or ALPHA_MISSING, 0.0)
+            require(alpha.isFinite() && alpha in 0.0..1.0) { "Alpha must be in 0..1, was $alpha" }
+            return ColorValue(space, values[0], values[1], values[2], values[3], missing, alpha + 0.0)
         }
 
         private fun finite(value: Double): Double = when {

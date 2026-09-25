@@ -80,6 +80,10 @@ kotlin {
             // classpath. foundation is api because every public picker composable
             // is designed to be composed with foundation layouts and its widgets
             // are foundation-based slot hosts.
+            // ColorValue, ColorSpace and ColorChannel are in the state's signatures, and so is the
+            // bridge's conversion to Compose's Color.
+            api(project(":color"))
+            api(project(":color-compose"))
             api(libs.compose.runtime)
             api(libs.compose.foundation)
             api(libs.compose.ui)

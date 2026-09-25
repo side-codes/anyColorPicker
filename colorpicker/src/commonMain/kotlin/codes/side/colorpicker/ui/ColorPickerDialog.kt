@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import codes.side.colorpicker.conversion.toComposeColor
 import codes.side.colorpicker.model.HslColor
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColorPickerStateSaver
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
@@ -70,7 +69,7 @@ public fun ColorPickerDialog(
 ) {
     // initialColor is a reset key: a new initial color re-creates the state,
     // while configuration changes restore in-progress edits via the saver.
-    val state = rememberSaveable(initialColor, saver = ColorPickerStateSaver) {
+    val state = rememberSaveable(initialColor, saver = ColorPickerState.Saver()) {
         ColorPickerState(initialColor)
     }
 

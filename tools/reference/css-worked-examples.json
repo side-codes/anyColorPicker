@@ -1,0 +1,28 @@
+{
+  "examples": [
+    { "example": "ex-leaf-spectro", "color": "lch(51.2345% 21.2 130)", "equals": "lab(51.2345% -13.6271 16.2401)", "tolerance": [5e-5, 5e-5, 5e-5] },
+    { "example": "ex-hsl-sucks", "color": "hsl(240deg 100% 50%)", "equals": "oklch(0.452 0.313 264.1)", "tolerance": [5e-4, 5e-4, 0.05] },
+    { "example": "ex-hsl-sucks", "color": "hsl(60deg 100% 50%)", "equals": "oklch(0.968 0.211 109.8)", "tolerance": [5e-4, 5e-4, 0.05] },
+    { "example": "ex-hsl-sucks-more", "color": "hsl(220deg 100% 50%)", "equals": "oklch(0.533 0.26 262.6)", "tolerance": [5e-4, 5e-3, 0.05] },
+    { "example": "ex-hsl-sucks-more", "color": "hsl(250deg 100% 50%)", "equals": "oklch(0.462 0.306 268.9)", "tolerance": [5e-4, 5e-4, 0.05] },
+    { "example": "ex-hsl-sucks-more", "color": "hsl(50deg 100% 50%)", "equals": "oklch(0.882 0.181 94.24)", "tolerance": [5e-4, 5e-4, 5e-3] },
+    { "example": "ex-hsl-sucks-more", "color": "hsl(80deg 100% 50%)", "equals": "oklch(0.91 0.245 129.9)", "tolerance": [5e-3, 5e-4, 0.05] },
+    { "example": "ex-hwb-simple", "color": "hwb(150 20% 10%)", "equals": "hsl(150 77.78% 55%)", "tolerance": [1e-9, 5e-3, 1e-9] },
+    { "example": "ex-hwb-simple", "color": "hwb(150 20% 10%)", "equals": "rgb(20% 90% 55%)", "tolerance": [5e-3, 5e-3, 5e-3] },
+    { "example": "ex-hwb-achromatic", "color": "hwb(45 40% 80%)", "equals": "rgb(33.33% 33.33% 33.33%)", "tolerance": [5e-5, 5e-5, 5e-5] },
+    { "example": "ex-xyz", "color": "#7654CD", "equals": "rgb(46.27% 32.94% 80.39%)", "tolerance": [5e-5, 5e-5, 5e-5] },
+    { "example": "ex-xyz", "color": "#7654CD", "equals": "lab(44.36% 36.05 -58.99)", "tolerance": [5e-3, 5e-3, 5e-3] },
+    { "example": "ex-same-color", "color": "oklch(65% 0.15 270)", "equals": "lab(57.9% 11.4 -53.7)", "tolerance": [0.05, 0.05, 0.05] },
+    { "example": "ex-same-color", "color": "oklch(65% 0.15 270)", "equals": "color(display-p3 0.445 0.529 0.891)", "tolerance": [5e-4, 5e-4, 5e-4] },
+    { "example": "ex-same-color", "color": "oklch(65% 0.15 270)", "equals": "#6c88ea", "tolerance": [0.00196078431372549, 0.00196078431372549, 0.00196078431372549] },
+    { "example": "ex-same-color-oog", "color": "oklch(65% 0.25 270)", "equals": "lab(56.03% 32.3 -88.58)", "tolerance": [5e-3, 0.05, 5e-3] },
+    { "example": "ex-same-color-oog", "color": "oklch(65% 0.25 270)", "equals": "color(display-p3 0.3731 0.4673 1.105)", "tolerance": [5e-5, 5e-5, 5e-4] },
+    { "example": "ex-same-color-oog", "color": "oklch(65% 0.25 270)", "equals": "color(srgb 0.3475 0.4707 1.146)", "tolerance": [5e-5, 5e-5, 5e-4] },
+    { "example": "ex-lightness-over-100", "color": "color(xyz-d65 1 1 1)", "equals": "lab(100.1154% 9.064489 5.801761)", "tolerance": [5e-5, 5e-7, 5e-7] },
+    { "example": "ex-analogous-hue", "color": "color(display-p3 0.7 0.5 none)", "equals": "oklch(63.612% 0.1522 78.748)", "tolerance": [5e-6, 5e-5, 5e-4] },
+    { "example": "ex-p3-oog-canvas", "color": "oklch(76% 0.27 60)", "equals": "color(display-p3 1.062 0.4954 -0.3115)", "tolerance": [5e-4, 5e-5, 5e-5] },
+    { "example": "ex-hsl-computed", "color": "hsl(38.824 100% 50%)", "equals": "rgb(255, 165, 0)", "tolerance": [0.00196078431372549, 0.00196078431372549, 0.00196078431372549] },
+    { "example": "ex-hwb-serial", "color": "hwb(740deg 20% 30% / 50%)", "equals": "rgba(178.5, 93.5, 51, 0.5)", "tolerance": [0.000196078431372549, 0.000196078431372549, 0.00196078431372549] },
+    { "example": "ex-equivalent-different-lightness", "color": "lab(50% 0 0)", "equals": "oklab(0.56897 0 0)", "printed": ["lab(50% 0 0)", "0.56897"], "tolerance": [5e-6, 1e-9, 1e-9] }
+  ]
+}
