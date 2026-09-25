@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.0.0 (unreleased)
+
+2.0 builds the pickers on a color model of its own, following CSS Color 4, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](README.md#-migrating-from-1x) maps each removed declaration to its replacement.
+
+### Breaking changes
+
+- **A color is a `ColorValue`.** The `model`, `conversion` and `util` packages are gone: `HslColor`, `RgbColor`, `CmykColor`, `LabColor`, `OklabColor`, `OklchColor`, `OkhslColor`, `OkhsvColor`, `PickerColor`, their conversions and hex functions, and `randomHslColor`. A `ColorValue` is a color in one of fifteen spaces, in CSS's units, so HSL's saturation and lightness run 0–100 rather than 0–1.
+- **`ColorPickerState` holds a `ColorValue`.** It is built from a `ColorValue` or a Compose `Color`, with no default. `state.value`, `state[channel]` and fifteen typed views (`state.hsl`, `state.okLch`, …) replace the eight typed getters, `pickerColor` and `argbInt`, and `state[channel] = x` and `state.set(view)` replace the thirty `update…` functions. Writing NaN or a value outside a channel's limit throws where 1.x ignored or clamped it.
+- **The 21 channel sliders and the three planes are gone.** `ChannelSlider(state, channel)` and `ChannelPlane(state, x, y)` take any channel of any space.
+- **The pickers' value forms are fully controlled.** They take a `ColorValue` or a Compose `Color` in place of 1.x's color classes. A change reaches the callback in the same event, and the picker draws only what the caller passes back, where 1.x applied the caller's value when the gesture ended.
+- **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider.
+- **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and a `space`,** Okhsl by default, where 1.x's was fixed to HSL.
+- **State saved by 1.x is not restored.** It starts again from its initial value.
+
+### Added
+
+- **`codes.side:color`,** the color model without Compose: `ColorValue`; sRGB, linear sRGB, Display P3, XYZ D65 and D50, Lab, LCH, Oklab, OkLCh, HSL, HWB, HSV, Okhsl, Okhsv and CMYK; spaces an app defines; conversion between them; CSS Color 4 gamut mapping; CSS color strings and hex, both ways.
+- **`codes.side:color-compose`,** `ColorValue.toComposeColor()` and `Color.toColorValue()`. A Compose color in Display P3 or another of Compose's RGB spaces keeps its space.
+- **`ColorPicker(state, space)`,** a picker for any space: a plane when the space has one hue and two other channels, a slider for each channel, and alpha.
+- **Five more named pickers,** `HsvColorPicker`, `HwbColorPicker`, `LchColorPicker`, `OklabColorPicker` and `OkLchColorPicker`, beside the six 1.x had. Each comes over a `ColorPickerState`, a `ColorValue` and a Compose `Color`.
+- **`ChannelSlider` and `ChannelPlane`.** Arrow keys and screen readers step by each channel's own unit: a degree on a hue, 1/255 on an RGB channel, 0.001 on OkLCh chroma. A value past the end of a track, such as OkLCh chroma 0.5, pins the thumb while the label keeps its true number.
+- **`AlphaSlider` takes `onValueChangeFinished`.**
+
 ## 1.2.1
 
 ### Fixed
