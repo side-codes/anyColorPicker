@@ -209,6 +209,35 @@ class PlaneInputTest {
         val config = onNodeWithTag("plane").fetchSemanticsNode().config
         assertTrue(SemanticsActions.CustomActions !in config, "nothing to offer when it is off")
     }
+
+    @Test
+    fun aPlaneCanStepByItsOwnAmount() = runComposeUiTest {
+        var x = 0.5f
+        var y = 0.5f
+        setContent {
+            ColorPlaneImpl(
+                xValue = x,
+                yValue = y,
+                onValueChange = { newX, newY ->
+                    x = newX
+                    y = newY
+                },
+                onStep = { dx, dy, coarse ->
+                    val amount = if (coarse) 0.25f else 0.05f
+                    x += dx * amount
+                    y += dy * amount
+                    true
+                },
+                surface = {},
+                modifier = Modifier.testTag("plane").size(200.dp),
+            )
+        }
+        onNodeWithTag("plane").requestFocus()
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(0.55f, x, 1e-6f)
+        onNodeWithTag("plane").performKeyInput { withKeyDown(Key.ShiftLeft) { pressKey(Key.DirectionUp) } }
+        assertEquals(0.75f, y, 1e-6f)
+    }
 }
 
 private fun Modifier.countKeyDowns(onKeyDown: () -> Unit): Modifier = onKeyEvent { event ->
