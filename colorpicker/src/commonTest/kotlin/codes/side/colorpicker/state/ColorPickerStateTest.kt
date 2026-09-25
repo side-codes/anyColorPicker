@@ -254,4 +254,30 @@ class ColorPickerStateTest {
         state.editAlpha(0.5)
         assertEquals(Hsl(200.0, 80.0, 50.0, 0.5), state.value)
     }
+
+    @Test
+    fun displayComponentsAreWhatEachChannelsSliderShows() {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        state.value = grey
+        val shown = state.displayComponents(Hsl)
+        assertEquals(200.0, shown[Hsl.H.index], "a grey's hue is the one remembered")
+        for (channel in Hsl.channels) assertEquals(state.displayValue(channel), shown[channel.index], "$channel")
+    }
+
+    @Test
+    fun aTwoChannelEditIsOneWrite() {
+        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0))
+        val reported = mutableListOf<ColorValue>()
+        state.onEdit = { reported += it }
+        state.edit(Hsl.S, 30.0, Hsl.L, 40.0)
+        assertEquals(listOf(Hsl(0.0, 30.0, 40.0)), reported)
+    }
+
+    @Test
+    fun aTwoChannelEditOnAGreyTakesTheRememberedHue() {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        state.value = grey
+        state.edit(Hsl.S, 60.0, Hsl.L, 40.0)
+        assertEquals(Hsl(200.0, 60.0, 40.0), state.value)
+    }
 }

@@ -100,8 +100,16 @@ public class ColorPickerState(initialValue: ColorValue) {
      * What a slider on [channel] shows: its value; for a missing hue, the one last chosen in its
      * family, or 0 when none has been; for any other missing component, 0, as CSS reads `none`.
      */
-    public fun displayValue(channel: ColorChannel): Double =
-        get(channel) ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
+    public fun displayValue(channel: ColorChannel): Double = displayComponents(channel.space)[channel.index]
+
+    // [displayValue] for every channel of [space], converting once: what a track or a plane holds still.
+    internal fun displayComponents(space: ColorSpace): DoubleArray {
+        val color = current.to(space)
+        return DoubleArray(space.channels.size) { index ->
+            val channel = space.channels[index]
+            color[channel] ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
+        }
+    }
 
     /**
      * Sets [channel] to [value], or to `none` when it is null, and leaves the color in [channel]'s
@@ -127,6 +135,12 @@ public class ColorPickerState(initialValue: ColorValue) {
 
     internal fun editAlpha(alpha: Double?) {
         submit(current.withAlpha(alpha))
+    }
+
+    // Two channels of one space in one write, as a plane drags them: the color passes through no value
+    // with only one of them changed.
+    internal fun edit(x: ColorChannel, xValue: Double?, y: ColorChannel, yValue: Double?) {
+        submit(edited(x, xValue).with(y, yValue))
     }
 
     private fun submit(edited: ColorValue) {
