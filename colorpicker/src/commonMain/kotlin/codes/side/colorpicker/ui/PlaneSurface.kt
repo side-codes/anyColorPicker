@@ -157,11 +157,16 @@ internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
 // What a raster is built from: the pair of channels and every held component.
 private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
 
+// A built raster and the pair of channels it shows.
+private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: ImageBitmap)
+
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
  * are two brushes, exactly. Any other pair is a raster, built on [Dispatchers.Default] whenever a held
- * channel changes, with the previous one drawn until it arrives. A preview draws one frame and has no
- * later one to wait for, so there the raster is built at once.
+ * channel changes, with the previous one drawn until it arrives. A raster of another pair is another
+ * space's colors rather than an earlier state of these, so after a change of channels nothing is drawn
+ * until the new pair's arrives. A preview draws one frame and has no later one to wait for, so there the
+ * raster is built at once.
  */
 @Composable
 internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: DoubleArray): DrawScope.() -> Unit {
@@ -173,7 +178,7 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
     val bitmap = if (LocalInspectionMode.current) {
         remember(x, y, key) { rasterizePlane(x, y, held, planeGridOf(x, y)) }
     } else {
-        val raster = remember { mutableStateOf<ImageBitmap?>(null) }
+        val raster = remember { mutableStateOf<PlaneRaster?>(null) }
         val request by rememberUpdatedState(PlaneRequest(x, y, key))
         LaunchedEffect(Unit) {
             // One raster at a time, always of the latest request. A drag changes the held channels
@@ -183,10 +188,10 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
                 val built = withContext(Dispatchers.Default) {
                     rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
                 }
-                raster.value = built
+                raster.value = PlaneRaster(next.x, next.y, built)
             }
         }
-        raster.value
+        raster.value?.takeIf { it.x === x && it.y === y }?.bitmap
     }
     return { if (bitmap != null) drawPlaneBitmap(bitmap) }
 }

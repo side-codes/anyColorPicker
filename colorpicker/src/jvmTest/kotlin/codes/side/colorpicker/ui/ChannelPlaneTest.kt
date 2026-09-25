@@ -1,8 +1,12 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PixelMap
@@ -38,6 +42,7 @@ import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.OkLch
 import codes.side.color.Okhsl
+import codes.side.color.Okhsv
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -46,6 +51,7 @@ import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
@@ -351,5 +357,23 @@ class ChannelPlaneTest {
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionUp) }
         assertEquals(listOf(51.0 to 50.0, 51.0 to 51.0), emitted.map { it[Hsl.S] to it[Hsl.L] })
+    }
+
+    @Test
+    fun aPlaneMovedToOtherChannelsNeverDrawsTheOldRaster() = runComposeUiTest {
+        // Okhsv's value plane is vivid at the top right; OkLCh's lightness plane is near white there,
+        // and its 256 × 256 raster takes long enough that the capture below comes before it lands.
+        fun vivid(c: Color) = c.red > 0.7f && c.red - c.green > 0.3f
+        var axes by mutableStateOf(Okhsv.S to Okhsv.V)
+        val state = ColorPickerState(Okhsv(29.2, 0.3, 0.3))
+        setContent {
+            Box(Modifier.background(Color.Black)) {
+                ChannelPlane(state, axes.first, axes.second, Modifier.testTag("plane").size(200.dp))
+            }
+        }
+        waitUntil(timeoutMillis = 5_000) { vivid(pixels().at(0.85f, 0.95f)) }
+        axes = OkLch.C to OkLch.L
+        val topRight = pixels().at(0.85f, 0.95f)
+        assertFalse(vivid(topRight), "Okhsv's raster is drawn under OkLCh's axes: $topRight")
     }
 }
