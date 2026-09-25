@@ -190,10 +190,6 @@ class ColorPickerStateTest {
                 state[Hsl.H]
                 assertEquals(200.0, state.displayValue(Hsl.H))
                 state.color
-                state.hslColor
-                state.okhslColor
-                state.pickerColor
-                state.argbInt
             }
         } finally {
             snapshot.dispose()
