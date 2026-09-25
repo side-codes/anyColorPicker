@@ -2,28 +2,46 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
-import codes.side.colorpicker.model.HslColor
+import codes.side.color.Cmyk
+import codes.side.color.ColorSpace
+import codes.side.color.ColorValue
+import codes.side.color.Hsl
+import codes.side.color.Hsv
+import codes.side.color.Hwb
+import codes.side.color.Lab
+import codes.side.color.Lch
+import codes.side.color.OkLch
+import codes.side.color.Okhsl
+import codes.side.color.Okhsv
+import codes.side.color.Oklab
+import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerTheme
 import kotlin.test.Test
@@ -31,268 +49,224 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * What the picker parameters are for: replacing one slider, theming every slider at once, and
- * turning the whole thing off. None of it means anything outside a real composition.
+ * What the picker parameters are for: every picker taking the same configuration, theming every
+ * component at once, and turning one off. None of it means anything outside a real composition.
  */
 @OptIn(ExperimentalTestApi::class)
 class PickerConfigurationTest {
 
-    private fun state() = ColorPickerState(HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f))
+    private val seed = Okhsl(30.0, 0.5, 0.5)
+
+    private class NamedPicker(val space: ColorSpace, val content: @Composable (ColorPickerState) -> Unit)
+
+    private val named = listOf(
+        NamedPicker(Srgb) { RgbColorPicker(it) },
+        NamedPicker(Hsl) { HslColorPicker(it) },
+        NamedPicker(Hsv) { HsvColorPicker(it) },
+        NamedPicker(Hwb) { HwbColorPicker(it) },
+        NamedPicker(Lab) { LabColorPicker(it) },
+        NamedPicker(Lch) { LchColorPicker(it) },
+        NamedPicker(Oklab) { OklabColorPicker(it) },
+        NamedPicker(OkLch) { OkLchColorPicker(it) },
+        NamedPicker(Okhsl) { OkhslColorPicker(it) },
+        NamedPicker(Okhsv) { OkhsvColorPicker(it) },
+        NamedPicker(Cmyk) { CmykColorPicker(it) },
+    )
 
     @Test
-    fun aReplacedSlotIsDrawnInsteadOfTheDefault() = runComposeUiTest {
-        setContent {
-            HslColorPicker(state = state(), hueSlider = { Text("Farbton") })
+    fun eachNamedPickerShowsItsOwnSpace() = runComposeUiTest {
+        val state = ColorPickerState(seed)
+        var index by mutableIntStateOf(0)
+        setContent { named[index].content(state) }
+        for (i in named.indices) {
+            index = i
+            waitForIdle()
+            val space = named[i].space
+            val labels = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)).fetchSemanticsNodes()
+                .map { it.config[SemanticsProperties.ContentDescription].single() }
+            assertEquals(space.channels.map { channelSpokenLabel(it) } + ALPHA_LABEL, labels, "${space.id}'s sliders")
+            val planes = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNodes().size
+            assertEquals(if (hasPlane(space)) 1 else 0, planes, "${space.id}'s plane")
         }
-        onNodeWithText("Farbton").assertExists()
-        // The slider it stood in for is gone, and the ones beside it are not.
-        onNodeWithText("Hue").assertDoesNotExist()
-        onNodeWithText("Saturation").assertExists()
     }
 
     @Test
-    fun aReplacedSlotInheritsThePickersColorsWithoutForwardingThem() = runComposeUiTest {
-        val custom = ColorPickerColors(
-            checkerboardLight = Color.Red,
-            checkerboardDark = Color.Green,
-            disabledAlpha = 0.5f,
-            disabledSaturation = 1f,
+    fun everyPickerTakesTheSameConfigurationInAllThreeForms() = runComposeUiTest {
+        // That this compiles is most of the assertion: the twelve pickers agree on the set.
+        val onState: List<@Composable (ColorPickerState) -> Unit> = listOf(
+            { ColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { RgbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { HslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { HsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { HwbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { LabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { LchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { OklabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { OkLchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { OkhslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { OkhsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { CmykColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
         )
-        var seen: ColorPickerColors? = null
+        val onValue: List<@Composable (ColorValue) -> Unit> = listOf(
+            { ColorPicker(it, {}, enabled = false, thumb = {}) },
+            { RgbColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HslColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HsvColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HwbColorPicker(it, {}, enabled = false, thumb = {}) },
+            { LabColorPicker(it, {}, enabled = false, thumb = {}) },
+            { LchColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OklabColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkLchColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkhslColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}) },
+            { CmykColorPicker(it, {}, enabled = false, thumb = {}) },
+        )
+        val onColor: List<@Composable (Color) -> Unit> = listOf(
+            { ColorPicker(it, {}, enabled = false, thumb = {}) },
+            { RgbColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HslColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HsvColorPicker(it, {}, enabled = false, thumb = {}) },
+            { HwbColorPicker(it, {}, enabled = false, thumb = {}) },
+            { LabColorPicker(it, {}, enabled = false, thumb = {}) },
+            { LchColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OklabColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkLchColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkhslColorPicker(it, {}, enabled = false, thumb = {}) },
+            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}) },
+            { CmykColorPicker(it, {}, enabled = false, thumb = {}) },
+        )
         setContent {
-            HslColorPicker(
-                state = state(),
-                colors = custom,
-                // Nothing is passed to this slot, so anything it reads came through the theme
-                // the picker provides.
-                hueSlider = { seen = ColorPickerDefaults.currentColors() },
-            )
+            val shared = remember { ColorPickerState(seed) }
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                onState.forEach { picker -> picker(shared) }
+                onValue.forEach { picker -> picker(seed) }
+                onColor.forEach { picker -> picker(Color.Red) }
+            }
         }
-        assertEquals(custom, seen)
     }
 
     /**
-     * The track is one part of a slider's height, and a Material slider will not measure below
-     * its own minimum, so the size here has to clear that before the change shows at all.
+     * The track is one part of a slider's height, and a Material slider will not measure below its own
+     * minimum, so the size here has to clear that before the change shows at all.
      */
     @Test
     fun aThemedTrackHeightReachesAChannelSlider() = runComposeUiTest {
         setContent {
-            Box(Modifier.testTag("default")) { HueSlider(state = state()) }
+            Box(Modifier.testTag("default")) { ChannelSlider(ColorPickerState(seed), Okhsl.H) }
         }
         val default = onNodeWithTag("default").getUnclippedBoundsInRoot().height
-
         setContent {
             ColorPickerTheme(dimensions = ColorPickerDefaults.dimensions(trackHeight = 80.dp)) {
-                Box(Modifier.testTag("raised")) { HueSlider(state = state()) }
+                Box(Modifier.testTag("raised")) { ChannelSlider(ColorPickerState(seed), Okhsl.H) }
             }
         }
         val raised = onNodeWithTag("raised").getUnclippedBoundsInRoot().height
-
-        assertTrue(
-            raised > default,
-            "an 80dp track should make the slider taller than the 16dp default, $raised vs $default",
-        )
-    }
-
-    @Test
-    fun aDisabledPickerRefusesADragOnASlotThatNeverSawEnabled() = runComposeUiTest {
-        val state = state()
-        val before = state.hslColor.hue
-        setContent {
-            HslColorPicker(
-                state = state,
-                enabled = false,
-                // The trap this guards: replacing a slider to relabel it, and not forwarding
-                // enabled. The picker has to refuse the drag on the slot's behalf.
-                hueSlider = {
-                    Box(Modifier.testTag("replaced").width(200.dp)) {
-                        HueSlider(state = state, label = null, valueLabel = null)
-                    }
-                },
-            )
-        }
-        onNodeWithTag("replaced").performTouchInput { swipeRight() }
-        assertEquals(before, state.hslColor.hue)
-    }
-
-    @Test
-    fun aDisabledPickerReportsItselfDisabled() = runComposeUiTest {
-        setContent {
-            HslColorPicker(
-                state = state(),
-                modifier = Modifier.testTag("picker"),
-                enabled = false,
-            )
-        }
-        onNodeWithTag("picker").assertIsNotEnabled()
+        assertTrue(raised > default, "an 80dp track should make the slider taller than the 16dp default, $raised vs $default")
     }
 
     @Test
     fun aDisabledSliderRefusesADrag() = runComposeUiTest {
-        val state = state()
-        val before = state.hslColor.hue
+        val state = ColorPickerState(seed)
         setContent {
-            HueSlider(
-                state = state,
-                modifier = Modifier.testTag("slider").width(200.dp),
-                enabled = false,
-                label = null,
-                valueLabel = null,
-            )
+            ChannelSlider(state, Okhsl.H, Modifier.testTag("slider").width(200.dp), enabled = false, label = null, valueLabel = null)
         }
         onNodeWithTag("slider").performTouchInput { swipeRight() }
-        assertEquals(before, state.hslColor.hue)
+        assertEquals(seed, state.value)
     }
 
     @Test
     fun anEnabledSliderAcceptsADrag() = runComposeUiTest {
-        val state = state()
-        val before = state.hslColor.hue
-        setContent {
-            HueSlider(
-                state = state,
-                modifier = Modifier.testTag("slider").width(200.dp),
-                label = null,
-                valueLabel = null,
-            )
-        }
+        val state = ColorPickerState(seed)
+        setContent { ChannelSlider(state, Okhsl.H, Modifier.testTag("slider").width(200.dp), label = null, valueLabel = null) }
         onNodeWithTag("slider").performTouchInput { swipeRight() }
-        assertTrue(state.hslColor.hue != before, "an enabled slider should have moved")
+        assertTrue(state.value != seed, "an enabled slider should have moved")
     }
 
-    @Test
-    fun everyPickerTakesTheSameConfiguration() = runComposeUiTest {
-        // That this compiles is most of the assertion: the six have to agree on the set.
-        val pickers: List<@Composable (ColorPickerState) -> Unit> = listOf(
-            { HslColorPicker(it, enabled = false, thumb = {}) },
-            { RgbColorPicker(it, enabled = false, thumb = {}) },
-            { CmykColorPicker(it, enabled = false, thumb = {}) },
-            { LabColorPicker(it, enabled = false, thumb = {}) },
-            { OkhslColorPicker(it, enabled = false, thumb = {}) },
-            { OkhsvColorPicker(it, enabled = false, thumb = {}) },
-        )
-        setContent {
-            val shared = state()
-            pickers.forEach { picker -> Box { picker(shared) } }
+    private fun colourfulness(pixels: androidx.compose.ui.graphics.PixelMap): Float {
+        var total = 0f
+        val y = pixels.height / 2
+        for (x in 0 until pixels.width) {
+            val c = pixels[x, y]
+            total += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
         }
+        return total / pixels.width
     }
 
     /**
-     * Refusing the gesture is half of disabled; the other half is looking it. Measured as how
-     * colourful the track still is, since a dimmed gradient over the background loses spread
-     * between its channels rather than moving in any one direction.
+     * Refusing the gesture is half of disabled; the other half is looking it. Measured as how colourful
+     * the track still is, since a dimmed gradient over the background loses spread between its channels
+     * rather than moving in any one direction.
      */
     @Test
     fun aDisabledSliderIsDrawnDimmer() = runComposeUiTest {
-        fun colourfulness(): Float {
-            val pixels = onNodeWithTag("slider").captureToImage().toPixelMap()
-            var total = 0f
-            val y = pixels.height / 2
-            for (x in 0 until pixels.width) {
-                val c = pixels[x, y]
-                total += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
-            }
-            return total / pixels.width
-        }
-
         setContent {
             Box(Modifier.testTag("slider").width(200.dp).background(Color.White)) {
-                HueSlider(state = state(), label = null, valueLabel = null)
+                ChannelSlider(ColorPickerState(seed), Okhsl.H, label = null, valueLabel = null)
             }
         }
-        val lit = colourfulness()
-
+        val lit = colourfulness(onNodeWithTag("slider").captureToImage().toPixelMap())
         setContent {
             Box(Modifier.testTag("slider").width(200.dp).background(Color.White)) {
-                HueSlider(state = state(), enabled = false, label = null, valueLabel = null)
+                ChannelSlider(ColorPickerState(seed), Okhsl.H, enabled = false, label = null, valueLabel = null)
             }
         }
-        val dimmed = colourfulness()
-
-        assertTrue(
-            dimmed < lit * 0.75f,
-            "a disabled track should be visibly washed out: $dimmed against $lit",
-        )
+        val dimmed = colourfulness(onNodeWithTag("slider").captureToImage().toPixelMap())
+        assertTrue(dimmed < lit * 0.75f, "a disabled track should be visibly washed out: $dimmed against $lit")
     }
 
     /** The planes dim through their own path, not the slider's, so they get their own check. */
     @Test
     fun aDisabledPlaneIsDrawnDimmer() = runComposeUiTest {
-        fun colourfulness(): Float {
-            val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
-            var total = 0f
-            val y = pixels.height / 2
-            for (x in 0 until pixels.width) {
-                val c = pixels[x, y]
-                total += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
-            }
-            return total / pixels.width
-        }
-
         setContent {
             Box(Modifier.background(Color.White)) {
-                HslPlane(state = state(), modifier = Modifier.testTag("plane").size(160.dp))
+                ChannelPlane(ColorPickerState(Hsl(200.0, 80.0, 50.0)), Hsl.S, Hsl.L, Modifier.testTag("plane").size(160.dp))
             }
         }
-        val lit = colourfulness()
-
+        val lit = colourfulness(onNodeWithTag("plane").captureToImage().toPixelMap())
         setContent {
             Box(Modifier.background(Color.White)) {
-                HslPlane(
-                    state = state(),
-                    enabled = false,
-                    modifier = Modifier.testTag("plane").size(160.dp),
-                )
+                ChannelPlane(ColorPickerState(Hsl(200.0, 80.0, 50.0)), Hsl.S, Hsl.L, Modifier.testTag("plane").size(160.dp), enabled = false)
             }
         }
-        val dimmed = colourfulness()
-
-        assertTrue(
-            dimmed < lit * 0.75f,
-            "a disabled plane should be visibly washed out: $dimmed against $lit",
-        )
+        val dimmed = colourfulness(onNodeWithTag("plane").captureToImage().toPixelMap())
+        assertTrue(dimmed < lit * 0.75f, "a disabled plane should be visibly washed out: $dimmed against $lit")
     }
 
     /**
-     * The two knobs are independent, so all four settings have to behave: dim only, drain only,
-     * both, and neither. Colourfulness catches draining; lightness toward the white background
-     * catches dimming.
+     * The two knobs are independent, so all four settings have to behave: dim only, drain only, both,
+     * and neither. Colourfulness catches draining; lightness toward the white background catches dimming.
      */
     @Test
     fun theDisabledLookIsWhateverTheColorsAskFor() = runComposeUiTest {
         fun measure(disabledAlpha: Float, disabledSaturation: Float): Pair<Float, Float> {
             setContent {
                 ColorPickerTheme(
-                    colors = ColorPickerDefaults.colors(
-                        disabledAlpha = disabledAlpha,
-                        disabledSaturation = disabledSaturation,
-                    ),
+                    colors = ColorPickerDefaults.colors(disabledAlpha = disabledAlpha, disabledSaturation = disabledSaturation),
                 ) {
                     Box(Modifier.background(Color.White)) {
-                        HslPlane(
-                            state = state(),
+                        ChannelPlane(
+                            ColorPickerState(Hsl(200.0, 80.0, 50.0)),
+                            Hsl.S,
+                            Hsl.L,
+                            Modifier.testTag("plane").size(160.dp),
                             enabled = false,
-                            modifier = Modifier.testTag("plane").size(160.dp),
                         )
                     }
                 }
             }
             val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
-            var colour = 0f
             var light = 0f
             val y = pixels.height / 2
             for (x in 0 until pixels.width) {
                 val c = pixels[x, y]
-                colour += maxOf(c.red, c.green, c.blue) - minOf(c.red, c.green, c.blue)
                 light += (c.red + c.green + c.blue) / 3f
             }
-            return colour / pixels.width to light / pixels.width
+            return colourfulness(pixels) to light / pixels.width
         }
 
         val (untouchedColour, untouchedLight) = measure(1f, 1f)
-        val (dimmedColour, dimmedLight) = measure(0.38f, 1f)
-        val (drainedColour, drainedLight) = measure(1f, 0f)
+        val (_, dimmedLight) = measure(0.38f, 1f)
+        val (drainedColour, _) = measure(1f, 0f)
         val (bothColour, bothLight) = measure(0.38f, 0f)
 
         // Neither knob set leaves it looking enabled.
