@@ -398,6 +398,39 @@ public final class codes/side/colorpicker/state/ColorPickerState$Companion {
 	public static synthetic fun Saver$default (Lcodes/side/colorpicker/state/ColorPickerState$Companion;Ljava/util/Collection;ILjava/lang/Object;)Landroidx/compose/runtime/saveable/Saver;
 }
 
+public final class codes/side/colorpicker/state/ColorPickerStateViewsKt {
+	public static final fun getCmyk (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getDisplayP3 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getHsl (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getHsv (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getHwb (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getLab (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getLch (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getOkLch (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getOkhsl (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getOkhsv (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getOklab (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getSrgb (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getSrgbLinear (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getXyzD50 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getXyzD65 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun set-11RcLd0 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-7jXRPvs (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-9Crj1pI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-BJ8B4ww (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-E_3oONA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-Fmdgyq8 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-LTCmHu4 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-QdQAm9Q (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-S9D4_nc (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-Y2eWPdA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-cKsaJvA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-mmr5dew (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-mvXxeeQ (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-tro4B1k (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-w1g9Peg (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+}
+
 public final class codes/side/colorpicker/state/ColoringMode : java/lang/Enum {
 	public static final field Contextual Lcodes/side/colorpicker/state/ColoringMode;
 	public static final field Independent Lcodes/side/colorpicker/state/ColoringMode;
