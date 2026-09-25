@@ -3,8 +3,11 @@ package codes.side.colorpicker.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -21,8 +24,9 @@ import codes.side.color.Okhsv
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 /** The samples a plane is rasterized at, across and down. */
 @Immutable
@@ -81,61 +85,74 @@ internal fun planeGridOf(x: ColorChannel, y: ColorChannel): PlaneGrid = when {
 internal fun gridSample(index: Int, count: Int): Double = if (count <= 1) 0.0 else index.toDouble() / (count - 1)
 
 /**
- * The sRGB colors of the plane over [x] and [y] on a [columns] × [rows] grid, three values a sample,
- * row 0 at the top, where [y] is at the end of its range; the other channels are at [held]. The colors
- * are brought into sRGB by chroma reduction, a row per bulk call, with [ensureActive] called before
- * each so an abandoned raster stops.
+ * The sRGB colors of the plane over [x] and [y] on a [columns] × [rows] grid, filled a row at a time
+ * so a caller can pause between rows. Three values a sample in [rgb], row 0 at the top, where [y] is at
+ * the end of its range; the other channels are at [held]. Each row goes through one bulk call into sRGB
+ * by chroma reduction.
  */
-internal fun planeColors(
-    x: ColorChannel,
-    y: ColorChannel,
+internal class PlaneRows(
+    private val x: ColorChannel,
+    private val y: ColorChannel,
     held: DoubleArray,
-    columns: Int,
-    rows: Int,
-    ensureActive: () -> Unit = {},
-): DoubleArray {
-    val size = x.space.channels.size
-    val mapper = Srgb.gamut.mapper(x.space)
-    val xValues = DoubleArray(columns) { channelValueAt(x, x.referenceRange, gridSample(it, columns)) }
-    val row = DoubleArray(columns * size)
-    for (column in 0 until columns) {
-        held.copyInto(row, column * size)
-        row[column * size + x.index] = xValues[column]
+    private val columns: Int,
+    private val rows: Int,
+) {
+    private val size = x.space.channels.size
+    private val mapper = Srgb.gamut.mapper(x.space)
+    private val row = DoubleArray(columns * size).also { row ->
+        for (column in 0 until columns) {
+            held.copyInto(row, column * size)
+            row[column * size + x.index] = channelValueAt(x, x.referenceRange, gridSample(column, columns))
+        }
     }
-    val rgb = DoubleArray(columns * rows * 3)
-    for (r in 0 until rows) {
-        ensureActive()
+
+    val rgb: DoubleArray = DoubleArray(columns * rows * 3)
+
+    /** Fills row [r] of [rgb]. */
+    fun fill(r: Int) {
         val yValue = channelValueAt(y, y.referenceRange, 1.0 - gridSample(r, rows))
         for (column in 0 until columns) row[column * size + y.index] = yValue
         mapper.convert(row, 0, rgb, r * columns * 3, columns)
     }
-    return rgb
+}
+
+/** Every row of [PlaneRows] at once. */
+internal fun planeColors(x: ColorChannel, y: ColorChannel, held: DoubleArray, columns: Int, rows: Int): DoubleArray {
+    val grid = PlaneRows(x, y, held, columns, rows)
+    for (r in 0 until rows) grid.fill(r)
+    return grid.rgb
 }
 
 /** [planeColors] packed as opaque `0xAARRGGBB`, a pixel per sample. */
-internal fun planePixels(
-    x: ColorChannel,
-    y: ColorChannel,
-    held: DoubleArray,
-    grid: PlaneGrid,
-    ensureActive: () -> Unit = {},
-): IntArray {
-    val rgb = planeColors(x, y, held, grid.columns, grid.rows, ensureActive)
-    return IntArray(grid.columns * grid.rows) { srgbArgb(rgb, 3 * it) }
-}
+internal fun planePixels(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): IntArray =
+    packPixels(planeColors(x, y, held, grid.columns, grid.rows), grid)
 
 /** The plane over [x] and [y] as an image of [grid]'s size, to be drawn scaled. */
-internal fun rasterizePlane(
-    x: ColorChannel,
-    y: ColorChannel,
-    held: DoubleArray,
-    grid: PlaneGrid,
-    ensureActive: () -> Unit = {},
-): ImageBitmap = imageBitmapFromPixels(planePixels(x, y, held, grid, ensureActive), grid.columns, grid.rows)
+internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): ImageBitmap =
+    imageBitmapFromPixels(planePixels(x, y, held, grid), grid.columns, grid.rows)
+
+// Rows filled between two yields. On wasm, Dispatchers.Default is the thread that handles input, so a
+// raster that never yielded would hold every event until it finished.
+private const val ROWS_PER_YIELD = 16
+
+/** [rasterizePlane], yielding every few rows, and stopping there when cancelled. */
+internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): ImageBitmap {
+    val rows = PlaneRows(x, y, held, grid.columns, grid.rows)
+    for (r in 0 until grid.rows) {
+        if (r % ROWS_PER_YIELD == 0) yield()
+        rows.fill(r)
+    }
+    return imageBitmapFromPixels(packPixels(rows.rgb, grid), grid.columns, grid.rows)
+}
+
+private fun packPixels(rgb: DoubleArray, grid: PlaneGrid): IntArray = IntArray(grid.columns * grid.rows) { srgbArgb(rgb, 3 * it) }
 
 /** Whether two brushes draw the plane over [x] and [y] exactly: HSL's S × L and HSV's S × V. */
 internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
     (x === Hsl.S && y === Hsl.L) || (x === Hsv.S && y === Hsv.V)
+
+// What a raster is built from: the pair of channels and every held component.
+private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
 
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
@@ -149,13 +166,21 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
     val key = held.toList()
     if (x === Hsl.S && y === Hsl.L) return remember(key) { hslSurface(held[Hsl.H.index]) }
     if (x === Hsv.S && y === Hsv.V) return remember(key) { hsvSurface(held[Hsv.H.index]) }
-    val grid = planeGridOf(x, y)
     val bitmap = if (LocalInspectionMode.current) {
-        remember(x, y, key) { rasterizePlane(x, y, held, grid) }
+        remember(x, y, key) { rasterizePlane(x, y, held, planeGridOf(x, y)) }
     } else {
         val raster = remember { mutableStateOf<ImageBitmap?>(null) }
-        LaunchedEffect(x, y, key) {
-            raster.value = withContext(Dispatchers.Default) { rasterizePlane(x, y, held, grid) { ensureActive() } }
+        val request by rememberUpdatedState(PlaneRequest(x, y, key))
+        LaunchedEffect(Unit) {
+            // One raster at a time, always of the latest request. A drag changes the held channels
+            // faster than a raster is built; cancelling the one in flight for each change would land
+            // none until the drag stopped. Built in order, an older raster never lands after a newer one.
+            snapshotFlow { request }.conflate().collect { next ->
+                val built = withContext(Dispatchers.Default) {
+                    rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
+                }
+                raster.value = built
+            }
         }
         raster.value
     }

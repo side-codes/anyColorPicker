@@ -275,6 +275,23 @@ class ChannelPlaneTest {
     }
 
     @Test
+    fun thePlaneRedrawsWhileTheHueKeepsMoving() = runComposeUiTest {
+        // A hue drag changes the held channel more often than a 256 × 256 raster takes to build. A
+        // plane that dropped every raster a newer hue made stale would show the first hue throughout.
+        val state = ColorPickerState(Okhsl(30.0, 0.0, 1.0))
+        show(state, Okhsl.S, Okhsl.L)
+        waitUntil(timeoutMillis = 5_000) { rasterDrawn() }
+        val before = pixels().at(0.99f, 0.5f)
+        for (step in 1..60) {
+            state.value = Okhsl(30.0 + step * 3.0, 0.0, 1.0)
+            waitForIdle()
+            Thread.sleep(5)
+        }
+        val during = pixels().at(0.99f, 0.5f)
+        assertTrue(abs(during.green - before.green) > 0.1f, "the plane still shows hue 30 at the end of the drag, $during")
+    }
+
+    @Test
     fun anAppHslPlaneIsRasterizedAndEditsInItsSpace() = runComposeUiTest {
         val p3Hsl = ColorSpace.hsl("--plane-hsl-p3", DisplayP3)
         val state = ColorPickerState(Srgb(1.0, 0.0, 0.0))

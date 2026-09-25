@@ -56,10 +56,12 @@ class PlaneSurfaceTest {
     }
 
     @Test
-    fun cancellationIsCheckedBeforeEachRow() {
-        var checks = 0
-        planeColors(Okhsv.S, Okhsv.V, doubleArrayOf(40.0, 0.0, 0.0), columns = 8, rows = 5, ensureActive = { checks++ })
-        assertEquals(5, checks)
+    fun rowsFilledOneAtATimeMakeTheSameGrid() {
+        // A raster built in steps fills its rows between pauses; each row stands on its own.
+        val held = doubleArrayOf(40.0, 0.0, 0.0)
+        val rows = PlaneRows(Okhsv.S, Okhsv.V, held, columns = 8, rows = 5)
+        for (r in 4 downTo 0) rows.fill(r)
+        assertEquals(planeColors(Okhsv.S, Okhsv.V, held, columns = 8, rows = 5).toList(), rows.rgb.toList())
     }
 
     @Test
