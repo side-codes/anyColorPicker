@@ -1,7 +1,8 @@
-// Exports the color module's reference test data as JSON: CSS Color 4's named-color table and its
-// worked examples of equivalent colors from its own Bikeshed source, web-platform-tests' CSS color
-// parsing lists and the conversions in them, and seeded colors converted by color.js. Every source is pinned, so a rerun writes the same files. The
-// tests decode them with kotlinx.serialization; nothing here writes Kotlin.
+// Exports the color module's reference test data as JSON: CSS Color 4's named-color table, its
+// worked examples of equivalent colors and its worked conversions from its own Bikeshed source,
+// web-platform-tests' CSS color parsing lists and the conversions in them, and seeded colors
+// converted by color.js. Every source is pinned, so a rerun writes the same files. The tests decode
+// them with kotlinx.serialization; nothing here writes Kotlin.
 //
 //   cd tools/reference
 //   npm ci
@@ -55,6 +56,33 @@ function cssEquivalentColors(source) {
         pairs.push({ example: "note", first, second, equivalent: true });
     }
     return pairs;
+}
+
+// Worked conversions: a color and the same color printed in another space, both in one example
+// block. css-worked-examples.json names each block, the two texts as printed there (`printed` where
+// the source states the second in prose), and a tolerance per component: half a unit of the last
+// digit printed, or 1e-9 where the value is exact. The second color is read by color.js, which does
+// not clamp, so lab(100.1154% …) keeps its lightness past 100.
+//
+// Left out are examples written before the draft's current matrices: lch(51.2345% 21.2 130) as srgb
+// and display-p3, #7654CD as xyz-d50 and xyz-d65, lch(85.9017% 166.116 138.207) as display-p3,
+// rgb(76% 62% 3%) as lab and lch, and color(display-p3 0.84 0.19 0.72) as lab and lch, which color.js
+// converts as the library does, up to 1.4e-2 from the printed values.
+function cssWorkedExamples(source) {
+    const { examples } = JSON.parse(readFileSync(new URL("css-worked-examples.json", import.meta.url), "utf8"));
+    return examples.map(({ example, color, equals, printed = [color, equals], tolerance }) => {
+        const start = source.indexOf(`<div class="example" id="${example}">`);
+        if (start < 0) throw new Error(`${example}: no such example`);
+        const block = source.slice(start, source.indexOf("</div>", start));
+        for (const text of printed) {
+            if (!block.includes(text)) throw new Error(`${example}: "${text}" is not printed there`);
+        }
+        const parsed = new Color(equals);
+        const space = Object.keys(COLORJS).find(id => COLORJS[id] === parsed.space.id);
+        if (space === undefined) throw new Error(`${example}: ${equals} is in ${parsed.space.id}, which the library does not have`);
+        if (tolerance.length !== parsed.coords.length) throw new Error(`${example}: ${tolerance.length} tolerances for ${parsed.coords.length} components`);
+        return { example, color, equals: { space, components: components(parsed.coords) }, tolerance };
+    });
 }
 
 // ---- web-platform-tests: parsing ----
@@ -252,6 +280,7 @@ mkdirSync(OUT, { recursive: true });
 const cssSource = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
 const namedColors = cssNamedColors(cssSource);
 const equivalentColors = cssEquivalentColors(cssSource);
+const workedExamples = cssWorkedExamples(cssSource);
 writeJson("css-color-4.json", {
     source: {
         repository: "https://github.com/w3c/csswg-drafts",
@@ -261,6 +290,7 @@ writeJson("css-color-4.json", {
     },
     namedColors,
     equivalentColors,
+    workedExamples,
 });
 
 const parsing = await wptParsing();
@@ -290,6 +320,6 @@ writeJson("colorjs.json", {
     okhsx,
 });
 
-console.log(`CSS Color 4: ${namedColors.length} named colors, ${equivalentColors.length} equivalent-color examples`);
+console.log(`CSS Color 4: ${namedColors.length} named colors, ${equivalentColors.length} equivalent-color examples, ${workedExamples.length} worked conversions`);
 console.log(`WPT: ${parsing.valid.length} valid, ${parsing.validColorFunction.length} color() templates, ${parsing.invalid.length} invalid, ${conversions.length} conversions`);
 console.log(`color.js ${colorJsVersion}: ${colorJs.length} conversions, ${okhsx.length} Okhsl/Okhsv colors`);

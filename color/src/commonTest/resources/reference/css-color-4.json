@@ -171,5 +171,31 @@
     {"example":"ex-equivalent-different-lightness","first":"lab(50% 0 0)","second":"oklab(0.5 0 0)","equivalent":false},
     {"example":"note","first":"red","second":"color(srgb 1 0 0)","equivalent":true},
     {"example":"note","first":"red","second":"color(display-p3 0.91748756 0.20028681 0.13856059)","equivalent":true}
+  ],
+  "workedExamples": [
+    {"example":"ex-leaf-spectro","color":"lch(51.2345% 21.2 130)","equals":{"space":"lab","components":[51.2345,-13.6271,16.2401]},"tolerance":[0.00005,0.00005,0.00005]},
+    {"example":"ex-hsl-sucks","color":"hsl(240deg 100% 50%)","equals":{"space":"oklch","components":[0.452,0.313,264.1]},"tolerance":[0.0005,0.0005,0.05]},
+    {"example":"ex-hsl-sucks","color":"hsl(60deg 100% 50%)","equals":{"space":"oklch","components":[0.968,0.211,109.8]},"tolerance":[0.0005,0.0005,0.05]},
+    {"example":"ex-hsl-sucks-more","color":"hsl(220deg 100% 50%)","equals":{"space":"oklch","components":[0.533,0.26,262.6]},"tolerance":[0.0005,0.005,0.05]},
+    {"example":"ex-hsl-sucks-more","color":"hsl(250deg 100% 50%)","equals":{"space":"oklch","components":[0.462,0.306,268.9]},"tolerance":[0.0005,0.0005,0.05]},
+    {"example":"ex-hsl-sucks-more","color":"hsl(50deg 100% 50%)","equals":{"space":"oklch","components":[0.882,0.181,94.24]},"tolerance":[0.0005,0.0005,0.005]},
+    {"example":"ex-hsl-sucks-more","color":"hsl(80deg 100% 50%)","equals":{"space":"oklch","components":[0.91,0.245,129.9]},"tolerance":[0.005,0.0005,0.05]},
+    {"example":"ex-hwb-simple","color":"hwb(150 20% 10%)","equals":{"space":"hsl","components":[150,77.78,55.00000000000001]},"tolerance":[1e-9,0.005,1e-9]},
+    {"example":"ex-hwb-simple","color":"hwb(150 20% 10%)","equals":{"space":"srgb","components":[0.2,0.9,0.55]},"tolerance":[0.005,0.005,0.005]},
+    {"example":"ex-hwb-achromatic","color":"hwb(45 40% 80%)","equals":{"space":"srgb","components":[0.3333,0.3333,0.3333]},"tolerance":[0.00005,0.00005,0.00005]},
+    {"example":"ex-xyz","color":"#7654CD","equals":{"space":"srgb","components":[0.46270000000000006,0.32939999999999997,0.8039000000000001]},"tolerance":[0.00005,0.00005,0.00005]},
+    {"example":"ex-xyz","color":"#7654CD","equals":{"space":"lab","components":[44.36,36.05,-58.99]},"tolerance":[0.005,0.005,0.005]},
+    {"example":"ex-same-color","color":"oklch(65% 0.15 270)","equals":{"space":"lab","components":[57.9,11.4,-53.7]},"tolerance":[0.05,0.05,0.05]},
+    {"example":"ex-same-color","color":"oklch(65% 0.15 270)","equals":{"space":"display-p3","components":[0.445,0.529,0.891]},"tolerance":[0.0005,0.0005,0.0005]},
+    {"example":"ex-same-color","color":"oklch(65% 0.15 270)","equals":{"space":"srgb","components":[0.4235294117647059,0.5333333333333333,0.9176470588235294]},"tolerance":[0.00196078431372549,0.00196078431372549,0.00196078431372549]},
+    {"example":"ex-same-color-oog","color":"oklch(65% 0.25 270)","equals":{"space":"lab","components":[56.03,32.3,-88.58]},"tolerance":[0.005,0.05,0.005]},
+    {"example":"ex-same-color-oog","color":"oklch(65% 0.25 270)","equals":{"space":"display-p3","components":[0.3731,0.4673,1.105]},"tolerance":[0.00005,0.00005,0.0005]},
+    {"example":"ex-same-color-oog","color":"oklch(65% 0.25 270)","equals":{"space":"srgb","components":[0.3475,0.4707,1.146]},"tolerance":[0.00005,0.00005,0.0005]},
+    {"example":"ex-lightness-over-100","color":"color(xyz-d65 1 1 1)","equals":{"space":"lab","components":[100.1154,9.064489,5.801761]},"tolerance":[0.00005,5e-7,5e-7]},
+    {"example":"ex-analogous-hue","color":"color(display-p3 0.7 0.5 none)","equals":{"space":"oklch","components":[0.63612,0.1522,78.748]},"tolerance":[0.000005,0.00005,0.0005]},
+    {"example":"ex-p3-oog-canvas","color":"oklch(76% 0.27 60)","equals":{"space":"display-p3","components":[1.062,0.4954,-0.3115]},"tolerance":[0.0005,0.00005,0.00005]},
+    {"example":"ex-hsl-computed","color":"hsl(38.824 100% 50%)","equals":{"space":"srgb","components":[1,0.6470588235294118,0]},"tolerance":[0.00196078431372549,0.00196078431372549,0.00196078431372549]},
+    {"example":"ex-hwb-serial","color":"hwb(740deg 20% 30% / 50%)","equals":{"space":"srgb","components":[0.7,0.36666666666666664,0.2]},"tolerance":[0.000196078431372549,0.000196078431372549,0.00196078431372549]},
+    {"example":"ex-equivalent-different-lightness","color":"lab(50% 0 0)","equals":{"space":"oklab","components":[0.56897,0,0]},"tolerance":[0.000005,1e-9,1e-9]}
   ]
 }
