@@ -37,15 +37,40 @@ internal class HueMemory {
 
     private val hues = mutableStateMapOf<HueFamily, Double>()
 
-    /** The hue remembered for [channel]'s family, or null when it has none. */
-    fun hue(channel: ColorChannel): Double? = channel.family?.let { hues[it] }
+    /**
+     * The hue remembered for [channel]'s family. A family no value has taught yet, such as one of an
+     * app's spaces before a color in it is written, takes the hue a family with one would carry into
+     * it by rule 4; null when no family has a hue.
+     */
+    fun hue(channel: ColorChannel): Double? {
+        val family = channel.family ?: return null
+        return hues[family] ?: carried(channel)
+    }
+
+    // Rule 4 worked on reading: the reference color of the first family with a hue, converted into
+    // [channel]'s space. Nothing is written, so reading stays free to happen in any snapshot.
+    private fun carried(channel: ColorChannel): Double? {
+        for ((family, space) in spaces) {
+            val hue = hues[family] ?: continue
+            referenceColor(space, hue).to(channel.space)[channel]?.let { return it }
+        }
+        return null
+    }
 
     /** Every remembered hue, by family. */
     val remembered: Map<HueFamily, Double> get() = hues.toMap()
 
-    /** Puts back hues saved earlier, over the ones [learn] remembered. */
-    fun restore(saved: Map<HueFamily, Double>) {
+    /**
+     * Puts back hues saved earlier, over the ones [learn] remembered. A saved family whose space is
+     * among [known] joins again, so later values keep teaching it; one whose space is not keeps its
+     * hue until a color in that space is written.
+     */
+    fun restore(saved: Map<HueFamily, Double>, known: Collection<ColorSpace>) {
         hues.putAll(saved)
+        for (space in known) {
+            val family = space.hueChannel()?.family ?: continue
+            if (family in saved) spaces.getOrPut(family) { space }
+        }
     }
 
     fun learn(color: ColorValue) {

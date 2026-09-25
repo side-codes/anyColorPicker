@@ -2,6 +2,7 @@ package codes.side.colorpicker.state
 
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
+import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
@@ -70,6 +71,15 @@ class ColorPickerStateTest {
         state.value = grey
         state[Hsl.S] = 50.0
         assertEquals(Hsl(200.0, 50.0, 50.0), state.value)
+    }
+
+    @Test
+    fun aGreyColoredInAnAppSpaceNeverSeenTakesTheRememberedHue() {
+        val p3Hsl = ColorSpace.hsl("--hsl-p3", DisplayP3)
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        state.value = grey
+        state[p3Hsl.S] = 50.0
+        assertNear(Hsl(200.0, 100.0, 50.0).to(p3Hsl)[p3Hsl.H]!!, state.value[p3Hsl.H], message = "not red")
     }
 
     @Test

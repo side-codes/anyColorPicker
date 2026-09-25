@@ -141,8 +141,8 @@ public class ColorPickerState(initialValue: ColorValue) {
 
     internal val rememberedHues: Map<HueFamily, Double> get() = memory.remembered
 
-    internal fun restoreHues(saved: Map<HueFamily, Double>) {
-        memory.restore(saved)
+    internal fun restoreHues(saved: Map<HueFamily, Double>, known: Collection<ColorSpace>) {
+        memory.restore(saved, known)
     }
 
     public companion object {

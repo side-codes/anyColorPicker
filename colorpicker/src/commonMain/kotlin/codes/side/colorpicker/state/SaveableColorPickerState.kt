@@ -75,7 +75,7 @@ private fun restored(saved: List<*>, spaces: Map<String, ColorSpace>): ColorPick
     } catch (_: IllegalArgumentException) {
         return null
     }
-    return ColorPickerState(value).apply { restoreHues(hues) }
+    return ColorPickerState(value).apply { restoreHues(hues, spaces.values) }
 }
 
 /**

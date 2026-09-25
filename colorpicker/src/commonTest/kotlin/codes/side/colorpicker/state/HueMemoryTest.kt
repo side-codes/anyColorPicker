@@ -123,9 +123,16 @@ class HueMemoryTest {
     }
 
     @Test
+    fun aFamilyNeverSeenTakesItsHueFromOneThatWas() {
+        val p3Hsl = ColorSpace.hsl("--hsl-p3", DisplayP3)
+        val memory = memoryOf(Hsl(200.0, 80.0, 50.0), grey)
+        assertNear(Hsl(200.0, 100.0, 50.0).to(p3Hsl)[p3Hsl.H]!!, memory.hue(p3Hsl.H))
+    }
+
+    @Test
     fun restoredHuesReplaceLearnedOnes() {
         val memory = memoryOf(Hsl(200.0, 80.0, 50.0))
-        memory.restore(mapOf(HueFamily.rgbHexcone(Srgb) to 90.0, HueFamily("--elsewhere") to 10.0))
+        memory.restore(mapOf(HueFamily.rgbHexcone(Srgb) to 90.0, HueFamily("--elsewhere") to 10.0), emptyList())
         assertEquals(90.0, memory.hue(Hsl.H))
         assertEquals(mapOf(HueFamily.rgbHexcone(Srgb) to 90.0, HueFamily("--elsewhere") to 10.0), memory.remembered - HueFamily.Oklab - HueFamily.CieLab)
     }

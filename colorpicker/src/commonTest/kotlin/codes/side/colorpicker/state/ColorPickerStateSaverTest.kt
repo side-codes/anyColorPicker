@@ -66,6 +66,18 @@ class ColorPickerStateSaverTest {
     }
 
     @Test
+    fun aRestoredStateKeepsTeachingAnAppFamilyItsSaverKnows() {
+        val p3Hsl = ColorSpace.hsl("--hsl-p3", DisplayP3)
+        val state = ColorPickerState(p3Hsl.color(doubleArrayOf(30.0, 80.0, 50.0)))
+        state.value = Srgb(0.2, 0.4, 0.8)
+        val restored = roundTrip(state, ColorPickerState.Saver(listOf(p3Hsl)))
+        val yellow = Srgb(1.0, 0.8, 0.0)
+        restored.value = yellow
+        restored.value = grey
+        assertNear(yellow.to(p3Hsl)[p3Hsl.H]!!, restored.displayValue(p3Hsl.H))
+    }
+
+    @Test
     fun anUnknownSpaceRestoresAsNull() {
         assertNull(ColorPickerState.Saver().restore(listOf(1, "--nowhere", 0.0, 0.0, 0.0, 0, 1.0, false)))
     }
