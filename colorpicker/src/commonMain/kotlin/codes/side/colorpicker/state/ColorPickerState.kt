@@ -6,34 +6,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import codes.side.color.Cmyk
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
 import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
-import codes.side.color.Hsl
 import codes.side.color.HueFamily
-import codes.side.color.Lab
-import codes.side.color.OkLch
-import codes.side.color.Okhsl
-import codes.side.color.Okhsv
-import codes.side.color.Oklab
-import codes.side.color.Srgb
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
-import codes.side.color.toGamut
-import codes.side.colorpicker.model.CmykColor
-import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.model.LabColor
-import codes.side.colorpicker.model.OKLAB_AB_RANGE
-import codes.side.colorpicker.model.OkhslColor
-import codes.side.colorpicker.model.OkhsvColor
-import codes.side.colorpicker.model.OklabColor
-import codes.side.colorpicker.model.OklchColor
-import codes.side.colorpicker.model.PickerColor
-import codes.side.colorpicker.model.RgbColor
 
 /**
  * The color a picker edits, and what the picker remembers beside it.
@@ -62,18 +43,39 @@ public class ColorPickerState(initialValue: ColorValue) {
     private val memory = HueMemory()
     private var current by mutableStateOf(initialValue)
 
+    // A value handed to the edit sink and not yet answered by [write]. Edits build on it, so two key
+    // presses before the caller recomposes move two steps. Snapshot state, so a picker reconciling its
+    // caller's value recomposes after every emission, even one its caller ignores.
+    private var pending by mutableStateOf<ColorValue?>(null)
+
     init {
-        memory.learn(initialValue)
+        // Unobserved: a state is built in composition, and whatever it read here, the composable building
+        // it would read too. That composable would then recompose on every new hue, and one that builds a
+        // state without remembering it would build another each time, forever.
+        Snapshot.withoutReadObservation { memory.learn(initialValue) }
     }
 
-    /** The color. Writing one equal to it changes nothing. */
+    /**
+     * The color. Writing one equal to it changes nothing.
+     *
+     * The state behind `ColorPicker`'s value and color forms is handed only to their slots, and there a
+     * write, like [set], is reported to the caller as an edit is, and drawn once the caller passes it
+     * back.
+     */
     public var value: ColorValue
         get() = current
         set(value) {
-            if (value == current) return
-            current = value
-            memory.learn(value)
+            if (onEdit == null) write(value) else if (value != editBase) submit(value)
         }
+
+    // Takes [value] in, answering any emission: every write while no picker reports edits instead of
+    // applying them, and a picker reconciling its caller's value.
+    internal fun write(value: ColorValue) {
+        pending = null
+        if (value == current) return
+        current = value
+        memory.learn(value)
+    }
 
     /** [value] as a Compose color, mapped into sRGB with `GamutMapping.Css`. */
     public val color: Color get() = current.toComposeColor()
@@ -102,9 +104,10 @@ public class ColorPickerState(initialValue: ColorValue) {
      */
     public fun displayValue(channel: ColorChannel): Double = displayComponents(channel.space)[channel.index]
 
-    // [displayValue] for every channel of [space], converting once: what a track or a plane holds still.
-    internal fun displayComponents(space: ColorSpace): DoubleArray {
-        val color = current.to(space)
+    // [displayValue] for every channel of [space], converting [of] once: what a track or a plane
+    // holds still, and what a key press steps from.
+    internal fun displayComponents(space: ColorSpace, of: ColorValue = current): DoubleArray {
+        val color = of.to(space)
         return DoubleArray(space.channels.size) { index ->
             val channel = space.channels[index]
             color[channel] ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
@@ -129,12 +132,23 @@ public class ColorPickerState(initialValue: ColorValue) {
     // instead of applying them has set a sink.
     internal var onEdit: ((ColorValue) -> Unit)? = null
 
+    /** The value edits build on: the last one emitted and not yet answered, else [value]. */
+    internal val editBase: ColorValue get() = pending ?: current
+
+    /** The last value emitted to the caller of a picker and not yet answered by [write]. */
+    internal val lastEmission: ColorValue? get() = pending
+
+    // Records [value] as handed to the caller of a picker that reports edits instead of applying them.
+    internal fun emit(value: ColorValue) {
+        pending = value
+    }
+
     internal fun edit(channel: ColorChannel, value: Double?) {
         submit(edited(channel, value))
     }
 
     internal fun editAlpha(alpha: Double?) {
-        submit(current.withAlpha(alpha))
+        submit(editBase.withAlpha(alpha))
     }
 
     // Two channels of one space in one write, as a plane drags them: the color passes through no value
@@ -145,11 +159,11 @@ public class ColorPickerState(initialValue: ColorValue) {
 
     private fun submit(edited: ColorValue) {
         val sink = onEdit
-        if (sink != null) sink(edited) else value = edited
+        if (sink != null) sink(edited) else write(edited)
     }
 
     private fun edited(channel: ColorChannel, value: Double?): ColorValue {
-        var color = current.to(channel.space)
+        var color = editBase.to(channel.space)
         val hue = channel.space.hueChannel()
         if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, memory.hue(hue) ?: 0.0)
         return color.with(channel, value)
@@ -171,127 +185,5 @@ public class ColorPickerState(initialValue: ColorValue) {
          */
         public fun Saver(knownSpaces: Collection<ColorSpace> = ColorSpaces.all): Saver<ColorPickerState, Any> =
             colorPickerStateSaver(knownSpaces)
-    }
-
-    // ---- In the model package's types, which the per-channel sliders, planes and pickers use ----
-
-    /** A state starting from [initialColor]. */
-    public constructor(initialColor: PickerColor = HslColor()) : this(initialColor.toColorValue())
-
-    // The color in [space] as the model package reads it: itself in its own space, and otherwise
-    // converted from its mapping into sRGB.
-    private fun legacy(space: ColorSpace): ColorValue =
-        if (current.space == space) current else current.toGamut(Srgb.gamut).to(space)
-
-    private fun legacyHue(color: ColorValue, channel: ColorChannel): Double = color[channel] ?: memory.hue(channel) ?: 0.0
-
-    /** The color as HSL, saturation and lightness 0–1. */
-    public val hslColor: HslColor get() = legacy(Hsl).let { hslColorOf(it, legacyHue(it, Hsl.H)) }
-
-    /** The color as sRGB, mapped into its gamut. */
-    public val rgbColor: RgbColor get() = rgbColorOf(legacy(Srgb))
-
-    /** The color as CMYK. */
-    public val cmykColor: CmykColor get() = cmykColorOf(legacy(Cmyk))
-
-    /** The color as CIELAB. */
-    public val labColor: LabColor get() = labColorOf(legacy(Lab))
-
-    /** The color as Oklab. */
-    public val oklabColor: OklabColor get() = oklabColorOf(legacy(Oklab))
-
-    /** The color as OkLCh. */
-    public val oklchColor: OklchColor get() = legacy(OkLch).let { oklchColorOf(it, legacyHue(it, OkLch.H)) }
-
-    /** The color as Okhsl. */
-    public val okhslColor: OkhslColor get() = legacy(Okhsl).let { okhslColorOf(it, legacyHue(it, Okhsl.H)) }
-
-    /** The color as Okhsv. */
-    public val okhsvColor: OkhsvColor get() = legacy(Okhsv).let { okhsvColorOf(it, legacyHue(it, Okhsv.H)) }
-
-    /** The color as packed ARGB (`0xAARRGGBB`), mapped into sRGB. */
-    public val argbInt: Int get() = color.toArgb()
-
-    /** The color in its own space, as the model package's class for that space, or as sRGB. */
-    public val pickerColor: PickerColor
-        get() = when (current.space) {
-            Hsl -> hslColor
-            Cmyk -> cmykColor
-            Lab -> labColor
-            Oklab -> oklabColor
-            OkLch -> oklchColor
-            Okhsl -> okhslColor
-            Okhsv -> okhsvColor
-            else -> rgbColor
-        }
-
-    // A model-package channel write: NaN is ignored, and the value is held to [range], then scaled.
-    private fun setLegacy(channel: ColorChannel, value: Float, range: ClosedFloatingPointRange<Float>, scale: Double = 1.0) {
-        if (!value.isNaN()) set(channel, value.coerceIn(range) * scale)
-    }
-
-    public fun updateHue(hue: Float): Unit = setLegacy(Hsl.H, hue, 0f..360f)
-    public fun updateSaturation(saturation: Float): Unit = setLegacy(Hsl.S, saturation, 0f..1f, 100.0)
-    public fun updateLightness(lightness: Float): Unit = setLegacy(Hsl.L, lightness, 0f..1f, 100.0)
-    public fun updateFromHsl(hsl: HslColor) {
-        value = hsl.toColorValue()
-    }
-
-    public fun updateRed(red: Float): Unit = setLegacy(Srgb.R, red, 0f..1f)
-    public fun updateGreen(green: Float): Unit = setLegacy(Srgb.G, green, 0f..1f)
-    public fun updateBlue(blue: Float): Unit = setLegacy(Srgb.B, blue, 0f..1f)
-    public fun updateFromRgb(rgb: RgbColor) {
-        value = rgb.toColorValue()
-    }
-
-    public fun updateCyan(cyan: Float): Unit = setLegacy(Cmyk.C, cyan, 0f..1f)
-    public fun updateMagenta(magenta: Float): Unit = setLegacy(Cmyk.M, magenta, 0f..1f)
-    public fun updateYellow(yellow: Float): Unit = setLegacy(Cmyk.Y, yellow, 0f..1f)
-    public fun updateKey(key: Float): Unit = setLegacy(Cmyk.K, key, 0f..1f)
-    public fun updateFromCmyk(cmyk: CmykColor) {
-        value = cmyk.toColorValue()
-    }
-
-    public fun updateLabLightness(l: Float): Unit = setLegacy(Lab.L, l, 0f..100f)
-    public fun updateLabA(a: Float): Unit = setLegacy(Lab.A, a, -128f..127f)
-    public fun updateLabB(b: Float): Unit = setLegacy(Lab.B, b, -128f..127f)
-    public fun updateFromLab(lab: LabColor) {
-        value = lab.toColorValue()
-    }
-
-    public fun updateOklabLightness(l: Float): Unit = setLegacy(Oklab.L, l, 0f..1f)
-    public fun updateOklabA(a: Float): Unit = setLegacy(Oklab.A, a, -OKLAB_AB_RANGE..OKLAB_AB_RANGE)
-    public fun updateOklabB(b: Float): Unit = setLegacy(Oklab.B, b, -OKLAB_AB_RANGE..OKLAB_AB_RANGE)
-    public fun updateFromOklab(oklab: OklabColor) {
-        value = oklab.toColorValue()
-    }
-
-    public fun updateOklchLightness(l: Float): Unit = setLegacy(OkLch.L, l, 0f..1f)
-    public fun updateOklchChroma(chroma: Float): Unit = setLegacy(OkLch.C, chroma, 0f..OKLAB_AB_RANGE)
-    public fun updateOklchHue(hue: Float): Unit = setLegacy(OkLch.H, hue, 0f..360f)
-    public fun updateFromOklch(oklch: OklchColor) {
-        value = oklch.toColorValue()
-    }
-
-    public fun updateOkhslHue(hue: Float): Unit = setLegacy(Okhsl.H, hue, 0f..360f)
-    public fun updateOkhslSaturation(saturation: Float): Unit = setLegacy(Okhsl.S, saturation, 0f..1f)
-    public fun updateOkhslLightness(lightness: Float): Unit = setLegacy(Okhsl.L, lightness, 0f..1f)
-    public fun updateFromOkhsl(okhsl: OkhslColor) {
-        value = okhsl.toColorValue()
-    }
-
-    public fun updateOkhsvHue(hue: Float): Unit = setLegacy(Okhsv.H, hue, 0f..360f)
-    public fun updateOkhsvSaturation(saturation: Float): Unit = setLegacy(Okhsv.S, saturation, 0f..1f)
-    public fun updateOkhsvValue(value: Float): Unit = setLegacy(Okhsv.V, value, 0f..1f)
-    public fun updateFromOkhsv(okhsv: OkhsvColor) {
-        value = okhsv.toColorValue()
-    }
-
-    public fun updateAlpha(alpha: Float) {
-        if (!alpha.isNaN()) value = current.withAlpha(alpha.coerceIn(0f, 1f).toDouble())
-    }
-
-    public fun updateFromArgbInt(argb: Int) {
-        value = Color(argb).toColorValue()
     }
 }

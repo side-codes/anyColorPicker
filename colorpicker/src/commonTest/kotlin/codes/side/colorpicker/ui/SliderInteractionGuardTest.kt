@@ -1,5 +1,6 @@
 package codes.side.colorpicker.ui
 
+import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -14,7 +15,7 @@ class SliderInteractionGuardTest {
 
     @Test
     fun beginSetsIsInteracting() {
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val guard = SliderInteractionGuard(state)
         guard.begin()
         assertTrue(state.isInteracting)
@@ -22,7 +23,7 @@ class SliderInteractionGuardTest {
 
     @Test
     fun endClearsIsInteracting() {
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val guard = SliderInteractionGuard(state)
         guard.begin()
         guard.end()
@@ -32,7 +33,7 @@ class SliderInteractionGuardTest {
     @Test
     fun forgottenMidDragClearsIsInteracting() {
         // Slider removed from composition while a drag is in progress.
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val guard = SliderInteractionGuard(state)
         guard.begin()
         guard.onForgotten()
@@ -41,7 +42,7 @@ class SliderInteractionGuardTest {
 
     @Test
     fun forgottenAfterGestureFinishedDoesNothing() {
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val guard = SliderInteractionGuard(state)
         guard.begin()
         guard.end()
@@ -53,7 +54,7 @@ class SliderInteractionGuardTest {
     fun forgottenIdleGuardDoesNotClobberAnotherSlidersGesture() {
         // An idle slider (e.g. AlphaSlider toggled off) leaves composition while a
         // different slider on the same state is mid-drag: the flag must survive.
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val dragging = SliderInteractionGuard(state)
         val idle = SliderInteractionGuard(state)
         dragging.begin()
@@ -63,7 +64,7 @@ class SliderInteractionGuardTest {
 
     @Test
     fun abandonedMidDragClearsIsInteracting() {
-        val state = ColorPickerState()
+        val state = ColorPickerState(Srgb(0.5, 0.5, 0.5))
         val guard = SliderInteractionGuard(state)
         guard.begin()
         guard.onAbandoned()

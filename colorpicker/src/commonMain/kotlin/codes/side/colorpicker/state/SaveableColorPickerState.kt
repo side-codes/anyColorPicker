@@ -10,8 +10,6 @@ import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
 import codes.side.color.HueFamily
 import codes.side.color.compose.toColorValue
-import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.model.PickerColor
 
 // The first element of every saved list. A later format changes it, and a list of another format
 // restores as null rather than being misread.
@@ -102,9 +100,3 @@ public fun rememberSaveableColorPickerState(
     initialColor: Color,
     knownSpaces: Collection<ColorSpace> = ColorSpaces.all,
 ): ColorPickerState = rememberSaveableColorPickerState(initialColor.toColorValue(), knownSpaces)
-
-/** Like [rememberSaveableColorPickerState], starting from a color of the model package. */
-@Composable
-public fun rememberSaveableColorPickerState(
-    initialColor: PickerColor = HslColor(),
-): ColorPickerState = rememberSaveableColorPickerState(initialColor.toColorValue())

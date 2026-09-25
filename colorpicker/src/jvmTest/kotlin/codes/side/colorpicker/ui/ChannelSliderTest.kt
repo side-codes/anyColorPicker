@@ -264,4 +264,17 @@ class ChannelSliderTest {
         val yellow = pixels[pixels.width - pixels.width / 6 - 1, pixels.height / 2]
         assertTrue(yellow.red > 0.7f && yellow.green > 0.7f && yellow.blue < 0.3f, "expected yellow a sixth from the right, got $yellow")
     }
+
+    @Test
+    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        val emitted = mutableListOf<ColorValue>()
+        state.onEdit = {
+            state.emit(it)
+            emitted += it
+        }
+        show(state, Hsl.H)
+        press(Key.DirectionRight, times = 2)
+        assertEquals(listOf(201.0, 202.0), emitted.map { it[Hsl.H] })
+    }
 }

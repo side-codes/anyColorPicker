@@ -10,9 +10,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import codes.side.color.ColorChannel
 import codes.side.color.Hsl
 import codes.side.color.Hsv
@@ -154,11 +157,16 @@ internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
 // What a raster is built from: the pair of channels and every held component.
 private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
 
+// A built raster and the pair of channels it shows.
+private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: ImageBitmap)
+
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
  * are two brushes, exactly. Any other pair is a raster, built on [Dispatchers.Default] whenever a held
- * channel changes, with the previous one drawn until it arrives. A preview draws one frame and has no
- * later one to wait for, so there the raster is built at once.
+ * channel changes, with the previous one drawn until it arrives. A raster of another pair is another
+ * space's colors rather than an earlier state of these, so after a change of channels nothing is drawn
+ * until the new pair's arrives. A preview draws one frame and has no later one to wait for, so there the
+ * raster is built at once.
  */
 @Composable
 internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: DoubleArray): DrawScope.() -> Unit {
@@ -170,7 +178,7 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
     val bitmap = if (LocalInspectionMode.current) {
         remember(x, y, key) { rasterizePlane(x, y, held, planeGridOf(x, y)) }
     } else {
-        val raster = remember { mutableStateOf<ImageBitmap?>(null) }
+        val raster = remember { mutableStateOf<PlaneRaster?>(null) }
         val request by rememberUpdatedState(PlaneRequest(x, y, key))
         LaunchedEffect(Unit) {
             // One raster at a time, always of the latest request. A drag changes the held channels
@@ -180,10 +188,10 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
                 val built = withContext(Dispatchers.Default) {
                     rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
                 }
-                raster.value = built
+                raster.value = PlaneRaster(next.x, next.y, built)
             }
         }
-        raster.value
+        raster.value?.takeIf { it.x === x && it.y === y }?.bitmap
     }
     return { if (bitmap != null) drawPlaneBitmap(bitmap) }
 }
@@ -216,4 +224,23 @@ private fun hsvSurface(hue: Double): DrawScope.() -> Unit {
         drawRect(ramp)
         drawRect(shading)
     }
+}
+
+/**
+ * Draws [bitmap] stretched over the whole drawing area.
+ *
+ * A ShaderBrush will not do it: an ImageShader paints the bitmap at its own size and clamps
+ * outwards, so an 80-pixel box filled from a 4-pixel ramp comes back the ramp's last colour
+ * across almost all of it. Scaling needs a destination size, and the low filter quality is
+ * the bilinear read the grid sizes above are measured against.
+ */
+internal fun DrawScope.drawPlaneBitmap(bitmap: ImageBitmap) {
+    drawImage(
+        image = bitmap,
+        srcOffset = IntOffset.Zero,
+        srcSize = IntSize(bitmap.width, bitmap.height),
+        dstOffset = IntOffset.Zero,
+        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+        filterQuality = FilterQuality.Low,
+    )
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.color.ColorChannel
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
@@ -29,8 +30,8 @@ import kotlinx.collections.immutable.ImmutableList
  * Building block for a single-channel color slider: an M3 [Slider] with a gradient
  * track, optional label row, and optional transparency checkerboard.
  *
- * All built-in channel sliders (hue, red, alpha, ...) are thin wrappers around this;
- * use it directly to build a custom channel.
+ * [ChannelSlider] and [AlphaSlider] are drawn by the same slider. Use this one for a track
+ * no [ColorChannel] describes, such as a value of your own.
  *
  * @param value current position in `0..1`; callers map their channel range to this.
  * @param gradientColors color stops of the track gradient, from `0` to `1`.
@@ -132,8 +133,9 @@ internal fun ColorSliderImpl(
         activeTrackColor = Color.Transparent,
         inactiveTrackColor = Color.Transparent,
     )
+    val active = enabled && LocalPickerEnabled.current
 
-    Column(modifier = modifier.fillMaxWidth().disabledAppearance(enabled, colors)) {
+    Column(modifier = modifier.fillMaxWidth().disabledAppearance(active, colors)) {
         if (label != null || valueLabel != null) {
             Row(
                 modifier = Modifier
@@ -150,7 +152,7 @@ internal fun ColorSliderImpl(
             value = value,
             onValueChange = onValueChange,
             onValueChangeFinished = onValueChangeFinished,
-            enabled = enabled,
+            enabled = active,
             modifier = Modifier
                 .fillMaxWidth()
                 .then(sliderModifier)

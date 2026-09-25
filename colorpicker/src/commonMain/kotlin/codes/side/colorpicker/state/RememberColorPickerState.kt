@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import codes.side.color.ColorValue
-import codes.side.colorpicker.model.HslColor
-import codes.side.colorpicker.model.PickerColor
 
 /**
  * Creates and remembers a [ColorPickerState] for the lifetime of the composition.
@@ -20,9 +18,3 @@ public fun rememberColorPickerState(initialValue: ColorValue): ColorPickerState 
 /** Like [rememberColorPickerState], starting from a Compose [Color]. */
 @Composable
 public fun rememberColorPickerState(initialColor: Color): ColorPickerState = remember { ColorPickerState(initialColor) }
-
-/** Like [rememberColorPickerState], starting from a color of the model package. */
-@Composable
-public fun rememberColorPickerState(
-    initialColor: PickerColor = HslColor(),
-): ColorPickerState = remember { ColorPickerState(initialColor) }

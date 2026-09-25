@@ -183,6 +183,7 @@ internal fun ColorPlaneImpl(
     val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
     val currentSurface by rememberUpdatedState(surface)
     val currentOnStep by rememberUpdatedState(onStep)
+    val active = enabled && LocalPickerEnabled.current
 
     // False when the plane is already against that edge. An arrow the plane keeps is an arrow
     // focus cannot leave on, and a device driven by a D-pad alone has nothing else to press.
@@ -212,12 +213,12 @@ internal fun ColorPlaneImpl(
         },
         modifier = modifier
             .defaultMinSize(dimensions.planeMinSize, dimensions.planeMinSize)
-            .disabledAppearance(enabled, colors)
+            .disabledAppearance(active, colors)
             .semantics {
                 semanticLabel?.let { contentDescription = it }
                 semanticValueText?.let { stateDescription = it }
-                if (!enabled) disabled()
-                if (enabled && actionLabels != null) {
+                if (!active) disabled()
+                if (active && actionLabels != null) {
                     customActions = listOf(
                         CustomAccessibilityAction(actionLabels.increaseX) {
                             step(1, 0, coarse = true)
@@ -235,16 +236,16 @@ internal fun ColorPlaneImpl(
                 }
             }
             .onKeyEvent { event ->
-                if (!enabled) return@onKeyEvent false
+                if (!active) return@onKeyEvent false
                 val (dx, dy) = planeKeyDirection(event) ?: return@onKeyEvent false
                 step(dx, dy, coarse = event.isShiftPressed)
             }
             .focusRequester(focusRequester)
-            .focusable(enabled, interactionSource)
-            // Keyed on enabled so the handler is torn down rather than left running with a
+            .focusable(active, interactionSource)
+            // Keyed on active so the handler is torn down rather than left running with a
             // flag it checks: a gesture in flight when the plane is disabled ends there.
-            .pointerInput(enabled) {
-                if (!enabled) return@pointerInput
+            .pointerInput(active) {
+                if (!active) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     // Pressing takes focus, so the arrow keys carry on from where the finger

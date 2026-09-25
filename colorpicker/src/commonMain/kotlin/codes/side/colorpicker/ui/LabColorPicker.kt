@@ -1,107 +1,121 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import codes.side.colorpicker.model.LabColor
+import androidx.compose.ui.graphics.Color
+import codes.side.color.ColorChannel
+import codes.side.color.ColorValue
+import codes.side.color.Lab
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
-import codes.side.colorpicker.theme.ColorPickerTheme
 
 /**
- * Complete CIELAB picker: L*, a*, and b* sliders, plus an optional alpha slider.
- *
- * Each slider is a slot, defaulted to the channel slider it names. Replace one to relabel or
- * restyle that channel: whatever is passed inherits this picker's colors, shapes and
- * dimensions through the theme, and is dimmed only if [enabled] is forwarded to it — though
- * it is refused input either way.
- *
- * @param showAlpha whether to include the [AlphaSlider].
- * @param coloringMode defaults to [ColoringMode.Contextual] so each track previews
- * the resulting color at the current values of the other channels.
- * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
- * @param shapes track shape; see [ColorPickerDefaults.shapes].
- * @param enabled when `false` the picker is dimmed, refuses input, and reports itself
- * disabled to accessibility. Input is refused by the picker as well as by each slider, so a
- * replaced slider slot cannot stay live even if the call site did not forward this to it.
- * @param thumb optional replacement for every slider's thumb; see [ColorSlider].
- * @param lightnessSlider slot for the lightness channel; defaults to [LightnessLabSlider].
- * @param aSlider slot for the a channel; defaults to [LabASlider].
- * @param bSlider slot for the b channel; defaults to [LabBSlider].
- * @param alphaSlider the [AlphaSlider], shown only when [showAlpha] is `true`.
+ * [ColorPicker] for [Lab], CSS lab() with its D50 white, over [state]: lightness, a and b sliders and
+ * alpha, contextual by default. Most of the a–b square lies outside sRGB and draws as the nearest color
+ * sRGB holds. The parameters are [ColorPicker]'s.
  */
 @Composable
 public fun LabColorPicker(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
+    showPlane: Boolean = hasPlane(Lab),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
-    coloringMode: ColoringMode = ColoringMode.Contextual,
+    coloringMode: ColoringMode = defaultColoringMode(Lab),
+    onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    lightnessSlider: @Composable () -> Unit = { LightnessLabSlider(state, enabled = enabled, coloringMode = coloringMode, thumb = thumb) },
-    aSlider: @Composable () -> Unit = { LabASlider(state, enabled = enabled, coloringMode = coloringMode, thumb = thumb) },
-    bSlider: @Composable () -> Unit = { LabBSlider(state, enabled = enabled, coloringMode = coloringMode, thumb = thumb) },
-    alphaSlider: @Composable () -> Unit = { AlphaSlider(state, enabled = enabled, thumb = thumb) },
-) {
-    // Provided rather than passed down, so a replaced slider slot inherits the picker's
-    // theme without the call site forwarding it.
-    ColorPickerTheme(colors = colors, shapes = shapes) {
-        Column(
-            modifier = modifier.disabledInput(enabled),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            lightnessSlider()
-            aSlider()
-            bSlider()
-            if (showAlpha) alphaSlider()
-        }
-    }
-}
+    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Lab, enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+): Unit = ColorPicker(
+    state = state,
+    modifier = modifier,
+    space = Lab,
+    showPlane = showPlane,
+    showAlpha = showAlpha,
+    enabled = enabled,
+    coloringMode = coloringMode,
+    onValueChangeFinished = onValueChangeFinished,
+    colors = colors,
+    shapes = shapes,
+    thumb = thumb,
+    plane = plane,
+    channelSlider = channelSlider,
+    alphaSlider = alphaSlider,
+)
 
-/**
- * [LabColorPicker] over a colour the caller holds, for an app keeping it in a view model rather
- * than in a [ColorPickerState].
- *
- * [onColorChange] fires for changes the user makes, not for a [color] written back in, so the
- * usual loop of the two updating each other does not start.
- *
- * The slots are not here: their defaults name the state, which this overload owns. Reach for
- * the [ColorPickerState] overload to replace a slider.
- */
+/** [LabColorPicker] over a value the caller holds, reported in [Lab]; controlled as [ColorPicker]'s value form is. */
 @Composable
 public fun LabColorPicker(
-    color: LabColor,
-    onColorChange: (LabColor) -> Unit,
+    value: ColorValue,
+    onValueChange: (ColorValue) -> Unit,
     modifier: Modifier = Modifier,
+    showPlane: Boolean = hasPlane(Lab),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
-    coloringMode: ColoringMode = ColoringMode.Contextual,
+    coloringMode: ColoringMode = defaultColoringMode(Lab),
+    onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
-) {
-    val state = rememberHoistedColorState(
-        color = color,
-        read = { labColor },
-        write = { updateFromLab(it) },
-        onColorChange = onColorChange,
-    )
-    LabColorPicker(
-        state = state,
-        modifier = modifier,
-        showAlpha = showAlpha,
-        enabled = enabled,
-        coloringMode = coloringMode,
-        colors = colors,
-        shapes = shapes,
-        thumb = thumb,
-    )
-}
+    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Lab, enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+): Unit = ColorPicker(
+    value = value,
+    onValueChange = onValueChange,
+    modifier = modifier,
+    space = Lab,
+    showPlane = showPlane,
+    showAlpha = showAlpha,
+    enabled = enabled,
+    coloringMode = coloringMode,
+    onValueChangeFinished = onValueChangeFinished,
+    colors = colors,
+    shapes = shapes,
+    thumb = thumb,
+    plane = plane,
+    channelSlider = channelSlider,
+    alphaSlider = alphaSlider,
+)
+
+/** [LabColorPicker] over a Compose [Color] the caller holds; controlled as [ColorPicker]'s color form is. */
+@Composable
+public fun LabColorPicker(
+    color: Color,
+    onColorChange: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+    showPlane: Boolean = hasPlane(Lab),
+    showAlpha: Boolean = true,
+    enabled: Boolean = true,
+    coloringMode: ColoringMode = defaultColoringMode(Lab),
+    onValueChangeFinished: () -> Unit = {},
+    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
+    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Lab, enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+): Unit = ColorPicker(
+    color = color,
+    onColorChange = onColorChange,
+    modifier = modifier,
+    space = Lab,
+    showPlane = showPlane,
+    showAlpha = showAlpha,
+    enabled = enabled,
+    coloringMode = coloringMode,
+    onValueChangeFinished = onValueChangeFinished,
+    colors = colors,
+    shapes = shapes,
+    thumb = thumb,
+    plane = plane,
+    channelSlider = channelSlider,
+    alphaSlider = alphaSlider,
+)

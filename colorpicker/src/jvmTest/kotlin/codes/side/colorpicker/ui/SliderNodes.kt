@@ -6,6 +6,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 
 /**
@@ -15,3 +16,8 @@ import androidx.compose.ui.test.hasTestTag
 @OptIn(ExperimentalTestApi::class)
 internal fun ComposeUiTest.sliderIn(tag: String): SemanticsNodeInteraction =
     onNode(hasAnyAncestor(hasTestTag(tag)) and SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
+
+/** The Material slider a screen reader calls [name], such as "Hue" or "Alpha". */
+@OptIn(ExperimentalTestApi::class)
+internal fun ComposeUiTest.sliderNamed(name: String): SemanticsNodeInteraction =
+    onNode(hasContentDescription(name) and SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
