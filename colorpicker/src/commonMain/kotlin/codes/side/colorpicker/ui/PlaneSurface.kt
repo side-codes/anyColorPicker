@@ -164,8 +164,9 @@ private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val he
 internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: DoubleArray): DrawScope.() -> Unit {
     val held = DoubleArray(displayed.size) { if (it == x.index || it == y.index) 0.0 else displayed[it] }
     val key = held.toList()
-    if (x === Hsl.S && y === Hsl.L) return remember(key) { hslSurface(held[Hsl.H.index]) }
-    if (x === Hsv.S && y === Hsv.V) return remember(key) { hsvSurface(held[Hsv.H.index]) }
+    if (isExactPlane(x, y)) {
+        return remember(x, key) { if (x === Hsl.S) hslSurface(held[Hsl.H.index]) else hsvSurface(held[Hsv.H.index]) }
+    }
     val bitmap = if (LocalInspectionMode.current) {
         remember(x, y, key) { rasterizePlane(x, y, held, planeGridOf(x, y)) }
     } else {

@@ -33,6 +33,7 @@ import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
+import codes.side.color.GamutMapping
 import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.OkLch
@@ -294,9 +295,16 @@ class ChannelPlaneTest {
     @Test
     fun anAppHslPlaneIsRasterizedAndEditsInItsSpace() = runComposeUiTest {
         val p3Hsl = ColorSpace.hsl("--plane-hsl-p3", DisplayP3)
-        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0))
+        // Hue 120 at full saturation and lightness parks the indicator in the top right corner.
+        val state = ColorPickerState(p3Hsl.color(doubleArrayOf(120.0, 100.0, 100.0)))
         show(state, p3Hsl.S, p3Hsl.L)
         waitUntil(timeoutMillis = 5_000) { rasterDrawn() }
+        // Display P3's green lies outside sRGB. sRGB HSL's brushes would draw sRGB's own green here,
+        // where the plane shows P3's brought into sRGB by chroma reduction.
+        val p3Green = p3Hsl.color(doubleArrayOf(120.0, 100.0, 50.0)).toComposeColor(mapping = GamutMapping.ChromaReduction)
+        assertTrue(maxOf(p3Green.red, p3Green.blue, 1f - p3Green.green) > 0.05f, "P3's green maps away from sRGB's, $p3Green")
+        assertColor(p3Green, pixels().at(0.99f, 0.5f), 6f / 255f, "P3 HSL's pure hue")
+        state.value = Srgb(1.0, 0.0, 0.0)
         onNodeWithTag("plane").performTouchInput {
             down(center)
             up()
