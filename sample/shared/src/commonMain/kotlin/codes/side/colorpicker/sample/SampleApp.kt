@@ -2,24 +2,27 @@ package codes.side.colorpicker.sample
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +38,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,48 +48,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import codes.side.colorpicker.conversion.toComposeColor
-import codes.side.colorpicker.model.HslColor
+import codes.side.color.ColorSpaces
+import codes.side.color.HexAlpha
+import codes.side.color.Okhsl
+import codes.side.color.toCssString
+import codes.side.color.toHexString
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.rememberSaveableColorPickerState
-import codes.side.colorpicker.ui.AlphaSlider
-import codes.side.colorpicker.ui.BlueSlider
+import codes.side.colorpicker.ui.ChannelSlider
+import codes.side.colorpicker.ui.ColorPicker
 import codes.side.colorpicker.ui.ColorPickerDialog
 import codes.side.colorpicker.ui.ColorSwatch
-import codes.side.colorpicker.ui.CyanSlider
-import codes.side.colorpicker.ui.GreenSlider
-import codes.side.colorpicker.ui.HslPlane
-import codes.side.colorpicker.ui.HueSlider
-import codes.side.colorpicker.ui.KeySlider
-import codes.side.colorpicker.ui.LabASlider
-import codes.side.colorpicker.ui.LabBSlider
-import codes.side.colorpicker.ui.LightnessLabSlider
-import codes.side.colorpicker.ui.LightnessSlider
-import codes.side.colorpicker.ui.MagentaSlider
-import codes.side.colorpicker.ui.OkhslHueSlider
-import codes.side.colorpicker.ui.OkhslLightnessSlider
-import codes.side.colorpicker.ui.OkhslPlane
-import codes.side.colorpicker.ui.OkhslSaturationSlider
-import codes.side.colorpicker.ui.OkhsvHueSlider
-import codes.side.colorpicker.ui.OkhsvPlane
-import codes.side.colorpicker.ui.OkhsvSaturationSlider
-import codes.side.colorpicker.ui.OkhsvValueSlider
-import codes.side.colorpicker.ui.RedSlider
-import codes.side.colorpicker.ui.SaturationSlider
-import codes.side.colorpicker.ui.YellowSlider
-import codes.side.colorpicker.util.randomHslColor
+import codes.side.colorpicker.ui.RgbColorPicker
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SampleApp() {
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     MaterialTheme(colorScheme = colorScheme) {
-        val state = rememberSaveableColorPickerState(
-            initialColor = HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f),
-        )
+        val state = rememberSaveableColorPickerState(Okhsl(250.0, 0.8, 0.6))
+        // Saved by id: saved state holds strings, not color spaces.
+        var spaceId by rememberSaveable { mutableStateOf(Okhsl.id) }
+        val space = ColorSpaces.all.first { it.id == spaceId }
         var showDialog by rememberSaveable { mutableStateOf(false) }
-        var coloringMode by rememberSaveable { mutableStateOf(ColoringMode.Contextual) }
+        var coloringMode by rememberSaveable { mutableStateOf(ColoringMode.Independent) }
         var enabled by rememberSaveable { mutableStateOf(true) }
+        // Held as an app holding a Compose Color would hold it, with no ColorPickerState of its own.
+        var color by remember { mutableStateOf(Color(0xFF3366CC)) }
 
         Scaffold(
             topBar = {
@@ -105,9 +95,51 @@ fun SampleApp() {
                 // Live preview swatch
                 item {
                     ColorSwatch(
-                        color = state.hslColor.toComposeColor(),
+                        color = state.color,
                         modifier = Modifier.fillMaxWidth().height(80.dp),
                     )
+                }
+
+                // The value as CSS writes it, in its own space, and as hex, mapped into sRGB
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column {
+                            Readout(state.value.toCssString(precision = 4))
+                            Readout(state.value.toHexString(HexAlpha.Last))
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = {
+                                    state.value = Okhsl(Random.nextDouble(360.0), Random.nextDouble(0.4, 1.0), Random.nextDouble(0.3, 0.8))
+                                },
+                            ) {
+                                Text("Random")
+                            }
+                            Button(onClick = { showDialog = true }) {
+                                Text("Dialog")
+                            }
+                        }
+                    }
+                }
+
+                // The picker's space: every one the library ships
+                item {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (each in ColorSpaces.all) {
+                            FilterChip(
+                                selected = each === space,
+                                onClick = { spaceId = each.id },
+                                label = { Text(each.id) },
+                            )
+                        }
+                    }
                 }
 
                 // Coloring mode switcher
@@ -142,158 +174,16 @@ fun SampleApp() {
                     }
                 }
 
-                // Color values readout
+                // One picker for whichever space is chosen above. Moving a channel leaves the color in
+                // that space, so the CSS readout changes function as the chips change.
                 item {
-                    val hsl = state.hslColor
-                    val rgb = state.rgbColor
-                    val cmyk = state.cmykColor
-                    val lab = state.labColor
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "#${
-                                state.argbInt
-                                    .toUInt()
-                                    .toString(16)
-                                    .uppercase()
-                                    .padStart(8, '0')
-                            }",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Button(onClick = { state.updateFromHsl(randomHslColor()) }) {
-                                Text("Random")
-                            }
-                            Button(onClick = { showDialog = true }) {
-                                Text("Dialog")
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    val h = hsl.intHue.pad(3)
-                    val s = hsl.intSaturation.pad(3)
-                    val l = hsl.intLightness.pad(3)
-                    val ha = hsl.intAlpha.pad(3)
-                    val r = rgb.intRed.pad(3)
-                    val g = rgb.intGreen.pad(3)
-                    val b = rgb.intBlue.pad(3)
-                    val ra = rgb.intAlpha.pad(3)
-                    val c = cmyk.intCyan.pad(3)
-                    val m = cmyk.intMagenta.pad(3)
-                    val y = cmyk.intYellow.pad(3)
-                    val k = cmyk.intKey.pad(3)
-                    val ll = lab.intL.pad(3)
-                    val la = lab.intA.pad(3)
-                    val lb = lab.intB.pad(3)
-                    val okhsl = state.okhslColor
-                    val okhsv = state.okhsvColor
-                    val oklch = state.oklchColor
-                    Readout("HSL   H:$h  S:$s  L:$l  A:$ha")
-                    Readout("RGB   R:$r  G:$g  B:$b  A:$ra")
-                    Readout("CMYK  C:$c  M:$m  Y:$y  K:$k")
-                    Readout("LAB   L:$ll  a:$la  b:$lb")
-                    Readout(
-                        "OKHSL H:${okhsl.intHue.pad(3)}  S:${okhsl.intSaturation.pad(3)}  L:${okhsl.intLightness.pad(3)}",
-                    )
-                    Readout(
-                        "OKHSV H:${okhsv.intHue.pad(3)}  S:${okhsv.intSaturation.pad(3)}  V:${okhsv.intValue.pad(3)}",
-                    )
-                    Readout(
-                        "OKLCH L:${oklch.intL.pad(3)}  C:${oklch.intChroma.pad(3)}  H:${oklch.intHue.pad(3)}",
-                    )
-                }
-
-                // Saturation / lightness plane, driven by the same state as everything else
-                item { SectionHeader("Saturation / Lightness") }
-                item {
-                    HslPlane(
+                    ColorPicker(
                         state = state,
+                        space = space,
                         enabled = enabled,
-                        modifier = Modifier.fillMaxWidth().height(220.dp),
+                        coloringMode = coloringMode,
                     )
                 }
-
-                item { HorizontalDivider() }
-
-                item { SectionHeader("Okhsl plane") }
-                item {
-                    OkhslPlane(
-                        state = state,
-                        enabled = enabled,
-                        modifier = Modifier.fillMaxWidth().height(220.dp),
-                    )
-                }
-
-                item { HorizontalDivider() }
-
-                item { SectionHeader("Okhsv plane") }
-                item {
-                    OkhsvPlane(
-                        state = state,
-                        enabled = enabled,
-                        modifier = Modifier.fillMaxWidth().height(220.dp),
-                    )
-                }
-
-                item { HorizontalDivider() }
-
-                // HSL section
-                item { SectionHeader("HSL") }
-                item { HueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { SaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { LightnessSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // RGB section
-                item { SectionHeader("RGB") }
-                item { RedSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { GreenSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { BlueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // CMYK section
-                item { SectionHeader("CMYK") }
-                item { CyanSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { MagentaSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { YellowSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { KeySlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // LAB section
-                item { SectionHeader("LAB") }
-                item { LightnessLabSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { LabASlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { LabBSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // Okhsl section. Drag the lightness slider here and then the HSL one
-                // above at the same hue: only this one holds its apparent brightness.
-                item { SectionHeader("Okhsl") }
-                item { OkhslHueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { OkhslSaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { OkhslLightnessSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // Okhsv section
-                item { SectionHeader("Okhsv") }
-                item { OkhsvHueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { OkhsvSaturationSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-                item { OkhsvValueSlider(state = state, enabled = enabled, coloringMode = coloringMode) }
-
-                item { HorizontalDivider() }
-
-                // Alpha section
-                item { SectionHeader("Alpha") }
-                item { AlphaSlider(state = state, enabled = enabled) }
 
                 item { HorizontalDivider() }
 
@@ -301,12 +191,33 @@ fun SampleApp() {
                 // picker state, so the thumb here restyles itself as the color changes.
                 item { SectionHeader("Custom thumb") }
                 item {
-                    HueSlider(
+                    ChannelSlider(
                         state = state,
+                        channel = Okhsl.H,
                         enabled = enabled,
                         coloringMode = coloringMode,
-                        thumb = { source -> SquareThumb(state.hslColor.toComposeColor(), source) },
+                        thumb = { source -> SquareThumb(state.color, source) },
                         thumbWidth = SquareThumbSize,
+                    )
+                }
+
+                item { HorizontalDivider() }
+
+                // A picker over a value the app holds: every change arrives in the callback, and the
+                // picker draws only what the app passes back.
+                item { SectionHeader("Controlled by a Compose Color") }
+                item {
+                    ColorSwatch(
+                        color = color,
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                    )
+                }
+                item {
+                    RgbColorPicker(
+                        color = color,
+                        onColorChange = { color = it },
+                        enabled = enabled,
+                        coloringMode = coloringMode,
                     )
                 }
             }
@@ -320,6 +231,7 @@ fun SampleApp() {
                     showDialog = false
                 },
                 onDismiss = { showDialog = false },
+                space = space,
             )
         }
     }
@@ -376,5 +288,3 @@ private fun Readout(text: String) {
         fontFamily = FontFamily.Monospace,
     )
 }
-
-private fun Int.pad(width: Int): String = toString().padStart(width)
