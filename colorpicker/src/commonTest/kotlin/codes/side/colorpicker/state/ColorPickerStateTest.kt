@@ -280,4 +280,42 @@ class ColorPickerStateTest {
         state.edit(Hsl.S, 60.0, Hsl.L, 40.0)
         assertEquals(Hsl(200.0, 60.0, 40.0), state.value)
     }
+
+    @Test
+    fun editsBuildOnTheLastEmission() {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        state.onEdit = { state.emit(it) }
+        state.edit(Hsl.S, 60.0)
+        state.edit(Hsl.L, 40.0)
+        assertEquals(Hsl(200.0, 60.0, 40.0), state.lastEmission)
+        assertEquals(Hsl(200.0, 50.0, 50.0), state.value, "an emission is not applied")
+    }
+
+    @Test
+    fun writingTheValueAnswersTheEmission() {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        state.onEdit = { state.emit(it) }
+        state.edit(Hsl.S, 60.0)
+        state.value = Hsl(200.0, 55.0, 50.0)
+        assertNull(state.lastEmission)
+        assertEquals(Hsl(200.0, 55.0, 50.0), state.editBase)
+    }
+
+    @Test
+    fun anEqualWriteStillAnswersTheEmission() {
+        val red = Srgb(1.0, 0.0, 0.0)
+        val state = ColorPickerState(red)
+        state.onEdit = { state.emit(it) }
+        state.editAlpha(0.5)
+        state.value = red
+        assertNull(state.lastEmission, "a caller that keeps its value has answered too")
+        assertSame(red, state.editBase)
+    }
+
+    @Test
+    fun displayComponentsOfAnotherValueUseTheRememberedHue() {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        val shown = state.displayComponents(Hsl, of = grey)
+        assertEquals(listOf(200.0, 0.0, 50.0), shown.toList())
+    }
 }

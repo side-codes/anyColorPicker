@@ -337,4 +337,19 @@ class ChannelPlaneTest {
         assertTrue(ltr > 150f, "saturation 90 belongs near the right edge, was $ltr")
         assertEquals(ltr, centre(LayoutDirection.Rtl), 1f, "the indicator moved between layout directions")
     }
+
+    @Test
+    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
+        val state = state()
+        val emitted = mutableListOf<ColorValue>()
+        state.onEdit = {
+            state.emit(it)
+            emitted += it
+        }
+        show(state)
+        onNodeWithTag("plane").requestFocus()
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionUp) }
+        assertEquals(listOf(51.0 to 50.0, 51.0 to 51.0), emitted.map { it[Hsl.S] to it[Hsl.L] })
+    }
 }

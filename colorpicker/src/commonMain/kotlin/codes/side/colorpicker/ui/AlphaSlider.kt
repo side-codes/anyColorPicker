@@ -2,22 +2,33 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.GamutMapping
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
-import kotlinx.collections.immutable.persistentListOf
+
+// How far an arrow key and Page Up or Page Down move alpha.
+private const val ALPHA_STEP = 0.01
+private const val ALPHA_PAGE_STEP = 0.1
 
 /**
  * Slider for the alpha (opacity) of [state], from transparent to opaque over a transparency
  * checkerboard. It edits alpha alone and keeps the color's space. A missing alpha reads 0, as CSS reads
  * `none`, and moving the slider gives it a value.
  *
+ * Arrow keys move alpha by 0.01, and Page Up and Page Down by 0.1.
+ *
+ * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
+ * that changes the value.
  * @param semanticLabel accessibility description of the slider; pass a localized string to replace the
  * English default.
  * @param semanticValueText accessibility announcement of the current value (`0..255`).
@@ -27,6 +38,7 @@ public fun AlphaSlider(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    onValueChangeFinished: () -> Unit = {},
     label: (@Composable () -> Unit)? = { SliderLabel(ALPHA_LABEL) },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(alphaValueText(state.value.alpha)) },
     semanticLabel: String? = ALPHA_LABEL,
@@ -42,27 +54,43 @@ public fun AlphaSlider(
     // The color itself, brought into sRGB as the other tracks are, faded in from transparent so the
     // gradient previews the color instead of fading through transparent black.
     val opaqueColor = remember(opaque) { opaque.toComposeColor(mapping = GamutMapping.ChromaReduction) }
-    val gradientColors = remember(opaqueColor) { persistentListOf(opaqueColor.copy(alpha = 0f), opaqueColor) }
-
+    val stops = remember(opaqueColor) { TrackStops(listOf(opaqueColor.copy(alpha = 0f), opaqueColor), null) }
     val interaction = remember(state) { SliderInteractionGuard(state) }
-    ColorSlider(
+    val currentFinished by rememberUpdatedState(onValueChangeFinished)
+    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    // A key press moves from the alpha edits build on, so two presses before a recomposition move two
+    // steps.
+    fun step(direction: Int, page: Boolean) {
+        val current = state.editBase.alpha
+        val next = (current + direction * if (page) ALPHA_PAGE_STEP else ALPHA_STEP).coerceIn(0.0, 1.0)
+        if (next == current) return
+        state.editAlpha(next)
+        currentFinished()
+    }
+
+    ColorSliderImpl(
         value = value.alpha.toFloat(),
         onValueChange = {
             interaction.begin()
             state.editAlpha(it.toDouble())
         },
-        gradientColors = gradientColors,
+        stops = stops,
         thumbColor = opaqueColor,
+        modifier = modifier,
+        sliderModifier = Modifier.channelKeys(enabled, mirrored, ::step),
         label = label,
         valueLabel = valueLabel,
+        onValueChangeFinished = {
+            interaction.end()
+            currentFinished()
+        },
+        enabled = enabled,
         showCheckerboard = true,
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,
         colors = colors,
         shapes = shapes,
-        modifier = modifier,
-        enabled = enabled,
-        onValueChangeFinished = { interaction.end() },
         thumb = thumb,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,

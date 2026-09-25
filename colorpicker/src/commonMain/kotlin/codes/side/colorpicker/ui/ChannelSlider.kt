@@ -93,9 +93,10 @@ public fun ChannelSlider(
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
     val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
 
-    // A key press moves from the value the state holds now, not the one this composition read.
+    // A key press moves from the value edits build on: the state's, or the last one emitted and not
+    // yet answered, so two presses before a recomposition move two steps.
     fun step(direction: Int, page: Boolean) {
-        val current = state.displayValue(channel)
+        val current = state.displayComponents(channel.space, state.editBase)[channel.index]
         val next = clampToRange(channel, range, current + direction * if (page) channel.pageStep else channel.step)
         if (next == current) return
         state.edit(channel, next)
@@ -143,7 +144,7 @@ internal fun accessibilitySteps(range: ClosedFloatingPointRange<Double>, step: D
 // handler, which moves a hundredth of the track whatever the channel. Right and left swap in
 // right-to-left layouts, as the track does. The key up is kept too: Material reports the end of a
 // step there, and this slider has already reported it.
-private fun Modifier.channelKeys(
+internal fun Modifier.channelKeys(
     enabled: Boolean,
     mirrored: Boolean,
     onStep: (direction: Int, page: Boolean) -> Unit,

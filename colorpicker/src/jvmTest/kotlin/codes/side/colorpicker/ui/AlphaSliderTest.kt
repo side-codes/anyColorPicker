@@ -1,12 +1,16 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.v2.runComposeUiTest
 import codes.side.color.ColorValue
 import codes.side.color.Okhsl
@@ -58,5 +62,37 @@ class AlphaSliderTest {
         sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
         assertEquals(Srgb(1.0, 0.0, 0.0, 0.25), reported)
         assertSame(red, state.value, "an edit goes to the sink, not the value")
+    }
+
+    @Test
+    fun keyStepsMoveAHundredthAndATenthAndReportTheirEnd() = runComposeUiTest {
+        var finished = 0
+        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
+        setContent { AlphaSlider(state, Modifier.testTag("slider"), onValueChangeFinished = { finished++ }) }
+        sliderIn("slider").requestFocus()
+        sliderIn("slider").performKeyInput { pressKey(Key.DirectionRight) }
+        assertNear(0.51, state.value.alpha, 1e-12)
+        sliderIn("slider").performKeyInput { pressKey(Key.PageDown) }
+        assertNear(0.41, state.value.alpha, 1e-12)
+        assertEquals(2, finished)
+    }
+
+    @Test
+    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
+        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
+        val emitted = mutableListOf<ColorValue>()
+        state.onEdit = {
+            state.emit(it)
+            emitted += it
+        }
+        setContent { AlphaSlider(state, Modifier.testTag("slider")) }
+        sliderIn("slider").requestFocus()
+        sliderIn("slider").performKeyInput {
+            pressKey(Key.DirectionRight)
+            pressKey(Key.DirectionRight)
+        }
+        assertEquals(2, emitted.size)
+        assertNear(0.51, emitted[0].alpha, 1e-12)
+        assertNear(0.52, emitted[1].alpha, 1e-12)
     }
 }

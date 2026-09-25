@@ -62,6 +62,11 @@ public class ColorPickerState(initialValue: ColorValue) {
     private val memory = HueMemory()
     private var current by mutableStateOf(initialValue)
 
+    // A value handed to the edit sink and not yet answered by a write of [value]. Edits build on it,
+    // so two key presses before the caller recomposes move two steps. Snapshot state, so a picker
+    // reconciling its caller's value recomposes after every emission, even one its caller ignores.
+    private var pending by mutableStateOf<ColorValue?>(null)
+
     init {
         memory.learn(initialValue)
     }
@@ -70,6 +75,7 @@ public class ColorPickerState(initialValue: ColorValue) {
     public var value: ColorValue
         get() = current
         set(value) {
+            pending = null
             if (value == current) return
             current = value
             memory.learn(value)
@@ -102,9 +108,10 @@ public class ColorPickerState(initialValue: ColorValue) {
      */
     public fun displayValue(channel: ColorChannel): Double = displayComponents(channel.space)[channel.index]
 
-    // [displayValue] for every channel of [space], converting once: what a track or a plane holds still.
-    internal fun displayComponents(space: ColorSpace): DoubleArray {
-        val color = current.to(space)
+    // [displayValue] for every channel of [space], converting [of] once: what a track or a plane
+    // holds still, and what a key press steps from.
+    internal fun displayComponents(space: ColorSpace, of: ColorValue = current): DoubleArray {
+        val color = of.to(space)
         return DoubleArray(space.channels.size) { index ->
             val channel = space.channels[index]
             color[channel] ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
@@ -129,12 +136,23 @@ public class ColorPickerState(initialValue: ColorValue) {
     // instead of applying them has set a sink.
     internal var onEdit: ((ColorValue) -> Unit)? = null
 
+    /** The value edits build on: the last one emitted and not yet answered, else [value]. */
+    internal val editBase: ColorValue get() = pending ?: current
+
+    /** The last value emitted to the caller of a picker and not yet answered by a write of [value]. */
+    internal val lastEmission: ColorValue? get() = pending
+
+    // Records [value] as handed to the caller of a picker that reports edits instead of applying them.
+    internal fun emit(value: ColorValue) {
+        pending = value
+    }
+
     internal fun edit(channel: ColorChannel, value: Double?) {
         submit(edited(channel, value))
     }
 
     internal fun editAlpha(alpha: Double?) {
-        submit(current.withAlpha(alpha))
+        submit(editBase.withAlpha(alpha))
     }
 
     // Two channels of one space in one write, as a plane drags them: the color passes through no value
@@ -149,7 +167,7 @@ public class ColorPickerState(initialValue: ColorValue) {
     }
 
     private fun edited(channel: ColorChannel, value: Double?): ColorValue {
-        var color = current.to(channel.space)
+        var color = editBase.to(channel.space)
         val hue = channel.space.hueChannel()
         if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, memory.hue(hue) ?: 0.0)
         return color.with(channel, value)

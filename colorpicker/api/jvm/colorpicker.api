@@ -532,7 +532,7 @@ public final class codes/side/colorpicker/theme/ColorPickerThemeKt {
 }
 
 public final class codes/side/colorpicker/ui/AlphaSliderKt {
-	public static final fun AlphaSlider-7LhMbNw (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun AlphaSlider-q3QzNKE (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ChannelPlaneKt {
@@ -574,7 +574,7 @@ public final class codes/side/colorpicker/ui/ColorSwatchKt {
 public final class codes/side/colorpicker/ui/ComposableSingletons$AlphaSliderKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$AlphaSliderKt;
 	public fun <init> ()V
-	public final fun getLambda$-487996643$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$561860369$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class codes/side/colorpicker/ui/ComposableSingletons$CmykSlidersKt {

@@ -70,9 +70,10 @@ public fun ChannelPlane(
                 channelValueAt(y, y.referenceRange, fy.toDouble()),
             )
         },
-        // A key moves from the values the state holds now, not the ones this composition read.
+        // A key moves from the values edits build on: the state's, or the last ones emitted and not
+        // yet answered.
         onStep = { dx, dy, coarse ->
-            val now = state.displayComponents(x.space)
+            val now = state.displayComponents(x.space, state.editBase)
             val xNow = now[x.index]
             val yNow = now[y.index]
             val nextX = if (dx == 0) xNow else clampToRange(x, x.referenceRange, xNow + dx * if (coarse) x.pageStep else x.step)
