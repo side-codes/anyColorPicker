@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import codes.side.color.Cmyk
@@ -68,7 +69,10 @@ public class ColorPickerState(initialValue: ColorValue) {
     private var pending by mutableStateOf<ColorValue?>(null)
 
     init {
-        memory.learn(initialValue)
+        // Unobserved: a state is built in composition, and whatever it read here, the composable building
+        // it would read too. That composable would then recompose on every new hue, and one that builds a
+        // state without remembering it would build another each time, forever.
+        Snapshot.withoutReadObservation { memory.learn(initialValue) }
     }
 
     /** The color. Writing one equal to it changes nothing. */
