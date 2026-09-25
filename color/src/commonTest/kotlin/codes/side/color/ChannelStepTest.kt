@@ -78,4 +78,10 @@ class ChannelStepTest {
     fun aReferenceRangeWithoutSpanIsRefused() {
         assertFailsWith<IllegalArgumentException> { ColorChannel("x", 1.0..1.0) }
     }
+
+    @Test
+    fun aReferenceRangeWithoutAFiniteSpanIsRefusedWhateverTheStep() {
+        assertFailsWith<IllegalArgumentException> { ColorChannel("x", 1.0..1.0, step = 0.1) }
+        assertFailsWith<IllegalArgumentException> { ColorChannel("x", 0.0..Double.POSITIVE_INFINITY, step = 0.1) }
+    }
 }

@@ -69,6 +69,9 @@ public sealed class ChannelKind {
  * [step] and [pageStep] are how far one key press moves a slider on this channel, and one Page Up.
  * By default [step] is the largest power of ten at or below a hundredth of [referenceRange]'s span,
  * and [pageStep] is ten of them.
+ *
+ * @throws IllegalArgumentException if [referenceRange] has no finite, positive span, if [step] is not
+ * positive and finite, or if [pageStep] is not finite or is smaller than [step].
  */
 public class ColorChannel(
     public val id: String,
@@ -82,6 +85,8 @@ public class ColorChannel(
     public val pageStep: Double = step * 10.0,
 ) {
     init {
+        val span = referenceRange.endInclusive - referenceRange.start
+        require(span > 0.0 && span.isFinite()) { "Channel $id's reference range needs a finite, positive span, was $referenceRange" }
         require(step > 0.0 && step.isFinite()) { "Channel $id's step must be positive and finite, was $step" }
         require(pageStep >= step && pageStep.isFinite()) { "Channel $id's page step must be at least its step, was $pageStep" }
     }
