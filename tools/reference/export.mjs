@@ -73,7 +73,9 @@ function cssWorkedExamples(source) {
     return examples.map(({ example, color, equals, printed = [color, equals], tolerance }) => {
         const start = source.indexOf(`<div class="example" id="${example}">`);
         if (start < 0) throw new Error(`${example}: no such example`);
-        const block = source.slice(start, source.indexOf("</div>", start));
+        const end = source.indexOf("</div>", start);
+        if (end < 0) throw new Error(`${example}: the example block never closes`);
+        const block = source.slice(start, end);
         for (const text of printed) {
             if (!block.includes(text)) throw new Error(`${example}: "${text}" is not printed there`);
         }
@@ -277,6 +279,8 @@ function writeJson(name, data) {
 
 mkdirSync(OUT, { recursive: true });
 
+const colorJsVersion = JSON.parse(readFileSync(new URL("node_modules/colorjs.io/package.json", import.meta.url))).version;
+
 const cssSource = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
 const namedColors = cssNamedColors(cssSource);
 const equivalentColors = cssEquivalentColors(cssSource);
@@ -287,6 +291,10 @@ writeJson("css-color-4.json", {
         commit: CSS_COMMIT,
         path: CSS_PATH,
         license: "W3C-20150513",
+        workedExamples: {
+            chosenIn: "tools/reference/css-worked-examples.json",
+            readBy: { package: "colorjs.io", version: colorJsVersion },
+        },
     },
     namedColors,
     equivalentColors,
@@ -306,7 +314,6 @@ writeJson("wpt.json", {
     conversions,
 });
 
-const colorJsVersion = JSON.parse(readFileSync(new URL("node_modules/colorjs.io/package.json", import.meta.url))).version;
 const colorJs = colorJsConversions();
 const okhsx = colorJsOkhsx();
 writeJson("colorjs.json", {

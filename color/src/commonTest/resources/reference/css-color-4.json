@@ -3,7 +3,14 @@
     "repository": "https://github.com/w3c/csswg-drafts",
     "commit": "11ab50923a2a289647bd869fcea346bc2543a0fb",
     "path": "css-color-4/Overview.bs",
-    "license": "W3C-20150513"
+    "license": "W3C-20150513",
+    "workedExamples": {
+      "chosenIn": "tools/reference/css-worked-examples.json",
+      "readBy": {
+        "package": "colorjs.io",
+        "version": "0.7.1"
+      }
+    }
   },
   "namedColors": [
     {"name":"aliceblue","rgb":[240,248,255]},
