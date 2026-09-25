@@ -36,8 +36,9 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * configuration changes and process death, and a different [initialValue] starts the dialog over from
  * it.
  *
- * @param onValueSelected called with the color when the confirm button is pressed: in [space] once a
- * channel has moved, and exactly [initialValue] if nothing did. The caller dismisses the dialog.
+ * @param onValueSelected called with the color when the confirm button is pressed: exactly [initialValue]
+ * if nothing was edited, in its own space if only alpha was, and otherwise in [space]. The caller
+ * dismisses the dialog.
  * @param onDismiss called when the user cancels or dismisses the dialog.
  * @param space the picker's space; Okhsl by default.
  * @param title dialog title; [confirmText] and [dismissText] label the buttons. Pass localized strings

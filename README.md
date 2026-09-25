@@ -285,7 +285,8 @@ The eleven named pickers are `RgbColorPicker` (sRGB), `HslColorPicker`, `HsvColo
 space fixed and takes the same parameters.
 
 Every part of a picker is a slot, handed the state, and for a slider the channel. Replace one to
-relabel it — which is how a picker is localized, since the library ships no strings of its own:
+relabel it — which is how a picker is localized, since its labels are English and the library
+ships no translations:
 
 ```kotlin
 HslColorPicker(
@@ -523,9 +524,10 @@ ColorPickerDialog(
 )
 ```
 
-Confirming returns the value in the dialog's space once a channel has moved, and exactly the
-initial value if none did, so an untouched Display P3 color is not clipped into sRGB on the way
-out. `ColorPickerDialog(initialColor, onColorSelected, onDismiss)` does the same over a Compose
+Confirming returns exactly the initial value if nothing was edited, so an untouched Display P3
+color is not clipped into sRGB on the way out. An edit of alpha alone keeps the initial value's
+space; any other edit returns the value in the dialog's space.
+`ColorPickerDialog(initialColor, onColorSelected, onDismiss)` does the same over a Compose
 `Color`.
 
 In-progress edits inside the dialog survive configuration changes; passing a new initial value
@@ -675,6 +677,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker` 
 | `HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)`                                 | `Hsl(200.0, 80.0, 50.0)`                                                                 | CSS's units: HSL's S and L are 0–100                       |
 | `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `OkLch(…)`           | each a `ColorValue`                                        |
 | `hsl.toRgb()`, `rgb.toOklch()`, …                                                           | `value.to(Srgb)`, `value.to(OkLch)`                                                      |                                                            |
+| `codes.side.colorpicker.conversion.HexAlpha`                                                | `codes.side.color.HexAlpha`                                                              |                                                            |
 | `color.toHexString(HexAlpha.First)`                                                         | `value.toHexString(HexAlpha.First)`                                                      |                                                            |
 | `"#3380CC".toRgbColorOrNull(HexAlpha.None)`                                                 | `ColorValue.parseHexOrNull("#3380CC", HexAlpha.None)`                                    |                                                            |
 | `hsl.toComposeColor()`, `color.toHslColor()`                                                | `value.toComposeColor()`, `color.toColorValue().to(Hsl)`                                 |                                                            |

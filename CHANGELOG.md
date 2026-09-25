@@ -22,6 +22,8 @@
 - **Five more named pickers,** `HsvColorPicker`, `HwbColorPicker`, `LchColorPicker`, `OklabColorPicker` and `OkLchColorPicker`, beside the six 1.x had. Each comes over a `ColorPickerState`, a `ColorValue` and a Compose `Color`.
 - **`ChannelSlider` and `ChannelPlane`.** Arrow keys and screen readers step by each channel's own unit: a degree on a hue, 1/255 on an RGB channel, 0.001 on OkLCh chroma. A value past the end of a track, such as OkLCh chroma 0.5, pins the thumb while the label keeps its true number.
 - **`AlphaSlider` takes `onValueChangeFinished`.**
+- **`ColorPickerState.Saver(knownSpaces)`,** for saving a state wherever Compose takes a `Saver`. It and `rememberSaveableColorPickerState(…, knownSpaces)` restore a value in a space the app defines.
+- **`ColorPickerState.displayValue(channel)`,** what a slider on that channel shows: a grey's remembered hue, and 0 for any other missing component.
 
 ## 1.2.1
 
