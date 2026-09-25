@@ -8,6 +8,7 @@
 //   npm ci
 //   node export.mjs
 import Color from "colorjs.io";
+import { JSDOM } from "jsdom";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 // The last commit to CSS Color 4's source on 2026-09-13, the Editor's Draft the library follows.
@@ -27,32 +28,44 @@ async function fetchText(url) {
 const wptFile = name => fetchText(`${WPT}/${name}`);
 
 // ---- CSS Color 4 ----
+//
+// The Bikeshed source is HTML with shorthands in its text, so it is parsed as HTML and queried.
+// Bikeshed writes an inline CSS value as ''value'' and a definition link as [=term=]; both stay in
+// the text, which is where the colors and the spec's own words about them are read from.
 
-// The named-color table: each row gives a name, its hex and its decimal, and the two must agree.
-function cssNamedColors(source) {
-    const rows = /<th scope=row><dfn>([a-z]+)<\/dfn><td>#([0-9a-f]{6})<td>(\d+) (\d+) (\d+)/g;
-    const colors = [];
-    for (const [, name, hex, ...decimal] of source.matchAll(rows)) {
-        const rgb = decimal.map(Number);
-        if (rgb.map(v => v.toString(16).padStart(2, "0")).join("") !== hex) throw new Error(`${name}: #${hex} is not ${decimal.join(" ")}`);
-        colors.push({ name, rgb });
-    }
-    return colors;
+const quotedCss = text => [...text.matchAll(/''([^']+)''/g)].map(m => m[1]);
+
+// The named-color table: a row per color, its name in the header cell, then its hex and its decimal,
+// which must agree.
+function cssNamedColors(document) {
+    return [...document.querySelectorAll("tr > th[scope=row] > dfn")].map(dfn => {
+        const name = dfn.textContent.trim();
+        const hex = dfn.parentElement.nextElementSibling?.textContent.trim();
+        const rgb = dfn.parentElement.nextElementSibling?.nextElementSibling?.textContent.trim().split(/\s+/).map(Number);
+        if (!/^#[0-9a-f]{6}$/.test(hex) || rgb?.length !== 3) throw new Error(`${name}: the row is not a name, a hex and a decimal`);
+        if (`#${rgb.map(v => v.toString(16).padStart(2, "0")).join("")}` !== hex) throw new Error(`${name}: ${hex} is not ${rgb.join(" ")}`);
+        return { name, rgb };
+    });
 }
 
 // §12, Comparing <color> Values: each worked example compares the first two colors it quotes, and
-// says "are <em>not</em>" when they are not equivalent; its notes add positive pairs of their own.
-function cssEquivalentColors(source) {
-    const start = source.indexOf('<h2 id="comparing-color-values">');
-    const section = source.slice(start, source.indexOf("<h2", start + 1));
+// says the two "are not [=equivalent colors=]" when they are not; its notes add positive pairs.
+function cssEquivalentColors(document) {
+    const heading = document.getElementById("comparing-color-values");
+    const next = [...document.querySelectorAll("h2")].find(h => heading.compareDocumentPosition(h) & h.DOCUMENT_POSITION_FOLLOWING);
+    const section = document.createRange();
+    section.setStartAfter(heading);
+    section.setEndBefore(next);
     const pairs = [];
-    for (const [, example, body] of section.matchAll(/<div class="example" id="(ex-equivalent-[\w-]+)">([\s\S]*?)<\/div>/g)) {
-        const colors = [...body.matchAll(/''([^']+)''/g)].map(m => m[1]);
-        if (colors.length < 2) throw new Error(`${example} quotes fewer than two colors`);
-        const equivalent = !/are\s+<em>not<\/em>\s+\[=equivalent colors=\]/.test(body);
-        pairs.push({ example, first: colors[0], second: colors[1], equivalent });
+    for (const example of document.querySelectorAll('div.example[id^="ex-equivalent-"]')) {
+        if (!section.intersectsNode(example)) continue;
+        const text = example.textContent;
+        const colors = quotedCss(text);
+        if (colors.length < 2) throw new Error(`${example.id} quotes fewer than two colors`);
+        const equivalent = !/are\s+not\s+\[=equivalent colors=\]/.test(text);
+        pairs.push({ example: example.id, first: colors[0], second: colors[1], equivalent });
     }
-    for (const [, first, second] of section.matchAll(/''([^']+)''\s+and\s+''([^']+)''—are \[=equivalent colors=\]/g)) {
+    for (const [, first, second] of section.toString().matchAll(/''([^']+)''\s+and\s+''([^']+)''—are \[=equivalent colors=\]/g)) {
         pairs.push({ example: "note", first, second, equivalent: true });
     }
     return pairs;
@@ -68,16 +81,13 @@ function cssEquivalentColors(source) {
 // and display-p3, #7654CD as xyz-d50 and xyz-d65, lch(85.9017% 166.116 138.207) as display-p3,
 // rgb(76% 62% 3%) as lab and lch, and color(display-p3 0.84 0.19 0.72) as lab and lch, which color.js
 // converts as the library does, up to 1.4e-2 from the printed values.
-function cssWorkedExamples(source) {
+function cssWorkedExamples(document) {
     const { examples } = JSON.parse(readFileSync(new URL("css-worked-examples.json", import.meta.url), "utf8"));
     return examples.map(({ example, color, equals, printed = [color, equals], tolerance }) => {
-        const start = source.indexOf(`<div class="example" id="${example}">`);
-        if (start < 0) throw new Error(`${example}: no such example`);
-        const end = source.indexOf("</div>", start);
-        if (end < 0) throw new Error(`${example}: the example block never closes`);
-        const block = source.slice(start, end);
+        const block = document.getElementById(example);
+        if (!block?.matches("div.example")) throw new Error(`${example}: no such example`);
         for (const text of printed) {
-            if (!block.includes(text)) throw new Error(`${example}: "${text}" is not printed there`);
+            if (!block.textContent.includes(text)) throw new Error(`${example}: "${text}" is not printed there`);
         }
         const parsed = new Color(equals);
         const space = Object.keys(COLORJS).find(id => COLORJS[id] === parsed.space.id);
@@ -281,10 +291,10 @@ mkdirSync(OUT, { recursive: true });
 
 const colorJsVersion = JSON.parse(readFileSync(new URL("node_modules/colorjs.io/package.json", import.meta.url))).version;
 
-const cssSource = await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`);
-const namedColors = cssNamedColors(cssSource);
-const equivalentColors = cssEquivalentColors(cssSource);
-const workedExamples = cssWorkedExamples(cssSource);
+const css = new JSDOM(await fetchText(`https://raw.githubusercontent.com/w3c/csswg-drafts/${CSS_COMMIT}/${CSS_PATH}`)).window.document;
+const namedColors = cssNamedColors(css);
+const equivalentColors = cssEquivalentColors(css);
+const workedExamples = cssWorkedExamples(css);
 writeJson("css-color-4.json", {
     source: {
         repository: "https://github.com/w3c/csswg-drafts",
