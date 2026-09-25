@@ -98,8 +98,9 @@ public fun ColorPickerDialog(
 }
 
 /**
- * [ColorPickerDialog] over a Compose [Color]. [onColorSelected] receives the color as `toComposeColor()`:
- * brought into sRGB by CSS gamut mapping, eight bits a channel. The rest is the [ColorValue] form's.
+ * [ColorPickerDialog] over a Compose [Color]. [onColorSelected] receives exactly [initialColor] if
+ * nothing was edited, and otherwise the color as `toComposeColor()`: brought into sRGB by CSS gamut
+ * mapping, eight bits a channel. The rest is the [ColorValue] form's.
  *
  * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which
  * [toColorValue] refuses.
@@ -125,10 +126,12 @@ public fun ColorPickerDialog(
     channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)? = null,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
 ) {
-    val state = rememberDialogState(initialColor, initialColor.toColorValue(), space)
+    val initialValue = remember(initialColor) { initialColor.toColorValue() }
+    val state = rememberDialogState(initialColor, initialValue, space)
     DialogContent(
         state = state,
-        onConfirm = { onColorSelected(state.color) },
+        // Mapped into sRGB, an untouched Display P3 color would come back clipped.
+        onConfirm = { onColorSelected(if (state.value == initialValue) initialColor else state.color) },
         onDismiss = onDismiss,
         modifier = modifier,
         space = space,

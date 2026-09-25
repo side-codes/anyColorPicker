@@ -20,6 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
+import androidx.compose.ui.graphics.colorspace.ColorSpaces as ComposeSpaces
 
 /**
  * The dialog builds its own state, so its slots are the only place a caller can reach it. A slot that
@@ -120,6 +121,16 @@ class ColorPickerDialogTest {
         waitForIdle()
         onNodeWithText("Select").performClick()
         assertEquals(Okhsl(40.0, 0.5, 0.6), selected)
+    }
+
+    @Test
+    fun anUneditedConfirmReturnsTheInitialComposeColorExactly() = runComposeUiTest {
+        // Mapped into sRGB on the way out, a Display P3 red would come back clipped to #FF0B0C.
+        val p3Red = Color(1f, 0f, 0f, 1f, ComposeSpaces.DisplayP3)
+        var selected: Color? = null
+        setContent { ColorPickerDialog(initialColor = p3Red, onColorSelected = { selected = it }, onDismiss = {}) }
+        onNodeWithText("Select").performClick()
+        assertEquals(p3Red, selected)
     }
 
     @Test
