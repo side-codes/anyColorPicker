@@ -1,9 +1,12 @@
 package codes.side.colorpicker.ui
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -26,24 +29,26 @@ class GradientTrackTest {
         positions = floatArrayOf(0f, 0.75f, 1f),
     )
 
+    // The track drawn whole: a thumb of no width at the start leaves no gap.
     private fun redAt(direction: LayoutDirection, fraction: Float): Color {
         var pixel = Color.Unspecified
         runComposeUiTest {
             setContent {
                 CompositionLocalProvider(LocalLayoutDirection provides direction) {
-                    ColorSliderImpl(
-                        value = 0f,
-                        onValueChange = {},
-                        onStep = { _, _ -> false },
-                        accessibilitySteps = 0,
-                        stops = stops,
-                        thumbColor = Color.Black,
-                        thumb = {},
-                        modifier = Modifier.size(width = 400.dp, height = 60.dp).testTag("slider"),
+                    GradientTrack(
+                        brush = stops.brush(direction),
+                        thumbFraction = 0f,
+                        interactionSource = remember { MutableInteractionSource() },
+                        checkerboardLight = Color.White,
+                        checkerboardDark = Color.LightGray,
+                        trackShape = RectangleShape,
+                        thumbWidth = 0.dp,
+                        thumbTrackGap = 0.dp,
+                        modifier = Modifier.size(width = 400.dp, height = 60.dp).testTag("track"),
                     )
                 }
             }
-            val pixels = onNodeWithTag("slider").captureToImage().toPixelMap()
+            val pixels = onNodeWithTag("track").captureToImage().toPixelMap()
             pixel = pixels[(fraction * (pixels.width - 1)).toInt(), pixels.height / 2]
         }
         return pixel

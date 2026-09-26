@@ -13,24 +13,19 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicColorSlider
-import codes.side.colorpicker.foundation.BasicColorSliderImpl
 import codes.side.colorpicker.foundation.ColorPickerStrings
-import codes.side.colorpicker.foundation.accessibilitySteps
-import codes.side.colorpicker.foundation.rememberFractionSteps
+import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlinx.collections.immutable.ImmutableList
-
-// How far a key moves this slider, a hundredth of the track and a tenth for a page, as
-// BasicColorSlider's defaults do.
-private const val COLOR_SLIDER_STEP = 0.01f
-private const val COLOR_SLIDER_PAGE_STEP = 0.1f
 
 /**
  * Building block for a single-channel color slider: a [BasicColorSlider] with a gradient
@@ -88,61 +83,38 @@ public fun ColorSlider(
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
-    val stops = remember(gradientColors) { TrackStops(gradientColors, null) }
-    ColorSliderImpl(
-        value = value,
-        onValueChange = onValueChange,
-        onStep = rememberFractionSteps(value, COLOR_SLIDER_STEP, COLOR_SLIDER_PAGE_STEP, onValueChange),
-        accessibilitySteps = accessibilitySteps(0.0..1.0, COLOR_SLIDER_STEP.toDouble()),
-        stops = stops,
-        thumbColor = thumbColor,
-        modifier = modifier,
-        label = label,
-        valueLabel = valueLabel,
-        onValueChangeFinished = onValueChangeFinished,
-        enabled = enabled,
-        trackHeight = trackHeight,
-        showCheckerboard = showCheckerboard,
-        semanticLabel = semanticLabel,
-        semanticValueText = semanticValueText,
-        colors = colors,
-        shapes = shapes,
-        interactionSource = interactionSource,
-        thumb = thumb,
-        thumbWidth = thumbWidth,
-        thumbTrackGap = thumbTrackGap,
-    )
+    val layoutDirection = LocalLayoutDirection.current
+    val gradient = remember(gradientColors, layoutDirection) { TrackStops(gradientColors, null).brush(layoutDirection) }
+    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+        BasicColorSlider(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = sliderModifier,
+            enabled = enabled,
+            thumbColor = thumbColor,
+            onValueChangeFinished = onValueChangeFinished,
+            semanticLabel = semanticLabel,
+            semanticValueText = semanticValueText,
+            interactionSource = interactionSource,
+            track = { SliderTrack(gradient, colors, shapes, thumbWidth, thumbTrackGap, trackHeight, showCheckerboard) },
+            thumb = { SliderHandle(thumb) },
+        )
+    }
 }
 
 /**
- * The Material look of [ColorSlider], [ChannelSlider] and [AlphaSlider] over [BasicColorSliderImpl]: the
- * label row, the gradient track with its gap at the thumb, the handle, the minimum touch size, and the
- * disabled look. [stops] sit at their own positions; [onStep] and [accessibilitySteps] are
- * [BasicColorSliderImpl]'s.
+ * The Material frame of [ColorSlider], [ChannelSlider] and [AlphaSlider]: the label row above the
+ * slider, the minimum touch size the slider is handed as its modifier, and the disabled look over
+ * both.
  */
 @Composable
-internal fun ColorSliderImpl(
-    value: Float,
-    onValueChange: (Float) -> Unit,
-    onStep: (direction: Int, page: Boolean) -> Boolean,
-    accessibilitySteps: Int,
-    stops: TrackStops,
-    thumbColor: Color,
-    modifier: Modifier = Modifier,
-    label: (@Composable () -> Unit)? = null,
-    valueLabel: (@Composable () -> Unit)? = null,
-    onValueChangeFinished: (() -> Unit)? = null,
-    enabled: Boolean = true,
-    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
-    showCheckerboard: Boolean = false,
-    semanticLabel: String? = null,
-    semanticValueText: String? = null,
-    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    interactionSource: MutableInteractionSource? = null,
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+internal fun SliderFrame(
+    modifier: Modifier,
+    enabled: Boolean,
+    colors: ColorPickerColors,
+    label: (@Composable () -> Unit)?,
+    valueLabel: (@Composable () -> Unit)?,
+    slider: @Composable (Modifier) -> Unit,
 ) {
     val active = enabled && LocalPickerEnabled.current
 
@@ -159,41 +131,46 @@ internal fun ColorSliderImpl(
             }
         }
 
-        BasicColorSliderImpl(
-            value = value,
-            onValueChange = onValueChange,
-            onStep = onStep,
-            accessibilitySteps = accessibilitySteps,
-            modifier = Modifier
+        slider(
+            Modifier
                 .fillMaxWidth()
                 .minimumInteractiveComponentSize(),
-            enabled = enabled,
-            thumbColor = thumbColor,
-            onValueChangeFinished = onValueChangeFinished,
-            semanticLabel = semanticLabel,
-            semanticValueText = semanticValueText,
-            interactionSource = interactionSource,
-            // The slots read the scope's interactionSource and thumbColor, not this function's parameters
-            // of the same names: the scope's source is the resolved one, and its color is opaque.
-            track = {
-                GradientTrack(
-                    stops = stops,
-                    thumbFraction = fraction,
-                    interactionSource = this.interactionSource,
-                    checkerboardLight = colors.checkerboardLight,
-                    checkerboardDark = colors.checkerboardDark,
-                    trackShape = shapes.trackShape,
-                    showCheckerboard = showCheckerboard,
-                    thumbWidth = thumbWidth,
-                    thumbTrackGap = thumbTrackGap,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(trackHeight),
-                )
-            },
-            thumb = {
-                if (thumb != null) thumb(this.interactionSource) else SliderThumb(this.interactionSource, this.thumbColor)
-            },
         )
     }
+}
+
+/** The Material track: [gradient] at [trackHeight], with its gap at the thumb. */
+@Composable
+internal fun ColorSliderScope.SliderTrack(
+    gradient: Brush,
+    colors: ColorPickerColors,
+    shapes: ColorPickerShapes,
+    thumbWidth: Dp,
+    thumbTrackGap: Dp,
+    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
+    showCheckerboard: Boolean = false,
+) {
+    GradientTrack(
+        brush = gradient,
+        thumbFraction = fraction,
+        interactionSource = interactionSource,
+        checkerboardLight = colors.checkerboardLight,
+        checkerboardDark = colors.checkerboardDark,
+        trackShape = shapes.trackShape,
+        showCheckerboard = showCheckerboard,
+        thumbWidth = thumbWidth,
+        thumbTrackGap = thumbTrackGap,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(trackHeight),
+    )
+}
+
+/**
+ * A caller's [thumb], or the default handle. Both read the scope's source and color rather than a wrapper's
+ * parameters of the same names: the scope's source is the resolved one, and its color is opaque.
+ */
+@Composable
+internal fun ColorSliderScope.SliderHandle(thumb: (@Composable (InteractionSource) -> Unit)?) {
+    if (thumb != null) thumb(interactionSource) else SliderThumb(interactionSource, thumbColor)
 }

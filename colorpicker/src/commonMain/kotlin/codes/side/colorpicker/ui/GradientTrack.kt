@@ -16,12 +16,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -38,15 +38,15 @@ private val TrackInsideCornerSize = 2.dp
  *
  * The gap shrinks when the thumb is pressed/dragged (matching M3's behavior where
  * the thumb narrows on interaction, causing the track to come closer). The track's
- * outer corners come from [trackShape]; in right-to-left layouts the gradient and
- * the thumb gap are mirrored, as the thumb is.
+ * outer corners come from [trackShape]. [brush] comes mirrored for right-to-left layouts,
+ * and the thumb gap is mirrored here, as the thumb is.
  *
  * @param showCheckerboard if true, draws a transparency checkerboard underneath
  * the gradient (only within the track segments). Used by [AlphaSlider].
  */
 @Composable
 internal fun GradientTrack(
-    stops: TrackStops,
+    brush: Brush,
     thumbFraction: Float,
     interactionSource: InteractionSource,
     checkerboardLight: Color,
@@ -78,8 +78,6 @@ internal fun GradientTrack(
         thumbWidth
     }
 
-    val layoutDirection = LocalLayoutDirection.current
-    val brush = remember(stops, layoutDirection) { stops.brush(layoutDirection) }
     val checkerboardBrush = if (showCheckerboard) {
         rememberCheckerboardBrush(
             cellSize = CheckerboardCellSize,
