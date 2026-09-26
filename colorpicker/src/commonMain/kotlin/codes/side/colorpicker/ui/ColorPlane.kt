@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +49,7 @@ import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlin.math.roundToInt
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 // One percent of the field per arrow press and ten with shift held, the step the M3 slider
 // uses for its own arrow keys. The accessibility actions take the coarse step whatever is
@@ -181,7 +180,6 @@ internal fun ColorPlaneImpl(
 ) {
     val source = interactionSource ?: remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
-    val scope = rememberCoroutineScope()
     val dimensions = ColorPickerDefaults.currentDimensions()
     // The gesture handler outlives any one composition, so it reads the callbacks and the
     // painter through these rather than capturing the values it was built with.
@@ -258,27 +256,33 @@ internal fun ColorPlaneImpl(
                     // Pressing takes focus, so the arrow keys carry on from where the finger
                     // left off rather than doing nothing until something is tabbed to.
                     focusRequester.requestFocus()
+                    // Emitted at once rather than from a coroutine, so they stay in order and a drag
+                    // torn down with the plane still ends on the caller's source.
                     val press = DragInteraction.Start()
-                    scope.launch { source.emit(press) }
-                    currentOnValueChange(
-                        planeXFraction(down.position.x, size.width),
-                        planeYFraction(down.position.y, size.height),
-                    )
-                    down.consume()
-
-                    val completed = drag(down.id) { change ->
+                    source.tryEmit(press)
+                    try {
                         currentOnValueChange(
-                            planeXFraction(change.position.x, size.width),
-                            planeYFraction(change.position.y, size.height),
+                            planeXFraction(down.position.x, size.width),
+                            planeYFraction(down.position.y, size.height),
                         )
-                        change.consume()
-                    }
+                        down.consume()
 
-                    currentOnFinished?.invoke()
-                    scope.launch {
-                        source.emit(
-                            if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press),
-                        )
+                        val completed = drag(down.id) { change ->
+                            currentOnValueChange(
+                                planeXFraction(change.position.x, size.width),
+                                planeYFraction(change.position.y, size.height),
+                            )
+                            change.consume()
+                        }
+
+                        currentOnFinished?.invoke()
+                        source.tryEmit(if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press))
+                    } catch (e: CancellationException) {
+                        // Torn down mid-drag, as when the plane is disabled under the finger: the drag
+                        // has still ended, and a thumb drawn from the source would otherwise stay dragged.
+                        source.tryEmit(DragInteraction.Cancel(press))
+                        currentOnFinished?.invoke()
+                        throw e
                     }
                 }
             },

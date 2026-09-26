@@ -15,8 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -48,7 +48,6 @@ import codes.side.colorpicker.ui.accessibilitySteps
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 
 /** What a [BasicColorSlider]'s track and thumb draw from. Only the library implements it. */
 @Stable
@@ -164,7 +163,6 @@ internal fun BasicColorSliderImpl(
         SliderSlots(fraction, active, source, thumbColor.asOpaqueThumb())
     }
     val geometry = remember { SliderGeometry() }
-    val scope = rememberCoroutineScope()
     // The gesture handler outlives any one composition, so it reads these rather than capturing the
     // values it was built with.
     val currentFraction by rememberUpdatedState(fraction)
@@ -230,8 +228,13 @@ internal fun BasicColorSliderImpl(
                 if (!active) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Consumed, so a clickable row or card around the slider does not take the touch
+                    // as its own. A scrolling parent still starts from a consumed down.
+                    down.consume()
+                    // Emitted at once rather than from a coroutine, so they stay in order and a gesture
+                    // torn down with the slider still ends on the caller's source.
                     val press = PressInteraction.Press(down.position)
-                    scope.launch { source.emit(press) }
+                    source.tryEmit(press)
                     var drag: DragInteraction.Start? = null
                     var last = currentFraction
 
@@ -253,16 +256,15 @@ internal fun BasicColorSliderImpl(
                             val up = currentEvent.changes.firstOrNull { it.id == down.id }
                             val tapped = up != null && up.changedToUp() && isOver(up.position)
                             if (tapped) {
+                                up.consume()
                                 report(down.position.x)
                                 currentOnFinished?.invoke()
                             }
-                            scope.launch {
-                                source.emit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
-                            }
+                            source.tryEmit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                         } else {
                             val start = DragInteraction.Start()
                             drag = start
-                            scope.launch { source.emit(start) }
+                            source.tryEmit(start)
                             // The finger's position each time, never a step from the value: a value the
                             // caller answers late is drawn, and the drag goes on from the finger.
                             report(slop.position.x)
@@ -271,18 +273,16 @@ internal fun BasicColorSliderImpl(
                                 change.consume()
                             }
                             currentOnFinished?.invoke()
-                            scope.launch {
-                                source.emit(if (completed) DragInteraction.Stop(start) else DragInteraction.Cancel(start))
-                                source.emit(if (completed) PressInteraction.Release(press) else PressInteraction.Cancel(press))
-                            }
+                            source.tryEmit(if (completed) DragInteraction.Stop(start) else DragInteraction.Cancel(start))
+                            source.tryEmit(if (completed) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                         }
                     } catch (e: CancellationException) {
-                        // Torn down mid-gesture, as when the slider is disabled under the finger: a thumb
-                        // drawn from the source would otherwise stay pressed.
-                        scope.launch {
-                            drag?.let { source.emit(DragInteraction.Cancel(it)) }
-                            source.emit(PressInteraction.Cancel(press))
-                        }
+                        // Torn down mid-gesture with no cancel event, as when the source is swapped under
+                        // the finger: a thumb drawn from the source would otherwise stay pressed, and a
+                        // drag that moved the value has still ended.
+                        drag?.let { source.tryEmit(DragInteraction.Cancel(it)) }
+                        source.tryEmit(PressInteraction.Cancel(press))
+                        if (drag != null) currentOnFinished?.invoke()
                         throw e
                     }
                 }
@@ -344,28 +344,27 @@ internal fun rememberFractionSteps(
     pageStep: Float,
     onValueChange: (Float) -> Unit,
 ): (direction: Int, page: Boolean) -> Boolean {
-    val base = remember { FractionBase() }
+    // The last step reported and not yet answered. It is state read here, so every step recomposes, even
+    // one the caller ignores or clamps back to the value it had; that composition drops it, and keys go
+    // back to stepping from the value drawn.
+    val unanswered = remember { mutableStateOf<Float?>(null) }
+    val stepping = unanswered.value != null
+    val currentValue by rememberUpdatedState(sliderFraction(value))
     val currentOnValueChange by rememberUpdatedState(onValueChange)
-    val answered = sliderFraction(value)
-    SideEffect { base.value = answered }
+    SideEffect { if (stepping) unanswered.value = null }
     return remember(step, pageStep) {
         { direction: Int, page: Boolean ->
-            val from = base.value
+            val from = unanswered.value ?: currentValue
             val next = (from + direction * if (page) pageStep else step).coerceIn(0f, 1f)
             if (next == from) {
                 false
             } else {
-                base.value = next
+                unanswered.value = next
                 currentOnValueChange(next)
                 true
             }
         }
     }
-}
-
-// Where keys step from: written after each composition, and by each step until the next one.
-private class FractionBase {
-    var value: Float = 0f
 }
 
 // Where the last measurement put the thumb and the track, for the pointer handler: written while

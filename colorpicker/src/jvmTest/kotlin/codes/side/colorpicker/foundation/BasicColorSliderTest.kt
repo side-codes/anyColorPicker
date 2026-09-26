@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
@@ -245,6 +248,24 @@ class BasicColorSliderTest {
         assertEquals(2, held.reported.size)
         assertEquals(0.51f, held.reported[0], 1e-6f)
         assertEquals(0.52f, held.reported[1], 1e-6f)
+    }
+
+    @Test
+    fun aCallerThatClampsKeepsTheKeysOnItsValue() = runComposeUiTest {
+        var value by mutableFloatStateOf(0.8f)
+        setContent {
+            BasicColorSlider(
+                value = value,
+                onValueChange = { value = it.coerceAtMost(0.8f) },
+                modifier = Modifier.width(220.dp).testTag("slider"),
+                track = {},
+                thumb = { Box(Modifier.size(20.dp)) },
+            )
+        }
+        // Each step past the caller's limit is answered with the value it already had.
+        press(Key.DirectionRight, times = 5)
+        press(Key.DirectionLeft)
+        assertEquals(0.79f, value, 1e-6f)
     }
 
     @Test

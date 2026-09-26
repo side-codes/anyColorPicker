@@ -1,6 +1,7 @@
 package codes.side.colorpicker.foundation
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
@@ -195,6 +196,92 @@ class BasicColorSliderPointerTest {
         waitForIdle()
         assertTrue(seen.getOrNull(2) is DragInteraction.Cancel, "$seen")
         assertTrue(seen.getOrNull(3) is PressInteraction.Cancel, "$seen")
+        assertEquals(1, held.finished, "the drag it cut off reports its end")
+    }
+
+    @Test
+    fun aSliderInAClickableRowKeepsItsTouches() = runComposeUiTest {
+        val held = HeldSlider()
+        val row = MutableInteractionSource()
+        val rowSaw = mutableListOf<Interaction>()
+        var clicks = 0
+        setContent {
+            LaunchedEffect(row) { row.interactions.collect { rowSaw += it } }
+            Box(Modifier.clickable(interactionSource = row, indication = null) { clicks++ }) {
+                BasicColorSlider(
+                    value = held.value,
+                    onValueChange = { held.reported += it },
+                    modifier = Modifier.width(220.dp).testTag("slider"),
+                    track = {},
+                    thumb = { Box(Modifier.size(20.dp)) },
+                )
+            }
+        }
+        onNodeWithTag("slider").performTouchInput { click(Offset(alongTrack(0.25f), centerY)) }
+        waitForIdle()
+        assertEquals(1, held.reported.size, "the slider took the tap")
+        assertEquals(0, clicks, "and the row did not")
+        assertTrue(rowSaw.none { it is PressInteraction.Press }, "nor did it show a press: $rowSaw")
+    }
+
+    @Test
+    fun aSliderRemovedMidDragReleasesItsSource() = runComposeUiTest {
+        val source = MutableInteractionSource()
+        val seen = mutableListOf<Interaction>()
+        var shown by mutableStateOf(true)
+        setContent {
+            LaunchedEffect(source) { source.interactions.collect { seen += it } }
+            if (shown) {
+                BasicColorSlider(
+                    value = 0.5f,
+                    onValueChange = {},
+                    modifier = Modifier.width(220.dp).testTag("slider"),
+                    interactionSource = source,
+                    track = {},
+                    thumb = { Box(Modifier.size(20.dp)) },
+                )
+            }
+        }
+        onNodeWithTag("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(viewConfiguration.touchSlop * 2, 0f))
+        }
+        waitForIdle()
+        shown = false
+        waitForIdle()
+        assertTrue(seen.getOrNull(2) is DragInteraction.Cancel, "$seen")
+        assertTrue(seen.getOrNull(3) is PressInteraction.Cancel, "$seen")
+    }
+
+    @Test
+    fun aSourceSwappedMidDragEndsTheDragOnTheOldOne() = runComposeUiTest {
+        val first = MutableInteractionSource()
+        val second = MutableInteractionSource()
+        var current by mutableStateOf(first)
+        val toFirst = mutableListOf<Interaction>()
+        var finished = 0
+        setContent {
+            LaunchedEffect(first) { first.interactions.collect { toFirst += it } }
+            BasicColorSlider(
+                value = 0.5f,
+                onValueChange = {},
+                modifier = Modifier.width(220.dp).testTag("slider"),
+                onValueChangeFinished = { finished++ },
+                interactionSource = current,
+                track = {},
+                thumb = { Box(Modifier.size(20.dp)) },
+            )
+        }
+        onNodeWithTag("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(viewConfiguration.touchSlop * 2, 0f))
+        }
+        waitForIdle()
+        current = second
+        waitForIdle()
+        assertTrue(toFirst.getOrNull(2) is DragInteraction.Cancel, "$toFirst")
+        assertTrue(toFirst.getOrNull(3) is PressInteraction.Cancel, "$toFirst")
+        assertEquals(1, finished, "the drag it cut off reports its end")
     }
 
     @Test

@@ -296,6 +296,32 @@ class ChannelSliderTest {
     }
 
     @Test
+    fun disablingMidDragEndsTheInteraction() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        var enabled by mutableStateOf(true)
+        var finished = 0
+        setContent {
+            ChannelSlider(
+                state,
+                Hsl.S,
+                Modifier.size(width = 300.dp, height = 60.dp).testTag("slider"),
+                enabled = enabled,
+                onValueChangeFinished = { finished++ },
+            )
+        }
+        sliderIn("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(viewConfiguration.touchSlop * 2, 0f))
+        }
+        waitForIdle()
+        assertTrue(state.isInteracting)
+        enabled = false
+        waitForIdle()
+        assertFalse(state.isInteracting, "a drag cut off by disabling has ended")
+        assertEquals(1, finished)
+    }
+
+    @Test
     fun theTrackIsMirroredInRightToLeft() = runComposeUiTest {
         show(ColorPickerState(Hsl(180.0, 100.0, 50.0)), Hsl.H, direction = LayoutDirection.Rtl, coloringMode = ColoringMode.Contextual)
         val pixels = onNodeWithTag("slider").captureToImage().toPixelMap()

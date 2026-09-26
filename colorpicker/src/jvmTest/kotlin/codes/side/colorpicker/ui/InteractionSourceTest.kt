@@ -28,6 +28,7 @@ import codes.side.colorpicker.state.ColorPickerState
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -150,6 +151,28 @@ class InteractionSourceTest {
         }
         assertSame(source, slider)
         assertSame(source, plane)
+    }
+
+    @Test
+    fun aPlaneDisabledMidDragCancelsItsDragAndEndsTheInteraction() = runComposeUiTest {
+        val state = ColorPickerState(teal)
+        val source = MutableInteractionSource()
+        var enabled by mutableStateOf(true)
+        val seen = mutableListOf<Interaction>()
+        setContent {
+            LaunchedEffect(source) { source.interactions.collect { seen += it } }
+            ChannelPlane(state, Hsl.S, Hsl.L, Modifier.size(200.dp).testTag("plane"), enabled = enabled, interactionSource = source)
+        }
+        onNodeWithTag("plane").performTouchInput {
+            down(center)
+            moveBy(Offset(20f, 0f))
+        }
+        waitForIdle()
+        assertTrue(state.isInteracting)
+        enabled = false
+        waitForIdle()
+        assertTrue(seen.any { it is DragInteraction.Cancel }, "a thumb reading the source would stay dragged: $seen")
+        assertFalse(state.isInteracting, "a drag cut off by disabling has ended")
     }
 
     @Test
