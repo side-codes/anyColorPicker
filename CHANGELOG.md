@@ -40,6 +40,7 @@
 - **`Modifier.checkerboard(light, dark)`,** the transparency checkerboard the swatch draws a color over.
 - **`BasicChannelSlider` and `BasicAlphaSlider`,** the channel and alpha sliders with no look of their own. Their `track` and `thumb` slots read the channel, its value and the track's gradient, computed and mirrored as the Material sliders draw them, from `ChannelSliderScope` and `AlphaSliderScope`.
 - **`BasicColorPlane` and `BasicChannelPlane`,** the planes with no look and no size of their own. The `thumb` slot reads the position, and on a channel plane the channels and the opaque color under it, from `ColorPlaneScope` and `ChannelPlaneScope`.
+- **`BasicColorPicker`,** over a state, a `ColorValue` or a Compose `Color`, laying out whatever plane, channel sliders and alpha slider it is given, stacked or side by side (`orientation`), with `null` leaving the plane or alpha out.
 
 ## 1.2.1
 

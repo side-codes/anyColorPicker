@@ -15,6 +15,12 @@ public final class codes/side/colorpicker/foundation/BasicChannelSliderKt {
 	public static final fun BasicChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
+public final class codes/side/colorpicker/foundation/BasicColorPickerKt {
+	public static final fun BasicColorPicker-CWKs5lI (JLkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPicker-aqv2aB4 (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPicker-eKw1uXw (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+}
+
 public final class codes/side/colorpicker/foundation/BasicColorPlaneKt {
 	public static final fun BasicColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/graphics/Shape;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
