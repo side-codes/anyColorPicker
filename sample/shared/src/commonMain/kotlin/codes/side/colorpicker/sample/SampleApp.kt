@@ -204,6 +204,13 @@ fun SampleApp() {
 
                 item { HorizontalDivider() }
 
+                // The same state in a picker with no Material in it: the Basic components, drawn by
+                // FoundationPicker alone.
+                item { SectionHeader("Built on foundation") }
+                item { FoundationPicker(state, enabled) }
+
+                item { HorizontalDivider() }
+
                 // A picker over a value the app holds: every change arrives in the callback, and the
                 // picker draws only what the app passes back.
                 item { SectionHeader("Controlled by a Compose Color") }
