@@ -1,43 +1,14 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKmpLibrary)
-    alias(libs.plugins.dokka)
-    alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.library)
     // Tests only: they decode their reference data from JSON files under src/commonTest/resources.
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.kotlinxResources)
 }
 
-group = "codes.side"
-version = providers.gradleProperty("VERSION_NAME").get()
-
 kotlin {
-    explicitApi()
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-    }
-
-    jvm()
-
     android {
         namespace = "codes.side.color"
-        compileSdk = 37
-        minSdk = 24
-
-        withHostTest {}
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
     }
-
-    iosArm64()
-    iosSimulatorArm64()
 
     sourceSets {
         commonMain.dependencies {
@@ -52,7 +23,7 @@ kotlin {
     }
 }
 
-// Published as the root build script sets up every module with the publish plugin.
+// Published as build-logic's library plugin publishes every library module.
 mavenPublishing {
     pom {
         name.set("anyColorPicker color")

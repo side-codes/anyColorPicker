@@ -1,51 +1,17 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.library)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidKmpLibrary)
-    alias(libs.plugins.dokka)
-    alias(libs.plugins.mavenPublish)
 }
 
-group = "codes.side"
-version = providers.gradleProperty("VERSION_NAME").get()
-
 kotlin {
-    explicitApi()
-
-    // Compose Multiplatform for web. The DSL is still marked experimental in the Kotlin
-    // Gradle plugin, so the opt-in is required and the shape may change between Kotlin
-    // versions; the library itself needs no wasm-specific source.
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        // Required even for a library: without an executable binary webpack does not
-        // bundle the Skiko runtime, and the browser test target cannot load Compose.
-        // See https://youtrack.jetbrains.com/issue/CMP-4906
-        binaries.executable()
-    }
-
-    jvm()
-
     android {
         namespace = "codes.side.colorpicker"
-        compileSdk = 37
-        minSdk = 24
-
-        withHostTest {}
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
     }
 
-    // iosX64 (Intel simulator) removed: Compose Multiplatform stopped publishing
-    // iosx64 artifacts as of 1.11.0.
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
@@ -125,7 +91,7 @@ tasks.withType<Test>().configureEach {
     systemProperty("user.country", "US")
 }
 
-// Published as the root build script sets up every module with the publish plugin.
+// Published as build-logic's library plugin publishes every library module.
 mavenPublishing {
     pom {
         name.set("anyColorPicker")

@@ -1,50 +1,18 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 // The bridge has no composables, but it is compiled by the Compose compiler for good: the compiler
 // gives ComposeColorSpaces a $stable field that Compose consumers read at run time, so removing it
 // would break them. The Compose Gradle plugin also puts skiko.mjs where the wasm browser tests'
 // webpack finds it, as ui-graphics imports Skiko there; it requires the compiler, and the compiler
 // requires the runtime on the classpath.
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.library)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidKmpLibrary)
-    alias(libs.plugins.dokka)
-    alias(libs.plugins.mavenPublish)
 }
 
-group = "codes.side"
-version = providers.gradleProperty("VERSION_NAME").get()
-
 kotlin {
-    explicitApi()
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        // Without an executable binary webpack does not bundle the Skiko runtime, and the browser
-        // tests cannot load. https://youtrack.jetbrains.com/issue/CMP-4906
-        binaries.executable()
-    }
-
-    jvm()
-
     android {
         namespace = "codes.side.color.compose"
-        compileSdk = 37
-        minSdk = 24
-
-        withHostTest {}
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
     }
-
-    iosArm64()
-    iosSimulatorArm64()
 
     sourceSets {
         commonMain.dependencies {
@@ -68,7 +36,7 @@ afterEvaluate {
     }
 }
 
-// Published as the root build script sets up every module with the publish plugin.
+// Published as build-logic's library plugin publishes every library module.
 mavenPublishing {
     pom {
         name.set("anyColorPicker color for Compose")
