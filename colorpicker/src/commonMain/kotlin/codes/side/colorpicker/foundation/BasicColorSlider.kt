@@ -1,16 +1,25 @@
 package codes.side.colorpicker.foundation
 
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitHorizontalPointerSlopOrCancellation
+import androidx.compose.foundation.gestures.horizontalDrag
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.input.key.Key
@@ -18,6 +27,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.changedToUp
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -35,6 +47,8 @@ import codes.side.colorpicker.ui.LocalPickerEnabled
 import codes.side.colorpicker.ui.accessibilitySteps
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /** What a [BasicColorSlider]'s track and thumb draw from. Only the library implements it. */
 @Stable
@@ -149,6 +163,13 @@ internal fun BasicColorSliderImpl(
     val slots = remember(fraction, active, source, thumbColor) {
         SliderSlots(fraction, active, source, thumbColor.asOpaqueThumb())
     }
+    val geometry = remember { SliderGeometry() }
+    val scope = rememberCoroutineScope()
+    // The gesture handler outlives any one composition, so it reads these rather than capturing the
+    // values it was built with.
+    val currentFraction by rememberUpdatedState(fraction)
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
+    val currentOnFinished by rememberUpdatedState(onValueChangeFinished)
 
     // A key's step ends where it lands, so one that changes the value reports its end at once.
     fun step(direction: Int, page: Boolean) {
@@ -201,7 +222,71 @@ internal fun BasicColorSliderImpl(
                 }
                 true
             }
-            .focusable(active, source),
+            .focusable(active, source)
+            .hoverable(source, active)
+            // Keyed on active so a gesture in flight when the slider is disabled ends there, and on the
+            // source, or a handler kept across a new one goes on reporting to the old.
+            .pointerInput(active, source) {
+                if (!active) return@pointerInput
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val press = PressInteraction.Press(down.position)
+                    scope.launch { source.emit(press) }
+                    var drag: DragInteraction.Start? = null
+                    var last = currentFraction
+
+                    // Reports where a pointer at [x] points, unless the thumb is already there.
+                    fun report(x: Float) {
+                        val next = geometry.fractionAt(x)
+                        if (next == last) return
+                        last = next
+                        currentOnValueChange(next)
+                    }
+
+                    try {
+                        val slop = awaitHorizontalPointerSlopOrCancellation(down.id, down.type) { change, _ ->
+                            change.consume()
+                        }
+                        if (slop == null) {
+                            // Lifted over the slider before the slop, it is a tap. Taken by another
+                            // handler, such as a scrolling parent, or lifted elsewhere, it is nothing.
+                            val up = currentEvent.changes.firstOrNull { it.id == down.id }
+                            val tapped = up != null && up.changedToUp() && isOver(up.position)
+                            if (tapped) {
+                                report(down.position.x)
+                                currentOnFinished?.invoke()
+                            }
+                            scope.launch {
+                                source.emit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                            }
+                        } else {
+                            val start = DragInteraction.Start()
+                            drag = start
+                            scope.launch { source.emit(start) }
+                            // The finger's position each time, never a step from the value: a value the
+                            // caller answers late is drawn, and the drag goes on from the finger.
+                            report(slop.position.x)
+                            val completed = horizontalDrag(slop.id) { change ->
+                                report(change.position.x)
+                                change.consume()
+                            }
+                            currentOnFinished?.invoke()
+                            scope.launch {
+                                source.emit(if (completed) DragInteraction.Stop(start) else DragInteraction.Cancel(start))
+                                source.emit(if (completed) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                            }
+                        }
+                    } catch (e: CancellationException) {
+                        // Torn down mid-gesture, as when the slider is disabled under the finger: a thumb
+                        // drawn from the source would otherwise stay pressed.
+                        scope.launch {
+                            drag?.let { source.emit(DragInteraction.Cancel(it)) }
+                            source.emit(PressInteraction.Cancel(press))
+                        }
+                        throw e
+                    }
+                }
+            },
     ) { measurables, constraints ->
         val thumbPlaceable = measurables[0].measure(constraints.copy(minWidth = 0, minHeight = 0))
         val trackPlaceable = measurables[1].measure(
@@ -209,6 +294,7 @@ internal fun BasicColorSliderImpl(
         )
         val width = constraints.constrainWidth(thumbPlaceable.width + trackPlaceable.width)
         val height = constraints.constrainHeight(max(thumbPlaceable.height, trackPlaceable.height))
+        geometry.update(width, thumbPlaceable.width, trackPlaceable.width, layoutDirection == LayoutDirection.Rtl)
         layout(width, height) {
             trackPlaceable.placeRelative(thumbPlaceable.width / 2, (height - trackPlaceable.height) / 2)
             // Placed after the track, so it is drawn over it.
@@ -280,4 +366,40 @@ internal fun rememberFractionSteps(
 // Where keys step from: written after each composition, and by each step until the next one.
 private class FractionBase {
     var value: Float = 0f
+}
+
+// Where the last measurement put the thumb and the track, for the pointer handler: written while
+// measuring and read when an event arrives, so it is not state.
+private class SliderGeometry {
+    private var width = 0
+    private var thumbWidth = 0
+    private var trackWidth = 0
+    private var rtl = false
+
+    fun update(width: Int, thumbWidth: Int, trackWidth: Int, rtl: Boolean) {
+        this.width = width
+        this.thumbWidth = thumbWidth
+        this.trackWidth = trackWidth
+        this.rtl = rtl
+    }
+
+    fun fractionAt(x: Float): Float = sliderFractionAt(x, width, thumbWidth, trackWidth, rtl)
+}
+
+/**
+ * The track position a pointer at [x] points to, on a slider [width] wide whose thumb, [thumbWidth]
+ * wide, centres on the track's start at `0` and on its end, [trackWidth] further on, at `1`. Right to
+ * left, the start is at the right.
+ */
+internal fun sliderFractionAt(x: Float, width: Int, thumbWidth: Int, trackWidth: Int, rtl: Boolean): Float {
+    if (trackWidth <= 0) return 0f
+    val fromStart = if (rtl) width - x else x
+    return ((fromStart - thumbWidth / 2f) / trackWidth).coerceIn(0f, 1f)
+}
+
+// Whether a pointer at [position] is over the slider, counting the margin its touch target is grown by.
+private fun AwaitPointerEventScope.isOver(position: Offset): Boolean {
+    val margin = extendedTouchPadding
+    return position.x in -margin.width..size.width + margin.width &&
+        position.y in -margin.height..size.height + margin.height
 }
