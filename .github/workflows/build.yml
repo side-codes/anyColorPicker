@@ -30,9 +30,9 @@ jobs:
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v6
       - name: Build libraries
-        run: ./gradlew :colorpicker-foundation:assemble :color:assemble :color-compose:assemble
+        run: ./gradlew :colorpicker-foundation:assemble :colorpicker-material3:assemble :color:assemble :color-compose:assemble
       - name: Run tests
-        run: ./gradlew :colorpicker-foundation:allTests :color:allTests :color-compose:allTests
+        run: ./gradlew :colorpicker-foundation:allTests :colorpicker-material3:allTests :color:allTests :color-compose:allTests
       # Fails when public API drifts from each library's api/. Without this the
       # binary-compatibility plugin is configured but never consulted.
       - name: Check the public API matches the committed dump
@@ -93,6 +93,6 @@ jobs:
           xcodebuild -version
 
       - name: Build iOS framework
-        run: ./gradlew :colorpicker-foundation:linkDebugFrameworkIosSimulatorArm64
+        run: ./gradlew :colorpicker-material3:linkDebugFrameworkIosSimulatorArm64
       - name: Run iOS simulator tests
-        run: ./gradlew :colorpicker-foundation:iosSimulatorArm64Test :color:iosSimulatorArm64Test :color-compose:iosSimulatorArm64Test
+        run: ./gradlew :colorpicker-foundation:iosSimulatorArm64Test :colorpicker-material3:iosSimulatorArm64Test :color:iosSimulatorArm64Test :color-compose:iosSimulatorArm64Test

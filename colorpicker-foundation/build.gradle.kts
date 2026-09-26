@@ -12,16 +12,6 @@ kotlin {
         namespace = "codes.side.colorpicker.foundation"
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ColorPicker"
-            isStatic = true
-        }
-    }
-
     // Everything but Android draws through Skiko, so the one platform-specific thing the
     // library needs — handing a pixel array to the toolkit as an image — has a single
     // implementation in skikoMain and an Android one beside it. JVM and Android both have
@@ -59,9 +49,7 @@ kotlin {
             api(libs.compose.runtime)
             api(libs.compose.foundation)
             api(libs.compose.ui)
-            // implementation: no material3 or coroutines types leak into public
-            // signatures (material3 is an internal rendering detail).
-            implementation(libs.compose.material3)
+            // implementation: no coroutines type appears in a public signature.
             implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
@@ -94,7 +82,7 @@ tasks.withType<Test>().configureEach {
 // Published as build-logic's library plugin publishes every library module.
 mavenPublishing {
     pom {
-        name.set("anyColorPicker")
-        description.set("Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3")
+        name.set("anyColorPicker foundation")
+        description.set("Color picker behaviour for Compose Multiplatform without Material: sliders, planes and pickers that take their look from slots, with the picker state and the strings")
     }
 }

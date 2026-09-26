@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    screenshotTestImplementation(project(":colorpicker-foundation"))
+    screenshotTestImplementation(project(":colorpicker-material3"))
     screenshotTestImplementation(libs.compose.material3)
     screenshotTestImplementation(libs.androidx.compose.ui.tooling)
     screenshotTestImplementation(libs.androidx.compose.ui.tooling.preview)
