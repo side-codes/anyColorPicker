@@ -28,7 +28,7 @@ internal fun colorPickerStateSaver(knownSpaces: Collection<ColorSpace>): Saver<C
 
 // [knownSpaces] by id, then the library's own. Two different spaces under one id are refused, as
 // parseCss refuses them.
-private fun spacesById(knownSpaces: Collection<ColorSpace>): Map<String, ColorSpace> {
+internal fun spacesById(knownSpaces: Collection<ColorSpace>): Map<String, ColorSpace> {
     val spaces = LinkedHashMap<String, ColorSpace>()
     for (space in knownSpaces) {
         require(spaces.getOrPut(space.id) { space } === space) { "Two different color spaces have the id ${space.id}" }
