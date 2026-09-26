@@ -35,8 +35,6 @@ import codes.side.colorpicker.foundation.LocalColorPickerEnabled
  * @param value current position in `0..1`; callers map their channel range to this.
  * @param trackColors color stops of the track, evenly spaced from `0` to `1`.
  * @param thumbColor the color the thumb shows; [thumb] reads it opaque, as [ColorSliderScope.thumbColor].
- * @param label optional slot shown above the track's start; see [SliderLabel].
- * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
  * @param showCheckerboard draws a transparency checkerboard under the gradient, for
  * gradients with translucent stops (used by [AlphaSlider]).
  * @param semanticLabel accessibility content description of the slider (what channel
@@ -53,6 +51,8 @@ import codes.side.colorpicker.foundation.LocalColorPickerEnabled
  * @param interactionSource receives the slider's press, drag, focus and hover interactions, which [thumb]
  * reads from [ColorSliderScope.interactionSource]. Note that if `null` is provided, interactions will
  * still happen internally.
+ * @param label optional slot shown above the track's start; see [SliderLabel].
+ * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
  * @param thumb draws the thumb, reading where it is, whether the slider is enabled, its interactions and
  * its opaque color from [ColorSliderScope]; [ColorPickerDefaults.SliderThumb], a rounded bar, by default.
  */
@@ -63,8 +63,6 @@ public fun ColorSlider(
     trackColors: List<Color>,
     thumbColor: Color,
     modifier: Modifier = Modifier,
-    label: (@Composable () -> Unit)? = null,
-    valueLabel: (@Composable () -> Unit)? = null,
     onValueChangeFinished: (() -> Unit)? = null,
     enabled: Boolean = true,
     showCheckerboard: Boolean = false,
@@ -74,6 +72,8 @@ public fun ColorSlider(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
+    label: (@Composable () -> Unit)? = null,
+    valueLabel: (@Composable () -> Unit)? = null,
     // this., or this function's own interactionSource and thumbColor would shadow the scope's: the
     // scope's source is the resolved one, and its color is opaque.
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, this.thumbColor) },

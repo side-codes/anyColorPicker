@@ -38,11 +38,9 @@ private val FocusRingGap = 4.dp
 private const val PLANE_ASPECT_RATIO = 1.6f
 
 /**
- * Default values used by color picker components.
- *
- * The composable factories read the ambient [MaterialTheme] at the call site, so the
- * defaults automatically follow the app's color scheme and shape system. Pass explicit
- * arguments to override individual values.
+ * Defaults for the Material color picker components: the theme values, whose composable factories read the ambient
+ * [MaterialTheme] at the call site and so follow the app's color scheme and shape system; the slider and plane
+ * thumbs; and the slots a picker draws unless given others.
  */
 public object ColorPickerDefaults {
 
@@ -232,7 +230,7 @@ public object ColorPickerDefaults {
 
     /**
      * The plane a picker draws unless given another: a [ChannelPlane] over the axes the picker hands it,
-     * as wide as the picker and 1.6 times as wide as it is tall.
+     * filling the width the picker gives it, the whole picker's or its start half's, at 1.6 times its height.
      */
     public fun plane(
         enabled: Boolean,

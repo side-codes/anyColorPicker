@@ -34,14 +34,14 @@ public fun AlphaSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onValueChangeFinished: () -> Unit = {},
-    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.alphaName()) },
-    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
     semanticLabel: String? = ColorPickerStrings.current.alphaName(),
     semanticValueText: String? = ColorPickerStrings.current.alphaValue(state.value.alpha, true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
+    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.alphaName()) },
+    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
     // this., or this function's own interactionSource would shadow the scope's resolved one.
     thumb: @Composable AlphaSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, thumbColor) },
 ) {

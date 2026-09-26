@@ -70,8 +70,8 @@ public fun ColorPickerDialog(
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, {}, thumb),
-    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, {}, thumb),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished = {}, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished = {}, thumb),
 ) {
     val state = rememberDialogState(initialValue, initialValue, space)
     DialogContent(
@@ -118,8 +118,8 @@ public fun ColorPickerDialog(
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, {}, thumb),
-    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, {}, thumb),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished = {}, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished = {}, thumb),
 ) {
     val initialValue = remember(initialColor) { initialColor.toColorValue() }
     val state = rememberDialogState(initialColor, initialValue, space)

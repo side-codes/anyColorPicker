@@ -35,16 +35,16 @@ import codes.side.colorpicker.state.ColoringMode
  * [ColoringMode.Contextual].
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
  * step that changes the value.
- * @param label slot above the track's start; the channel's name from [ColorPickerStrings] by default.
- * See [SliderLabel].
- * @param valueLabel slot above the track's end; the value in the channel's usual units, in the locale's
- * number format, by default. See [SliderValueLabel].
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
  * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
  * `null` omits it.
  * @param dimensions the track's height and the room it leaves for the thumb; see [ColorSlider].
  * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
  * provided, interactions will still happen internally.
+ * @param label slot above the track's start; the channel's name from [ColorPickerStrings] by default.
+ * See [SliderLabel].
+ * @param valueLabel slot above the track's end; the value in the channel's usual units, in the locale's
+ * number format, by default. See [SliderValueLabel].
  * @param thumb draws the thumb, reading the channel, its value and the opaque color under it from
  * [ChannelSliderScope]; [ColorPickerDefaults.SliderThumb] by default.
  * @throws IllegalArgumentException if [range] is not a finite span of increasing values within
@@ -59,16 +59,16 @@ public fun ChannelSlider(
     range: ClosedFloatingPointRange<Double> = channel.referenceRange,
     coloringMode: ColoringMode = ColoringMode.defaultFor(channel.space),
     onValueChangeFinished: () -> Unit = {},
-    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
-    valueLabel: (@Composable () -> Unit)? = {
-        SliderValueLabel(ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), false))
-    },
     semanticLabel: String? = ColorPickerStrings.current.channelSpokenName(channel),
     semanticValueText: String? = ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
+    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
+    valueLabel: (@Composable () -> Unit)? = {
+        SliderValueLabel(ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), false))
+    },
     // this., or this function's own interactionSource would shadow the scope's resolved one.
     thumb: @Composable ChannelSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, thumbColor) },
 ) {

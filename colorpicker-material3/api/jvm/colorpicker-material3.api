@@ -1,5 +1,5 @@
 public final class codes/side/colorpicker/material3/AlphaSliderKt {
-	public static final fun AlphaSlider (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun AlphaSlider (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/material3/ChannelPlaneKt {
@@ -7,7 +7,7 @@ public final class codes/side/colorpicker/material3/ChannelPlaneKt {
 }
 
 public final class codes/side/colorpicker/material3/ChannelSliderKt {
-	public static final fun ChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/material3/CmykColorPickerKt {
@@ -103,7 +103,7 @@ public final class codes/side/colorpicker/material3/ColorPlaneKt {
 }
 
 public final class codes/side/colorpicker/material3/ColorSliderKt {
-	public static final fun ColorSlider-Fl0aNZw (FLkotlin/jvm/functions/Function1;Ljava/util/List;JLandroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;ZZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorSlider-Fl0aNZw (FLkotlin/jvm/functions/Function1;Ljava/util/List;JLandroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;ZZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/material3/ColorSwatchKt {
@@ -113,14 +113,14 @@ public final class codes/side/colorpicker/material3/ColorSwatchKt {
 public final class codes/side/colorpicker/material3/ComposableSingletons$AlphaSliderKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/material3/ComposableSingletons$AlphaSliderKt;
 	public fun <init> ()V
-	public final fun getLambda$1263869720$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda$1335058195$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1847164849$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1918353324$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class codes/side/colorpicker/material3/ComposableSingletons$ChannelSliderKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/material3/ComposableSingletons$ChannelSliderKt;
 	public fun <init> ()V
-	public final fun getLambda$-1801336669$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1900967201$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class codes/side/colorpicker/material3/ComposableSingletons$CmykColorPickerKt {
@@ -149,7 +149,7 @@ public final class codes/side/colorpicker/material3/ComposableSingletons$ColorPi
 public final class codes/side/colorpicker/material3/ComposableSingletons$ColorSliderKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/material3/ComposableSingletons$ColorSliderKt;
 	public fun <init> ()V
-	public final fun getLambda$-746995414$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$126338278$codes_side_colorpicker_material3 ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class codes/side/colorpicker/material3/ComposableSingletons$HslColorPickerKt {
