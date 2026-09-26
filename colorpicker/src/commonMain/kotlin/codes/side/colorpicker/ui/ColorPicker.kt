@@ -98,6 +98,7 @@ internal fun defaultAlphaSlider(
  * lightness, and its saturation is measured against the display, so every position is a color the
  * screen can show.
  * @param showPlane whether to draw [plane]; by default, when [space] has one hue and two other channels.
+ * A space without them has no plane, so [plane] is never called for it, whatever [showPlane] says.
  * @param showAlpha whether to draw [alphaSlider].
  * @param enabled when false the picker is dimmed, refuses input and reports itself disabled.
  * @param coloringMode how the channel tracks are drawn: [ColoringMode.Independent] by default for a
