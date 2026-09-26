@@ -16,6 +16,10 @@ public final class codes/side/colorpicker/material3/CmykColorPickerKt {
 	public static final fun CmykColorPicker-a6Bmh3g (JLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
+public final class codes/side/colorpicker/material3/ColorComparisonKt {
+	public static final fun ColorComparison-9TxLVRM (JJLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/Shape;Lcodes/side/colorpicker/material3/ColorPickerColors;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+}
+
 public final class codes/side/colorpicker/material3/ColorPickerColors {
 	public static final field $stable I
 	public synthetic fun <init> (JJFFLkotlin/jvm/internal/DefaultConstructorMarker;)V
