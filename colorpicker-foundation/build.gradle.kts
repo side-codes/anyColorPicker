@@ -73,24 +73,37 @@ kotlin {
 }
 
 // The foundation is for apps on a design system other than Material, so Material must never reach them through it.
-// A dependency added here, or one that a library it depends on starts pulling in, fails this.
+// A dependency added here, or one that a library it depends on starts pulling in, fails this. Each target resolves
+// its own graph, and a dependency declared for one platform reaches only that one, so every published target is walked.
 val checkNoMaterial = tasks.register("checkNoMaterial") {
     group = "verification"
-    description = "Fails if a Material artifact is on the JVM runtime classpath."
-    val root = configurations.named("jvmRuntimeClasspath").flatMap { it.incoming.resolutionResult.rootComponent }
+    description = "Fails if a Material artifact is on the classpath of any target the foundation publishes."
+    val roots = listOf(
+        "androidRuntimeClasspath",
+        "jvmRuntimeClasspath",
+        "wasmJsRuntimeClasspath",
+        "iosArm64CompileKlibraries",
+        "iosSimulatorArm64CompileKlibraries",
+    ).associateWith { name -> configurations.named(name).flatMap { it.incoming.resolutionResult.rootComponent } }
     doLast {
-        val seen = mutableSetOf<ResolvedComponentResult>()
-        fun visit(component: ResolvedComponentResult) {
-            if (seen.add(component)) {
-                component.dependencies.filterIsInstance<ResolvedDependencyResult>().forEach { visit(it.selected) }
+        fun material(root: ResolvedComponentResult): List<String> {
+            val seen = mutableSetOf<ResolvedComponentResult>()
+            fun visit(component: ResolvedComponentResult) {
+                if (seen.add(component)) {
+                    component.dependencies.filterIsInstance<ResolvedDependencyResult>().forEach { visit(it.selected) }
+                }
             }
+            visit(root)
+            return seen.mapNotNull { it.moduleVersion }
+                .map { "${it.group}:${it.name}" }
+                .filter { it.startsWith("androidx.compose.material") || it.startsWith("org.jetbrains.compose.material") }
+                .sorted()
         }
-        visit(root.get())
-        val material = seen.mapNotNull { it.moduleVersion }
-            .map { "${it.group}:${it.name}" }
-            .filter { it.startsWith("androidx.compose.material") || it.startsWith("org.jetbrains.compose.material") }
-            .sorted()
-        check(material.isEmpty()) { "Material is on colorpicker-foundation's runtime classpath: $material" }
+        val found = roots.mapValues { (_, root) -> material(root.get()) }.filterValues { it.isNotEmpty() }
+        check(found.isEmpty()) {
+            val lines = found.entries.joinToString("\n") { (name, modules) -> "$name: $modules" }
+            "Material is on colorpicker-foundation's classpath:\n$lines"
+        }
     }
 }
 tasks.named("check") { dependsOn(checkNoMaterial) }
