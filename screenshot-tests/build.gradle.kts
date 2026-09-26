@@ -69,6 +69,8 @@ val readmeGoldens = mapOf(
     "OkhsvPlanePreview" to "okhsv-plane",
     "SwatchPreview" to "color-swatch",
     "HorizontalPickerPreview" to "horizontal-picker",
+    "DialogPreview" to "dialog",
+    "DialogHorizontalPreview" to "dialog-horizontal",
 )
 
 val docsImageDir = rootProject.layout.projectDirectory.dir("docs/images")

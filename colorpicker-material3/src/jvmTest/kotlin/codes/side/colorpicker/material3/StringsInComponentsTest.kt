@@ -105,7 +105,7 @@ class StringsInComponentsTest {
     fun theDialogTakesItsWordsFromTheStrings() = runComposeUiTest {
         setContent {
             ProvideColorPickerStrings(Custom) {
-                ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismiss = {})
+                ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismissRequest = {})
             }
         }
         onNodeWithText("Choose").assertExists()
@@ -115,7 +115,7 @@ class StringsInComponentsTest {
 
     @Test
     fun theDialogReadsSelectColorAndOkByDefault() = runComposeUiTest {
-        setContent { ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismiss = {}) }
+        setContent { ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismissRequest = {}) }
         onNodeWithText("Select color").assertExists()
         onNodeWithText("OK").assertExists()
     }
