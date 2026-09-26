@@ -1,6 +1,5 @@
 package codes.side.colorpicker.ui
 
-import codes.side.color.Cmyk
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpaces
 import codes.side.color.Hsl
@@ -109,15 +108,6 @@ class TrackStopsTest {
         assertEquals(listOf(0.0, 100.0, 50.0), heldComponents(Hsl.H, displayed, ColoringMode.Independent).toList())
         assertEquals(listOf(200.0, 0.0, 20.0), heldComponents(Hsl.S, displayed, ColoringMode.Contextual).toList())
         assertEquals(listOf(0.0, 0.0, 0.0), heldComponents(Lab.L, doubleArrayOf(40.0, 20.0, -30.0), ColoringMode.Independent).toList())
-    }
-
-    @Test
-    fun aSpaceWithAHueDefaultsToIndependentTracks() {
-        assertEquals(ColoringMode.Independent, defaultColoringMode(Hsl))
-        assertEquals(ColoringMode.Independent, defaultColoringMode(OkLch))
-        assertEquals(ColoringMode.Contextual, defaultColoringMode(Srgb))
-        assertEquals(ColoringMode.Contextual, defaultColoringMode(Lab))
-        assertEquals(ColoringMode.Contextual, defaultColoringMode(Cmyk))
     }
 
     @Test

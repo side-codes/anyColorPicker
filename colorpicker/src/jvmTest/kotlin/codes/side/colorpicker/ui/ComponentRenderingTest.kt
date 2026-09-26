@@ -29,6 +29,7 @@ import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.colorpicker.state.ColorPickerState
+import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -52,6 +53,17 @@ class ComponentRenderingTest {
         }
 
         onNodeWithTag("swatch").assertHeightIsAtLeast(1.dp)
+    }
+
+    @Test
+    fun aPlaneGivenNoSizeFallsBackToItsMinimum() = runComposeUiTest {
+        // BasicChannelPlane imposes no size; the Material plane keeps a picker-sized fallback.
+        setContent {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                ChannelPlane(ColorPickerState(Hsl(0.0, 50.0, 50.0)), Hsl.S, Hsl.L, Modifier.testTag("plane"))
+            }
+        }
+        onNodeWithTag("plane").assertHeightIsAtLeast(ColorPickerDefaults.PlaneMinSize)
     }
 
     @Test

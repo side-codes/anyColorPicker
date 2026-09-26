@@ -2,13 +2,13 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.BasicChannelPlane
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.PlaneActionLabels
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -25,10 +25,10 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * held channel changes. The library's own planes each have a grid measured to fit them; any other pair
  * takes 64 × 64.
  *
- * Like [ColorPlane], which it draws with, the plane is not mirrored in right-to-left layouts. An arrow
- * key moves a channel by its [ColorChannel.step], and Shift with an arrow by its
- * [ColorChannel.pageStep]; at an edge the plane passes the key on, so focus can leave. The four
- * accessibility actions move by [ColorChannel.pageStep].
+ * Like [ColorPlane], the plane is not mirrored in right-to-left layouts. An arrow key moves a channel by
+ * its [ColorChannel.step], and Shift with an arrow by its [ColorChannel.pageStep]; at an edge the plane
+ * passes the key on, so focus can leave. The four accessibility actions move by
+ * [ColorChannel.pageStep].
  *
  * @param onValueChangeFinished called when a drag ends, and after each key press or accessibility
  * action that changes the value.
@@ -58,56 +58,22 @@ public fun ChannelPlane(
     interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
-    requirePlaneChannels(x, y)
-    val displayed = state.displayComponents(x.space)
-    val interaction = remember(state) { SliderInteractionGuard(state) }
-    val currentFinished by rememberUpdatedState(onValueChangeFinished)
-
-    ColorPlaneImpl(
-        xValue = fractionOf(displayed[x.index], x.referenceRange),
-        yValue = fractionOf(displayed[y.index], y.referenceRange),
-        onValueChange = { fx, fy ->
-            interaction.begin()
-            state.edit(
-                x,
-                channelValueAt(x, x.referenceRange, fx.toDouble()),
-                y,
-                channelValueAt(y, y.referenceRange, fy.toDouble()),
-            )
-        },
-        // A key moves from the values edits build on: the state's, or the last ones emitted and not
-        // yet answered.
-        onStep = { dx, dy, coarse ->
-            val now = state.displayComponents(x.space, state.editBase)
-            val xNow = now[x.index]
-            val yNow = now[y.index]
-            val nextX = if (dx == 0) xNow else clampToRange(x, x.referenceRange, xNow + dx * if (coarse) x.pageStep else x.step)
-            val nextY = if (dy == 0) yNow else clampToRange(y, y.referenceRange, yNow + dy * if (coarse) y.pageStep else y.step)
-            if (nextX == xNow && nextY == yNow) {
-                false
-            } else {
-                state.edit(x, nextX, y, nextY)
-                true
-            }
-        },
-        surface = rememberPlaneSurface(x, y, displayed),
-        modifier = modifier,
-        onValueChangeFinished = {
-            interaction.end()
-            currentFinished()
-        },
+    val active = enabled && LocalPickerEnabled.current
+    val dimensions = ColorPickerDefaults.currentDimensions()
+    BasicChannelPlane(
+        state = state,
+        x = x,
+        y = y,
+        modifier = modifier
+            .defaultMinSize(dimensions.planeMinSize, dimensions.planeMinSize)
+            .disabledAppearance(active, colors),
         enabled = enabled,
+        onValueChangeFinished = onValueChangeFinished,
+        shape = shapes.planeShape,
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,
         actionLabels = actionLabels,
-        colors = colors,
-        shapes = shapes,
         interactionSource = interactionSource,
-        thumb = thumb,
+        thumb = { PlaneHandle(thumb, dimensions.planeThumbSize) },
     )
-}
-
-/** @throws IllegalArgumentException unless [x] and [y] are two different channels of one space. */
-internal fun requirePlaneChannels(x: ColorChannel, y: ColorChannel) {
-    require(x !== y && x.space == y.space) { "A plane takes two different channels of one space, not $x and $y" }
 }

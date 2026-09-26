@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

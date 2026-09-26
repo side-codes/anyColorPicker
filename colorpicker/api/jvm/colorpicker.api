@@ -1,5 +1,49 @@
+public abstract interface class codes/side/colorpicker/foundation/AlphaSliderScope : codes/side/colorpicker/foundation/ColorSliderScope {
+	public abstract fun getAlpha ()D
+	public abstract fun getGradient ()Landroidx/compose/ui/graphics/Brush;
+}
+
+public final class codes/side/colorpicker/foundation/BasicAlphaSliderKt {
+	public static final fun BasicAlphaSlider (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class codes/side/colorpicker/foundation/BasicChannelPlaneKt {
+	public static final fun BasicChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/graphics/Shape;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public final class codes/side/colorpicker/foundation/BasicChannelSliderKt {
+	public static final fun BasicChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public final class codes/side/colorpicker/foundation/BasicColorPickerKt {
+	public static final fun BasicColorPicker-CWKs5lI (JLkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPicker-aqv2aB4 (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPicker-eKw1uXw (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function5;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;FLandroidx/compose/runtime/Composer;II)V
+}
+
+public final class codes/side/colorpicker/foundation/BasicColorPlaneKt {
+	public static final fun BasicColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/graphics/Shape;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
 public final class codes/side/colorpicker/foundation/BasicColorSliderKt {
 	public static final fun BasicColorSlider-2Tede64 (FLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZJLkotlin/jvm/functions/Function0;FFLjava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public abstract interface class codes/side/colorpicker/foundation/ChannelPlaneScope : codes/side/colorpicker/foundation/ColorPlaneScope {
+	public abstract fun getThumbColor-0d7_KjU ()J
+	public abstract fun getX ()Lcodes/side/color/ColorChannel;
+	public abstract fun getY ()Lcodes/side/color/ColorChannel;
+}
+
+public abstract interface class codes/side/colorpicker/foundation/ChannelSliderScope : codes/side/colorpicker/foundation/ColorSliderScope {
+	public abstract fun getChannel ()Lcodes/side/color/ColorChannel;
+	public abstract fun getGradient ()Landroidx/compose/ui/graphics/Brush;
+	public abstract fun getValue ()D
+}
+
+public final class codes/side/colorpicker/foundation/CheckerboardKt {
+	public static final fun checkerboard--WgHM3s (Landroidx/compose/ui/Modifier;JJF)Landroidx/compose/ui/Modifier;
+	public static synthetic fun checkerboard--WgHM3s$default (Landroidx/compose/ui/Modifier;JJFILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 }
 
 public abstract interface class codes/side/colorpicker/foundation/ColorPickerStrings {
@@ -14,8 +58,8 @@ public abstract interface class codes/side/colorpicker/foundation/ColorPickerStr
 	public fun dismiss (Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public fun newColor (Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public fun originalColor (Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
-	public fun planeActions (Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/ui/PlaneActionLabels;
-	public fun planeAxisActions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/ui/PlaneActionLabels;
+	public fun planeActions (Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/foundation/PlaneActionLabels;
+	public fun planeAxisActions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/foundation/PlaneActionLabels;
 	public fun planeDescription (Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public fun planeValue (Lcodes/side/color/ColorChannel;DLcodes/side/color/ColorChannel;DLandroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public fun restoreOriginal (Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
@@ -38,8 +82,8 @@ public final class codes/side/colorpicker/foundation/ColorPickerStrings$DefaultI
 	public static fun dismiss (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public static fun newColor (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public static fun originalColor (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
-	public static fun planeActions (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/ui/PlaneActionLabels;
-	public static fun planeAxisActions (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/ui/PlaneActionLabels;
+	public static fun planeActions (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/foundation/PlaneActionLabels;
+	public static fun planeAxisActions (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/foundation/PlaneActionLabels;
 	public static fun planeDescription (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public static fun planeValue (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lcodes/side/color/ColorChannel;DLcodes/side/color/ColorChannel;DLandroidx/compose/runtime/Composer;I)Ljava/lang/String;
 	public static fun restoreOriginal (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
@@ -51,11 +95,30 @@ public final class codes/side/colorpicker/foundation/ColorPickerStringsKt {
 	public static final fun ProvideColorPickerStrings (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
 }
 
+public abstract interface class codes/side/colorpicker/foundation/ColorPlaneScope {
+	public abstract fun getEnabled ()Z
+	public abstract fun getInteractionSource ()Landroidx/compose/foundation/interaction/InteractionSource;
+	public abstract fun getXFraction ()F
+	public abstract fun getYFraction ()F
+}
+
 public abstract interface class codes/side/colorpicker/foundation/ColorSliderScope {
 	public abstract fun getEnabled ()Z
 	public abstract fun getFraction ()F
 	public abstract fun getInteractionSource ()Landroidx/compose/foundation/interaction/InteractionSource;
 	public abstract fun getThumbColor-0d7_KjU ()J
+}
+
+public final class codes/side/colorpicker/foundation/PlaneActionLabels {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDecreaseX ()Ljava/lang/String;
+	public final fun getDecreaseY ()Ljava/lang/String;
+	public final fun getIncreaseX ()Ljava/lang/String;
+	public final fun getIncreaseY ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class codes/side/colorpicker/state/ColorPickerState {
@@ -111,11 +174,16 @@ public final class codes/side/colorpicker/state/ColorPickerStateViewsKt {
 }
 
 public final class codes/side/colorpicker/state/ColoringMode : java/lang/Enum {
+	public static final field Companion Lcodes/side/colorpicker/state/ColoringMode$Companion;
 	public static final field Contextual Lcodes/side/colorpicker/state/ColoringMode;
 	public static final field Independent Lcodes/side/colorpicker/state/ColoringMode;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/state/ColoringMode;
 	public static fun values ()[Lcodes/side/colorpicker/state/ColoringMode;
+}
+
+public final class codes/side/colorpicker/state/ColoringMode$Companion {
+	public final fun defaultFor (Lcodes/side/color/ColorSpace;)Lcodes/side/colorpicker/state/ColoringMode;
 }
 
 public final class codes/side/colorpicker/state/RememberColorPickerStateKt {
@@ -213,7 +281,7 @@ public final class codes/side/colorpicker/ui/AlphaSliderKt {
 }
 
 public final class codes/side/colorpicker/ui/ChannelPlaneKt {
-	public static final fun ChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/ui/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ChannelSliderKt {
@@ -238,7 +306,7 @@ public final class codes/side/colorpicker/ui/ColorPickerKt {
 }
 
 public final class codes/side/colorpicker/ui/ColorPlaneKt {
-	public static final fun ColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;ZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/ui/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;ZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ColorSliderKt {
@@ -307,18 +375,6 @@ public final class codes/side/colorpicker/ui/OklabColorPickerKt {
 	public static final fun OklabColorPicker (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 	public static final fun OklabColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 	public static final fun OklabColorPicker-a6Bmh3g (JLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZZZLcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
-}
-
-public final class codes/side/colorpicker/ui/PlaneActionLabels {
-	public static final field $stable I
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public fun equals (Ljava/lang/Object;)Z
-	public final fun getDecreaseX ()Ljava/lang/String;
-	public final fun getDecreaseY ()Ljava/lang/String;
-	public final fun getIncreaseX ()Ljava/lang/String;
-	public final fun getIncreaseY ()Ljava/lang/String;
-	public fun hashCode ()I
-	public fun toString ()Ljava/lang/String;
 }
 
 public final class codes/side/colorpicker/ui/RgbColorPickerKt {

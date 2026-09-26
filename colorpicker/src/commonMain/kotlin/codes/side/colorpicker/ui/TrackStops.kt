@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.ColorChannel
-import codes.side.color.ColorSpace
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.anchorOf
@@ -62,10 +61,6 @@ internal fun requireSliderRange(channel: ColorChannel, range: ClosedFloatingPoin
     val limit = channel.limit
     require(limit == null || (range.start in limit && range.endInclusive in limit)) { "A slider on $channel takes a range within $limit, was $range" }
 }
-
-/** Independent tracks for a space with a hue, whose other channels have anchors worth showing; contextual otherwise. */
-internal fun defaultColoringMode(space: ColorSpace): ColoringMode =
-    if (space.channels.any { it.isHue }) ColoringMode.Independent else ColoringMode.Contextual
 
 /**
  * The components a track on [channel] holds still, from [displayed], every channel of its space as it

@@ -3,19 +3,16 @@ package codes.side.colorpicker.ui
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.BasicChannelSlider
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
-import kotlin.math.roundToInt
 
 /**
  * A slider for one [channel] of any color space, the library's or an app's. It shows the channel's
@@ -64,7 +61,7 @@ public fun ChannelSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     range: ClosedFloatingPointRange<Double> = channel.referenceRange,
-    coloringMode: ColoringMode = defaultColoringMode(channel.space),
+    coloringMode: ColoringMode = ColoringMode.defaultFor(channel.space),
     onValueChangeFinished: () -> Unit = {},
     label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
     valueLabel: (@Composable () -> Unit)? = {
@@ -79,61 +76,20 @@ public fun ChannelSlider(
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
-    requireSliderRange(channel, range)
-    val displayed = state.displayComponents(channel.space)
-    val value = displayed[channel.index]
-    val held = heldComponents(channel, displayed, coloringMode)
-    val heldKey = held.toList()
-    val stops = remember(channel, range, heldKey) { trackStops(channel, held, range) }
-    val shown = value.coerceIn(range.start, range.endInclusive)
-    val thumbColor = remember(channel, heldKey, shown) { trackColorAt(channel, held, shown) }
-    val fraction = fractionOf(value, range)
-    val interaction = remember(state) { SliderInteractionGuard(state) }
-    val currentFinished by rememberUpdatedState(onValueChangeFinished)
-
-    // A key press moves from the value edits build on: the state's, or the last one emitted and not
-    // yet answered, so two presses before a recomposition move two steps.
-    fun step(direction: Int, page: Boolean): Boolean {
-        val current = state.displayComponents(channel.space, state.editBase)[channel.index]
-        val next = clampToRange(channel, range, current + direction * if (page) channel.pageStep else channel.step)
-        if (next == current) return false
-        state.edit(channel, next)
-        return true
+    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+        BasicChannelSlider(
+            state = state,
+            channel = channel,
+            modifier = sliderModifier,
+            enabled = enabled,
+            range = range,
+            coloringMode = coloringMode,
+            onValueChangeFinished = onValueChangeFinished,
+            semanticLabel = semanticLabel,
+            semanticValueText = semanticValueText,
+            interactionSource = interactionSource,
+            track = { SliderTrack(gradient, colors, shapes, thumbWidth, thumbTrackGap) },
+            thumb = { SliderHandle(thumb) },
+        )
     }
-
-    ColorSliderImpl(
-        value = fraction,
-        onValueChange = {
-            interaction.begin()
-            state.edit(channel, channelValueAt(channel, range, it.toDouble()))
-        },
-        onStep = ::step,
-        accessibilitySteps = accessibilitySteps(range, channel.step),
-        stops = stops,
-        thumbColor = thumbColor,
-        modifier = modifier,
-        label = label,
-        valueLabel = valueLabel,
-        onValueChangeFinished = {
-            interaction.end()
-            currentFinished()
-        },
-        enabled = enabled,
-        semanticLabel = semanticLabel,
-        semanticValueText = semanticValueText,
-        colors = colors,
-        shapes = shapes,
-        interactionSource = interactionSource,
-        thumb = thumb,
-        thumbWidth = thumbWidth,
-        thumbTrackGap = thumbTrackGap,
-    )
 }
-
-/**
- * The steps a slider over [range] reports to accessibility services. Compose moves a slider by a
- * (steps + 1)th of its range per screen reader increment, so a range [step] fits into n times takes
- * n − 1.
- */
-internal fun accessibilitySteps(range: ClosedFloatingPointRange<Double>, step: Double): Int =
-    (((range.endInclusive - range.start) / step).roundToInt() - 1).coerceAtLeast(0)

@@ -1,5 +1,7 @@
 package codes.side.colorpicker.state
 
+import codes.side.color.ColorSpace
+
 /**
  * Controls how a slider's gradient track is rendered with respect to other channels.
  *
@@ -17,4 +19,14 @@ public enum class ColoringMode {
 
     /** Gradient shows the resulting color at each position given the other channels. */
     Contextual,
+    ;
+
+    public companion object {
+        /**
+         * The coloring a slider over [space] takes unless given another: [Independent] for a space with a
+         * hue, whose other channels have anchors worth showing, and [Contextual] otherwise.
+         */
+        public fun defaultFor(space: ColorSpace): ColoringMode =
+            if (space.channels.any { it.isHue }) Independent else Contextual
+    }
 }

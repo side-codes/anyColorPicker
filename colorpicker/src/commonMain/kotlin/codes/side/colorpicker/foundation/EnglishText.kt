@@ -17,7 +17,6 @@ import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 import codes.side.color.XyzD50
 import codes.side.color.XyzD65
-import codes.side.colorpicker.ui.PlaneActionLabels
 import kotlin.math.ceil
 import kotlin.math.log10
 

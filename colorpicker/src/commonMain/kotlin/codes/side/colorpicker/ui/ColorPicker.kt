@@ -1,13 +1,9 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -18,6 +14,7 @@ import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
+import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -101,6 +98,7 @@ internal fun defaultAlphaSlider(
  * lightness, and its saturation is measured against the display, so every position is a color the
  * screen can show.
  * @param showPlane whether to draw [plane]; by default, when [space] has one hue and two other channels.
+ * A space without them has no plane, so [plane] is never called for it, whatever [showPlane] says.
  * @param showAlpha whether to draw [alphaSlider].
  * @param enabled when false the picker is dimmed, refuses input and reports itself disabled.
  * @param coloringMode how the channel tracks are drawn: [ColoringMode.Independent] by default for a
@@ -123,7 +121,7 @@ public fun ColorPicker(
     showPlane: Boolean = hasPlane(space),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
-    coloringMode: ColoringMode = defaultColoringMode(space),
+    coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
@@ -132,19 +130,22 @@ public fun ColorPicker(
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
-    // Provided rather than passed down, so a replaced slot inherits the picker's theme and its disabled
-    // state without the call site forwarding them.
+    // Provided rather than passed down, so a replaced slot inherits the picker's theme without the call
+    // site forwarding it. BasicColorPicker does the same for the picker's disabled state.
     ColorPickerTheme(colors = colors, shapes = shapes) {
-        CompositionLocalProvider(LocalPickerEnabled provides (enabled && LocalPickerEnabled.current)) {
-            Column(
-                modifier = modifier.disabledInput(enabled),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                if (showPlane) plane(state)
-                for (channel in space.channels) key(channel) { channelSlider(state, channel) }
-                if (showAlpha) alphaSlider(state)
-            }
-        }
+        // BasicColorPicker hands its plane the axes; this picker's plane slot chooses its own.
+        val planeSlot: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? =
+            if (showPlane) { planeState, _, _ -> plane(planeState) } else null
+        BasicColorPicker(
+            state = state,
+            space = space,
+            plane = planeSlot,
+            channelSlider = channelSlider,
+            alphaSlider = if (showAlpha) alphaSlider else null,
+            modifier = modifier,
+            enabled = enabled,
+            spacing = 12.dp,
+        )
     }
 }
 
@@ -175,7 +176,7 @@ public fun ColorPicker(
     showPlane: Boolean = hasPlane(space),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
-    coloringMode: ColoringMode = defaultColoringMode(space),
+    coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
@@ -226,7 +227,7 @@ public fun ColorPicker(
     showPlane: Boolean = hasPlane(space),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
-    coloringMode: ColoringMode = defaultColoringMode(space),
+    coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
