@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
@@ -100,6 +99,9 @@ public object ColorPickerDialogDefaults {
      * one space, a row of segmented buttons for up to five, the most Material's guidance puts in a row, and a
      * button opening a menu of them beyond five.
      *
+     * The row takes the width its widest label needs in every segment, or any more width given as a minimum, as
+     * the dialog gives it when its body is stacked.
+     *
      * @param enabled when false the switcher is dimmed and refuses input.
      */
     @Composable
@@ -107,7 +109,7 @@ public object ColorPickerDialogDefaults {
         val spaces = state.spaces
         when {
             spaces.size < 2 -> {}
-            spaces.size <= MAX_SEGMENTS -> SingleChoiceSegmentedButtonRow(modifier.fillMaxWidth()) {
+            spaces.size <= MAX_SEGMENTS -> SingleChoiceSegmentedButtonRow(modifier) {
                 spaces.forEachIndexed { index, space ->
                     SegmentedButton(
                         selected = space == state.space,

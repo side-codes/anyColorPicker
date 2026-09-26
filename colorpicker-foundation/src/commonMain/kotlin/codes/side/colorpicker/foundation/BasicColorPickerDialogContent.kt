@@ -4,9 +4,8 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.dp
 // label and a value above each track.
 private val SideBySideMinWidth = 480.dp
 
-private enum class DialogArrangement { Stacked, SideBySide }
+private enum class DialogArrangement { Stacked, SideBySide, Unbounded }
 
 // The tallest height the content has been laid out at. Read and written in layout alone, so growing it
 // recomposes nothing.
@@ -41,7 +40,12 @@ private class HeightFloor {
  *   picker, and [picker] is handed [Orientation.Horizontal], so the plane sits beside the sliders.
  * - Otherwise stacked, scrolling.
  *
- * Arranged side by side, it scrolls when even that does not fit.
+ * Arranged side by side, it scrolls when even that does not fit. Given no height limit, as in a scrolling
+ * column, it stacks at its own height.
+ *
+ * Stacked, the switcher spans the width; side by side, it keeps its own width and the header takes the rest.
+ * The parts are measured, never asked for intrinsic sizes, so a slot built on `SubcomposeLayout`, as
+ * `BoxWithConstraints` and lazy lists are, lays out as any other does.
  *
  * It never shrinks while it is composed for the same [state]: a space with no plane is laid out at the
  * height of the tallest space shown so far, so the dialog around it does not jump when the space changes.
@@ -67,44 +71,70 @@ public fun BasicColorPickerDialogContent(
     val sideBySide = remember { mutableStateOf(false) }
     val stackedScroll = rememberScrollState()
     val sideBySideScroll = rememberScrollState()
-    SubcomposeLayout(modifier) { constraints ->
-        // Composed whichever way it is laid out, since its height is what decides.
-        val stacked = subcompose(DialogArrangement.Stacked) {
-            Column(
-                modifier = Modifier
-                    .then(if (sideBySide.value) Modifier.clearAndSetSemantics {} else Modifier)
-                    .verticalScroll(stackedScroll),
-                verticalArrangement = Arrangement.spacedBy(spacing),
-            ) {
-                header?.invoke()
-                spaceSwitcher?.invoke()
-                picker(Orientation.Vertical)
-            }
-        }.single()
-        val fits = !constraints.hasBoundedHeight || stacked.maxIntrinsicHeight(constraints.maxWidth) <= constraints.maxHeight
-        val beside = !fits && constraints.maxWidth >= SideBySideMinWidth.roundToPx()
-        // Unobserved, or this layout would measure again for its own write.
-        if (Snapshot.withoutReadObservation { sideBySide.value } != beside) sideBySide.value = beside
-        val content = if (!beside) {
-            stacked
-        } else {
-            subcompose(DialogArrangement.SideBySide) {
-                Column(Modifier.verticalScroll(sideBySideScroll), verticalArrangement = Arrangement.spacedBy(spacing)) {
-                    if (header != null || spaceSwitcher != null) {
-                        // The switcher at its own width, which a row of labels needs whole, and the header,
-                        // which stretches, in the rest.
-                        Row(horizontalArrangement = Arrangement.spacedBy(spacing), verticalAlignment = Alignment.CenterVertically) {
-                            header?.let { Box(Modifier.weight(1f)) { it() } }
-                            spaceSwitcher?.let { Box(Modifier.width(IntrinsicSize.Max)) { it() } }
-                        }
-                    }
-                    picker(Orientation.Horizontal)
+    // Built here rather than in the measure block, so every measure pass hands SubcomposeLayout the same content,
+    // and a slot recomposes only when what it reads changes.
+    val stacked: @Composable () -> Unit = {
+        StackedParts(
+            modifier = Modifier
+                .then(if (sideBySide.value) Modifier.clearAndSetSemantics {} else Modifier)
+                .verticalScroll(stackedScroll),
+            header = header,
+            spaceSwitcher = spaceSwitcher,
+            picker = picker,
+            spacing = spacing,
+        )
+    }
+    // Without the scroll, which a height with no limit makes throw.
+    val unbounded: @Composable () -> Unit = { StackedParts(Modifier, header, spaceSwitcher, picker, spacing) }
+    val besideTheSliders: @Composable () -> Unit = {
+        Column(Modifier.verticalScroll(sideBySideScroll), verticalArrangement = Arrangement.spacedBy(spacing)) {
+            if (header != null || spaceSwitcher != null) {
+                // The switcher, measured first, at its own width, which a row of labels needs whole, and the
+                // header, which stretches, in the rest.
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing), verticalAlignment = Alignment.CenterVertically) {
+                    header?.let { Box(Modifier.weight(1f)) { it() } }
+                    spaceSwitcher?.invoke()
                 }
-            }.single()
+            }
+            picker(Orientation.Horizontal)
         }
-        val placeable = content.measure(constraints.copy(minHeight = 0))
+    }
+    SubcomposeLayout(modifier) { constraints ->
+        val placeable = if (!constraints.hasBoundedHeight) {
+            if (Snapshot.withoutReadObservation { sideBySide.value }) sideBySide.value = false
+            subcompose(DialogArrangement.Unbounded, unbounded).single().measure(constraints.copy(minHeight = 0))
+        } else {
+            // Measured whichever way it is laid out: whether it has to scroll is what decides.
+            val stackedPlaceable = subcompose(DialogArrangement.Stacked, stacked).single().measure(constraints.copy(minHeight = 0))
+            // Set as the scroll is measured. Unobserved, as the writes below are, or this layout would measure
+            // again for its own reads and writes.
+            val overflows = Snapshot.withoutReadObservation { stackedScroll.maxValue } > 0
+            val beside = overflows && constraints.maxWidth >= SideBySideMinWidth.roundToPx()
+            if (Snapshot.withoutReadObservation { sideBySide.value } != beside) sideBySide.value = beside
+            if (beside) {
+                subcompose(DialogArrangement.SideBySide, besideTheSliders).single().measure(constraints.copy(minHeight = 0))
+            } else {
+                stackedPlaceable
+            }
+        }
         val height = maxOf(placeable.height, floor.height).coerceIn(constraints.minHeight, constraints.maxHeight)
         floor.height = height
         layout(placeable.width, height) { placeable.place(0, 0) }
+    }
+}
+
+// Header over switcher over the picker, the switcher spanning the width.
+@Composable
+private fun StackedParts(
+    modifier: Modifier,
+    header: (@Composable () -> Unit)?,
+    spaceSwitcher: (@Composable () -> Unit)?,
+    picker: @Composable (Orientation) -> Unit,
+    spacing: Dp,
+) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(spacing)) {
+        header?.invoke()
+        spaceSwitcher?.let { Box(Modifier.fillMaxWidth(), propagateMinConstraints = true) { it() } }
+        picker(Orientation.Vertical)
     }
 }

@@ -3,12 +3,16 @@ package codes.side.colorpicker.foundation
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +76,67 @@ class BasicColorPickerDialogContentTest {
         onNodeWithTag("picker ${Orientation.Horizontal}").assertDoesNotExist()
         onNodeWithTag("content").assertHeightIsEqualTo(500.dp)
         assertEquals(50.dp, onNodeWithTag("switcher").getBoundsInRoot().top)
+    }
+
+    @Test
+    fun stackedTheSwitcherSpansTheWidth() = runComposeUiTest {
+        setContent { Content(width = 320.dp, height = 600.dp) }
+        onNodeWithTag("switcher").assertWidthIsEqualTo(320.dp)
+    }
+
+    // Slots of a size only a measurement tells, as BoxWithConstraints, a lazy list or a tab row are: none of them
+    // answers an intrinsic measurement, and asking throws.
+    @Composable
+    private fun UnmeasurableContent(width: Dp, height: Dp) {
+        Box(Modifier.requiredSize(width, height)) {
+            BasicColorPickerDialogContent(
+                state = state,
+                picker = { orientation ->
+                    BoxWithConstraints(Modifier.testTag("picker $orientation").fillMaxWidth()) {
+                        Box(Modifier.height(if (orientation == Orientation.Vertical) 400.dp else 200.dp))
+                    }
+                },
+                modifier = Modifier.testTag("content"),
+                header = { BoxWithConstraints(Modifier.testTag("header")) { Box(Modifier.fillMaxWidth().height(40.dp)) } },
+                spaceSwitcher = { BoxWithConstraints(Modifier.testTag("switcher")) { Box(Modifier.size(120.dp, 40.dp)) } },
+                spacing = 10.dp,
+            )
+        }
+    }
+
+    @Test
+    fun slotsThatAnswerNoIntrinsicMeasurementAreStacked() = runComposeUiTest {
+        setContent { UnmeasurableContent(width = 320.dp, height = 600.dp) }
+        onNodeWithTag("picker ${Orientation.Vertical}").assertExists()
+        onNodeWithTag("content").assertHeightIsEqualTo(500.dp)
+    }
+
+    @Test
+    fun slotsThatAnswerNoIntrinsicMeasurementGoBesideTheSliders() = runComposeUiTest {
+        setContent { UnmeasurableContent(width = 600.dp, height = 300.dp) }
+        onNodeWithTag("picker ${Orientation.Horizontal}").assertExists()
+        onNodeWithTag("switcher").assertWidthIsEqualTo(120.dp)
+        onNodeWithTag("header").assertWidthIsEqualTo(470.dp)
+    }
+
+    @Test
+    fun inAColumnThatScrollsItStacksAtItsOwnHeight() = runComposeUiTest {
+        // A scrolling column measures its content with no height limit, which the content fits by definition.
+        setContent {
+            Box(Modifier.requiredSize(320.dp, 300.dp)) {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    BasicColorPickerDialogContent(
+                        state = state,
+                        picker = picker,
+                        modifier = Modifier.testTag("content"),
+                        header = { BasicText("header", Modifier.height(40.dp)) },
+                        spacing = 10.dp,
+                    )
+                }
+            }
+        }
+        onNodeWithTag("picker ${Orientation.Vertical}").assertExists()
+        onNodeWithTag("content").assertHeightIsEqualTo(450.dp)
     }
 
     @Test
