@@ -36,6 +36,7 @@ import codes.side.colorpicker.material3.ChannelPlane
 import codes.side.colorpicker.material3.ChannelSlider
 import codes.side.colorpicker.material3.CmykColorPicker
 import codes.side.colorpicker.material3.ColorPickerDefaults
+import codes.side.colorpicker.material3.ColorPickerDialog
 import codes.side.colorpicker.material3.ColorSwatch
 import codes.side.colorpicker.material3.HslColorPicker
 import codes.side.colorpicker.material3.HsvColorPicker
@@ -276,6 +277,22 @@ fun OkhsvPlanePreview() = Frame {
     val state = state()
     ChannelPlane(state, Okhsv.S, Okhsv.V, Modifier.fillMaxWidth().height(260.dp))
     ChannelSlider(state, Okhsv.H)
+}
+
+@PreviewTest
+@Preview(name = "Dialog", widthDp = 440, heightDp = 960)
+@Composable
+fun DialogPreview() = Frame {
+    ColorPickerDialog(initialValue = Seed.withAlpha(0.8), onValueSelected = {}, onDismissRequest = {})
+}
+
+// A landscape tablet: too short to stack the picker, and wide enough to put the plane beside the sliders. A
+// phone's dialog window is narrower than that in landscape too, so there the body scrolls instead.
+@PreviewTest
+@Preview(name = "Dialog horizontal", widthDp = 1280, heightDp = 600)
+@Composable
+fun DialogHorizontalPreview() = Frame {
+    ColorPickerDialog(initialValue = Seed.withAlpha(0.8), onValueSelected = {}, onDismissRequest = {})
 }
 
 @PreviewTest
