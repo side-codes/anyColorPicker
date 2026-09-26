@@ -72,6 +72,29 @@ kotlin {
     }
 }
 
+// The foundation is for apps on a design system other than Material, so Material must never reach them through it.
+// A dependency added here, or one that a library it depends on starts pulling in, fails this.
+val checkNoMaterial = tasks.register("checkNoMaterial") {
+    group = "verification"
+    description = "Fails if a Material artifact is on the JVM runtime classpath."
+    val root = configurations.named("jvmRuntimeClasspath").flatMap { it.incoming.resolutionResult.rootComponent }
+    doLast {
+        val seen = mutableSetOf<ResolvedComponentResult>()
+        fun visit(component: ResolvedComponentResult) {
+            if (seen.add(component)) {
+                component.dependencies.filterIsInstance<ResolvedDependencyResult>().forEach { visit(it.selected) }
+            }
+        }
+        visit(root.get())
+        val material = seen.mapNotNull { it.moduleVersion }
+            .map { "${it.group}:${it.name}" }
+            .filter { it.startsWith("androidx.compose.material") || it.startsWith("org.jetbrains.compose.material") }
+            .sorted()
+        check(material.isEmpty()) { "Material is on colorpicker-foundation's runtime classpath: $material" }
+    }
+}
+tasks.named("check") { dependsOn(checkNoMaterial) }
+
 // The UI tests assert English words and numbers in en-US's format, so a machine set to another locale must not fail
 // them. The formatting tests name their locales and do not depend on this.
 tasks.withType<Test>().configureEach {

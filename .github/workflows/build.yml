@@ -33,6 +33,9 @@ jobs:
         run: ./gradlew :colorpicker-foundation:assemble :colorpicker-material3:assemble :color:assemble :color-compose:assemble
       - name: Run tests
         run: ./gradlew :colorpicker-foundation:allTests :colorpicker-material3:allTests :color:allTests :color-compose:allTests
+      # colorpicker-foundation is for apps on another design system; Material must not reach them through it.
+      - name: Check the foundation carries no Material
+        run: ./gradlew :colorpicker-foundation:checkNoMaterial
       # Fails when public API drifts from each library's api/. Without this the
       # binary-compatibility plugin is configured but never consulted.
       - name: Check the public API matches the committed dump
