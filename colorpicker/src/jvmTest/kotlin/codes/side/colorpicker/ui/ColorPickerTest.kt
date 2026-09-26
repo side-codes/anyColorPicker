@@ -28,6 +28,7 @@ import codes.side.color.ColorSpaces
 import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
+import codes.side.colorpicker.foundation.EnglishText
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -56,7 +57,7 @@ class ColorPickerTest {
         for (each in ColorSpaces.all) {
             space = each
             waitForIdle()
-            assertEquals(each.channels.map { channelSpokenLabel(it) } + ALPHA_LABEL, sliderLabels(), "${each.id}'s sliders")
+            assertEquals(each.channels.map { EnglishText.channelSpokenName(it) } + EnglishText.alphaName(), sliderLabels(), "${each.id}'s sliders")
             assertEquals(if (hasPlane(each)) 1 else 0, planeCount(), "${each.id}'s plane")
         }
     }

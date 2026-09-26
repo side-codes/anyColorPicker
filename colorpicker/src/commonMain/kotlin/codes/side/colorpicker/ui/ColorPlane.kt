@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
@@ -92,8 +93,8 @@ internal fun planeYFraction(y: Float, height: Int): Float =
  *
  * @param surface paints the field, filling the whole drawing area. It is drawn under the
  * position indicator and clipped to [ColorPickerShapes.planeShape].
- * @param semanticLabel accessibility description of the surface; pass a localized string to
- * replace the English default, or `null` to omit.
+ * @param semanticLabel accessibility description of the surface; `null` by default, since the plane
+ * does not know what it shows. A [ChannelPlane] names its channels.
  * @param semanticValueText accessibility announcement of the current pair of values.
  * @param actionLabels names the four accessibility actions that move the plane, since a screen
  * reader has no gesture for a surface with two degrees of freedom; `null` omits them and leaves
@@ -118,7 +119,7 @@ public fun ColorPlane(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
+    actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
@@ -168,7 +169,7 @@ internal fun ColorPlaneImpl(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
+    actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,

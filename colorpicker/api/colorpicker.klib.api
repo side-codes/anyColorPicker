@@ -17,6 +17,31 @@ final enum class codes.side.colorpicker.state/ColoringMode : kotlin/Enum<codes.s
     final fun values(): kotlin/Array<codes.side.colorpicker.state/ColoringMode> // codes.side.colorpicker.state/ColoringMode.values|values#static(){}[0]
 }
 
+abstract interface codes.side.colorpicker.foundation/ColorPickerStrings { // codes.side.colorpicker.foundation/ColorPickerStrings|null[0]
+    open fun alphaName(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.alphaName|alphaName(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun alphaValue(kotlin/Double, kotlin/Boolean, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.alphaValue|alphaValue(kotlin.Double;kotlin.Boolean;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun channelName(codes.side.color/ColorChannel, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.channelName|channelName(codes.side.color.ColorChannel;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun channelSpokenName(codes.side.color/ColorChannel, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.channelSpokenName|channelSpokenName(codes.side.color.ColorChannel;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun channelValue(codes.side.color/ColorChannel, kotlin/Double, kotlin/Boolean, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.channelValue|channelValue(codes.side.color.ColorChannel;kotlin.Double;kotlin.Boolean;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun confirm(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.confirm|confirm(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun dialogTitle(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.dialogTitle|dialogTitle(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun dismiss(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.dismiss|dismiss(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun newColor(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.newColor|newColor(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun originalColor(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.originalColor|originalColor(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun planeActions(codes.side.color/ColorChannel, codes.side.color/ColorChannel, androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.ui/PlaneActionLabels // codes.side.colorpicker.foundation/ColorPickerStrings.planeActions|planeActions(codes.side.color.ColorChannel;codes.side.color.ColorChannel;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun planeAxisActions(androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.ui/PlaneActionLabels // codes.side.colorpicker.foundation/ColorPickerStrings.planeAxisActions|planeAxisActions(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun planeDescription(codes.side.color/ColorChannel, codes.side.color/ColorChannel, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.planeDescription|planeDescription(codes.side.color.ColorChannel;codes.side.color.ColorChannel;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun planeValue(codes.side.color/ColorChannel, kotlin/Double, codes.side.color/ColorChannel, kotlin/Double, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.planeValue|planeValue(codes.side.color.ColorChannel;kotlin.Double;codes.side.color.ColorChannel;kotlin.Double;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun restoreOriginal(androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.restoreOriginal|restoreOriginal(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun sliderPosition(kotlin/Float, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.sliderPosition|sliderPosition(kotlin.Float;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    open fun spaceName(codes.side.color/ColorSpace, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // codes.side.colorpicker.foundation/ColorPickerStrings.spaceName|spaceName(codes.side.color.ColorSpace;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+
+    final object Companion { // codes.side.colorpicker.foundation/ColorPickerStrings.Companion|null[0]
+        final val current // codes.side.colorpicker.foundation/ColorPickerStrings.Companion.current|{}current[0]
+            final fun <get-current>(androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.foundation/ColorPickerStrings // codes.side.colorpicker.foundation/ColorPickerStrings.Companion.current.<get-current>|<get-current>(androidx.compose.runtime.Composer?;kotlin.Int){}[0]
+    }
+}
+
 final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorpicker.state/ColorPickerState|null[0]
     constructor <init>(androidx.compose.ui.graphics/Color) // codes.side.colorpicker.state/ColorPickerState.<init>|<init>(androidx.compose.ui.graphics.Color){}[0]
     constructor <init>(codes.side.color/ColorValue) // codes.side.colorpicker.state/ColorPickerState.<init>|<init>(codes.side.color.ColorValue){}[0]
@@ -120,11 +145,6 @@ final class codes.side.colorpicker.ui/PlaneActionLabels { // codes.side.colorpic
     final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.colorpicker.ui/PlaneActionLabels.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // codes.side.colorpicker.ui/PlaneActionLabels.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // codes.side.colorpicker.ui/PlaneActionLabels.toString|toString(){}[0]
-
-    final object Companion { // codes.side.colorpicker.ui/PlaneActionLabels.Companion|null[0]
-        final val Default // codes.side.colorpicker.ui/PlaneActionLabels.Companion.Default|{}Default[0]
-            final fun <get-Default>(): codes.side.colorpicker.ui/PlaneActionLabels // codes.side.colorpicker.ui/PlaneActionLabels.Companion.Default.<get-Default>|<get-Default>(){}[0]
-    }
 }
 
 final object codes.side.colorpicker.theme/ColorPickerDefaults { // codes.side.colorpicker.theme/ColorPickerDefaults|null[0]
@@ -212,6 +232,7 @@ final fun (codes.side.colorpicker.state/ColorPickerState).codes.side.colorpicker
 final fun (codes.side.colorpicker.state/ColorPickerState).codes.side.colorpicker.state/set(codes.side.color/SrgbLinearColor) // codes.side.colorpicker.state/set|set@codes.side.colorpicker.state.ColorPickerState(codes.side.color.SrgbLinearColor){}[0]
 final fun (codes.side.colorpicker.state/ColorPickerState).codes.side.colorpicker.state/set(codes.side.color/XyzD50Color) // codes.side.colorpicker.state/set|set@codes.side.colorpicker.state.ColorPickerState(codes.side.color.XyzD50Color){}[0]
 final fun (codes.side.colorpicker.state/ColorPickerState).codes.side.colorpicker.state/set(codes.side.color/XyzD65Color) // codes.side.colorpicker.state/set|set@codes.side.colorpicker.state.ColorPickerState(codes.side.color.XyzD65Color){}[0]
+final fun codes.side.colorpicker.foundation/ProvideColorPickerStrings(codes.side.colorpicker.foundation/ColorPickerStrings, kotlin/Function2<androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int) // codes.side.colorpicker.foundation/ProvideColorPickerStrings|ProvideColorPickerStrings(codes.side.colorpicker.foundation.ColorPickerStrings;kotlin.Function2<androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter(): kotlin/Int // codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter|codes_side_colorpicker_state_ColorPickerState$stableprop_getter(){}[0]
 final fun codes.side.colorpicker.state/rememberColorPickerState(androidx.compose.ui.graphics/Color, androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberColorPickerState|rememberColorPickerState(androidx.compose.ui.graphics.Color;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun codes.side.colorpicker.state/rememberColorPickerState(codes.side.color/ColorValue, androidx.compose.runtime/Composer?, kotlin/Int): codes.side.colorpicker.state/ColorPickerState // codes.side.colorpicker.state/rememberColorPickerState|rememberColorPickerState(codes.side.color.ColorValue;androidx.compose.runtime.Composer?;kotlin.Int){}[0]

@@ -6,9 +6,9 @@ import androidx.compose.runtime.Immutable
  * What a screen reader calls the four directions a [ColorPlane] can be moved in.
  *
  * A plane has two degrees of freedom and the adjustable semantics a slider uses carry one, so
- * the way to move it without a pointer is a set of named actions. The names are read aloud, so
- * an app in another language passes its own; the defaults name the axis rather than the
- * channel, because [ColorPlane] does not know what it is showing.
+ * the way to move it without a pointer is a set of named actions. The defaults come from
+ * [codes.side.colorpicker.foundation.ColorPickerStrings]: a [ChannelPlane]'s name its channels, and
+ * a [ColorPlane]'s its axes, since it does not know what it is showing.
  */
 @Immutable
 public class PlaneActionLabels(
@@ -39,14 +39,4 @@ public class PlaneActionLabels(
 
     override fun toString(): String =
         "PlaneActionLabels(increaseX=$increaseX, decreaseX=$decreaseX, increaseY=$increaseY, decreaseY=$decreaseY)"
-
-    public companion object {
-        /** Axis names, for a plane whose channels are not known. */
-        public val Default: PlaneActionLabels = PlaneActionLabels(
-            increaseX = "Increase horizontally",
-            decreaseX = "Decrease horizontally",
-            increaseY = "Increase vertically",
-            decreaseY = "Decrease vertically",
-        )
-    }
 }

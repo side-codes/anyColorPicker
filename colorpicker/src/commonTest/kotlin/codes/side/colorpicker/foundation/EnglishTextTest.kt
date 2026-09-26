@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import codes.side.color.Cmyk
 import codes.side.color.ColorChannel
@@ -21,15 +21,18 @@ import codes.side.color.TransferFunction
 import codes.side.color.WhitePoint
 import codes.side.color.XyzD50
 import codes.side.color.XyzD65
+import codes.side.colorpicker.ui.PlaneActionLabels
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
-class ChannelTextTest {
+class EnglishTextTest {
+
+    private val en = NumberFormatter("en-US")
 
     private fun assertShows(channel: ColorChannel, value: Double, label: String, text: String) {
-        assertEquals(label, channelLabel(channel), "$channel's label")
-        assertEquals(text, channelValueText(channel, value), "$channel at $value")
+        assertEquals(label, EnglishText.channelName(channel), "$channel's label")
+        assertEquals(text, EnglishText.channelValue(channel, value, en), "$channel at $value")
     }
 
     @Test
@@ -50,9 +53,9 @@ class ChannelTextTest {
     fun labReadsInWholeUnitsAndIsSpokenWithItsStars() {
         assertShows(Lab.L, 53.2, "L", "53")
         assertShows(Lab.A, -20.6, "a", "-21")
-        assertEquals("L*", channelSpokenLabel(Lab.L))
-        assertEquals("b*", channelSpokenLabel(Lab.B))
-        assertEquals("Chroma", channelSpokenLabel(Lch.C))
+        assertEquals("L*", EnglishText.channelSpokenName(Lab.L))
+        assertEquals("b*", EnglishText.channelSpokenName(Lab.B))
+        assertEquals("Chroma", EnglishText.channelSpokenName(Lch.C))
     }
 
     @Test
@@ -95,15 +98,28 @@ class ChannelTextTest {
     @Test
     fun everyLibraryChannelHasItsOwnText() {
         for (space in ColorSpaces.all) {
-            for (channel in space.channels) assertNotNull(libraryText(channel), "$channel falls back to an app channel's text")
+            for (channel in space.channels) assertTrue(EnglishText.hasEntry(channel), "$channel falls back to an app channel's text")
         }
     }
 
     @Test
     fun alphaReadsInBytes() {
-        assertEquals("Alpha", ALPHA_LABEL)
-        assertEquals("128", alphaValueText(0.5))
-        assertEquals("0", alphaValueText(0.0))
+        assertEquals("Alpha", EnglishText.alphaName())
+        assertEquals("128", EnglishText.alphaValue(0.5, en))
+        assertEquals("0", EnglishText.alphaValue(0.0, en))
+    }
+
+    @Test
+    fun aSliderWithNoChannelReadsItsPositionInPercent() {
+        assertEquals("37%", EnglishText.sliderPosition(0.37f, en))
+    }
+
+    @Test
+    fun aPositionOffTheTrackReadsWhereTheThumbIs() {
+        // A caller's value can be NaN (0/0 from an empty range) or past an end; the thumb then sits at an end.
+        assertEquals("0%", EnglishText.sliderPosition(Float.NaN, en))
+        assertEquals("100%", EnglishText.sliderPosition(1.2f, en))
+        assertEquals("0%", EnglishText.sliderPosition(-0.3f, en))
     }
 
     @Test
@@ -113,23 +129,26 @@ class ChannelTextTest {
         assertShows(hsl.S, 50.25, "s", "50")
         val rgb = ColorSpace.rgb("--text-rgb", RgbPrimaries.DisplayP3, WhitePoint.D65, TransferFunction.Srgb)
         assertShows(rgb.R, 0.5, "r", "0.500")
-        assertEquals("r", channelSpokenLabel(rgb.R))
+        assertEquals("r", EnglishText.channelSpokenName(rgb.R))
     }
 
     @Test
-    fun decimalsRoundHalfAwayFromZeroAndDropTheSignOfZero() {
-        assertEquals("0.000", decimals(-0.0004, 3))
-        assertEquals("-1.24", decimals(-1.2351, 2))
-        assertEquals("3", decimals(2.5, 0))
-        assertEquals("0.100", decimals(0.1, 3))
-        assertEquals("12.050", decimals(12.05, 3))
+    fun anAppChannelFollowsTheLocalesSeparator() {
+        val rgb = ColorSpace.rgb("--text-rgb-fr", RgbPrimaries.DisplayP3, WhitePoint.D65, TransferFunction.Srgb)
+        assertEquals("0,500", EnglishText.channelValue(rgb.R, 0.5, NumberFormatter("fr-FR")))
+    }
+
+    @Test
+    fun aLibraryValueFollowsTheLocale() {
+        val text = EnglishText.channelValue(Hsl.S, 40.0, NumberFormatter("fr-FR"))
+        assertTrue(Regex("40[\u00A0\u202F]%").matches(text), text)
     }
 
     @Test
     fun aPlaneIsNamedAfterItsChannels() {
-        assertEquals("Saturation and lightness", planeLabel(Hsl.S, Hsl.L))
-        assertEquals("a* and b*", planeLabel(Lab.A, Lab.B))
-        assertEquals("40% saturation, 60% lightness", planeValueText(Hsl.S, 40.0, Hsl.L, 60.0))
+        assertEquals("Saturation and lightness", EnglishText.planeDescription(Hsl.S, Hsl.L))
+        assertEquals("a* and b*", EnglishText.planeDescription(Lab.A, Lab.B))
+        assertEquals("40% saturation, 60% lightness", EnglishText.planeValue(Hsl.S, 40.0, Hsl.L, 60.0, en))
         assertEquals(
             PlaneActionLabels(
                 increaseX = "Increase chroma",
@@ -137,7 +156,38 @@ class ChannelTextTest {
                 increaseY = "Increase lightness",
                 decreaseY = "Decrease lightness",
             ),
-            planeActionLabels(OkLch.C, OkLch.L),
+            EnglishText.planeActions(OkLch.C, OkLch.L),
         )
+    }
+
+    @Test
+    fun aPlaneWithNoChannelsNamesItsAxes() {
+        assertEquals(
+            PlaneActionLabels(
+                increaseX = "Increase horizontally",
+                decreaseX = "Decrease horizontally",
+                increaseY = "Increase vertically",
+                decreaseY = "Decrease vertically",
+            ),
+            EnglishText.planeAxisActions(),
+        )
+    }
+
+    @Test
+    fun everyLibrarySpaceHasItsOwnName() {
+        val names = ColorSpaces.all.map { EnglishText.spaceName(it) }
+        assertEquals(names.size, names.toSet().size, "two spaces share a name: $names")
+        assertEquals(listOf("Okhsl", "OkLCh", "HSV", "RGB"), listOf(Okhsl, OkLch, Hsv, Srgb).map { EnglishText.spaceName(it) })
+        assertEquals("--text-hsl-name", EnglishText.spaceName(ColorSpace.hsl("--text-hsl-name", DisplayP3)))
+    }
+
+    @Test
+    fun theDialogWordsFollowMaterialsPickers() {
+        assertEquals("Select color", EnglishText.dialogTitle())
+        assertEquals("OK", EnglishText.confirm())
+        assertEquals("Cancel", EnglishText.dismiss())
+        assertEquals("Original color", EnglishText.originalColor())
+        assertEquals("New color", EnglishText.newColor())
+        assertEquals("Restore original color", EnglishText.restoreOriginal())
     }
 }

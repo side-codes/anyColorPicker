@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -57,9 +58,10 @@ kotlin {
 
     // Everything but Android draws through Skiko, so the one platform-specific thing the
     // library needs — handing a pixel array to the toolkit as an image — has a single
-    // implementation in skikoMain and an Android one beside it. It is a group in the default
-    // template rather than a dependsOn edge: an explicit dependsOn switches the template off,
-    // and iosMain, appleMain and nativeMain go with it.
+    // implementation in skikoMain and an Android one beside it. JVM and Android both have
+    // java.text, so the number formatter has one implementation in jvmAndAndroidMain. Both are
+    // groups in the default template rather than dependsOn edges: an explicit dependsOn switches
+    // the template off, and iosMain, appleMain and nativeMain go with it.
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyDefaultHierarchyTemplate {
         common {
@@ -67,6 +69,10 @@ kotlin {
                 withJvm()
                 withWasmJs()
                 withIos()
+            }
+            group("jvmAndAndroid") {
+                withJvm()
+                withCompilations { it.platformType == KotlinPlatformType.androidJvm }
             }
         }
     }
@@ -111,6 +117,13 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
         }
     }
+}
+
+// The UI tests assert English words and numbers in en-US's format, so a machine set to another locale must not fail
+// them. The formatting tests name their locales and do not depend on this.
+tasks.withType<Test>().configureEach {
+    systemProperty("user.language", "en")
+    systemProperty("user.country", "US")
 }
 
 // Published as the root build script sets up every module with the publish plugin.

@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.GamutMapping
 import codes.side.color.compose.toComposeColor
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -29,9 +30,10 @@ private const val ALPHA_PAGE_STEP = 0.1
  *
  * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
  * that changes the value.
- * @param semanticLabel accessibility description of the slider; pass a localized string to replace the
- * English default.
- * @param semanticValueText accessibility announcement of the current value (`0..255`).
+ * @param semanticLabel accessibility description of the slider; "Alpha" from [ColorPickerStrings] by
+ * default.
+ * @param semanticValueText accessibility announcement of the current value (`0..255`), in the locale's
+ * number format by default.
  */
 @Composable
 public fun AlphaSlider(
@@ -39,10 +41,10 @@ public fun AlphaSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onValueChangeFinished: () -> Unit = {},
-    label: (@Composable () -> Unit)? = { SliderLabel(ALPHA_LABEL) },
-    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(alphaValueText(state.value.alpha)) },
-    semanticLabel: String? = ALPHA_LABEL,
-    semanticValueText: String? = alphaValueText(state.value.alpha),
+    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.alphaName()) },
+    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
+    semanticLabel: String? = ColorPickerStrings.current.alphaName(),
+    semanticValueText: String? = ColorPickerStrings.current.alphaValue(state.value.alpha, true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,

@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -49,12 +50,13 @@ import kotlin.math.roundToInt
  * [ColoringMode.Contextual].
  * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
  * that changes the value.
- * @param label slot above the track's start; the channel's name by default. See [SliderLabel].
- * @param valueLabel slot above the track's end; the value in the channel's usual units by default.
- * See [SliderValueLabel].
+ * @param label slot above the track's start; the channel's name from [ColorPickerStrings] by default.
+ * See [SliderLabel].
+ * @param valueLabel slot above the track's end; the value in the channel's usual units, in the locale's
+ * number format, by default. See [SliderValueLabel].
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
- * @param semanticValueText how a screen reader announces the value; `null` leaves Material's reading
- * of the thumb's position.
+ * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
+ * `null` leaves Material's reading of the thumb's position.
  * @param thumb optional replacement for the thumb; see [ColorSlider].
  * @param thumbWidth how much room the track leaves for the thumb; see [ColorSlider].
  * @param thumbTrackGap clearance between the thumb and each track end.
@@ -70,10 +72,12 @@ public fun ChannelSlider(
     range: ClosedFloatingPointRange<Double> = channel.referenceRange,
     coloringMode: ColoringMode = defaultColoringMode(channel.space),
     onValueChangeFinished: () -> Unit = {},
-    label: (@Composable () -> Unit)? = { SliderLabel(channelLabel(channel)) },
-    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(channelValueText(channel, state.displayValue(channel))) },
-    semanticLabel: String? = channelSpokenLabel(channel),
-    semanticValueText: String? = channelValueText(channel, state.displayValue(channel)),
+    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
+    valueLabel: (@Composable () -> Unit)? = {
+        SliderValueLabel(ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), false))
+    },
+    semanticLabel: String? = ColorPickerStrings.current.channelSpokenName(channel),
+    semanticValueText: String? = ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,

@@ -41,6 +41,7 @@ import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
 import codes.side.color.Srgb
+import codes.side.colorpicker.foundation.EnglishText
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerTheme
@@ -84,7 +85,7 @@ class PickerConfigurationTest {
             val space = named[i].space
             val labels = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)).fetchSemanticsNodes()
                 .map { it.config[SemanticsProperties.ContentDescription].single() }
-            assertEquals(space.channels.map { channelSpokenLabel(it) } + ALPHA_LABEL, labels, "${space.id}'s sliders")
+            assertEquals(space.channels.map { EnglishText.channelSpokenName(it) } + EnglishText.alphaName(), labels, "${space.id}'s sliders")
             val planes = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNodes().size
             assertEquals(if (hasPlane(space)) 1 else 0, planes, "${space.id}'s plane")
         }
