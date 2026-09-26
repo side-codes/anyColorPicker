@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -33,7 +34,8 @@ rootProject.name = "anyColorPicker"
 
 include(":color")
 include(":color-compose")
-include(":colorpicker")
+include(":colorpicker-foundation")
+include(":colorpicker-material3")
 include(":screenshot-tests")
 include(":sample:shared")
 include(":sample:androidApp")

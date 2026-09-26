@@ -53,14 +53,14 @@ import codes.side.color.HexAlpha
 import codes.side.color.Okhsl
 import codes.side.color.toCssString
 import codes.side.color.toHexString
+import codes.side.colorpicker.material3.ChannelSlider
+import codes.side.colorpicker.material3.ColorPicker
+import codes.side.colorpicker.material3.ColorPickerDefaults
+import codes.side.colorpicker.material3.ColorPickerDialog
+import codes.side.colorpicker.material3.ColorSwatch
+import codes.side.colorpicker.material3.RgbColorPicker
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.rememberSaveableColorPickerState
-import codes.side.colorpicker.theme.ColorPickerDefaults
-import codes.side.colorpicker.ui.ChannelSlider
-import codes.side.colorpicker.ui.ColorPicker
-import codes.side.colorpicker.ui.ColorPickerDialog
-import codes.side.colorpicker.ui.ColorSwatch
-import codes.side.colorpicker.ui.RgbColorPicker
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -201,6 +201,13 @@ fun SampleApp() {
                         dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
                     )
                 }
+
+                item { HorizontalDivider() }
+
+                // The same state in a picker with no Material in it: the Basic components, drawn by
+                // FoundationPicker alone.
+                item { SectionHeader("Built on foundation") }
+                item { FoundationPicker(state, enabled) }
 
                 item { HorizontalDivider() }
 

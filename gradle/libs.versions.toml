@@ -34,6 +34,9 @@ androidx-compose-runtime-annotation = { group = "androidx.compose.runtime", name
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-resources = { group = "com.goncalossilva", name = "resources", version.ref = "kotlinx-resources" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
+mavenPublish-gradlePlugin = { group = "com.vanniktech", name = "gradle-maven-publish-plugin", version.ref = "maven-publish" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -48,3 +51,5 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 screenshot = { id = "com.android.compose.screenshot", version.ref = "screenshot" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+# build-logic's convention plugin for the published modules.
+library = { id = "codes.side.library" }

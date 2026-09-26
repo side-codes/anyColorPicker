@@ -2,7 +2,7 @@
 
 # anyColorPicker — Compose Multiplatform Color Picker
 
-Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform and Material 3.
+Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform: ready-made Material 3 pickers, and the same pickers without Material for a design system of your own.
 
 > **This README describes 2.0, which is not released yet.** The latest release is 1.2.1, documented at the [v1.2.1 tag](https://github.com/side-codes/anyColorPicker/tree/v1.2.1#readme). [Migrating from 1.x](#-migrating-from-1x) maps one API onto the other.
 
@@ -19,6 +19,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Alpha channel support
 - Color picker dialog
 - Material 3 theming via `ColorPickerDefaults` and `ColorPickerTheme`
+- The same components without Material, as `Basic*` components that draw what their slots draw, for any other design system
 - Accessibility semantics throughout — sliders step by each channel's own unit, and planes take focus, move with the arrow keys, and offer a screen reader one named action per direction
 - Words and numbers from one `ColorPickerStrings`, with numbers in the device's format — `40 %` in French, `٤٠٪` in Egyptian Arabic; reword or translate by providing your own
 - RTL layout support everywhere but the planes, which map a color space rather than showing progress
@@ -27,7 +28,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 
 ```kotlin
 // build.gradle.kts
-implementation("codes.side:colorpicker:2.0.0")
+implementation("codes.side:colorpicker-material3:2.0.0")
 ```
 
 In a Kotlin Multiplatform project, add it to `commonMain`:
@@ -36,18 +37,23 @@ In a Kotlin Multiplatform project, add it to `commonMain`:
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("codes.side:colorpicker:2.0.0")
+            implementation("codes.side:colorpicker-material3:2.0.0")
         }
     }
 }
 ```
 
-It brings two smaller modules with it, which also work on their own:
+On a design system other than Material, depend on `codes.side:colorpicker-foundation` instead and draw
+the pickers yourself: see [Without Material](#without-material).
 
-| Artifact                   | Holds                                                                                       |
-|----------------------------|---------------------------------------------------------------------------------------------|
-| `codes.side:color`         | `ColorValue`, the color spaces, conversion, gamut mapping, CSS strings and hex. No Compose. |
-| `codes.side:color-compose` | `ColorValue.toComposeColor()` and `Color.toColorValue()`.                                   |
+Each artifact brings the ones below it, and each works on its own:
+
+| Artifact                            | Holds                                                                                                                                                         |
+|-------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `codes.side:colorpicker-material3`  | The Material 3 pickers, sliders, planes, swatch, dialog and theme, in `codes.side.colorpicker.material3`.                                                     |
+| `codes.side:colorpicker-foundation` | `ColorPickerState`, in `codes.side.colorpicker.state`; the `Basic*` components and `ColorPickerStrings`, in `codes.side.colorpicker.foundation`. No Material. |
+| `codes.side:color-compose`          | `ColorValue.toComposeColor()` and `Color.toColorValue()`.                                                                                                     |
+| `codes.side:color`                  | `ColorValue`, the color spaces, conversion, gamut mapping, CSS strings and hex. No Compose.                                                                   |
 
 Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 
@@ -589,8 +595,9 @@ keeps them. A string passed to a component still wins over the provided ones.
 
 ### Theming
 
-All pickers and components accept `colors`, `shapes` and `dimensions` built with
-`ColorPickerDefaults`; the colors and shapes derive from `MaterialTheme` by default:
+Every slider, plane and picker accepts `colors`, `shapes` and `dimensions` built with
+`ColorPickerDefaults`, and `ColorSwatch` its `colors` and a `shape`; the colors and shapes derive
+from `MaterialTheme` by default:
 
 ```kotlin
 ColorPicker(
@@ -624,6 +631,71 @@ whatever an enclosing `ColorPickerTheme` provided.
 `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()` keep every value you leave out, and
 each class's `copy` does the same from one you already have, such as
 `ColorPickerDefaults.currentColors()`.
+
+### Without Material
+
+`codes.side:colorpicker-foundation` holds the same components with no look of their own. Each draws
+what its slots draw, and a slot reads what it needs from a scope: a slider's position, its color and
+whether it is enabled, a plane's position, a channel slider's gradient. Dragging, the keyboard, a
+screen reader and the picker's disabled state work as they do in the Material components, which are
+built on these.
+
+| Material 3      | Foundation                                       |
+|-----------------|--------------------------------------------------|
+| `ColorPicker`   | `BasicColorPicker`                               |
+| `ChannelSlider` | `BasicChannelSlider`                             |
+| `AlphaSlider`   | `BasicAlphaSlider`                               |
+| `ColorSlider`   | `BasicColorSlider`                               |
+| `ChannelPlane`  | `BasicChannelPlane`                              |
+| `ColorPlane`    | `BasicColorPlane`                                |
+| `ColorSwatch`   | a clip, `Modifier.checkerboard` and a background |
+
+A picker with round thumbs and pill tracks, and nothing from Material:
+
+```kotlin
+BasicColorPicker(
+    state = state,
+    space = Okhsv,
+    plane = { s, x, y ->
+        BasicChannelPlane(
+            s, x, y,
+            Modifier.fillMaxWidth().aspectRatio(1.6f),
+            shape = RoundedCornerShape(16.dp),
+            thumb = { RoundThumb(thumbColor) },
+        )
+    },
+    channelSlider = { s, channel ->
+        BasicChannelSlider(
+            s, channel, Modifier.fillMaxWidth(),
+            track = { Box(Modifier.fillMaxWidth().height(12.dp).clip(CircleShape).background(gradient)) },
+            thumb = { RoundThumb(thumbColor) },
+        )
+    },
+    alphaSlider = { s ->
+        BasicAlphaSlider(
+            s, Modifier.fillMaxWidth(),
+            track = {
+                Box(
+                    Modifier.fillMaxWidth().height(12.dp).clip(CircleShape)
+                        .checkerboard(Color.White, Color.LightGray)
+                        .background(gradient),
+                )
+            },
+            thumb = { RoundThumb(thumbColor) },
+        )
+    },
+    spacing = 16.dp,
+)
+
+@Composable
+fun RoundThumb(color: Color) {
+    Box(Modifier.size(24.dp).background(Color.White, CircleShape).padding(3.dp).background(color, CircleShape))
+}
+```
+
+A slot reads from its scope whether it is enabled. What lies outside every scope, such as a label
+drawn above a slider, reads `LocalColorPickerEnabled` to look disabled with the picker. The sample
+app's *Built on foundation* section runs a picker like this one.
 
 ## 🔗 State Management
 
@@ -709,10 +781,12 @@ produces.
 ## 🚚 Migrating from 1.x
 
 2.0 replaces 1.x's color classes with `ColorValue` and its per-channel components with ones that
-take a channel. The color types live in `codes.side.color`, which `colorpicker` brings with it.
+take a channel. The color types live in `codes.side.color`, which `colorpicker-material3` brings with it.
 
 | 1.x                                                                                         | 2.0                                                                                      | Note                                                       |
 |---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| `implementation("codes.side:colorpicker:1.2.1")`                                            | `implementation("codes.side:colorpicker-material3:2.0.0")`                               | `codes.side:colorpicker` stops at 1.2.1                    |
+| `codes.side.colorpicker.ui.*`, `codes.side.colorpicker.theme.*`                             | `codes.side.colorpicker.material3.*`                                                     |                                                            |
 | `HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)`                                 | `Hsl(200.0, 80.0, 50.0)`                                                                 | CSS's units: HSL's S and L are 0–100                       |
 | `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `OkLch(…)`           | each a `ColorValue`                                        |
 | `hsl.toRgb()`, `rgb.toOklch()`, …                                                           | `value.to(Srgb)`, `value.to(OkLch)`                                                      |                                                            |
@@ -750,12 +824,12 @@ The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar`
 
 ```diff
 - implementation("codes.side:andcolorpicker:0.6.2")
-+ implementation("codes.side:colorpicker:2.0.0")
++ implementation("codes.side:colorpicker-material3:2.0.0")
 ```
 
 There is no 1:1 API mapping — migrate by concept:
 
-| andcolorpicker (View-based)                                    | colorpicker (Compose)                                                                                                              |
+| andcolorpicker (View-based)                                    | colorpicker-material3 (Compose)                                                                                                    |
 |----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | `HSLColorPickerSeekBar` (`hslMode` = hue/saturation/lightness) | `ChannelSlider(state, Hsl.H)`, `Hsl.S` or `Hsl.L`, or `HslColorPicker` for all three                                               |
 | `RGBColorPickerSeekBar`                                        | `ChannelSlider(state, Srgb.R)`, `Srgb.G` or `Srgb.B`, or `RgbColorPicker`                                                          |

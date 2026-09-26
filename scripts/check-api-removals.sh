@@ -9,6 +9,8 @@
 # Without a tag it takes the latest v* tag reachable from HEAD's parent, so a build of the release
 # tag itself is checked against the release before it.
 set -euo pipefail
+# The dumps are found relative to the repository's root.
+cd "$(git rev-parse --show-toplevel)"
 # One collation for sort and comm on every runner: publish.yml runs this on macOS.
 export LC_ALL=C
 
@@ -58,7 +60,8 @@ check() {
     echo "::notice::$dump did not exist at $ref; it has nothing to compare against."
     return
   fi
-  removed="$(comm -23 <(git show "$ref:$dump" | "$keys") <("$keys" < "$dump"))"
+  # A dump that is gone lost everything it held.
+  removed="$(comm -23 <(git show "$ref:$dump" | "$keys") <(if [ -f "$dump" ]; then "$keys" < "$dump"; fi))"
   if [ -n "$removed" ]; then
     echo "::error::$dump lost $(wc -l <<< "$removed") declaration(s) published in $ref:"
     echo "$removed"
@@ -66,11 +69,16 @@ check() {
   fi
 }
 
-check colorpicker/api/jvm/colorpicker.api jvm_keys
-check colorpicker/api/colorpicker.klib.api klib_keys
-check color/api/jvm/color.api jvm_keys
-check color/api/color.klib.api klib_keys
-check color-compose/api/jvm/color-compose.api jvm_keys
-check color-compose/api/color-compose.klib.api klib_keys
+# Every module's dumps, at the ref and now: a module added since is compared from its first release on, and one
+# removed since is caught along with everything it published.
+shopt -s nullglob
+now=( */api/jvm/*.api */api/*.klib.api )
+dumps="$( { git ls-tree -r --name-only "$ref" | grep -E '^[^/]+/api/(jvm/[^/]+\.api|[^/]+\.klib\.api)$' || true; printf '%s\n' "${now[@]}"; } | sort -u)"
+while IFS= read -r dump; do
+  case "$dump" in
+    *.klib.api) check "$dump" klib_keys ;;
+    *) check "$dump" jvm_keys ;;
+  esac
+done <<< "$dumps"
 [ "$status" -eq 0 ] && echo "No declaration published in $ref is missing."
 exit "$status"

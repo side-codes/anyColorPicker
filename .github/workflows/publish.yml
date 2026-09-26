@@ -71,7 +71,7 @@ jobs:
           fi
 
       - name: Run tests
-        run: ./gradlew :colorpicker:allTests :color:allTests :color-compose:allTests
+        run: ./gradlew :colorpicker-foundation:allTests :colorpicker-material3:allTests :color:allTests :color-compose:allTests
 
       - name: Check the public API matches the committed dump
         run: ./gradlew apiCheck
