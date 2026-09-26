@@ -2,7 +2,7 @@
 //
 // The official com.android.compose.screenshot plugin hangs its per-variant tasks off the
 // `screenshotTest` component, which com.android.library creates and the KMP Android
-// library plugin does not — applying it directly to :colorpicker registers the aggregate
+// library plugin does not — applying it directly to a library module registers the aggregate
 // task but never updateDebugScreenshotTest or validateDebugScreenshotTest. A thin
 // com.android.library module that depends on the published library gives the plugin the
 // shape it expects. Nothing here is published.
@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    screenshotTestImplementation(project(":colorpicker"))
+    screenshotTestImplementation(project(":colorpicker-foundation"))
     screenshotTestImplementation(libs.compose.material3)
     screenshotTestImplementation(libs.androidx.compose.ui.tooling)
     screenshotTestImplementation(libs.androidx.compose.ui.tooling.preview)

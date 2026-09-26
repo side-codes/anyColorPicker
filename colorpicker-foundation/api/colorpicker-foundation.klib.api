@@ -5,7 +5,7 @@
 // - Show manifest properties: true
 // - Show declarations: true
 
-// Library unique name: <codes.side:colorpicker>
+// Library unique name: <codes.side:colorpicker-foundation>
 final enum class codes.side.colorpicker.state/ColoringMode : kotlin/Enum<codes.side.colorpicker.state/ColoringMode> { // codes.side.colorpicker.state/ColoringMode|null[0]
     enum entry Contextual // codes.side.colorpicker.state/ColoringMode.Contextual|null[0]
     enum entry Independent // codes.side.colorpicker.state/ColoringMode.Independent|null[0]

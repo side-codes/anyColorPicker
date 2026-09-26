@@ -29,4 +29,4 @@
 
 # Generated, and noisy in review.
 kotlin-js-store/** linguist-generated=true
-colorpicker/api/** linguist-generated=true
+*/api/** linguist-generated=true

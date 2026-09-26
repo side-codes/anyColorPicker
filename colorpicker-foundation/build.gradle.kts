@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     android {
-        namespace = "codes.side.colorpicker"
+        namespace = "codes.side.colorpicker.foundation"
     }
 
     listOf(

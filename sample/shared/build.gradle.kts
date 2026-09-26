@@ -37,7 +37,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":colorpicker"))
+            implementation(project(":colorpicker-foundation"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
