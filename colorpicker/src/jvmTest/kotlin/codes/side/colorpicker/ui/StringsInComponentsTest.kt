@@ -24,7 +24,6 @@ import codes.side.colorpicker.foundation.ProvideColorPickerStrings
 import codes.side.colorpicker.foundation.visible
 import codes.side.colorpicker.foundation.withDefaultLocale
 import codes.side.colorpicker.state.ColorPickerState
-import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -129,7 +128,7 @@ class StringsInComponentsTest {
             ColorSlider(
                 value = 0.37f,
                 onValueChange = {},
-                gradientColors = persistentListOf(Color.Black, Color.White),
+                trackColors = listOf(Color.Black, Color.White),
                 thumbColor = Color.Gray,
                 modifier = Modifier.testTag("slider"),
             )

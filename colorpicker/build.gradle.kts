@@ -81,7 +81,7 @@ kotlin {
         commonMain.dependencies {
             // api: types from these modules appear in the library's public API
             // (@Composable/@Immutable/@Stable from runtime; Modifier, Color, Shape,
-            // Dp from ui; ImmutableList in ColorSlider's signature). Consumers
+            // Dp from ui). Consumers
             // compile against them, so they must be on the consumer's compile
             // classpath. foundation is api because every public picker composable
             // is designed to be composed with foundation layouts and its widgets
@@ -93,7 +93,6 @@ kotlin {
             api(libs.compose.runtime)
             api(libs.compose.foundation)
             api(libs.compose.ui)
-            api(libs.kotlinx.collections.immutable)
             // implementation: no material3 or coroutines types leak into public
             // signatures (material3 is an internal rendering detail).
             implementation(libs.compose.material3)

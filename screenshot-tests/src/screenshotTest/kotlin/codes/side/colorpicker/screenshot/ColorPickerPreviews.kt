@@ -2,6 +2,7 @@ package codes.side.colorpicker.screenshot
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -32,6 +33,7 @@ import codes.side.color.Okhsv
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.ui.AlphaSlider
 import codes.side.colorpicker.ui.ChannelPlane
 import codes.side.colorpicker.ui.ChannelSlider
@@ -194,6 +196,11 @@ fun CmykIndependentPreview() = Frame { CmykColorPicker(state = state(), coloring
 @Composable
 fun CmykContextualPreview() = Frame { CmykColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
 
+@PreviewTest
+@Preview(name = "Horizontal picker", widthDp = 720, heightDp = 360)
+@Composable
+fun HorizontalPickerPreview() = Frame { OkhslColorPicker(state = state(), orientation = Orientation.Horizontal) }
+
 // Kept character-for-character identical to SquareThumb in the sample app, so the image
 // in the README is the thing the sample actually runs.
 @Composable
@@ -234,13 +241,13 @@ fun CustomThumbPreview() = Frame {
     ChannelSlider(
         state = state,
         channel = Okhsl.H,
-        thumb = { source -> SquareThumb(state.color, source) },
-        thumbWidth = SquareThumbSize,
+        thumb = { SquareThumb(state.color, interactionSource) },
+        dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
     )
     AlphaSlider(
         state = state,
-        thumb = { source -> SquareThumb(state.color, source) },
-        thumbWidth = SquareThumbSize,
+        thumb = { SquareThumb(state.color, interactionSource) },
+        dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
     )
 }
 

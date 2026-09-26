@@ -1,8 +1,6 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,10 +13,12 @@ import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.BasicColorPicker
+import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 import codes.side.colorpicker.theme.ColorPickerTheme
 
@@ -36,54 +36,6 @@ internal fun planeAxes(space: ColorSpace): Pair<ColorChannel, ColorChannel>? {
     return x to others.first { it !== x }
 }
 
-// A picker's plane, width over height.
-private const val PLANE_ASPECT_RATIO = 1.6f
-
-/** The plane a picker over [space] draws unless given another: a [ChannelPlane] over [planeAxes]. */
-internal fun defaultPlane(
-    space: ColorSpace,
-    enabled: Boolean,
-    onValueChangeFinished: () -> Unit,
-): @Composable (ColorPickerState) -> Unit = { state ->
-    val axes = planeAxes(space)
-    if (axes != null) {
-        ChannelPlane(
-            state,
-            axes.first,
-            axes.second,
-            Modifier.fillMaxWidth().aspectRatio(PLANE_ASPECT_RATIO),
-            enabled = enabled,
-            onValueChangeFinished = onValueChangeFinished,
-        )
-    }
-}
-
-/** The slider a picker draws for each channel unless given another: a [ChannelSlider]. */
-internal fun defaultChannelSlider(
-    enabled: Boolean,
-    coloringMode: ColoringMode,
-    onValueChangeFinished: () -> Unit,
-    thumb: (@Composable (InteractionSource) -> Unit)?,
-): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
-    ChannelSlider(
-        state,
-        channel,
-        enabled = enabled,
-        coloringMode = coloringMode,
-        onValueChangeFinished = onValueChangeFinished,
-        thumb = thumb,
-    )
-}
-
-/** The alpha slider a picker draws unless given another: an [AlphaSlider]. */
-internal fun defaultAlphaSlider(
-    enabled: Boolean,
-    onValueChangeFinished: () -> Unit,
-    thumb: (@Composable (InteractionSource) -> Unit)?,
-): @Composable (ColorPickerState) -> Unit = { state ->
-    AlphaSlider(state, enabled = enabled, onValueChangeFinished = onValueChangeFinished, thumb = thumb)
-}
-
 /**
  * A complete picker for [space], editing [state]: a plane over two of its channels when it has one hue
  * and two other channels, a slider per channel in channel order, and an alpha slider. Moving a channel
@@ -97,53 +49,54 @@ internal fun defaultAlphaSlider(
  * @param space the space whose channels the picker shows. Okhsl by default: its lightness is perceived
  * lightness, and its saturation is measured against the display, so every position is a color the
  * screen can show.
- * @param showPlane whether to draw [plane]; by default, when [space] has one hue and two other channels.
- * A space without them has no plane, so [plane] is never called for it, whatever [showPlane] says.
- * @param showAlpha whether to draw [alphaSlider].
  * @param enabled when false the picker is dimmed, refuses input and reports itself disabled.
+ * @param orientation [Orientation.Vertical] stacks the plane, the channel sliders and alpha;
+ * [Orientation.Horizontal] puts the plane in the start half and the sliders and alpha in the end half,
+ * and gives the sliders the whole width when there is no plane.
  * @param coloringMode how the channel tracks are drawn: [ColoringMode.Independent] by default for a
  * space with a hue, so a hue track stays a full spectrum, else [ColoringMode.Contextual].
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or accessibility step.
  * @param colors checkerboard and disabled colors; see [ColorPickerDefaults.colors].
  * @param shapes track and plane shapes; see [ColorPickerDefaults.shapes].
- * @param thumb optional replacement for every slider's thumb; see [ColorSlider].
- * @param plane slot for the plane; by default a [ChannelPlane] across [space]'s colorfulness channel
- * and up its other one: HSL's S × L, HSV's S × V, HWB's W × B, LCH's and OkLCh's C × L.
+ * @param dimensions track and plane sizes; see [ColorPickerDefaults.dimensions].
+ * @param thumb draws every slider's thumb from its [ColorSliderScope]; [ColorPickerDefaults.SliderThumb]
+ * by default.
+ * @param plane slot for the plane, handed the state and its axes: across, the channel that measures
+ * colorfulness, and up the other, as HSL's S × L, HSV's S × V, HWB's W × B, LCH's and OkLCh's C × L. A
+ * [ChannelPlane] by default; `null` leaves it out, and a space without such a plane never calls it.
  * @param channelSlider slot for each channel's slider, given the state and the channel; [ChannelSlider]
  * by default.
- * @param alphaSlider slot for the alpha slider; [AlphaSlider] by default.
+ * @param alphaSlider slot for the alpha slider; [AlphaSlider] by default, and `null` leaves it out.
  */
 @Composable
 public fun ColorPicker(
     state: ColorPickerState,
     modifier: Modifier = Modifier,
     space: ColorSpace = Okhsl,
-    showPlane: Boolean = hasPlane(space),
-    showAlpha: Boolean = true,
     enabled: Boolean = true,
+    orientation: Orientation = Orientation.Vertical,
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
-    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
     // Provided rather than passed down, so a replaced slot inherits the picker's theme without the call
     // site forwarding it. BasicColorPicker does the same for the picker's disabled state.
-    ColorPickerTheme(colors = colors, shapes = shapes) {
-        // BasicColorPicker hands its plane the axes; this picker's plane slot chooses its own.
-        val planeSlot: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? =
-            if (showPlane) { planeState, _, _ -> plane(planeState) } else null
+    ColorPickerTheme(colors = colors, shapes = shapes, dimensions = dimensions) {
         BasicColorPicker(
             state = state,
             space = space,
-            plane = planeSlot,
+            plane = plane,
             channelSlider = channelSlider,
-            alphaSlider = if (showAlpha) alphaSlider else null,
+            alphaSlider = alphaSlider,
             modifier = modifier,
             enabled = enabled,
+            orientation = orientation,
             spacing = 12.dp,
         )
     }
@@ -173,30 +126,30 @@ public fun ColorPicker(
     onValueChange: (ColorValue) -> Unit,
     modifier: Modifier = Modifier,
     space: ColorSpace = Okhsl,
-    showPlane: Boolean = hasPlane(space),
-    showAlpha: Boolean = true,
     enabled: Boolean = true,
+    orientation: Orientation = Orientation.Vertical,
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
-    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
     val state = rememberControlledPickerState(value, space, onValueChange, toValue = { it }, fromValue = { it })
     ColorPicker(
         state = state,
         modifier = modifier,
         space = space,
-        showPlane = showPlane,
-        showAlpha = showAlpha,
         enabled = enabled,
+        orientation = orientation,
         coloringMode = coloringMode,
         onValueChangeFinished = onValueChangeFinished,
         colors = colors,
         shapes = shapes,
+        dimensions = dimensions,
         thumb = thumb,
         plane = plane,
         channelSlider = channelSlider,
@@ -224,17 +177,17 @@ public fun ColorPicker(
     onColorChange: (Color) -> Unit,
     modifier: Modifier = Modifier,
     space: ColorSpace = Okhsl,
-    showPlane: Boolean = hasPlane(space),
-    showAlpha: Boolean = true,
     enabled: Boolean = true,
+    orientation: Orientation = Orientation.Vertical,
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
-    alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
     val state = rememberControlledPickerState(
         color,
@@ -247,13 +200,13 @@ public fun ColorPicker(
         state = state,
         modifier = modifier,
         space = space,
-        showPlane = showPlane,
-        showAlpha = showAlpha,
         enabled = enabled,
+        orientation = orientation,
         coloringMode = coloringMode,
         onValueChangeFinished = onValueChangeFinished,
         colors = colors,
         shapes = shapes,
+        dimensions = dimensions,
         thumb = thumb,
         plane = plane,
         channelSlider = channelSlider,

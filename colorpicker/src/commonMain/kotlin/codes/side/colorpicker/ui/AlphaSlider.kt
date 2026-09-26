@@ -1,15 +1,15 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
+import codes.side.colorpicker.foundation.AlphaSliderScope
 import codes.side.colorpicker.foundation.BasicAlphaSlider
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 
 /**
@@ -26,8 +26,11 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * default.
  * @param semanticValueText accessibility announcement of the current value (`0..255`), in the locale's
  * number format by default.
+ * @param dimensions the track's height and the room it leaves for the thumb; see [ColorSlider].
  * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
  * provided, interactions will still happen internally.
+ * @param thumb draws the thumb, reading the alpha and the opaque color from [AlphaSliderScope];
+ * [ColorPickerDefaults.SliderThumb] by default.
  */
 @Composable
 public fun AlphaSlider(
@@ -41,10 +44,10 @@ public fun AlphaSlider(
     semanticValueText: String? = ColorPickerStrings.current.alphaValue(state.value.alpha, true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+    // this., or this function's own interactionSource would shadow the scope's resolved one.
+    thumb: @Composable AlphaSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, thumbColor) },
 ) {
     SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
         BasicAlphaSlider(
@@ -55,8 +58,8 @@ public fun AlphaSlider(
             semanticLabel = semanticLabel,
             semanticValueText = semanticValueText,
             interactionSource = interactionSource,
-            track = { SliderTrack(gradient, colors, shapes, thumbWidth, thumbTrackGap, showCheckerboard = true) },
-            thumb = { SliderHandle(thumb) },
+            track = { SliderTrack(gradient, colors, shapes, dimensions, showCheckerboard = true) },
+            thumb = thumb,
         )
     }
 }

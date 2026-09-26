@@ -10,7 +10,7 @@
 - **`ColorPickerState` holds a `ColorValue`.** It is built from a `ColorValue` or a Compose `Color`, with no default. `state.value`, `state[channel]` and fifteen typed views (`state.hsl`, `state.okLch`, …) replace the eight typed getters, `pickerColor` and `argbInt`, and `state[channel] = x` and `state.set(view)` replace the thirty `update…` functions. Writing NaN or a value outside a channel's limit throws where 1.x ignored or clamped it.
 - **The 21 channel sliders and the three planes are gone.** `ChannelSlider(state, channel)` and `ChannelPlane(state, x, y)` take any channel of any space.
 - **The pickers' value forms are fully controlled.** They take a `ColorValue` or a Compose `Color` in place of 1.x's color classes. A change reaches the callback in the same event, and the picker draws only what the caller passes back, where 1.x applied the caller's value when the gesture ended.
-- **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider.
+- **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider. The plane's is handed its axes as well as the state, and `null` leaves the plane or alpha out, in place of `showAlpha = false`, on the pickers and the dialog alike.
 - **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and a `space`,** Okhsl by default, where 1.x's was fixed to HSL.
 - **State saved by 1.x is not restored.** It starts again from its initial value.
 - **Numbers follow the device's locale.** Values and spoken descriptions read `40 %` in French, `%40` in Turkish and `٤٠٪` in Egyptian Arabic, where 1.x wrote `40%` with a `.` separator everywhere.
@@ -22,6 +22,11 @@
 - **A screen reader moves `ColorSlider` and `AlphaSlider` a hundredth at a time,** as their arrow keys do.
 - **A slider reports presses** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags: a tap, a drag, a mouse button, or a finger held still for a tenth of a second, but not a scroll that starts on the slider. The default thumb narrows while pressed, and keeps its layout width as it does, so the track beside it no longer shifts.
 - **`PlaneActionLabels` moves to `codes.side.colorpicker.foundation`.**
+- **`ColorPickerColors`, `ColorPickerShapes` and `ColorPickerDimensions` are no longer data classes,** so they have no `componentN`. `copy` keeps a color or size left `Unspecified` and a shape left `null`, as Material's own color and shape classes do, and so do `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()`.
+- **`LocalColorPickerColors`, `LocalColorPickerShapes` and `LocalColorPickerDimensions` are no longer public.** `ColorPickerTheme` provides the values, and `ColorPickerDefaults.currentColors()`, `currentShapes()` and `currentDimensions()` read them.
+- **A `thumb` slot reads its component's scope** instead of being handed an `InteractionSource`: `thumb = { MyThumb(interactionSource, thumbColor) }`. A slider's scope carries its position, whether it is enabled, its interactions and the opaque color under the thumb, and a channel or alpha slider's its channel and value, or its alpha, too; a plane's carries its position, and a channel plane's its channels and the color under the thumb. A picker's `thumb` reaches its sliders the same way.
+- **Sliders and planes take `dimensions`** in place of `thumbWidth`, `thumbTrackGap` and `ColorSlider`'s `trackHeight`. `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)` changes one size and keeps the theme's others.
+- **`ColorSlider` takes `trackColors: List<Color>`** in place of `gradientColors: ImmutableList<Color>`. kotlinx-collections-immutable is no longer a dependency.
 
 ### Added
 
@@ -41,6 +46,9 @@
 - **`BasicChannelSlider` and `BasicAlphaSlider`,** the channel and alpha sliders with no look of their own. Their `track` and `thumb` slots read the channel, its value and the track's gradient, computed and mirrored as the Material sliders draw them, from `ChannelSliderScope` and `AlphaSliderScope`.
 - **`BasicColorPlane` and `BasicChannelPlane`,** the planes with no look and no size of their own. The `thumb` slot reads the position, and on a channel plane the channels and the opaque color under it, from `ColorPlaneScope` and `ChannelPlaneScope`.
 - **`BasicColorPicker`,** over a state, a `ColorValue` or a Compose `Color`, laying out whatever plane, channel sliders and alpha slider it is given, stacked or side by side (`orientation`), with `null` leaving the plane or alpha out.
+- **`ColorPickerDefaults.SliderThumb` and `ColorPickerDefaults.PlaneThumb`,** the default slider and plane thumbs, for a `thumb` slot that draws them beside something of its own.
+- **`ColorPickerDefaults.plane()`, `channelSlider()` and `alphaSlider()`,** the slots a picker draws by default, for a slot that wraps one.
+- **`orientation` and `dimensions` on every picker.** `Orientation.Horizontal` puts the plane beside the sliders.
 
 ## 1.2.1
 

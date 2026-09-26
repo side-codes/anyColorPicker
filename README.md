@@ -270,7 +270,7 @@ OkLchColorPicker(state)                     // the same, by name
 ColorPicker(
     state = state,
     space = Cmyk,
-    showAlpha = false,
+    alphaSlider = null,
     coloringMode = ColoringMode.Independent,
 )
 ```
@@ -280,13 +280,18 @@ channel in the space's order, then alpha. The plane runs across the channel that
 colorfulness and up the other: HSL's S × L, HSV's S × V, HWB's W × B, LCH's and OkLCh's C × L,
 Okhsl's S × L and Okhsv's S × V. Moving any part leaves the color in the picker's space.
 
+`plane = null` and `alphaSlider = null` leave those parts out, and `orientation = Orientation.Horizontal`
+puts the plane beside the sliders, in the start half:
+
+![Horizontal picker](docs/images/horizontal-picker.png)
+
 The eleven named pickers are `RgbColorPicker` (sRGB), `HslColorPicker`, `HsvColorPicker`,
 `HwbColorPicker`, `LabColorPicker`, `LchColorPicker`, `OklabColorPicker`, `OkLchColorPicker`,
 `OkhslColorPicker`, `OkhsvColorPicker` and `CmykColorPicker`. Each is `ColorPicker` with its
 space fixed and takes the same parameters.
 
-Every part of a picker is a slot, handed the state, and for a slider the channel. Replace one to
-change that part alone — here, the label of one slider:
+Every part of a picker is a slot, handed the state, and the channel for a slider or the two axes for
+the plane. Replace one to change that part alone — here, the label of one slider:
 
 ```kotlin
 HslColorPicker(
@@ -434,19 +439,20 @@ ChannelPlane(
 
 Passing `null` drops the actions and leaves the plane readable but not adjustable.
 
-`thumb` replaces the position indicator, and receives the plane's `InteractionSource` — which
-carries focus as well as drag, so a replacement can mark keyboard focus the way the default
-indicator does, with a second ring:
+`thumb` replaces the position indicator. It reads the plane's `InteractionSource` from its scope —
+which carries focus as well as drag, so a replacement can mark keyboard focus the way the default
+indicator does, with a second ring — and, on a `ChannelPlane`, the channels and the color under it:
 
 ```kotlin
-ChannelPlane(state, Hsl.S, Hsl.L, thumb = { source -> MyIndicator(source) })
+ChannelPlane(state, Hsl.S, Hsl.L, thumb = { MyIndicator(interactionSource, thumbColor) })
 ```
 
 ### Custom Thumb
 
 Every slider takes a `thumb` slot, so the Material 3 thumb can be replaced outright — its
 size, shape and stroke are yours rather than a fixed set of dimension parameters. The slot
-receives the slider's `InteractionSource`, so a thumb can also react to press and drag.
+reads the slider's `InteractionSource`, position and thumb color from its scope, so a thumb can
+also react to press and drag.
 
 ![Custom thumb](docs/images/custom-thumb.png)
 
@@ -476,8 +482,9 @@ fun SquareThumb(color: Color, interaction: InteractionSource) {
 ChannelSlider(
     state = state,
     channel = Okhsl.H,
-    thumb = { source -> SquareThumb(state.color, source) },
-    thumbWidth = SquareThumbSize,   // so the track leaves room for it
+    thumb = { SquareThumb(state.color, interactionSource) },
+    // so the track leaves room for it
+    dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
 )
 ```
 
@@ -485,15 +492,16 @@ The thumb needs no state parameter: `state` is already in scope at the call site
 composable restyles itself as the color changes. The ring is the fill lifted toward white
 rather than a light-or-dark choice made at some luminance threshold — a threshold snaps
 visibly the moment a drag crosses it, while this moves with the color. And because the
-slot is handed the slider's `InteractionSource`, the thumb can react to being dragged;
+slot reads the slider's `InteractionSource`, the thumb can react to being dragged;
 that is state a caller cannot otherwise reach, since the source is created inside the
 slider.
 
 `thumbWidth` matters. The track breaks around the thumb, and it sizes that break from this
-value, defaulting to `ColorPickerDefaults.ThumbWidth` (the Material 3 handle). A wider
-thumb that does not declare its width covers the gap and sits flush against the gradient.
-`thumbTrackGap` controls the clearance itself. The sample app's *Custom thumb* section runs
-exactly this code.
+value, `ColorPickerDefaults.ThumbWidth` (the Material 3 handle) by default. A wider thumb
+that does not declare its width covers the gap and sits flush against the gradient.
+`thumbTrackGap` controls the clearance itself. Copying `currentDimensions()` changes the one
+size and keeps whatever an enclosing `ColorPickerTheme` set for the rest. The sample app's
+*Custom thumb* section runs exactly this code.
 
 ### Color Swatch
 
@@ -521,7 +529,6 @@ ColorPickerDialog(
     title = "Select color",
     confirmText = "OK",
     dismissText = "Cancel",
-    showAlpha = true,
 )
 ```
 
@@ -582,8 +589,8 @@ keeps them. A string passed to a component still wins over the provided ones.
 
 ### Theming
 
-All pickers and components accept `colors` and `shapes` built with `ColorPickerDefaults`, which
-derive from `MaterialTheme` by default:
+All pickers and components accept `colors`, `shapes` and `dimensions` built with
+`ColorPickerDefaults`; the colors and shapes derive from `MaterialTheme` by default:
 
 ```kotlin
 ColorPicker(
@@ -613,6 +620,10 @@ ColorPickerTheme(
 
 A component reads the theme in its parameter defaults, so an explicit argument still wins over
 whatever an enclosing `ColorPickerTheme` provided.
+
+`ColorPickerDefaults.colors()`, `shapes()` and `dimensions()` keep every value you leave out, and
+each class's `copy` does the same from one you already have, such as
+`ColorPickerDefaults.currentColors()`.
 
 ## 🔗 State Management
 
@@ -723,6 +734,11 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker` 
 | `HslColorPicker(color: HslColor, onColorChange)`                                            | `HslColorPicker(value: ColorValue, onValueChange)` or `(color: Color, onColorChange)`    | fully controlled                                           |
 | a caller's value applied when the gesture ends                                              | applied at once; the callback is synchronous                                             |                                                            |
 | per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { state, channel -> … }`                                                |                                                            |
+| `showAlpha = false`                                                                         | `alphaSlider = null`                                                                     | `plane = null` leaves the plane out                        |
+| `thumb = { source -> MyThumb(source) }`                                                     | `thumb = { MyThumb(interactionSource) }`                                                 | the slot reads its scope                                   |
+| `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |
+| `ColorSlider(gradientColors = persistentListOf(…))`                                         | `ColorSlider(trackColors = listOf(…))`                                                   |                                                            |
+| `LocalColorPickerColors.current`, …                                                         | `ColorPickerDefaults.currentColors()`, …                                                 | provided by `ColorPickerTheme`                             |
 | `ColorPickerDialog(onColorSelected: (HslColor) -> Unit, initialColor: HslColor)`            | `ColorPickerDialog(initialValue, onValueSelected, …, space = Okhsl)` or the `Color` form |                                                            |
 | per-component `String` parameters to localize                                               | `ProvideColorPickerStrings(yourStrings) { … }`                                           | the parameters still win                                   |
 | a saved 1.x state                                                                           | not restored; the state starts from its initial value                                    |                                                            |

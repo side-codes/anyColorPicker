@@ -1,17 +1,18 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicChannelPlane
+import codes.side.colorpicker.foundation.ChannelPlaneScope
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.PlaneActionLabels
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 
 /**
@@ -37,9 +38,12 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * @param semanticValueText accessibility announcement of the pair of values.
  * @param actionLabels names the four accessibility actions after the channels; `null` omits them and
  * leaves the plane readable but not adjustable.
+ * @param dimensions the size the plane falls back to and the default indicator's diameter; see
+ * [ColorPlane].
  * @param interactionSource receives the plane's interactions; see [ColorPlane]. Note that if `null` is
  * provided, interactions will still happen internally.
- * @param thumb optional replacement for the position indicator; see [ColorPlane].
+ * @param thumb marks the current pair, reading the channels and the opaque color under it from
+ * [ChannelPlaneScope]; see [ColorPlane].
  * @throws IllegalArgumentException unless [x] and [y] are two different channels of one space.
  */
 @Composable
@@ -55,11 +59,12 @@ public fun ChannelPlane(
     actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeActions(x, y),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    // this., or this function's own interactionSource would shadow the scope's resolved one.
+    thumb: @Composable ChannelPlaneScope.() -> Unit = { ColorPickerDefaults.PlaneThumb(this.interactionSource, diameter = dimensions.planeThumbSize) },
 ) {
     val active = enabled && LocalPickerEnabled.current
-    val dimensions = ColorPickerDefaults.currentDimensions()
     BasicChannelPlane(
         state = state,
         x = x,
@@ -74,6 +79,6 @@ public fun ChannelPlane(
         semanticValueText = semanticValueText,
         actionLabels = actionLabels,
         interactionSource = interactionSource,
-        thumb = { PlaneHandle(thumb, dimensions.planeThumbSize) },
+        thumb = thumb,
     )
 }

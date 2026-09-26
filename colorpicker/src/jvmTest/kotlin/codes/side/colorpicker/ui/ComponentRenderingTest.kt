@@ -92,7 +92,7 @@ class ComponentRenderingTest {
     }
 
     @Test
-    fun aCustomThumbReplacesTheDefaultAndReceivesTheInteractionSource() = runComposeUiTest {
+    fun aCustomThumbReplacesTheDefaultAndReadsTheInteractionSource() = runComposeUiTest {
         // Mid grey cannot occur anywhere in a fully saturated hue track, so finding it
         // proves the caller's thumb was painted rather than the default handle.
         val marker = Color(0xFF7F7F7F)
@@ -104,15 +104,15 @@ class ComponentRenderingTest {
                     state = ColorPickerState(Hsl(180.0, 100.0, 50.0)),
                     channel = Hsl.H,
                     modifier = Modifier.size(width = 300.dp, height = 60.dp).testTag("hue"),
-                    thumb = { source ->
-                        received = source
+                    thumb = {
+                        received = interactionSource
                         Box(Modifier.size(24.dp).background(marker))
                     },
                 )
             }
         }
 
-        assertNotNull(received, "the thumb slot was never given an InteractionSource")
+        assertNotNull(received, "the thumb slot never read an InteractionSource")
 
         val pixels = onNodeWithTag("hue").captureToImage().toPixelMap()
         var sawMarker = false

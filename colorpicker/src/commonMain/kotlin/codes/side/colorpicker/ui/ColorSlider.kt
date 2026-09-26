@@ -1,6 +1,5 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicColorSlider
@@ -24,8 +22,8 @@ import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
-import kotlinx.collections.immutable.ImmutableList
 
 /**
  * Building block for a single-channel color slider: a [BasicColorSlider] with a gradient
@@ -37,7 +35,8 @@ import kotlinx.collections.immutable.ImmutableList
  * left for moving focus. A screen reader steps by a hundredth.
  *
  * @param value current position in `0..1`; callers map their channel range to this.
- * @param gradientColors color stops of the track gradient, from `0` to `1`.
+ * @param trackColors color stops of the track, evenly spaced from `0` to `1`.
+ * @param thumbColor the color the thumb shows; [thumb] reads it opaque, as [ColorSliderScope.thumbColor].
  * @param label optional slot shown above the track's start; see [SliderLabel].
  * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
  * @param showCheckerboard draws a transparency checkerboard under the gradient, for
@@ -49,42 +48,40 @@ import kotlinx.collections.immutable.ImmutableList
  * where it has them; `null` omits it.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param shapes track shape; see [ColorPickerDefaults.shapes].
- * @param interactionSource receives the slider's press, drag, focus and hover interactions, and is what
- * [thumb] is handed. Note that if `null` is provided, interactions will still happen internally.
- * @param thumb optional replacement for the slider thumb. `null` keeps the default handle, a
- * rounded bar in [thumbColor]; pass a composable to control its size, shape
- * and stroke entirely. It receives the slider's [InteractionSource], so a thumb can react
- * to press and drag; the current value and color need no parameter, since the caller
- * already passed them as [value] and [thumbColor].
- * @param thumbWidth how much room the track leaves for the thumb. A custom [thumb] wider
- * than [ColorPickerDefaults.ThumbWidth] must declare its width here, or the track's gap
- * closes and the thumb sits flush against the gradient.
- * @param thumbTrackGap clearance between the thumb and each track end.
+ * @param dimensions the track's height and the room it leaves for the thumb; see
+ * [ColorPickerDefaults.dimensions]. A custom [thumb] wider than [ColorPickerDefaults.ThumbWidth] must
+ * say so in [ColorPickerDimensions.thumbWidth], or the track's gap closes and the thumb sits flush
+ * against the gradient.
+ * @param interactionSource receives the slider's press, drag, focus and hover interactions, which [thumb]
+ * reads from [ColorSliderScope.interactionSource]. Note that if `null` is provided, interactions will
+ * still happen internally.
+ * @param thumb draws the thumb, reading where it is, whether the slider is enabled, its interactions and
+ * its opaque color from [ColorSliderScope]; [ColorPickerDefaults.SliderThumb], a rounded bar, by default.
  */
 @Composable
 public fun ColorSlider(
     value: Float,
     onValueChange: (Float) -> Unit,
-    gradientColors: ImmutableList<Color>,
+    trackColors: List<Color>,
     thumbColor: Color,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     valueLabel: (@Composable () -> Unit)? = null,
     onValueChangeFinished: (() -> Unit)? = null,
     enabled: Boolean = true,
-    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
     showCheckerboard: Boolean = false,
     semanticLabel: String? = null,
     semanticValueText: String? = ColorPickerStrings.current.sliderPosition(value),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+    // this., or this function's own interactionSource and thumbColor would shadow the scope's: the
+    // scope's source is the resolved one, and its color is opaque.
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, this.thumbColor) },
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    val gradient = remember(gradientColors, layoutDirection) { TrackStops(gradientColors, null).brush(layoutDirection) }
+    val gradient = remember(trackColors, layoutDirection) { TrackStops(trackColors, null).brush(layoutDirection) }
     SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
         BasicColorSlider(
             value = value,
@@ -96,8 +93,8 @@ public fun ColorSlider(
             semanticLabel = semanticLabel,
             semanticValueText = semanticValueText,
             interactionSource = interactionSource,
-            track = { SliderTrack(gradient, colors, shapes, thumbWidth, thumbTrackGap, trackHeight, showCheckerboard) },
-            thumb = { SliderHandle(thumb) },
+            track = { SliderTrack(gradient, colors, shapes, dimensions, showCheckerboard) },
+            thumb = thumb,
         )
     }
 }
@@ -139,15 +136,13 @@ internal fun SliderFrame(
     }
 }
 
-/** The Material track: [gradient] at [trackHeight], with its gap at the thumb. */
+/** The Material track: [gradient] at the dimensions' track height, with its gap at the thumb. */
 @Composable
 internal fun ColorSliderScope.SliderTrack(
     gradient: Brush,
     colors: ColorPickerColors,
     shapes: ColorPickerShapes,
-    thumbWidth: Dp,
-    thumbTrackGap: Dp,
-    trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
+    dimensions: ColorPickerDimensions,
     showCheckerboard: Boolean = false,
 ) {
     GradientTrack(
@@ -158,19 +153,10 @@ internal fun ColorSliderScope.SliderTrack(
         checkerboardDark = colors.checkerboardDark,
         trackShape = shapes.trackShape,
         showCheckerboard = showCheckerboard,
-        thumbWidth = thumbWidth,
-        thumbTrackGap = thumbTrackGap,
+        thumbWidth = dimensions.thumbWidth,
+        thumbTrackGap = dimensions.thumbTrackGap,
         modifier = Modifier
             .fillMaxWidth()
-            .height(trackHeight),
+            .height(dimensions.trackHeight),
     )
-}
-
-/**
- * A caller's [thumb], or the default handle. Both read the scope's source and color rather than a wrapper's
- * parameters of the same names: the scope's source is the resolved one, and its color is opaque.
- */
-@Composable
-internal fun ColorSliderScope.SliderHandle(thumb: (@Composable (InteractionSource) -> Unit)?) {
-    if (thumb != null) thumb(interactionSource) else SliderThumb(interactionSource, thumbColor)
 }

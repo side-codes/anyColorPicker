@@ -14,7 +14,6 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.v2.runComposeUiTest
-import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -30,7 +29,7 @@ class ColorSliderTest {
             ColorSlider(
                 value = held.value,
                 onValueChange = { held.value = it },
-                gradientColors = persistentListOf(Color.Black, Color.White),
+                trackColors = listOf(Color.Black, Color.White),
                 thumbColor = Color.Gray,
                 modifier = Modifier.testTag("slider"),
             )
