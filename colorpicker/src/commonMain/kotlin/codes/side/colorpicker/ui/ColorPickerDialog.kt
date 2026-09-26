@@ -22,6 +22,7 @@ import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -41,8 +42,8 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * dismisses the dialog.
  * @param onDismiss called when the user cancels or dismisses the dialog.
  * @param space the picker's space; Okhsl by default.
- * @param title dialog title; [confirmText] and [dismissText] label the buttons. Pass localized strings
- * to replace the English defaults.
+ * @param title dialog title; [confirmText] and [dismissText] label the buttons. The defaults come from
+ * [ColorPickerStrings]: "Select color", "OK" and "Cancel".
  * @param enabled when false the picker is dimmed and refuses input. The buttons stay live, so the dialog
  * can still be dismissed.
  * @param colors checkerboard and disabled colors, used by the swatch and the picker; see
@@ -61,9 +62,9 @@ public fun ColorPickerDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     space: ColorSpace = Okhsl,
-    title: String = "Pick a Color",
-    confirmText: String = "Select",
-    dismissText: String = "Cancel",
+    title: String = ColorPickerStrings.current.dialogTitle(),
+    confirmText: String = ColorPickerStrings.current.confirm(),
+    dismissText: String = ColorPickerStrings.current.dismiss(),
     showPlane: Boolean = hasPlane(space),
     showAlpha: Boolean = true,
     enabled: Boolean = true,
@@ -113,9 +114,9 @@ public fun ColorPickerDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     space: ColorSpace = Okhsl,
-    title: String = "Pick a Color",
-    confirmText: String = "Select",
-    dismissText: String = "Cancel",
+    title: String = ColorPickerStrings.current.dialogTitle(),
+    confirmText: String = ColorPickerStrings.current.confirm(),
+    dismissText: String = ColorPickerStrings.current.dismiss(),
     showPlane: Boolean = hasPlane(space),
     showAlpha: Boolean = true,
     enabled: Boolean = true,

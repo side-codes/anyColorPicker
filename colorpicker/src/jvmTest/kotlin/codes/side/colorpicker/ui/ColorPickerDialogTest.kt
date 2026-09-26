@@ -53,7 +53,7 @@ class ColorPickerDialogTest {
         onNodeWithText("Farbton 200").assertExists()
         onNodeWithText("Grün").performClick()
         onNodeWithText("Farbton 120").assertExists()
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertEquals(120.0, selected?.get(Okhsl.H), "confirm returns what the slot wrote")
     }
 
@@ -98,7 +98,7 @@ class ColorPickerDialogTest {
         val p3Red = DisplayP3(1.0, 0.0, 0.0)
         var selected: ColorValue? = null
         setContent { ColorPickerDialog(initialValue = p3Red, onValueSelected = { selected = it }, onDismiss = {}) }
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertSame(p3Red, selected)
     }
 
@@ -107,7 +107,7 @@ class ColorPickerDialogTest {
         var selected: ColorValue? = null
         setContent { ColorPickerDialog(initialValue = DisplayP3(0.2, 0.4, 0.6), onValueSelected = { selected = it }, onDismiss = {}) }
         sliderNamed("Lightness").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertEquals(Okhsl, selected?.space)
     }
 
@@ -119,7 +119,7 @@ class ColorPickerDialogTest {
         sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
         initial = Okhsl(40.0, 0.5, 0.6)
         waitForIdle()
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertEquals(Okhsl(40.0, 0.5, 0.6), selected)
     }
 
@@ -129,7 +129,7 @@ class ColorPickerDialogTest {
         val p3Red = Color(1f, 0f, 0f, 1f, ComposeSpaces.DisplayP3)
         var selected: Color? = null
         setContent { ColorPickerDialog(initialColor = p3Red, onColorSelected = { selected = it }, onDismiss = {}) }
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertEquals(p3Red, selected)
     }
 
@@ -138,7 +138,7 @@ class ColorPickerDialogTest {
         val blue = Color(0xFF3366CC)
         var selected: Color? = null
         setContent { ColorPickerDialog(initialColor = blue, onColorSelected = { selected = it }, onDismiss = {}) }
-        onNodeWithText("Select").performClick()
+        onNodeWithText("OK").performClick()
         assertEquals(blue, selected)
     }
 }

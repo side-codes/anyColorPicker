@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
@@ -41,8 +42,9 @@ import kotlinx.collections.immutable.ImmutableList
  * gradients with translucent stops (used by [AlphaSlider]).
  * @param semanticLabel accessibility content description of the slider (what channel
  * it controls); merged with the M3 slider's own progress semantics.
- * @param semanticValueText accessibility state description of the current value, for
- * announcing the channel's native units instead of a raw fraction.
+ * @param semanticValueText accessibility state description of the current value: the position as a
+ * percentage of the track by default, in the locale's number format. Pass the value in its own units
+ * where it has them; `null` leaves Material's reading of the raw fraction.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param shapes track shape; see [ColorPickerDefaults.shapes].
  * @param thumb optional replacement for the slider thumb. `null` keeps the Material 3
@@ -69,7 +71,7 @@ public fun ColorSlider(
     trackHeight: Dp = ColorPickerDefaults.currentDimensions().trackHeight,
     showCheckerboard: Boolean = false,
     semanticLabel: String? = null,
-    semanticValueText: String? = null,
+    semanticValueText: String? = ColorPickerStrings.current.sliderPosition(value),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,

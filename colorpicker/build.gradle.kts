@@ -119,6 +119,13 @@ kotlin {
     }
 }
 
+// The UI tests assert English words and numbers in en-US's format, so a machine set to another locale must not fail
+// them. The formatting tests name their locales and do not depend on this.
+tasks.withType<Test>().configureEach {
+    systemProperty("user.language", "en")
+    systemProperty("user.country", "US")
+}
+
 // Published as the root build script sets up every module with the publish plugin.
 mavenPublishing {
     pom {

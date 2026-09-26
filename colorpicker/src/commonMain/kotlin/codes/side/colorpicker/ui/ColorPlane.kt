@@ -45,6 +45,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
@@ -118,7 +119,7 @@ public fun ColorPlane(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
+    actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
@@ -168,7 +169,7 @@ internal fun ColorPlaneImpl(
     enabled: Boolean = true,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
-    actionLabels: PlaneActionLabels? = PlaneActionLabels.Default,
+    actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,

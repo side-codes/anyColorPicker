@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -46,9 +47,9 @@ public fun ChannelPlane(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onValueChangeFinished: () -> Unit = {},
-    semanticLabel: String? = planeLabel(x, y),
-    semanticValueText: String? = planeValueText(x, state.displayValue(x), y, state.displayValue(y)),
-    actionLabels: PlaneActionLabels? = planeActionLabels(x, y),
+    semanticLabel: String? = ColorPickerStrings.current.planeDescription(x, y),
+    semanticValueText: String? = ColorPickerStrings.current.planeValue(x, state.displayValue(x), y, state.displayValue(y)),
+    actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeActions(x, y),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
