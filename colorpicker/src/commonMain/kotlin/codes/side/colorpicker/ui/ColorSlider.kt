@@ -52,6 +52,8 @@ private const val COLOR_SLIDER_PAGE_STEP = 0.1f
  * where it has them; `null` omits it.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param shapes track shape; see [ColorPickerDefaults.shapes].
+ * @param interactionSource receives the slider's press, drag, focus and hover interactions, and is what
+ * [thumb] is handed. Note that if `null` is provided, interactions will still happen internally.
  * @param thumb optional replacement for the slider thumb. `null` keeps the default handle, a
  * rounded bar in [thumbColor]; pass a composable to control its size, shape
  * and stroke entirely. It receives the slider's [InteractionSource], so a thumb can react
@@ -79,6 +81,7 @@ public fun ColorSlider(
     semanticValueText: String? = ColorPickerStrings.current.sliderPosition(value),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
@@ -102,6 +105,7 @@ public fun ColorSlider(
         semanticValueText = semanticValueText,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,

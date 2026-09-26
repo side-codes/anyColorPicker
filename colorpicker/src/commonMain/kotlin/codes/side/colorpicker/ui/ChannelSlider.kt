@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,6 +49,8 @@ import kotlin.math.roundToInt
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
  * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
  * `null` omits it.
+ * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
+ * provided, interactions will still happen internally.
  * @param thumb optional replacement for the thumb; see [ColorSlider].
  * @param thumbWidth how much room the track leaves for the thumb; see [ColorSlider].
  * @param thumbTrackGap clearance between the thumb and each track end.
@@ -71,6 +74,7 @@ public fun ChannelSlider(
     semanticValueText: String? = ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
@@ -119,6 +123,7 @@ public fun ChannelSlider(
         semanticValueText = semanticValueText,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,

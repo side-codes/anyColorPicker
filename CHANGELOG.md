@@ -34,6 +34,7 @@
 - **`ColorPickerState.displayValue(channel)`,** what a slider on that channel shows: a grey's remembered hue, and 0 for any other missing component.
 - **`ColorPickerStrings`,** every word and number the components show or speak. Implement the members you need and provide them once with `ProvideColorPickerStrings`; a string passed to a component still wins. The library's own words are English.
 - **`BasicColorSlider`,** a slider that draws only what its `track` and `thumb` slots draw, which read its position, whether it is enabled, its interactions and the thumb's color from `ColorSliderScope`. A tap jumps and a drag follows the finger past the touch slop; Left and Right move by `step`, Page Up and Page Down by `pageStep`, Home and End to the ends, and a screen reader steps by `step`.
+- **`ColorSlider`, `ChannelSlider`, `AlphaSlider`, `ColorPlane` and `ChannelPlane` take an `interactionSource`.**
 
 ## 1.2.1
 

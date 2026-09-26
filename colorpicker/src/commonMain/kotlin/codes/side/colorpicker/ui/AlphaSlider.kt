@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,6 +34,8 @@ private const val ALPHA_PAGE_STEP = 0.1
  * default.
  * @param semanticValueText accessibility announcement of the current value (`0..255`), in the locale's
  * number format by default.
+ * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
+ * provided, interactions will still happen internally.
  */
 @Composable
 public fun AlphaSlider(
@@ -46,6 +49,7 @@ public fun AlphaSlider(
     semanticValueText: String? = ColorPickerStrings.current.alphaValue(state.value.alpha, true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
@@ -92,6 +96,7 @@ public fun AlphaSlider(
         semanticValueText = semanticValueText,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,

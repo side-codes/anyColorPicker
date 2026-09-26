@@ -100,6 +100,8 @@ internal fun planeYFraction(y: Float, height: Int): Float =
  * reader has no gesture for a surface with two degrees of freedom; `null` omits them and leaves
  * the plane readable but not adjustable. Arrow keys move it by one percent and shift-arrow by
  * ten, and pressing the surface takes focus so they land where they were aimed.
+ * @param interactionSource receives the plane's drag and focus interactions, and is what [thumb] is
+ * handed. Note that if `null` is provided, interactions will still happen internally.
  * @param thumb optional replacement for the position indicator, receiving the surface's
  * [InteractionSource] so it can react to being dragged — and to being focused, which the
  * default indicator marks with a second ring and a replacement is expected to mark somehow,
@@ -122,6 +124,7 @@ public fun ColorPlane(
     actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     val currentOnValueChange by rememberUpdatedState(onValueChange)
@@ -149,6 +152,7 @@ public fun ColorPlane(
         actionLabels = actionLabels,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
     )
 }
@@ -172,9 +176,10 @@ internal fun ColorPlaneImpl(
     actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeAxisActions(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+    val source = interactionSource ?: remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val dimensions = ColorPickerDefaults.currentDimensions()
@@ -208,8 +213,8 @@ internal fun ColorPlaneImpl(
             // size instead squeezes a larger custom thumb into the default diameter and
             // strands a smaller one in the corner of it, off the value it marks.
             Box {
-                if (thumb != null) thumb(interactionSource)
-                else PlaneThumb(dimensions.planeThumbSize, interactionSource)
+                if (thumb != null) thumb(source)
+                else PlaneThumb(dimensions.planeThumbSize, source)
             }
         },
         modifier = modifier
@@ -242,10 +247,11 @@ internal fun ColorPlaneImpl(
                 step(dx, dy, coarse = event.isShiftPressed)
             }
             .focusRequester(focusRequester)
-            .focusable(active, interactionSource)
+            .focusable(active, source)
             // Keyed on active so the handler is torn down rather than left running with a
-            // flag it checks: a gesture in flight when the plane is disabled ends there.
-            .pointerInput(active) {
+            // flag it checks: a gesture in flight when the plane is disabled ends there. Keyed
+            // on the source too, or a handler kept across a new one goes on reporting to the old.
+            .pointerInput(active, source) {
                 if (!active) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
@@ -253,7 +259,7 @@ internal fun ColorPlaneImpl(
                     // left off rather than doing nothing until something is tabbed to.
                     focusRequester.requestFocus()
                     val press = DragInteraction.Start()
-                    scope.launch { interactionSource.emit(press) }
+                    scope.launch { source.emit(press) }
                     currentOnValueChange(
                         planeXFraction(down.position.x, size.width),
                         planeYFraction(down.position.y, size.height),
@@ -270,7 +276,7 @@ internal fun ColorPlaneImpl(
 
                     currentOnFinished?.invoke()
                     scope.launch {
-                        interactionSource.emit(
+                        source.emit(
                             if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press),
                         )
                     }

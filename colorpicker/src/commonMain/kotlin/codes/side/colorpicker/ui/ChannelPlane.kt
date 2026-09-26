@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -36,6 +37,8 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * @param semanticValueText accessibility announcement of the pair of values.
  * @param actionLabels names the four accessibility actions after the channels; `null` omits them and
  * leaves the plane readable but not adjustable.
+ * @param interactionSource receives the plane's interactions; see [ColorPlane]. Note that if `null` is
+ * provided, interactions will still happen internally.
  * @param thumb optional replacement for the position indicator; see [ColorPlane].
  * @throws IllegalArgumentException unless [x] and [y] are two different channels of one space.
  */
@@ -52,6 +55,7 @@ public fun ChannelPlane(
     actionLabels: PlaneActionLabels? = ColorPickerStrings.current.planeActions(x, y),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
 ) {
     requirePlaneChannels(x, y)
@@ -98,6 +102,7 @@ public fun ChannelPlane(
         actionLabels = actionLabels,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
     )
 }
