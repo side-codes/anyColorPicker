@@ -95,4 +95,21 @@ class AlphaSliderTest {
         assertNear(0.51, emitted[0].alpha, 1e-12)
         assertNear(0.52, emitted[1].alpha, 1e-12)
     }
+
+    @Test
+    fun homeAndEndMakeItTransparentAndOpaque() = runComposeUiTest {
+        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
+        setContent { AlphaSlider(state, Modifier.testTag("slider")) }
+        sliderIn("slider").requestFocus()
+        sliderIn("slider").performKeyInput { pressKey(Key.MoveHome) }
+        assertNear(0.0, state.value.alpha)
+        sliderIn("slider").performKeyInput { pressKey(Key.MoveEnd) }
+        assertNear(1.0, state.value.alpha)
+    }
+
+    @Test
+    fun aScreenReaderStepsAlphaByAHundredth() = runComposeUiTest {
+        setContent { AlphaSlider(ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5)), Modifier.testTag("slider")) }
+        assertEquals(99, sliderIn("slider").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].steps)
+    }
 }

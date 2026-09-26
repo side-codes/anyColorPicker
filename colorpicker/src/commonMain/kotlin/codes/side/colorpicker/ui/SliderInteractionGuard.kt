@@ -8,9 +8,9 @@ import codes.side.colorpicker.state.ColorPickerState
  * [ChannelSlider], [AlphaSlider] or [ChannelPlane].
  *
  * None of them report the end of a gesture when its node is removed from composition
- * mid-drag: M3 Slider does not invoke `onValueChangeFinished`, and a raw pointer-input
- * coroutine is simply cancelled. Either would leave the flag stuck at `true` on a state
- * that outlives the component (e.g. hoisted in a view model). Remembering this guard makes
+ * mid-drag: the pointer-input coroutine is simply cancelled, which would leave the flag
+ * stuck at `true` on a state that outlives the component (e.g. hoisted in a view model).
+ * Remembering this guard makes
  * the flag self-healing: [onForgotten] clears it if — and only if — this component set it
  * and the gesture never finished.
  */

@@ -6,17 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import androidx.compose.ui.semantics.progressBarRangeInfo
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
@@ -41,9 +31,10 @@ import kotlin.math.roundToInt
  * space and brought into sRGB by chroma reduction, and the thumb is painted opaque, with the color
  * under it, so it stays visible at alpha 0.
  *
- * Arrow keys move by [ColorChannel.step] and Page Up and Page Down by [ColorChannel.pageStep], held to
- * [range], and a screen reader's increments move by [ColorChannel.step]. The track and the left and
- * right arrows are mirrored in right-to-left layouts, as Material's slider is.
+ * Left and Right move by [ColorChannel.step] and Page Up and Page Down by [ColorChannel.pageStep], held
+ * to [range], and Home and End jump to its ends; Up and Down are left for moving focus. A screen
+ * reader's increments move by [ColorChannel.step]. The track and the left and right arrows are
+ * mirrored in right-to-left layouts.
  *
  * @param range the values the track spans, within [ColorChannel.limit].
  * @param coloringMode [ColoringMode.Independent] by default for a space with a hue, else
@@ -56,7 +47,7 @@ import kotlin.math.roundToInt
  * number format, by default. See [SliderValueLabel].
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
  * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
- * `null` leaves Material's reading of the thumb's position.
+ * `null` omits it.
  * @param thumb optional replacement for the thumb; see [ColorSlider].
  * @param thumbWidth how much room the track leaves for the thumb; see [ColorSlider].
  * @param thumbTrackGap clearance between the thumb and each track end.
@@ -95,16 +86,15 @@ public fun ChannelSlider(
     val fraction = fractionOf(value, range)
     val interaction = remember(state) { SliderInteractionGuard(state) }
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
-    val mirrored = LocalLayoutDirection.current == LayoutDirection.Rtl
 
     // A key press moves from the value edits build on: the state's, or the last one emitted and not
     // yet answered, so two presses before a recomposition move two steps.
-    fun step(direction: Int, page: Boolean) {
+    fun step(direction: Int, page: Boolean): Boolean {
         val current = state.displayComponents(channel.space, state.editBase)[channel.index]
         val next = clampToRange(channel, range, current + direction * if (page) channel.pageStep else channel.step)
-        if (next == current) return
+        if (next == current) return false
         state.edit(channel, next)
-        currentFinished()
+        return true
     }
 
     ColorSliderImpl(
@@ -113,12 +103,11 @@ public fun ChannelSlider(
             interaction.begin()
             state.edit(channel, channelValueAt(channel, range, it.toDouble()))
         },
+        onStep = ::step,
+        accessibilitySteps = accessibilitySteps(range, channel.step),
         stops = stops,
         thumbColor = thumbColor,
         modifier = modifier,
-        sliderModifier = Modifier
-            .channelKeys(enabled, mirrored, ::step)
-            .semantics { progressBarRangeInfo = ProgressBarRangeInfo(fraction, 0f..1f, accessibilitySteps(range, channel.step)) },
         label = label,
         valueLabel = valueLabel,
         onValueChangeFinished = {
@@ -143,26 +132,3 @@ public fun ChannelSlider(
  */
 internal fun accessibilitySteps(range: ClosedFloatingPointRange<Double>, step: Double): Int =
     (((range.endInclusive - range.start) / step).roundToInt() - 1).coerceAtLeast(0)
-
-// Arrow keys by the channel's step and Page Up and Page Down by its page step, ahead of Material's own
-// handler, which moves a hundredth of the track whatever the channel. Right and left swap in
-// right-to-left layouts, as the track does. The key up is kept too: Material reports the end of a
-// step there, and this slider has already reported it.
-internal fun Modifier.channelKeys(
-    enabled: Boolean,
-    mirrored: Boolean,
-    onStep: (direction: Int, page: Boolean) -> Unit,
-): Modifier = onPreviewKeyEvent { event ->
-    if (!enabled) return@onPreviewKeyEvent false
-    val (direction, page) = when (event.key) {
-        Key.DirectionRight -> (if (mirrored) -1 else 1) to false
-        Key.DirectionLeft -> (if (mirrored) 1 else -1) to false
-        Key.DirectionUp -> 1 to false
-        Key.DirectionDown -> -1 to false
-        Key.PageUp -> 1 to true
-        Key.PageDown -> -1 to true
-        else -> return@onPreviewKeyEvent false
-    }
-    if (event.type == KeyEventType.KeyDown) onStep(direction, page)
-    true
-}

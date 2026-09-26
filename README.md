@@ -360,9 +360,10 @@ AlphaSlider(state)
 - `Contextual` draws each point of the track as the color the slider would make there;
   `Independent` holds the other channels at clear colors of middle lightness. Either way the track
   is computed in the channel's space and brought into sRGB by chroma reduction.
-- The arrow keys move by the channel's `step` and Page Up and Page Down by its `pageStep`: a degree
-  and ten on a hue, 1/255 and 17/255 on an RGB channel, 0.001 and 0.01 on OkLCh chroma. A screen
-  reader steps by `step` too.
+- Left and Right move by the channel's `step` and Page Up and Page Down by its `pageStep`: a degree
+  and ten on a hue, 1/255 and 17/255 on an RGB channel, 0.001 and 0.01 on OkLCh chroma. Home and End
+  jump to the ends of `range`, and Up and Down are left for moving focus. A screen reader steps by
+  `step` too.
 - `AlphaSlider` edits alpha alone and keeps the color's space. A missing alpha reads 0, as CSS reads
   `none`.
 

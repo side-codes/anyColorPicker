@@ -3,7 +3,7 @@ package codes.side.colorpicker.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +39,7 @@ private val TrackInsideCornerSize = 2.dp
  * The gap shrinks when the thumb is pressed/dragged (matching M3's behavior where
  * the thumb narrows on interaction, causing the track to come closer). The track's
  * outer corners come from [trackShape]; in right-to-left layouts the gradient and
- * the thumb gap are mirrored to match the mirrored M3 [androidx.compose.material3.Slider].
+ * the thumb gap are mirrored, as the thumb is.
  *
  * @param showCheckerboard if true, draws a transparency checkerboard underneath
  * the gradient (only within the track segments). Used by [AlphaSlider].
@@ -48,7 +48,7 @@ private val TrackInsideCornerSize = 2.dp
 internal fun GradientTrack(
     stops: TrackStops,
     thumbFraction: Float,
-    interactionSource: MutableInteractionSource,
+    interactionSource: InteractionSource,
     checkerboardLight: Color,
     checkerboardDark: Color,
     trackShape: Shape,
@@ -95,7 +95,7 @@ internal fun GradientTrack(
         val insideCornerSize = TrackInsideCornerSize.toPx()
         val gap = currentThumbWidth.toPx() / 2f + thumbTrackGap.toPx()
         val fractionCenter = thumbFraction.coerceIn(0f, 1f) * size.width
-        // M3 Slider mirrors the thumb position in RTL, so the gap must mirror
+        // The slider mirrors the thumb position in RTL, so the gap must mirror
         // to stay underneath the thumb.
         val thumbCenter = if (this.layoutDirection == LayoutDirection.Rtl) {
             size.width - fractionCenter

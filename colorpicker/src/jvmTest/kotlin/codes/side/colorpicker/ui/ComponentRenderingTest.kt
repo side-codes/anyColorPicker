@@ -82,7 +82,7 @@ class ComponentRenderingTest {
     @Test
     fun aCustomThumbReplacesTheDefaultAndReceivesTheInteractionSource() = runComposeUiTest {
         // Mid grey cannot occur anywhere in a fully saturated hue track, so finding it
-        // proves the caller's thumb was painted rather than the Material 3 default.
+        // proves the caller's thumb was painted rather than the default handle.
         val marker = Color(0xFF7F7F7F)
         var received: InteractionSource? = null
 

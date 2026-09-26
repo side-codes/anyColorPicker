@@ -34,6 +34,8 @@ class GradientTrackTest {
                     ColorSliderImpl(
                         value = 0f,
                         onValueChange = {},
+                        onStep = { _, _ -> false },
+                        accessibilitySteps = 0,
                         stops = stops,
                         thumbColor = Color.Black,
                         thumb = {},

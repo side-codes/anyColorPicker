@@ -17,6 +17,10 @@
 - **`ColorPickerDialog` reads "Select color" and "OK" by default,** as Material's own pickers do, where 1.x read "Pick a Color" and "Select".
 - **`PlaneActionLabels.Default` is gone.** Its words are `ColorPickerStrings.current.planeAxisActions()`.
 - **`ColorSlider` announces its position as a percentage by default,** where 1.x left Material's raw fraction.
+- **Up and Down no longer move a slider,** so focus can leave one on a device with only a D-pad. Left and Right still do.
+- **`ColorSlider`'s Page Up raises its value,** as the channel and alpha sliders' does; 1.x's lowered it.
+- **A screen reader moves `ColorSlider` and `AlphaSlider` a hundredth at a time,** as their arrow keys do.
+- **A slider reports a press the moment a finger lands,** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags. The default thumb narrows then, and keeps its layout width as it does, so the track beside it no longer shifts.
 
 ### Added
 
