@@ -52,15 +52,21 @@ public object ColorPickerDefaults {
     /**
      * Creates a [ColorPickerColors] with defaults taken from
      * `MaterialTheme.colorScheme` (`surfaceBright`/`surfaceDim` for the
-     * transparency checkerboard cells).
+     * transparency checkerboard cells). A color left [Color.Unspecified] takes its default, so a
+     * call naming one value keeps the rest.
      */
     @Composable
     public fun colors(
-        checkerboardLight: Color = MaterialTheme.colorScheme.surfaceBright,
-        checkerboardDark: Color = MaterialTheme.colorScheme.surfaceDim,
+        checkerboardLight: Color = Color.Unspecified,
+        checkerboardDark: Color = Color.Unspecified,
         disabledAlpha: Float = DisabledAlpha,
         disabledSaturation: Float = DisabledSaturation,
     ): ColorPickerColors = ColorPickerColors(
+        checkerboardLight = MaterialTheme.colorScheme.surfaceBright,
+        checkerboardDark = MaterialTheme.colorScheme.surfaceDim,
+        disabledAlpha = DisabledAlpha,
+        disabledSaturation = DisabledSaturation,
+    ).copy(
         checkerboardLight = checkerboardLight,
         checkerboardDark = checkerboardDark,
         disabledAlpha = disabledAlpha,
@@ -87,15 +93,24 @@ public object ColorPickerDefaults {
     public fun currentDimensions(): ColorPickerDimensions =
         LocalColorPickerDimensions.current ?: dimensions()
 
-    /** Creates a [ColorPickerDimensions] from the constants above. */
+    /**
+     * Creates a [ColorPickerDimensions] from the constants above. A size left [Dp.Unspecified] takes
+     * its constant, so a call naming one value keeps the rest.
+     */
     @Composable
     public fun dimensions(
-        trackHeight: Dp = TrackHeight,
-        thumbWidth: Dp = ThumbWidth,
-        thumbTrackGap: Dp = ThumbTrackGap,
-        planeMinSize: Dp = PlaneMinSize,
-        planeThumbSize: Dp = PlaneThumbSize,
+        trackHeight: Dp = Dp.Unspecified,
+        thumbWidth: Dp = Dp.Unspecified,
+        thumbTrackGap: Dp = Dp.Unspecified,
+        planeMinSize: Dp = Dp.Unspecified,
+        planeThumbSize: Dp = Dp.Unspecified,
     ): ColorPickerDimensions = ColorPickerDimensions(
+        trackHeight = TrackHeight,
+        thumbWidth = ThumbWidth,
+        thumbTrackGap = ThumbTrackGap,
+        planeMinSize = PlaneMinSize,
+        planeThumbSize = PlaneThumbSize,
+    ).copy(
         trackHeight = trackHeight,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,
@@ -104,15 +119,20 @@ public object ColorPickerDefaults {
     )
 
     /**
-     * Creates a [ColorPickerShapes] with a fully rounded slider track and a swatch
-     * shape taken from `MaterialTheme.shapes.small`.
+     * Creates a [ColorPickerShapes] with a fully rounded slider track, a swatch shape taken from
+     * `MaterialTheme.shapes.small` and a plane shape from `MaterialTheme.shapes.medium`. A shape left
+     * `null` takes its default, so a call naming one shape keeps the rest.
      */
     @Composable
     public fun shapes(
-        trackShape: Shape = CircleShape,
-        swatchShape: Shape = MaterialTheme.shapes.small,
-        planeShape: Shape = MaterialTheme.shapes.medium,
+        trackShape: Shape? = null,
+        swatchShape: Shape? = null,
+        planeShape: Shape? = null,
     ): ColorPickerShapes = ColorPickerShapes(
+        trackShape = CircleShape,
+        swatchShape = MaterialTheme.shapes.small,
+        planeShape = MaterialTheme.shapes.medium,
+    ).copy(
         trackShape = trackShape,
         swatchShape = swatchShape,
         planeShape = planeShape,

@@ -22,6 +22,8 @@
 - **A screen reader moves `ColorSlider` and `AlphaSlider` a hundredth at a time,** as their arrow keys do.
 - **A slider reports presses** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags: a tap, a drag, a mouse button, or a finger held still for a tenth of a second, but not a scroll that starts on the slider. The default thumb narrows while pressed, and keeps its layout width as it does, so the track beside it no longer shifts.
 - **`PlaneActionLabels` moves to `codes.side.colorpicker.foundation`.**
+- **`ColorPickerColors`, `ColorPickerShapes` and `ColorPickerDimensions` are no longer data classes,** so they have no `componentN`. `copy` keeps a color or size left `Unspecified` and a shape left `null`, as Material's own color and shape classes do, and so do `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()`.
+- **`LocalColorPickerColors`, `LocalColorPickerShapes` and `LocalColorPickerDimensions` are no longer public.** `ColorPickerTheme` provides the values, and `ColorPickerDefaults.currentColors()`, `currentShapes()` and `currentDimensions()` read them.
 
 ### Added
 

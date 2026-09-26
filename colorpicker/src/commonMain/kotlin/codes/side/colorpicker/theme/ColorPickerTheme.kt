@@ -13,15 +13,15 @@ import androidx.compose.runtime.compositionLocalOf
  * component reads this in a parameter default rather than in its body, so an explicit
  * argument always wins over what an ancestor provided.
  */
-public val LocalColorPickerColors: ProvidableCompositionLocal<ColorPickerColors?> =
+internal val LocalColorPickerColors: ProvidableCompositionLocal<ColorPickerColors?> =
     compositionLocalOf { null }
 
 /** Shapes every picker component below this point uses; see [LocalColorPickerColors]. */
-public val LocalColorPickerShapes: ProvidableCompositionLocal<ColorPickerShapes?> =
+internal val LocalColorPickerShapes: ProvidableCompositionLocal<ColorPickerShapes?> =
     compositionLocalOf { null }
 
 /** Dimensions every picker component below this point uses; see [LocalColorPickerColors]. */
-public val LocalColorPickerDimensions: ProvidableCompositionLocal<ColorPickerDimensions?> =
+internal val LocalColorPickerDimensions: ProvidableCompositionLocal<ColorPickerDimensions?> =
     compositionLocalOf { null }
 
 /**
