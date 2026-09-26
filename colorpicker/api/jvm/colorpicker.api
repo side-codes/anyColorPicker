@@ -215,6 +215,8 @@ public final class codes/side/colorpicker/theme/ColorPickerDefaults {
 	public static final field DisabledAlpha F
 	public static final field DisabledSaturation F
 	public static final field INSTANCE Lcodes/side/colorpicker/theme/ColorPickerDefaults;
+	public final fun PlaneThumb-6a0pyJM (Landroidx/compose/foundation/interaction/InteractionSource;Landroidx/compose/ui/Modifier;FLandroidx/compose/runtime/Composer;II)V
+	public final fun SliderThumb-3IgeMak (Landroidx/compose/foundation/interaction/InteractionSource;JLandroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 	public final fun colors-6xbWgXg (JJFFLandroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/theme/ColorPickerColors;
 	public final fun currentColors (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/theme/ColorPickerColors;
 	public final fun currentDimensions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/theme/ColorPickerDimensions;
@@ -262,15 +264,15 @@ public final class codes/side/colorpicker/theme/ColorPickerThemeKt {
 }
 
 public final class codes/side/colorpicker/ui/AlphaSliderKt {
-	public static final fun AlphaSlider-k5_M6YQ (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun AlphaSlider (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lcodes/side/colorpicker/theme/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ChannelPlaneKt {
-	public static final fun ChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lcodes/side/colorpicker/theme/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ChannelSliderKt {
-	public static final fun ChannelSlider-diKa7Ic (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun ChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lcodes/side/colorpicker/theme/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/CmykColorPickerKt {
@@ -291,11 +293,11 @@ public final class codes/side/colorpicker/ui/ColorPickerKt {
 }
 
 public final class codes/side/colorpicker/ui/ColorPlaneKt {
-	public static final fun ColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;ZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun ColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;ZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lcodes/side/colorpicker/theme/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ColorSliderKt {
-	public static final fun ColorSlider-uhCrT0k (FLkotlin/jvm/functions/Function1;Lkotlinx/collections/immutable/ImmutableList;JLandroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;ZFZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;FFLandroidx/compose/runtime/Composer;III)V
+	public static final fun ColorSlider-Fl0aNZw (FLkotlin/jvm/functions/Function1;Ljava/util/List;JLandroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;ZZLjava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/theme/ColorPickerColors;Lcodes/side/colorpicker/theme/ColorPickerShapes;Lcodes/side/colorpicker/theme/ColorPickerDimensions;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/ui/ColorSwatchKt {
@@ -305,7 +307,123 @@ public final class codes/side/colorpicker/ui/ColorSwatchKt {
 public final class codes/side/colorpicker/ui/ComposableSingletons$AlphaSliderKt {
 	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$AlphaSliderKt;
 	public fun <init> ()V
-	public final fun getLambda$77389290$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1936204964$codes_side_colorpicker ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1683345345$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$ChannelSliderKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$ChannelSliderKt;
+	public fun <init> ()V
+	public final fun getLambda$523136711$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$CmykColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$CmykColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1070663112$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1107162947$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1933624806$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$ColorPickerDialogKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$ColorPickerDialogKt;
+	public fun <init> ()V
+	public final fun getLambda$-1304033152$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1601418133$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$ColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$ColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1935168010$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-2014798415$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-507953637$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$ColorSliderKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$ColorSliderKt;
+	public fun <init> ()V
+	public final fun getLambda$1865609312$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$HslColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$HslColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$367993930$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$41509782$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$45919397$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$HsvColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$HsvColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-2144869447$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$226020182$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$498872414$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$HwbColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$HwbColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-716971730$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-877256567$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2144928342$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$LabColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$LabColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1423874590$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1321019453$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$357574678$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$LchColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$LchColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1392894358$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1612245398$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$167550661$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$OkLchColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OkLchColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-688752938$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1401225010$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$374813389$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$OkhslColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OkhslColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-41991978$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1087844690$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$245456109$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$OkhsvColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OkhsvColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1573702890$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-444529946$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$973773185$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$OklabColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$OklabColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-124899350$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1539680342$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$41948549$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class codes/side/colorpicker/ui/ComposableSingletons$RgbColorPickerKt {
+	public static final field INSTANCE Lcodes/side/colorpicker/ui/ComposableSingletons$RgbColorPickerKt;
+	public fun <init> ()V
+	public final fun getLambda$-1490984938$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-2120403267$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$24581218$codes_side_colorpicker ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class codes/side/colorpicker/ui/HslColorPickerKt {

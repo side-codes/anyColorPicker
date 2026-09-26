@@ -55,6 +55,7 @@ import codes.side.color.toCssString
 import codes.side.color.toHexString
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.rememberSaveableColorPickerState
+import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.ui.ChannelSlider
 import codes.side.colorpicker.ui.ColorPicker
 import codes.side.colorpicker.ui.ColorPickerDialog
@@ -196,8 +197,8 @@ fun SampleApp() {
                         channel = Okhsl.H,
                         enabled = enabled,
                         coloringMode = coloringMode,
-                        thumb = { source -> SquareThumb(state.color, source) },
-                        thumbWidth = SquareThumbSize,
+                        thumb = { SquareThumb(state.color, interactionSource) },
+                        dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
                     )
                 }
 

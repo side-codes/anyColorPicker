@@ -25,7 +25,6 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.dp
 import codes.side.color.Hsl
 import codes.side.colorpicker.state.ColorPickerState
-import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -96,7 +95,7 @@ class InteractionSourceTest {
             ColorSlider(
                 value = 0.5f,
                 onValueChange = {},
-                gradientColors = persistentListOf(Color.Black, Color.White),
+                trackColors = listOf(Color.Black, Color.White),
                 thumbColor = Color.Gray,
                 modifier = Modifier.width(300.dp).testTag("part"),
                 interactionSource = source,
@@ -131,7 +130,7 @@ class InteractionSourceTest {
     }
 
     @Test
-    fun aThumbSlotIsHandedTheCallersSource() = runComposeUiTest {
+    fun aThumbSlotReadsTheCallersSource() = runComposeUiTest {
         val source = MutableInteractionSource()
         var slider: InteractionSource? = null
         var plane: InteractionSource? = null
@@ -142,11 +141,11 @@ class InteractionSourceTest {
                     Hsl.H,
                     interactionSource = source,
                     thumb = {
-                        slider = it
+                        slider = interactionSource
                         Box(Modifier.size(4.dp))
                     },
                 )
-                ChannelPlane(ColorPickerState(teal), Hsl.S, Hsl.L, Modifier.size(200.dp), interactionSource = source, thumb = { plane = it })
+                ChannelPlane(ColorPickerState(teal), Hsl.S, Hsl.L, Modifier.size(200.dp), interactionSource = source, thumb = { plane = interactionSource })
             }
         }
         assertSame(source, slider)

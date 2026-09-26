@@ -1,12 +1,12 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import codes.side.color.ColorChannel
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
+import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -29,7 +29,7 @@ public fun HslColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Hsl, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
@@ -63,7 +63,7 @@ public fun HslColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Hsl, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
@@ -98,7 +98,7 @@ public fun HslColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(Hsl, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),

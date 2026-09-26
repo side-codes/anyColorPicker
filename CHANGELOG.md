@@ -24,6 +24,9 @@
 - **`PlaneActionLabels` moves to `codes.side.colorpicker.foundation`.**
 - **`ColorPickerColors`, `ColorPickerShapes` and `ColorPickerDimensions` are no longer data classes,** so they have no `componentN`. `copy` keeps a color or size left `Unspecified` and a shape left `null`, as Material's own color and shape classes do, and so do `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()`.
 - **`LocalColorPickerColors`, `LocalColorPickerShapes` and `LocalColorPickerDimensions` are no longer public.** `ColorPickerTheme` provides the values, and `ColorPickerDefaults.currentColors()`, `currentShapes()` and `currentDimensions()` read them.
+- **A `thumb` slot reads its component's scope** instead of being handed an `InteractionSource`: `thumb = { MyThumb(interactionSource, thumbColor) }`. A slider's scope carries its position, whether it is enabled, its interactions and the opaque color under the thumb, and a channel or alpha slider's its channel and value, or its alpha, too; a plane's carries its position, and a channel plane's its channels and the color under the thumb. A picker's `thumb` reaches its sliders the same way.
+- **Sliders and planes take `dimensions`** in place of `thumbWidth`, `thumbTrackGap` and `ColorSlider`'s `trackHeight`. `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)` changes one size and keeps the theme's others.
+- **`ColorSlider` takes `trackColors: List<Color>`** in place of `gradientColors: ImmutableList<Color>`. kotlinx-collections-immutable is no longer a dependency.
 
 ### Added
 
@@ -43,6 +46,7 @@
 - **`BasicChannelSlider` and `BasicAlphaSlider`,** the channel and alpha sliders with no look of their own. Their `track` and `thumb` slots read the channel, its value and the track's gradient, computed and mirrored as the Material sliders draw them, from `ChannelSliderScope` and `AlphaSliderScope`.
 - **`BasicColorPlane` and `BasicChannelPlane`,** the planes with no look and no size of their own. The `thumb` slot reads the position, and on a channel plane the channels and the opaque color under it, from `ColorPlaneScope` and `ChannelPlaneScope`.
 - **`BasicColorPicker`,** over a state, a `ColorValue` or a Compose `Color`, laying out whatever plane, channel sliders and alpha slider it is given, stacked or side by side (`orientation`), with `null` leaving the plane or alpha out.
+- **`ColorPickerDefaults.SliderThumb` and `ColorPickerDefaults.PlaneThumb`,** the default slider and plane thumbs, for a `thumb` slot that draws them beside something of its own.
 
 ## 1.2.1
 

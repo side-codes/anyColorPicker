@@ -32,6 +32,7 @@ import codes.side.color.Okhsv
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.ui.AlphaSlider
 import codes.side.colorpicker.ui.ChannelPlane
 import codes.side.colorpicker.ui.ChannelSlider
@@ -234,13 +235,13 @@ fun CustomThumbPreview() = Frame {
     ChannelSlider(
         state = state,
         channel = Okhsl.H,
-        thumb = { source -> SquareThumb(state.color, source) },
-        thumbWidth = SquareThumbSize,
+        thumb = { SquareThumb(state.color, interactionSource) },
+        dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
     )
     AlphaSlider(
         state = state,
-        thumb = { source -> SquareThumb(state.color, source) },
-        thumbWidth = SquareThumbSize,
+        thumb = { SquareThumb(state.color, interactionSource) },
+        dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = SquareThumbSize),
     )
 }
 

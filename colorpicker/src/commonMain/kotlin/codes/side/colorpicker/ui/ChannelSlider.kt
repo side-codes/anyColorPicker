@@ -1,17 +1,17 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicChannelSlider
+import codes.side.colorpicker.foundation.ChannelSliderScope
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 
 /**
@@ -46,11 +46,11 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
  * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
  * `null` omits it.
+ * @param dimensions the track's height and the room it leaves for the thumb; see [ColorSlider].
  * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
  * provided, interactions will still happen internally.
- * @param thumb optional replacement for the thumb; see [ColorSlider].
- * @param thumbWidth how much room the track leaves for the thumb; see [ColorSlider].
- * @param thumbTrackGap clearance between the thumb and each track end.
+ * @param thumb draws the thumb, reading the channel, its value and the opaque color under it from
+ * [ChannelSliderScope]; [ColorPickerDefaults.SliderThumb] by default.
  * @throws IllegalArgumentException if [range] is not a finite span of increasing values within
  * [ColorChannel.limit].
  */
@@ -71,10 +71,10 @@ public fun ChannelSlider(
     semanticValueText: String? = ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), true),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
-    thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
-    thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
+    // this., or this function's own interactionSource would shadow the scope's resolved one.
+    thumb: @Composable ChannelSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, thumbColor) },
 ) {
     SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
         BasicChannelSlider(
@@ -88,8 +88,8 @@ public fun ChannelSlider(
             semanticLabel = semanticLabel,
             semanticValueText = semanticValueText,
             interactionSource = interactionSource,
-            track = { SliderTrack(gradient, colors, shapes, thumbWidth, thumbTrackGap) },
-            thumb = { SliderHandle(thumb) },
+            track = { SliderTrack(gradient, colors, shapes, dimensions) },
+            thumb = thumb,
         )
     }
 }

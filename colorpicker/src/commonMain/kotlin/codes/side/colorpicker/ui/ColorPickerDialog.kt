@@ -1,6 +1,5 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +22,7 @@ import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -71,7 +71,7 @@ public fun ColorPickerDialog(
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState) -> Unit)? = null,
     channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)? = null,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
@@ -123,7 +123,7 @@ public fun ColorPickerDialog(
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState) -> Unit)? = null,
     channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)? = null,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
@@ -177,7 +177,7 @@ private fun DialogContent(
     coloringMode: ColoringMode,
     colors: ColorPickerColors,
     shapes: ColorPickerShapes,
-    thumb: (@Composable (InteractionSource) -> Unit)?,
+    thumb: @Composable ColorSliderScope.() -> Unit,
     plane: (@Composable (ColorPickerState) -> Unit)?,
     channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)?,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)?,

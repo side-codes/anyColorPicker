@@ -1,6 +1,5 @@
 package codes.side.colorpicker.ui
 
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -15,6 +14,7 @@ import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.BasicColorPicker
+import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -63,7 +63,7 @@ internal fun defaultChannelSlider(
     enabled: Boolean,
     coloringMode: ColoringMode,
     onValueChangeFinished: () -> Unit,
-    thumb: (@Composable (InteractionSource) -> Unit)?,
+    thumb: @Composable ColorSliderScope.() -> Unit,
 ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
     ChannelSlider(
         state,
@@ -79,7 +79,7 @@ internal fun defaultChannelSlider(
 internal fun defaultAlphaSlider(
     enabled: Boolean,
     onValueChangeFinished: () -> Unit,
-    thumb: (@Composable (InteractionSource) -> Unit)?,
+    thumb: @Composable ColorSliderScope.() -> Unit,
 ): @Composable (ColorPickerState) -> Unit = { state ->
     AlphaSlider(state, enabled = enabled, onValueChangeFinished = onValueChangeFinished, thumb = thumb)
 }
@@ -106,7 +106,7 @@ internal fun defaultAlphaSlider(
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or accessibility step.
  * @param colors checkerboard and disabled colors; see [ColorPickerDefaults.colors].
  * @param shapes track and plane shapes; see [ColorPickerDefaults.shapes].
- * @param thumb optional replacement for every slider's thumb; see [ColorSlider].
+ * @param thumb draws every slider's thumb from its [ColorSliderScope]; [ColorPickerDefaults.SliderThumb] by default.
  * @param plane slot for the plane; by default a [ChannelPlane] across [space]'s colorfulness channel
  * and up its other one: HSL's S × L, HSV's S × V, HWB's W × B, LCH's and OkLCh's C × L.
  * @param channelSlider slot for each channel's slider, given the state and the channel; [ChannelSlider]
@@ -125,7 +125,7 @@ public fun ColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
@@ -180,7 +180,7 @@ public fun ColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),
@@ -231,7 +231,7 @@ public fun ColorPicker(
     onValueChangeFinished: () -> Unit = {},
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    thumb: (@Composable (InteractionSource) -> Unit)? = null,
+    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: @Composable (ColorPickerState) -> Unit = defaultPlane(space, enabled, onValueChangeFinished),
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = defaultChannelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: @Composable (ColorPickerState) -> Unit = defaultAlphaSlider(enabled, onValueChangeFinished, thumb),

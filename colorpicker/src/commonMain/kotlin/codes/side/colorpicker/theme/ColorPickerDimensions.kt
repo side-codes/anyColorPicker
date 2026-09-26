@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.takeOrElse
  * Dimensions used by color picker components. Obtain instances via
  * [ColorPickerDefaults.dimensions] so defaults come from a single source.
  *
- * These travel with the theme rather than as parameters because they apply to every slider a
- * picker draws. A caller wanting a taller track sets it once here instead of on each of the
- * twenty-one channel sliders.
+ * Every slider and plane takes them as a parameter that defaults to the theme's, so a caller
+ * wanting a taller track sets it once in a [ColorPickerTheme] rather than on each slider a picker
+ * draws.
  *
  * @property trackHeight height of a slider's gradient track.
  * @property thumbWidth width the track reserves for the thumb. A custom thumb wider than this
