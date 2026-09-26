@@ -10,7 +10,7 @@
 - **`ColorPickerState` holds a `ColorValue`.** It is built from a `ColorValue` or a Compose `Color`, with no default. `state.value`, `state[channel]` and fifteen typed views (`state.hsl`, `state.okLch`, …) replace the eight typed getters, `pickerColor` and `argbInt`, and `state[channel] = x` and `state.set(view)` replace the thirty `update…` functions. Writing NaN or a value outside a channel's limit throws where 1.x ignored or clamped it.
 - **The 21 channel sliders and the three planes are gone.** `ChannelSlider(state, channel)` and `ChannelPlane(state, x, y)` take any channel of any space.
 - **The pickers' value forms are fully controlled.** They take a `ColorValue` or a Compose `Color` in place of 1.x's color classes. A change reaches the callback in the same event, and the picker draws only what the caller passes back, where 1.x applied the caller's value when the gesture ended.
-- **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider.
+- **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider. The plane's is handed its axes as well as the state, and `null` leaves the plane or alpha out, in place of `showAlpha = false`, on the pickers and the dialog alike.
 - **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and a `space`,** Okhsl by default, where 1.x's was fixed to HSL.
 - **State saved by 1.x is not restored.** It starts again from its initial value.
 - **Numbers follow the device's locale.** Values and spoken descriptions read `40 %` in French, `%40` in Turkish and `٤٠٪` in Egyptian Arabic, where 1.x wrote `40%` with a `.` separator everywhere.
@@ -47,6 +47,8 @@
 - **`BasicColorPlane` and `BasicChannelPlane`,** the planes with no look and no size of their own. The `thumb` slot reads the position, and on a channel plane the channels and the opaque color under it, from `ColorPlaneScope` and `ChannelPlaneScope`.
 - **`BasicColorPicker`,** over a state, a `ColorValue` or a Compose `Color`, laying out whatever plane, channel sliders and alpha slider it is given, stacked or side by side (`orientation`), with `null` leaving the plane or alpha out.
 - **`ColorPickerDefaults.SliderThumb` and `ColorPickerDefaults.PlaneThumb`,** the default slider and plane thumbs, for a `thumb` slot that draws them beside something of its own.
+- **`ColorPickerDefaults.plane()`, `channelSlider()` and `alphaSlider()`,** the slots a picker draws by default, for a slot that wraps one.
+- **`orientation` and `dimensions` on every picker.** `Orientation.Horizontal` puts the plane beside the sliders.
 
 ## 1.2.1
 

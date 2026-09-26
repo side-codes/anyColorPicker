@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
@@ -140,5 +142,13 @@ class ColorPickerDialogTest {
         setContent { ColorPickerDialog(initialColor = blue, onColorSelected = { selected = it }, onDismiss = {}) }
         onNodeWithText("OK").performClick()
         assertEquals(blue, selected)
+    }
+
+    @Test
+    fun aDialogCanLeaveOutAlphaAndThePlane() = runComposeUiTest {
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismiss = {}, plane = null, alphaSlider = null) }
+        onNodeWithText("Hue").assertExists()
+        onNodeWithText("Alpha").assertDoesNotExist()
+        onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).assertCountEquals(0)
     }
 }

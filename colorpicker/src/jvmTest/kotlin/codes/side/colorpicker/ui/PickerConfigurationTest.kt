@@ -1,6 +1,7 @@
 package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -95,46 +96,46 @@ class PickerConfigurationTest {
     fun everyPickerTakesTheSameConfigurationInAllThreeForms() = runComposeUiTest {
         // That this compiles is most of the assertion: the twelve pickers agree on the set.
         val onState: List<@Composable (ColorPickerState) -> Unit> = listOf(
-            { ColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { RgbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { HslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { HsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { HwbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { LabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { LchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { OklabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { OkLchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { OkhslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { OkhsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
-            { CmykColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}) },
+            { ColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { RgbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HwbColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkLchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { CmykColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
         )
         val onValue: List<@Composable (ColorValue) -> Unit> = listOf(
-            { ColorPicker(it, {}, enabled = false, thumb = {}) },
-            { RgbColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HslColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HsvColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HwbColorPicker(it, {}, enabled = false, thumb = {}) },
-            { LabColorPicker(it, {}, enabled = false, thumb = {}) },
-            { LchColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OklabColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkLchColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkhslColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}) },
-            { CmykColorPicker(it, {}, enabled = false, thumb = {}) },
+            { ColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { RgbColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HwbColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkLchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { CmykColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
         )
         val onColor: List<@Composable (Color) -> Unit> = listOf(
-            { ColorPicker(it, {}, enabled = false, thumb = {}) },
-            { RgbColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HslColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HsvColorPicker(it, {}, enabled = false, thumb = {}) },
-            { HwbColorPicker(it, {}, enabled = false, thumb = {}) },
-            { LabColorPicker(it, {}, enabled = false, thumb = {}) },
-            { LchColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OklabColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkLchColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkhslColorPicker(it, {}, enabled = false, thumb = {}) },
-            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}) },
-            { CmykColorPicker(it, {}, enabled = false, thumb = {}) },
+            { ColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { RgbColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { HwbColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { LchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkLchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OkhsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { CmykColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
         )
         setContent {
             val shared = remember { ColorPickerState(seed) }

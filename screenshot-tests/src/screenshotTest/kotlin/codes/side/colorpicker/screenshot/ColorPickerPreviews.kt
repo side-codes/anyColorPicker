@@ -2,6 +2,7 @@ package codes.side.colorpicker.screenshot
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -194,6 +195,11 @@ fun CmykIndependentPreview() = Frame { CmykColorPicker(state = state(), coloring
 @Preview(name = "CMYK contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
 fun CmykContextualPreview() = Frame { CmykColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+
+@PreviewTest
+@Preview(name = "Horizontal picker", widthDp = 720, heightDp = 360)
+@Composable
+fun HorizontalPickerPreview() = Frame { OkhslColorPicker(state = state(), orientation = Orientation.Horizontal) }
 
 // Kept character-for-character identical to SquareThumb in the sample app, so the image
 // in the README is the thing the sample actually runs.

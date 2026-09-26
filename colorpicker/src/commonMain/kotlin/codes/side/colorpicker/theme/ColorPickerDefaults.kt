@@ -5,6 +5,8 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -21,12 +23,22 @@ import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.state.ColorPickerState
+import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.ui.AlphaSlider
+import codes.side.colorpicker.ui.ChannelPlane
+import codes.side.colorpicker.ui.ChannelSlider
 
 // Material's slider handle height (SliderTokens.HandleHeight).
 private val SliderThumbHeight = 44.dp
 
 // How far outside the indicator the focus ring sits.
 private val FocusRingGap = 4.dp
+
+// A picker's plane, width over height.
+private const val PLANE_ASPECT_RATIO = 1.6f
 
 /**
  * Default values used by color picker components.
@@ -219,5 +231,67 @@ public object ColorPickerDefaults {
             ring(radius)
             if (showFocus) ring(outer)
         }
+    }
+
+    /**
+     * The plane a picker draws unless given another: a [ChannelPlane] over the axes the picker hands it,
+     * as wide as the picker and 1.6 times as wide as it is tall.
+     */
+    public fun plane(
+        enabled: Boolean,
+        onValueChangeFinished: () -> Unit,
+    ): @Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit = { state, x, y ->
+        ChannelPlane(
+            state,
+            x,
+            y,
+            Modifier.fillMaxWidth().aspectRatio(PLANE_ASPECT_RATIO),
+            enabled = enabled,
+            onValueChangeFinished = onValueChangeFinished,
+        )
+    }
+
+    /** The slider a picker draws for each channel unless given another: a [ChannelSlider] coloured by [coloringMode]. */
+    public fun channelSlider(
+        enabled: Boolean,
+        coloringMode: ColoringMode,
+        onValueChangeFinished: () -> Unit,
+        thumb: @Composable ColorSliderScope.() -> Unit,
+    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
+        ChannelSlider(
+            state,
+            channel,
+            enabled = enabled,
+            coloringMode = coloringMode,
+            onValueChangeFinished = onValueChangeFinished,
+            thumb = thumb,
+        )
+    }
+
+    /**
+     * [channelSlider] with each channel coloured as its own space's sliders are by default:
+     * [ColoringMode.defaultFor] that space.
+     */
+    public fun channelSlider(
+        enabled: Boolean,
+        onValueChangeFinished: () -> Unit,
+        thumb: @Composable ColorSliderScope.() -> Unit,
+    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
+        ChannelSlider(
+            state,
+            channel,
+            enabled = enabled,
+            onValueChangeFinished = onValueChangeFinished,
+            thumb = thumb,
+        )
+    }
+
+    /** The alpha slider a picker draws unless given another: an [AlphaSlider]. */
+    public fun alphaSlider(
+        enabled: Boolean,
+        onValueChangeFinished: () -> Unit,
+        thumb: @Composable ColorSliderScope.() -> Unit,
+    ): @Composable (ColorPickerState) -> Unit = { state ->
+        AlphaSlider(state, enabled = enabled, onValueChangeFinished = onValueChangeFinished, thumb = thumb)
     }
 }

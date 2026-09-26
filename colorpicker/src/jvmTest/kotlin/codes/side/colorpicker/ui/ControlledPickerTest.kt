@@ -66,7 +66,7 @@ class ControlledPickerTest {
                     held = it
                 },
                 space = Hsl,
-                showPlane = false,
+                plane = null,
             )
         }
         setProgress("Hue", 0.5f)
@@ -78,7 +78,7 @@ class ControlledPickerTest {
     @Test
     fun aRejectedChangeNeverMovesTheThumb() = runComposeUiTest {
         var reports = 0
-        setContent { ColorPicker(teal, { reports++ }, space = Hsl, showPlane = false) }
+        setContent { ColorPicker(teal, { reports++ }, space = Hsl, plane = null) }
         setProgress("Hue", 0.5f)
         waitForIdle()
         assertEquals(200f / 360f, hueProgress(), 1e-6f)
@@ -90,7 +90,7 @@ class ControlledPickerTest {
     fun aRoundedChangeShowsRounded() = runComposeUiTest {
         var held by mutableStateOf<ColorValue>(Hsl(180.0, 80.0, 50.0))
         setContent {
-            ColorPicker(held, { held = it.with(Hsl.H, round(it[Hsl.H]!! / 30.0) * 30.0) }, space = Hsl, showPlane = false)
+            ColorPicker(held, { held = it.with(Hsl.H, round(it[Hsl.H]!! / 30.0) * 30.0) }, space = Hsl, plane = null)
         }
         setProgress("Hue", 185f / 360f)
         waitForIdle()
@@ -110,7 +110,7 @@ class ControlledPickerTest {
                     held = it.with(Hsl.H, it[Hsl.H]!! + 1.0)
                 },
                 space = Hsl,
-                showPlane = false,
+                plane = null,
             )
         }
         setProgress("Hue", 0.5f)
@@ -131,7 +131,7 @@ class ControlledPickerTest {
                     held = it
                 },
                 space = Hsl,
-                showPlane = false,
+                plane = null,
             )
         }
         waitForIdle()
@@ -146,7 +146,7 @@ class ControlledPickerTest {
     fun aSlowCallersValueIsDrawnWhileTheDragGoesOnFromTheFinger() = runComposeUiTest {
         var held by mutableStateOf<ColorValue>(Hsl(0.0, 80.0, 50.0))
         val reported = mutableListOf<ColorValue>()
-        setContent { ColorPicker(held, { reported += it }, Modifier.width(400.dp), space = Hsl, showPlane = false) }
+        setContent { ColorPicker(held, { reported += it }, Modifier.width(400.dp), space = Hsl, plane = null) }
         sliderNamed("Hue").performTouchInput {
             down(Offset(width * 0.25f, centerY))
             moveTo(Offset(width * 0.5f, centerY))
@@ -185,7 +185,7 @@ class ControlledPickerTest {
     @Test
     fun anEditOutsideSrgbSurvivesAColorRoundTrip() = runComposeUiTest {
         var color by mutableStateOf(OkLch(0.7, 0.1, 150.0).toComposeColor())
-        setContent { ColorPicker(color, { color = it }, space = OkLch, showPlane = false) }
+        setContent { ColorPicker(color, { color = it }, space = OkLch, plane = null) }
         setProgress("Chroma", 0.875f)
         waitForIdle()
         onNodeWithText("0.350").assertExists()
@@ -196,7 +196,7 @@ class ControlledPickerTest {
         var color by mutableStateOf(teal.toComposeColor())
         val reported = mutableListOf<Color>()
         // A caller writing through a store: its echo arrives after the report, not in it.
-        setContent { ColorPicker(color, { reported += it }, space = Hsl, showPlane = false) }
+        setContent { ColorPicker(color, { reported += it }, space = Hsl, plane = null) }
         setProgress("Saturation", 0f)
         waitForIdle()
         color = reported.last()
@@ -219,7 +219,7 @@ class ControlledPickerTest {
                     held = it
                 },
                 space = Okhsl,
-                showPlane = false,
+                plane = null,
             )
         }
         waitForIdle()
@@ -234,7 +234,7 @@ class ControlledPickerTest {
     fun aComposeColorInDisplayP3SettlesWithoutReports() = runComposeUiTest {
         val p3 = Color(1f, 0f, 0f, 1f, ComposeSpaces.DisplayP3)
         var reports = 0
-        setContent { ColorPicker(p3, { reports++ }, space = Hsl, showPlane = false) }
+        setContent { ColorPicker(p3, { reports++ }, space = Hsl, plane = null) }
         // Reaching idle is the assertion that the two ends do not keep rewriting each other.
         waitForIdle()
         assertEquals(0, reports)
@@ -252,7 +252,7 @@ class ControlledPickerTest {
                     held = it
                 },
                 space = Hsl,
-                showPlane = false,
+                plane = null,
                 // A replaced slot is handed the picker's state, and writing it is how a custom control edits.
                 channelSlider = { state, channel ->
                     if (channel === Hsl.H) {
@@ -277,7 +277,7 @@ class ControlledPickerTest {
         // Converting into Okhsl, which holds sRGB alone, would pull the red to sRGB's edge for an opacity change.
         val p3Red = DisplayP3(1.0, 0.0, 0.0)
         val reported = mutableListOf<ColorValue>()
-        setContent { ColorPicker(p3Red, { reported += it }, space = Okhsl, showPlane = false) }
+        setContent { ColorPicker(p3Red, { reported += it }, space = Okhsl, plane = null) }
         setProgress("Alpha", 0.5f)
         assertEquals(DisplayP3(1.0, 0.0, 0.0, 0.5), reported.single())
     }
@@ -285,7 +285,7 @@ class ControlledPickerTest {
     @Test
     fun aDisabledPickerReportsNothing() = runComposeUiTest {
         var reports = 0
-        setContent { ColorPicker(teal, { reports++ }, Modifier.width(300.dp), space = Hsl, showPlane = false, enabled = false) }
+        setContent { ColorPicker(teal, { reports++ }, Modifier.width(300.dp), space = Hsl, plane = null, enabled = false) }
         sliderNamed("Hue").performTouchInput { swipeRight() }
         waitForIdle()
         assertEquals(0, reports)

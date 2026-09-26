@@ -27,6 +27,7 @@ import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 
 /**
@@ -48,10 +49,11 @@ import codes.side.colorpicker.theme.ColorPickerShapes
  * can still be dismissed.
  * @param colors checkerboard and disabled colors, used by the swatch and the picker; see
  * [ColorPickerDefaults.colors].
- * @param plane slot for the plane; null keeps [ColorPicker]'s.
- * @param channelSlider slot for each channel's slider; null keeps [ColorPicker]'s. Every slot is handed
- * the state the dialog owns, which a replacement needs to read and write.
- * @param alphaSlider slot for the alpha slider; null keeps [ColorPicker]'s.
+ * @param plane slot for the plane, handed the state the dialog owns and the plane's axes; `null` leaves
+ * it out.
+ * @param channelSlider slot for each channel's slider. Every slot is handed the state the dialog owns,
+ * which a replacement needs to read and write.
+ * @param alphaSlider slot for the alpha slider; `null` leaves it out.
  *
  * The remaining parameters are [ColorPicker]'s.
  */
@@ -65,16 +67,15 @@ public fun ColorPickerDialog(
     title: String = ColorPickerStrings.current.dialogTitle(),
     confirmText: String = ColorPickerStrings.current.confirm(),
     dismissText: String = ColorPickerStrings.current.dismiss(),
-    showPlane: Boolean = hasPlane(space),
-    showAlpha: Boolean = true,
     enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
-    plane: (@Composable (ColorPickerState) -> Unit)? = null,
-    channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)? = null,
-    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, {}, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, {}, thumb),
 ) {
     val state = rememberDialogState(initialValue, initialValue, space)
     DialogContent(
@@ -86,13 +87,10 @@ public fun ColorPickerDialog(
         title = title,
         confirmText = confirmText,
         dismissText = dismissText,
-        showPlane = showPlane,
-        showAlpha = showAlpha,
         enabled = enabled,
-        coloringMode = coloringMode,
         colors = colors,
         shapes = shapes,
-        thumb = thumb,
+        dimensions = dimensions,
         plane = plane,
         channelSlider = channelSlider,
         alphaSlider = alphaSlider,
@@ -117,16 +115,15 @@ public fun ColorPickerDialog(
     title: String = ColorPickerStrings.current.dialogTitle(),
     confirmText: String = ColorPickerStrings.current.confirm(),
     dismissText: String = ColorPickerStrings.current.dismiss(),
-    showPlane: Boolean = hasPlane(space),
-    showAlpha: Boolean = true,
     enabled: Boolean = true,
     coloringMode: ColoringMode = ColoringMode.defaultFor(space),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
-    plane: (@Composable (ColorPickerState) -> Unit)? = null,
-    channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)? = null,
-    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = null,
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, {}, thumb),
+    alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, {}, thumb),
 ) {
     val initialValue = remember(initialColor) { initialColor.toColorValue() }
     val state = rememberDialogState(initialColor, initialValue, space)
@@ -140,13 +137,10 @@ public fun ColorPickerDialog(
         title = title,
         confirmText = confirmText,
         dismissText = dismissText,
-        showPlane = showPlane,
-        showAlpha = showAlpha,
         enabled = enabled,
-        coloringMode = coloringMode,
         colors = colors,
         shapes = shapes,
-        thumb = thumb,
+        dimensions = dimensions,
         plane = plane,
         channelSlider = channelSlider,
         alphaSlider = alphaSlider,
@@ -171,15 +165,12 @@ private fun DialogContent(
     title: String,
     confirmText: String,
     dismissText: String,
-    showPlane: Boolean,
-    showAlpha: Boolean,
     enabled: Boolean,
-    coloringMode: ColoringMode,
     colors: ColorPickerColors,
     shapes: ColorPickerShapes,
-    thumb: @Composable ColorSliderScope.() -> Unit,
-    plane: (@Composable (ColorPickerState) -> Unit)?,
-    channelSlider: (@Composable (ColorPickerState, ColorChannel) -> Unit)?,
+    dimensions: ColorPickerDimensions,
+    plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)?,
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)?,
 ) {
     AlertDialog(
@@ -194,21 +185,16 @@ private fun DialogContent(
                     colors = colors,
                 )
                 Spacer(Modifier.height(16.dp))
-                // The slots are nullable rather than defaulted: null means whatever the picker draws,
-                // without the dialog repeating the picker's defaults.
                 ColorPicker(
                     state = state,
                     space = space,
-                    showPlane = showPlane,
-                    showAlpha = showAlpha,
                     enabled = enabled,
-                    coloringMode = coloringMode,
                     colors = colors,
                     shapes = shapes,
-                    thumb = thumb,
-                    plane = plane ?: defaultPlane(space, enabled) {},
-                    channelSlider = channelSlider ?: defaultChannelSlider(enabled, coloringMode, {}, thumb),
-                    alphaSlider = alphaSlider ?: defaultAlphaSlider(enabled, {}, thumb),
+                    dimensions = dimensions,
+                    plane = plane,
+                    channelSlider = channelSlider,
+                    alphaSlider = alphaSlider,
                 )
             }
         },
