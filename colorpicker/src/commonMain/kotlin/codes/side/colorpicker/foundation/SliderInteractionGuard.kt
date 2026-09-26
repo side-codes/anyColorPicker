@@ -1,11 +1,11 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.RememberObserver
 import codes.side.colorpicker.state.ColorPickerState
 
 /**
  * Manages [ColorPickerState.isInteracting] for one component's drag gesture — a
- * [ChannelSlider], [AlphaSlider] or [ChannelPlane].
+ * [BasicChannelSlider], [BasicAlphaSlider] or [BasicChannelPlane].
  *
  * A gesture whose node leaves composition mid-drag may end without reporting it: its
  * pointer-input coroutine can be cancelled rather than finished, which would leave the flag

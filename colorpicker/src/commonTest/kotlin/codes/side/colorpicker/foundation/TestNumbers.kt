@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import kotlin.math.abs
 import kotlin.math.roundToLong

@@ -28,7 +28,6 @@ import codes.side.color.Okhsl
 import codes.side.color.Srgb
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
-import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.assertNear
 import kotlin.math.abs
 import kotlin.math.round
@@ -161,25 +160,6 @@ class ControlledPickerTest {
         sliderNamed("Hue").performTouchInput { up() }
         val last = reported.last()[Hsl.H]!!
         assertTrue(last in 250.0..290.0, "the drag goes on from the finger at three quarters, not from the late value: $last")
-    }
-
-    @Test
-    fun aColorCallerKeepsTheExactEmittedValue() = runComposeUiTest {
-        var color by mutableStateOf(Okhsl(30.0, 0.5, 0.5).toComposeColor())
-        lateinit var state: ColorPickerState
-        setContent {
-            state = rememberControlledPickerState(
-                color,
-                Okhsl,
-                onChange = { color = it },
-                toValue = { it.toColorValue() },
-                fromValue = { it.toComposeColor() },
-            )
-        }
-        runOnUiThread { state.edit(Okhsl.S, 0.537) }
-        waitForIdle()
-        assertEquals(Okhsl, state.value.space, "not rebuilt from the 8-bit color")
-        assertEquals(0.537, state[Okhsl.S])
     }
 
     @Test

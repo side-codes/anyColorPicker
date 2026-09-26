@@ -44,6 +44,7 @@ public abstract interface class codes/side/colorpicker/foundation/ChannelSliderS
 public final class codes/side/colorpicker/foundation/CheckerboardKt {
 	public static final fun checkerboard--WgHM3s (Landroidx/compose/ui/Modifier;JJF)Landroidx/compose/ui/Modifier;
 	public static synthetic fun checkerboard--WgHM3s$default (Landroidx/compose/ui/Modifier;JJFILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+	public static final fun rememberCheckerboardBrush-d_3_b6Q (JJFLandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/Brush;
 }
 
 public abstract interface class codes/side/colorpicker/foundation/ColorPickerStrings {
@@ -107,6 +108,10 @@ public abstract interface class codes/side/colorpicker/foundation/ColorSliderSco
 	public abstract fun getFraction ()F
 	public abstract fun getInteractionSource ()Landroidx/compose/foundation/interaction/InteractionSource;
 	public abstract fun getThumbColor-0d7_KjU ()J
+}
+
+public final class codes/side/colorpicker/foundation/DisabledStateKt {
+	public static final fun getLocalColorPickerEnabled ()Landroidx/compose/runtime/CompositionLocal;
 }
 
 public final class codes/side/colorpicker/foundation/PlaneActionLabels {

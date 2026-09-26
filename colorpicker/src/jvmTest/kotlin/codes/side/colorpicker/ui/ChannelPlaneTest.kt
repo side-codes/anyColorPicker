@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.GamutMapping
 import codes.side.color.Hsl
@@ -45,13 +44,11 @@ import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
-import codes.side.colorpicker.foundation.requirePlaneChannels
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.assertNear
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -191,30 +188,6 @@ class ChannelPlaneTest {
     }
 
     @Test
-    fun aPressWritesBothChannelsInOneEdit() = runComposeUiTest {
-        val red = Srgb(1.0, 0.0, 0.0)
-        val state = ColorPickerState(red)
-        val reported = mutableListOf<ColorValue>()
-        state.onEdit = { reported += it }
-        show(state)
-        onNodeWithTag("plane").performTouchInput {
-            down(center)
-            up()
-        }
-        assertEquals(1, reported.size, "one edit for both channels")
-        assertEquals(Hsl, reported[0].space)
-        assertNear(50.0, reported[0][Hsl.S], 1.0)
-        assertNear(50.0, reported[0][Hsl.L], 1.0)
-    }
-
-    @Test
-    fun twoChannelsMustBeDifferentChannelsOfOneSpace() {
-        requirePlaneChannels(OkLch.C, OkLch.L)
-        assertFailsWith<IllegalArgumentException> { requirePlaneChannels(Hsl.S, OkLch.L) }
-        assertFailsWith<IllegalArgumentException> { requirePlaneChannels(Hsl.S, Hsl.S) }
-    }
-
-    @Test
     fun theHslPlaneIsExactInside() = runComposeUiTest {
         // Lightness 100 parks the indicator on the top edge, clear of the sampled points.
         show(ColorPickerState(Hsl(0.0, 100.0, 100.0)))
@@ -343,21 +316,6 @@ class ChannelPlaneTest {
         val ltr = centre(LayoutDirection.Ltr)
         assertTrue(ltr > 150f, "saturation 90 belongs near the right edge, was $ltr")
         assertEquals(ltr, centre(LayoutDirection.Rtl), 1f, "the indicator moved between layout directions")
-    }
-
-    @Test
-    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
-        val state = state()
-        val emitted = mutableListOf<ColorValue>()
-        state.onEdit = {
-            state.emit(it)
-            emitted += it
-        }
-        show(state)
-        onNodeWithTag("plane").requestFocus()
-        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
-        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionUp) }
-        assertEquals(listOf(51.0 to 50.0, 51.0 to 51.0), emitted.map { it[Hsl.S] to it[Hsl.L] })
     }
 
     @Test

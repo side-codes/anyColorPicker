@@ -4,25 +4,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.PixelMap
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputModeManager
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.v2.runComposeUiTest
-import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.unit.dp
 import codes.side.color.Hsl
-import codes.side.colorpicker.foundation.BasicColorPlaneImpl
 import codes.side.colorpicker.state.ColorPickerState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -85,43 +79,6 @@ class PlaneInputTest {
         val after = onNodeWithTag("plane").captureToImage().toPixelMap()
 
         assertEquals(0, changedPixels(before, after), "nothing is drawn for a touch user")
-    }
-
-    @Test
-    fun aPlaneCanStepByItsOwnAmount() = runComposeUiTest {
-        var x = 0.5f
-        var y = 0.5f
-        setContent {
-            BasicColorPlaneImpl(
-                xValue = x,
-                yValue = y,
-                onValueChange = { newX, newY ->
-                    x = newX
-                    y = newY
-                },
-                onStep = { dx, dy, coarse ->
-                    val amount = if (coarse) 0.25f else 0.05f
-                    x += dx * amount
-                    y += dy * amount
-                    true
-                },
-                surface = {},
-                modifier = Modifier.testTag("plane").size(200.dp),
-                enabled = true,
-                onValueChangeFinished = null,
-                shape = RectangleShape,
-                semanticLabel = null,
-                semanticValueText = null,
-                actionLabels = null,
-                interactionSource = null,
-                thumb = {},
-            )
-        }
-        onNodeWithTag("plane").requestFocus()
-        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
-        assertEquals(0.55f, x, 1e-6f)
-        onNodeWithTag("plane").performKeyInput { withKeyDown(Key.ShiftLeft) { pressKey(Key.DirectionUp) } }
-        assertEquals(0.75f, y, 1e-6f)
     }
 }
 

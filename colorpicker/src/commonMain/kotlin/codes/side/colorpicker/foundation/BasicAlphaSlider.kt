@@ -12,8 +12,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import codes.side.color.GamutMapping
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.ui.SliderInteractionGuard
-import codes.side.colorpicker.ui.TrackStops
 
 // How far Left or Right and Page Up or Page Down move alpha; a screen reader steps by the first.
 private const val ALPHA_STEP = 0.01

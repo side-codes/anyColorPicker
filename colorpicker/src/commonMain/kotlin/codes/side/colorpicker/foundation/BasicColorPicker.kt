@@ -12,16 +12,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.color.AnalogousCategory
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.ui.LocalPickerEnabled
-import codes.side.colorpicker.ui.disabledInput
-import codes.side.colorpicker.ui.planeAxes
-import codes.side.colorpicker.ui.rememberControlledPickerState
+
+/** Whether a picker over [space] shows a plane: [space] has one hue and two other channels. */
+internal fun hasPlane(space: ColorSpace): Boolean = space.channels.size == 3 && space.channels.count { it.isHue } == 1
+
+/**
+ * The channels a picker's plane over [space] shows, or null for a space with no plane: across, the
+ * channel tagged as colorfulness, or else the first that is not a hue; up, the other that is not a hue.
+ */
+internal fun planeAxes(space: ColorSpace): Pair<ColorChannel, ColorChannel>? {
+    if (!hasPlane(space)) return null
+    val others = space.channels.filter { !it.isHue }
+    val x = others.firstOrNull { it.analogous == AnalogousCategory.Colorfulness } ?: others.first()
+    return x to others.first { it !== x }
+}
 
 /**
  * A complete picker for [space] over [state], laying out the parts it is given: [plane] over two of the

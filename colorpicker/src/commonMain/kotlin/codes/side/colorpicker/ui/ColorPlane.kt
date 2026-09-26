@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import codes.side.colorpicker.foundation.BasicColorPlane
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.ColorPlaneScope
+import codes.side.colorpicker.foundation.LocalColorPickerEnabled
 import codes.side.colorpicker.foundation.PlaneActionLabels
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
@@ -65,7 +66,7 @@ public fun ColorPlane(
     // this., or this function's own interactionSource would shadow the scope's resolved one.
     thumb: @Composable ColorPlaneScope.() -> Unit = { ColorPickerDefaults.PlaneThumb(this.interactionSource, diameter = dimensions.planeThumbSize) },
 ) {
-    val active = enabled && LocalPickerEnabled.current
+    val active = enabled && LocalColorPickerEnabled.current
     BasicColorPlane(
         xValue = xValue,
         yValue = yValue,

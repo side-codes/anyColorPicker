@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -17,6 +18,7 @@ import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -31,10 +33,11 @@ import codes.side.color.ColorSpaces
 import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
-import codes.side.colorpicker.foundation.EnglishText
+import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -56,12 +59,16 @@ class ColorPickerTest {
     fun everyLibrarySpaceShowsItsPlaneItsChannelsAndAlpha() = runComposeUiTest {
         val state = ColorPickerState(Srgb(0.4, 0.6, 0.8))
         var space by mutableStateOf<ColorSpace>(Okhsl)
-        setContent { ColorPicker(state, space = space) }
+        var expected: List<String>? = null
+        setContent {
+            expected = spokenSliderNames(space)
+            ColorPicker(state, space = space)
+        }
         for (each in ColorSpaces.all) {
             space = each
             waitForIdle()
-            assertEquals(each.channels.map { EnglishText.channelSpokenName(it) } + EnglishText.alphaName(), sliderLabels(), "${each.id}'s sliders")
-            assertEquals(if (hasPlane(each)) 1 else 0, planeCount(), "${each.id}'s plane")
+            assertEquals(expected, sliderLabels(), "${each.id}'s sliders")
+            assertEquals(if (expectsPlane(each)) 1 else 0, planeCount(), "${each.id}'s plane")
         }
     }
 
@@ -184,7 +191,7 @@ class ColorPickerTest {
         setContent {
             ColorPicker(ColorPickerState(Srgb(0.2, 0.4, 0.6)), Modifier.width(400.dp), space = Srgb, orientation = Orientation.Horizontal)
         }
-        val red = sliderNamed(EnglishText.channelSpokenName(Srgb.R)).getUnclippedBoundsInRoot()
+        val red = sliderNamed("Red").getUnclippedBoundsInRoot()
         assertEquals(400f, (red.right - red.left).value, 0.5f)
     }
 
@@ -201,5 +208,45 @@ class ColorPickerTest {
         }
         assertEquals(listOf("Hue", "Saturation", "Lightness", "Alpha"), sliderLabels())
         assertEquals(1, planeCount())
+    }
+
+    @Test
+    fun aSliderInADisabledBasicPickerLooksDisabledWithoutBeingTold() = runComposeUiTest {
+        // All drain and no dimming, so a disabled hue track is grey from end to end.
+        val drained = ColorPickerColors(Color.White, Color.LightGray, disabledAlpha = 1f, disabledSaturation = 0f)
+        setContent {
+            BasicColorPicker(
+                teal(),
+                Hsl,
+                plane = null,
+                channelSlider = { s, channel ->
+                    if (channel === Hsl.H) ChannelSlider(s, channel, Modifier.width(300.dp).testTag("hue"), colors = drained)
+                },
+                alphaSlider = null,
+                enabled = false,
+            )
+        }
+        val pixels = onNodeWithTag("hue").captureToImage().toPixelMap()
+        for (x in 0 until pixels.width) {
+            for (y in 0 until pixels.height) {
+                val c = pixels[x, y]
+                assertTrue(maxOf(abs(c.red - c.green), abs(c.green - c.blue), abs(c.red - c.blue)) < 0.02f, "grey at $x, $y, was $c")
+            }
+        }
+    }
+
+    @Test
+    fun aReplacedSlotOfAControlledPickerInheritsItsColors() = runComposeUiTest {
+        val custom = ColorPickerColors(
+            checkerboardLight = Color.Red,
+            checkerboardDark = Color.Green,
+            disabledAlpha = 0.5f,
+            disabledSaturation = 1f,
+        )
+        var seen: ColorPickerColors? = null
+        setContent {
+            ColorPicker(Hsl(200.0, 80.0, 50.0), {}, space = Hsl, colors = custom, alphaSlider = { seen = ColorPickerDefaults.currentColors() })
+        }
+        assertEquals(custom, seen)
     }
 }

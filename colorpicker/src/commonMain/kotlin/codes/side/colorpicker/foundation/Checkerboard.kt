@@ -1,5 +1,7 @@
 package codes.side.colorpicker.foundation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
@@ -10,6 +12,7 @@ import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -23,6 +26,16 @@ public fun Modifier.checkerboard(light: Color, dark: Color, cellSize: Dp = 6.dp)
         val brush = checkerboardBrush(cellSize.roundToPx().coerceAtLeast(1), light, dark)
         onDrawBehind { drawRect(brush) }
     }
+
+/**
+ * The checkerboard [Modifier.checkerboard] draws, as a [Brush] for a shape of your own, such as the two
+ * segments of an alpha track either side of its thumb. It tiles from the origin of whatever it fills.
+ */
+@Composable
+public fun rememberCheckerboardBrush(light: Color, dark: Color, cellSize: Dp = 6.dp): Brush {
+    val cellPx = with(LocalDensity.current) { cellSize.roundToPx() }.coerceAtLeast(1)
+    return remember(cellPx, light, dark) { checkerboardBrush(cellPx, light, dark) }
+}
 
 /**
  * A [Brush] that tiles a checkerboard of [cellPx]-pixel cells.

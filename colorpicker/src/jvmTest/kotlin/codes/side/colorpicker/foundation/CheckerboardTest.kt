@@ -1,5 +1,6 @@
 package codes.side.colorpicker.foundation
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -51,5 +52,18 @@ class CheckerboardTest {
         val covered = pixels.cell(0, 0)
         assertTrue(covered.green > 0.9f && covered.red < 0.1f, "the content covers the board: $covered")
         assertTrue(pixels.cell(3, 3).isRed(), "the board shows where there is no content: ${pixels.cell(3, 3)}")
+    }
+
+    @Test
+    fun theBrushTilesTheSameBoard() = runComposeUiTest {
+        setContent {
+            val brush = rememberCheckerboardBrush(Color.Red, Color.Blue, cellSize = 6.dp)
+            Canvas(Modifier.size(24.dp).testTag("board")) { drawRect(brush) }
+        }
+        val pixels = onNodeWithTag("board").captureToImage().toPixelMap()
+        assertTrue(pixels.cell(0, 0).isRed(), "top left: ${pixels.cell(0, 0)}")
+        assertTrue(pixels.cell(1, 0).isBlue(), "next along: ${pixels.cell(1, 0)}")
+        assertTrue(pixels.cell(0, 1).isBlue(), "next down: ${pixels.cell(0, 1)}")
+        assertTrue(pixels.cell(3, 3).isRed(), "far corner: ${pixels.cell(3, 3)}")
     }
 }

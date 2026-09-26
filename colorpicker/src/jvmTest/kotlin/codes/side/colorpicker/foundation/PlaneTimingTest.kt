@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import codes.side.color.ColorChannel
 import codes.side.color.Hwb

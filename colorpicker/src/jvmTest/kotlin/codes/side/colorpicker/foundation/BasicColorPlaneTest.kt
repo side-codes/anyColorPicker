@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -161,5 +162,42 @@ class BasicColorPlaneTest {
         assertTrue(SemanticsProperties.Disabled in onNodeWithTag("plane").fetchSemanticsNode().config)
         onNodeWithTag("plane").performTouchInput { click(Offset(width * 0.25f, height * 0.25f)) }
         assertEquals(0.5f, held.x)
+    }
+
+    @Test
+    fun aPlaneCanStepByItsOwnAmount() = runComposeUiTest {
+        var x = 0.5f
+        var y = 0.5f
+        setContent {
+            BasicColorPlaneImpl(
+                xValue = x,
+                yValue = y,
+                onValueChange = { newX, newY ->
+                    x = newX
+                    y = newY
+                },
+                onStep = { dx, dy, coarse ->
+                    val amount = if (coarse) 0.25f else 0.05f
+                    x += dx * amount
+                    y += dy * amount
+                    true
+                },
+                surface = {},
+                modifier = Modifier.testTag("plane").size(200.dp),
+                enabled = true,
+                onValueChangeFinished = null,
+                shape = RectangleShape,
+                semanticLabel = null,
+                semanticValueText = null,
+                actionLabels = null,
+                interactionSource = null,
+                thumb = {},
+            )
+        }
+        onNodeWithTag("plane").requestFocus()
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(0.55f, x, 1e-6f)
+        onNodeWithTag("plane").performKeyInput { withKeyDown(Key.ShiftLeft) { pressKey(Key.DirectionUp) } }
+        assertEquals(0.75f, y, 1e-6f)
     }
 }

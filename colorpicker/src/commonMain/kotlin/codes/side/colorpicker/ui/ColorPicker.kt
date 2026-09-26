@@ -5,13 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import codes.side.color.AnalogousCategory
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
-import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
@@ -22,19 +20,8 @@ import codes.side.colorpicker.theme.ColorPickerDimensions
 import codes.side.colorpicker.theme.ColorPickerShapes
 import codes.side.colorpicker.theme.ColorPickerTheme
 
-/** Whether a picker over [space] shows a plane: [space] has one hue and two other channels. */
-internal fun hasPlane(space: ColorSpace): Boolean = space.channels.size == 3 && space.channels.count { it.isHue } == 1
-
-/**
- * The channels a picker's plane over [space] shows, or null for a space with no plane: across, the
- * channel tagged as colorfulness, or else the first that is not a hue; up, the other that is not a hue.
- */
-internal fun planeAxes(space: ColorSpace): Pair<ColorChannel, ColorChannel>? {
-    if (!hasPlane(space)) return null
-    val others = space.channels.filter { !it.isHue }
-    val x = others.firstOrNull { it.analogous == AnalogousCategory.Colorfulness } ?: others.first()
-    return x to others.first { it !== x }
-}
+// The space between a picker's parts.
+private val PickerSpacing = 12.dp
 
 /**
  * A complete picker for [space], editing [state]: a plane over two of its channels when it has one hue
@@ -97,7 +84,7 @@ public fun ColorPicker(
             modifier = modifier,
             enabled = enabled,
             orientation = orientation,
-            spacing = 12.dp,
+            spacing = PickerSpacing,
         )
     }
 }
@@ -138,23 +125,20 @@ public fun ColorPicker(
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
-    val state = rememberControlledPickerState(value, space, onValueChange, toValue = { it }, fromValue = { it })
-    ColorPicker(
-        state = state,
-        modifier = modifier,
-        space = space,
-        enabled = enabled,
-        orientation = orientation,
-        coloringMode = coloringMode,
-        onValueChangeFinished = onValueChangeFinished,
-        colors = colors,
-        shapes = shapes,
-        dimensions = dimensions,
-        thumb = thumb,
-        plane = plane,
-        channelSlider = channelSlider,
-        alphaSlider = alphaSlider,
-    )
+    ColorPickerTheme(colors = colors, shapes = shapes, dimensions = dimensions) {
+        BasicColorPicker(
+            value = value,
+            onValueChange = onValueChange,
+            space = space,
+            plane = plane,
+            channelSlider = channelSlider,
+            alphaSlider = alphaSlider,
+            modifier = modifier,
+            enabled = enabled,
+            orientation = orientation,
+            spacing = PickerSpacing,
+        )
+    }
 }
 
 /**
@@ -189,27 +173,18 @@ public fun ColorPicker(
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished, thumb),
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished, thumb),
 ) {
-    val state = rememberControlledPickerState(
-        color,
-        space,
-        onColorChange,
-        toValue = { it.toColorValue() },
-        fromValue = { it.toComposeColor() },
-    )
-    ColorPicker(
-        state = state,
-        modifier = modifier,
-        space = space,
-        enabled = enabled,
-        orientation = orientation,
-        coloringMode = coloringMode,
-        onValueChangeFinished = onValueChangeFinished,
-        colors = colors,
-        shapes = shapes,
-        dimensions = dimensions,
-        thumb = thumb,
-        plane = plane,
-        channelSlider = channelSlider,
-        alphaSlider = alphaSlider,
-    )
+    ColorPickerTheme(colors = colors, shapes = shapes, dimensions = dimensions) {
+        BasicColorPicker(
+            color = color,
+            onColorChange = onColorChange,
+            space = space,
+            plane = plane,
+            channelSlider = channelSlider,
+            alphaSlider = alphaSlider,
+            modifier = modifier,
+            enabled = enabled,
+            orientation = orientation,
+            spacing = PickerSpacing,
+        )
+    }
 }

@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable

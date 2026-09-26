@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Brush
@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 /**
  * A track's gradient: [colors] at [positions] along it, from 0 at the start to 1 at the end, or
- * evenly spaced when [positions] is null, as [ColorSlider]'s callers give them.
+ * evenly spaced when [positions] is null.
  */
 @Immutable
 internal class TrackStops(val colors: List<Color>, val positions: FloatArray?) {

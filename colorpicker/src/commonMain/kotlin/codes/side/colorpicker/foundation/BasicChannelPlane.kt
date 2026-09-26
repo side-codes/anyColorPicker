@@ -12,12 +12,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.ui.SliderInteractionGuard
-import codes.side.colorpicker.ui.channelValueAt
-import codes.side.colorpicker.ui.clampToRange
-import codes.side.colorpicker.ui.fractionOf
-import codes.side.colorpicker.ui.rememberPlaneSurface
-import codes.side.colorpicker.ui.trackColorAt
 
 /**
  * What a [BasicChannelPlane]'s thumb draws from: a [ColorPlaneScope] with the plane's channels. Only

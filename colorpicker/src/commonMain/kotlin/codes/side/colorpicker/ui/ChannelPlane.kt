@@ -8,6 +8,7 @@ import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicChannelPlane
 import codes.side.colorpicker.foundation.ChannelPlaneScope
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.LocalColorPickerEnabled
 import codes.side.colorpicker.foundation.PlaneActionLabels
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
@@ -64,7 +65,7 @@ public fun ChannelPlane(
     // this., or this function's own interactionSource would shadow the scope's resolved one.
     thumb: @Composable ChannelPlaneScope.() -> Unit = { ColorPickerDefaults.PlaneThumb(this.interactionSource, diameter = dimensions.planeThumbSize) },
 ) {
-    val active = enabled && LocalPickerEnabled.current
+    val active = enabled && LocalColorPickerEnabled.current
     BasicChannelPlane(
         state = state,
         x = x,

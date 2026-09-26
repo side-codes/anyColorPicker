@@ -1,4 +1,4 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,7 +38,7 @@ internal fun <T> rememberControlledPickerState(
     val currentOnChange by rememberUpdatedState(onChange)
     val currentFromValue by rememberUpdatedState(fromValue)
     state.onEdit = { edited ->
-        // An edit of alpha alone keeps the value's space, as AlphaSlider's does over a state: converting it
+        // An edit of alpha alone keeps the value's space, as BasicAlphaSlider's does over a state: converting it
         // would pull a color the picker's space cannot hold to that space's edge for an opacity change.
         val base = state.editBase
         val alphaOnly = edited.withAlpha(if (base.isAlphaMissing) null else base.alpha) == base

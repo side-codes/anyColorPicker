@@ -1,14 +1,10 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toPixelMap
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
@@ -20,7 +16,7 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
-class GradientTrackTest {
+class TrackStopsBrushTest {
 
     // Red for three quarters of the track, then red to blue. Evenly spaced, the same three colors
     // would reach halfway to blue by 70%.
@@ -29,24 +25,12 @@ class GradientTrackTest {
         positions = floatArrayOf(0f, 0.75f, 1f),
     )
 
-    // The track drawn whole: a thumb of no width at the start leaves no gap.
+    // The pixel [fraction] of the way across a box the brush for [direction] fills.
     private fun redAt(direction: LayoutDirection, fraction: Float): Color {
         var pixel = Color.Unspecified
         runComposeUiTest {
             setContent {
-                CompositionLocalProvider(LocalLayoutDirection provides direction) {
-                    GradientTrack(
-                        brush = stops.brush(direction),
-                        thumbFraction = 0f,
-                        interactionSource = remember { MutableInteractionSource() },
-                        checkerboardLight = Color.White,
-                        checkerboardDark = Color.LightGray,
-                        trackShape = RectangleShape,
-                        thumbWidth = 0.dp,
-                        thumbTrackGap = 0.dp,
-                        modifier = Modifier.size(width = 400.dp, height = 60.dp).testTag("track"),
-                    )
-                }
+                Canvas(Modifier.size(width = 400.dp, height = 60.dp).testTag("track")) { drawRect(stops.brush(direction)) }
             }
             val pixels = onNodeWithTag("track").captureToImage().toPixelMap()
             pixel = pixels[(fraction * (pixels.width - 1)).toInt(), pixels.height / 2]

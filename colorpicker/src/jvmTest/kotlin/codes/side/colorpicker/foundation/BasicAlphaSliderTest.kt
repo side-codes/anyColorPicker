@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PixelMap
 import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -19,15 +20,21 @@ import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
+import codes.side.colorpicker.state.assertNear
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
@@ -104,5 +111,36 @@ class BasicAlphaSliderTest {
         showAlpha(state)
         onNodeWithTag("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
         assertEquals(Okhsl(30.0, 0.8, 0.6, 0.25), state.value)
+    }
+
+    @Test
+    fun anEditGoesThroughTheEditPath() = runComposeUiTest {
+        val red = Srgb(1.0, 0.0, 0.0)
+        val state = ColorPickerState(red)
+        var reported: ColorValue? = null
+        state.onEdit = { reported = it }
+        showAlpha(state)
+        onNodeWithTag("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
+        assertEquals(Srgb(1.0, 0.0, 0.0, 0.25), reported)
+        assertSame(red, state.value, "an edit goes to the sink, not the value")
+    }
+
+    @Test
+    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
+        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
+        val emitted = mutableListOf<ColorValue>()
+        state.onEdit = {
+            state.emit(it)
+            emitted += it
+        }
+        showAlpha(state)
+        onNodeWithTag("slider").requestFocus()
+        onNodeWithTag("slider").performKeyInput {
+            pressKey(Key.DirectionRight)
+            pressKey(Key.DirectionRight)
+        }
+        assertEquals(2, emitted.size)
+        assertNear(0.51, emitted[0].alpha, 1e-12)
+        assertNear(0.52, emitted[1].alpha, 1e-12)
     }
 }

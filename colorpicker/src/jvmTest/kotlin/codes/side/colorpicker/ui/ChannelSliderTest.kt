@@ -29,13 +29,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
 import codes.side.color.Lab
 import codes.side.color.OkLch
 import codes.side.color.Srgb
-import codes.side.colorpicker.foundation.accessibilitySteps
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.assertNear
@@ -144,18 +142,6 @@ class ChannelSliderTest {
     }
 
     @Test
-    fun theRightEndOfAHueStaysAtTheRight() = runComposeUiTest {
-        val state = ColorPickerState(Hsl(359.5, 80.0, 50.0))
-        show(state, Hsl.H)
-        press(Key.DirectionRight)
-        assertEquals(LAST_HUE, state[Hsl.H])
-        sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
-        sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(1f) }
-        assertEquals(LAST_HUE, state[Hsl.H], "dragged to the end, the hue must not wrap to 0")
-        assertEquals(1f, progress().current)
-    }
-
-    @Test
     fun eachKeyStepReportsItsEndOnce() = runComposeUiTest {
         var finished = 0
         show(ColorPickerState(Hsl(200.0, 50.0, 50.0)), Hsl.S, onValueChangeFinished = { finished++ })
@@ -197,26 +183,10 @@ class ChannelSliderTest {
     }
 
     @Test
-    fun endTakesAHueToItsRightEndNotRoundToZero() = runComposeUiTest {
-        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
-        show(state, Hsl.H)
-        press(Key.MoveEnd)
-        assertEquals(LAST_HUE, state[Hsl.H])
-    }
-
-    @Test
     fun aScreenReaderStepsByTheChannelsStep() = runComposeUiTest {
         show(ColorPickerState(OkLch(0.6, 0.1, 30.0)), OkLch.C)
         // Compose moves a slider by a (steps + 1)th of its range per increment: 0.4 in steps of 0.001.
         assertEquals(399, progress().steps)
-    }
-
-    @Test
-    fun theStepsAScreenReaderTakesFitTheRange() {
-        assertEquals(359, accessibilitySteps(0.0..360.0, 1.0))
-        assertEquals(254, accessibilitySteps(0.0..1.0, 1.0 / 255.0))
-        assertEquals(49, accessibilitySteps(0.0..50.0, 1.0))
-        assertEquals(0, accessibilitySteps(0.0..0.5, 1.0))
     }
 
     @Test
@@ -238,19 +208,6 @@ class ChannelSliderTest {
         assertEquals(0.5f, progress().current, 1e-6f)
         sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(1f) }
         assertNear(50.0, state[Hsl.S])
-    }
-
-    @Test
-    fun editsLandInTheChannelsSpaceThroughTheEditPath() = runComposeUiTest {
-        val red = Srgb(1.0, 0.0, 0.0)
-        val state = ColorPickerState(red)
-        var reported: ColorValue? = null
-        state.onEdit = { reported = it }
-        show(state, Hsl.S)
-        sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
-        assertEquals(Hsl, reported?.space)
-        assertNear(50.0, reported?.get(Hsl.S))
-        assertSame(red, state.value, "an edit goes to the sink, not the value")
     }
 
     @Test
@@ -329,18 +286,5 @@ class ChannelSliderTest {
         // Mirrored: yellow, hue 60, sits a sixth of the way in from the right.
         val yellow = pixels[pixels.width - pixels.width / 6 - 1, pixels.height / 2]
         assertTrue(yellow.red > 0.7f && yellow.green > 0.7f && yellow.blue < 0.3f, "expected yellow a sixth from the right, got $yellow")
-    }
-
-    @Test
-    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
-        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
-        val emitted = mutableListOf<ColorValue>()
-        state.onEdit = {
-            state.emit(it)
-            emitted += it
-        }
-        show(state, Hsl.H)
-        press(Key.DirectionRight, times = 2)
-        assertEquals(listOf(201.0, 202.0), emitted.map { it[Hsl.H] })
     }
 }

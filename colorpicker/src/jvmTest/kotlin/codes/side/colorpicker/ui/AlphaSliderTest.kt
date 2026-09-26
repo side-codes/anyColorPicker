@@ -12,7 +12,6 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.v2.runComposeUiTest
-import codes.side.color.ColorValue
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
@@ -20,7 +19,6 @@ import codes.side.colorpicker.state.assertNear
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertSame
 
 @OptIn(ExperimentalTestApi::class)
 class AlphaSliderTest {
@@ -53,18 +51,6 @@ class AlphaSliderTest {
     }
 
     @Test
-    fun anEditGoesThroughTheEditPath() = runComposeUiTest {
-        val red = Srgb(1.0, 0.0, 0.0)
-        val state = ColorPickerState(red)
-        var reported: ColorValue? = null
-        state.onEdit = { reported = it }
-        setContent { AlphaSlider(state, Modifier.testTag("slider")) }
-        sliderIn("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.25f) }
-        assertEquals(Srgb(1.0, 0.0, 0.0, 0.25), reported)
-        assertSame(red, state.value, "an edit goes to the sink, not the value")
-    }
-
-    @Test
     fun keyStepsMoveAHundredthAndATenthAndReportTheirEnd() = runComposeUiTest {
         var finished = 0
         val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
@@ -75,25 +61,6 @@ class AlphaSliderTest {
         sliderIn("slider").performKeyInput { pressKey(Key.PageDown) }
         assertNear(0.41, state.value.alpha, 1e-12)
         assertEquals(2, finished)
-    }
-
-    @Test
-    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
-        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0, 0.5))
-        val emitted = mutableListOf<ColorValue>()
-        state.onEdit = {
-            state.emit(it)
-            emitted += it
-        }
-        setContent { AlphaSlider(state, Modifier.testTag("slider")) }
-        sliderIn("slider").requestFocus()
-        sliderIn("slider").performKeyInput {
-            pressKey(Key.DirectionRight)
-            pressKey(Key.DirectionRight)
-        }
-        assertEquals(2, emitted.size)
-        assertNear(0.51, emitted[0].alpha, 1e-12)
-        assertNear(0.52, emitted[1].alpha, 1e-12)
     }
 
     @Test

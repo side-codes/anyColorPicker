@@ -42,7 +42,6 @@ import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
 import codes.side.color.Srgb
-import codes.side.colorpicker.foundation.EnglishText
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerTheme
@@ -79,16 +78,20 @@ class PickerConfigurationTest {
     fun eachNamedPickerShowsItsOwnSpace() = runComposeUiTest {
         val state = ColorPickerState(seed)
         var index by mutableIntStateOf(0)
-        setContent { named[index].content(state) }
+        var expected: List<String>? = null
+        setContent {
+            expected = spokenSliderNames(named[index].space)
+            named[index].content(state)
+        }
         for (i in named.indices) {
             index = i
             waitForIdle()
             val space = named[i].space
             val labels = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)).fetchSemanticsNodes()
                 .map { it.config[SemanticsProperties.ContentDescription].single() }
-            assertEquals(space.channels.map { EnglishText.channelSpokenName(it) } + EnglishText.alphaName(), labels, "${space.id}'s sliders")
+            assertEquals(expected, labels, "${space.id}'s sliders")
             val planes = onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNodes().size
-            assertEquals(if (hasPlane(space)) 1 else 0, planes, "${space.id}'s plane")
+            assertEquals(if (expectsPlane(space)) 1 else 0, planes, "${space.id}'s plane")
         }
     }
 

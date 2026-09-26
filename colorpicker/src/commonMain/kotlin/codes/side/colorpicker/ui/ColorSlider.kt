@@ -15,11 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicColorSlider
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.LocalColorPickerEnabled
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerDimensions
@@ -81,7 +83,7 @@ public fun ColorSlider(
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, this.thumbColor) },
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    val gradient = remember(trackColors, layoutDirection) { TrackStops(trackColors, null).brush(layoutDirection) }
+    val gradient = remember(trackColors, layoutDirection) { trackBrush(trackColors, layoutDirection) }
     SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
         BasicColorSlider(
             value = value,
@@ -99,6 +101,10 @@ public fun ColorSlider(
     }
 }
 
+// [colors] evenly spaced from the track's start, mirrored in right-to-left layouts as the slider is.
+private fun trackBrush(colors: List<Color>, direction: LayoutDirection): Brush =
+    Brush.horizontalGradient(if (direction == LayoutDirection.Rtl) colors.reversed() else colors)
+
 /**
  * The Material frame of [ColorSlider], [ChannelSlider] and [AlphaSlider]: the label row above the
  * slider, the minimum touch size the slider is handed as its modifier, and the disabled look over
@@ -113,7 +119,7 @@ internal fun SliderFrame(
     valueLabel: (@Composable () -> Unit)?,
     slider: @Composable (Modifier) -> Unit,
 ) {
-    val active = enabled && LocalPickerEnabled.current
+    val active = enabled && LocalColorPickerEnabled.current
 
     Column(modifier = modifier.fillMaxWidth().disabledAppearance(active, colors)) {
         if (label != null || valueLabel != null) {

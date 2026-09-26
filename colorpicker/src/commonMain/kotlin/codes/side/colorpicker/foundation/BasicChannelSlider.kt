@@ -12,14 +12,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
-import codes.side.colorpicker.ui.SliderInteractionGuard
-import codes.side.colorpicker.ui.channelValueAt
-import codes.side.colorpicker.ui.clampToRange
-import codes.side.colorpicker.ui.fractionOf
-import codes.side.colorpicker.ui.heldComponents
-import codes.side.colorpicker.ui.requireSliderRange
-import codes.side.colorpicker.ui.trackColorAt
-import codes.side.colorpicker.ui.trackStops
 import kotlin.math.roundToInt
 
 /**

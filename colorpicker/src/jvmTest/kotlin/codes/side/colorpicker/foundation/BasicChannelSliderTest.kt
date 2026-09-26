@@ -16,6 +16,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
@@ -28,6 +29,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
+import codes.side.color.ColorValue
 import codes.side.color.Hsl
 import codes.side.color.OkLch
 import codes.side.color.Srgb
@@ -36,6 +38,7 @@ import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.assertNear
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
@@ -160,6 +163,63 @@ class BasicChannelSliderTest {
         onNodeWithTag("slider").requestFocus()
         onNodeWithTag("slider").performKeyInput { pressKey(Key.DirectionRight) }
         assertNear(0.101, state[OkLch.C], 1e-12)
+    }
+
+    @Test
+    fun theRightEndOfAHueStaysAtTheRight() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(359.5, 80.0, 50.0))
+        showChannel(state, Hsl.H)
+        onNodeWithTag("slider").requestFocus()
+        onNodeWithTag("slider").performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(LAST_HUE, state[Hsl.H])
+        onNodeWithTag("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        onNodeWithTag("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(1f) }
+        assertEquals(LAST_HUE, state[Hsl.H], "dragged to the end, the hue must not wrap to 0")
+        assertEquals(1f, onNodeWithTag("slider").fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current)
+    }
+
+    @Test
+    fun endTakesAHueToItsRightEndNotRoundToZero() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        showChannel(state, Hsl.H)
+        onNodeWithTag("slider").requestFocus()
+        onNodeWithTag("slider").performKeyInput { pressKey(Key.MoveEnd) }
+        assertEquals(LAST_HUE, state[Hsl.H])
+    }
+
+    @Test
+    fun theStepsAScreenReaderTakesFitTheRange() {
+        assertEquals(359, accessibilitySteps(0.0..360.0, 1.0))
+        assertEquals(254, accessibilitySteps(0.0..1.0, 1.0 / 255.0))
+        assertEquals(49, accessibilitySteps(0.0..50.0, 1.0))
+        assertEquals(0, accessibilitySteps(0.0..0.5, 1.0))
+    }
+
+    @Test
+    fun editsLandInTheChannelsSpaceThroughTheEditPath() = runComposeUiTest {
+        val red = Srgb(1.0, 0.0, 0.0)
+        val state = ColorPickerState(red)
+        var reported: ColorValue? = null
+        state.onEdit = { reported = it }
+        showChannel(state, Hsl.S)
+        onNodeWithTag("slider").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        assertEquals(Hsl, reported?.space)
+        assertNear(50.0, reported?.get(Hsl.S))
+        assertSame(red, state.value, "an edit goes to the sink, not the value")
+    }
+
+    @Test
+    fun keyPressesBuildOnTheLastEmission() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        val emitted = mutableListOf<ColorValue>()
+        state.onEdit = {
+            state.emit(it)
+            emitted += it
+        }
+        showChannel(state, Hsl.H)
+        onNodeWithTag("slider").requestFocus()
+        repeat(2) { onNodeWithTag("slider").performKeyInput { pressKey(Key.DirectionRight) } }
+        assertEquals(listOf(201.0, 202.0), emitted.map { it[Hsl.H] })
     }
 }
 

@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -28,7 +31,9 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
+import codes.side.color.Okhsl
 import codes.side.color.Srgb
+import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.assertNear
@@ -231,5 +236,44 @@ class BasicColorPickerTest {
             abs(actual.red - expected.red) < 1f / 255f && abs(actual.green - expected.green) < 1f / 255f && abs(actual.blue - expected.blue) < 1f / 255f,
             "expected $expected, was $actual",
         )
+    }
+
+    @Test
+    fun aPartReadsWhetherThePickerIsEnabled() = runComposeUiTest {
+        var enabled by mutableStateOf(true)
+        var seen: Boolean? = null
+        setContent {
+            BasicColorPicker(
+                ColorPickerState(teal),
+                Hsl,
+                plane = null,
+                channelSlider = { _, _ -> seen = LocalColorPickerEnabled.current },
+                alphaSlider = null,
+                enabled = enabled,
+            )
+        }
+        assertEquals(true, seen)
+        enabled = false
+        waitForIdle()
+        assertEquals(false, seen, "a disabled picker says so to a part never handed enabled")
+    }
+
+    @Test
+    fun aColorCallerKeepsTheExactEmittedValue() = runComposeUiTest {
+        var color by mutableStateOf(Okhsl(30.0, 0.5, 0.5).toComposeColor())
+        lateinit var state: ColorPickerState
+        setContent {
+            state = rememberControlledPickerState(
+                color,
+                Okhsl,
+                onChange = { color = it },
+                toValue = { it.toColorValue() },
+                fromValue = { it.toComposeColor() },
+            )
+        }
+        runOnUiThread { state.edit(Okhsl.S, 0.537) }
+        waitForIdle()
+        assertEquals(Okhsl, state.value.space, "not rebuilt from the 8-bit color")
+        assertEquals(0.537, state[Okhsl.S])
     }
 }

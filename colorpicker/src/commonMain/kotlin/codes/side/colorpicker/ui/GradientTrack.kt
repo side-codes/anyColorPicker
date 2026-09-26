@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.foundation.rememberCheckerboardBrush
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import kotlin.math.ceil
 
@@ -32,6 +33,7 @@ import kotlin.math.ceil
 // the same shrink is applied to a custom thumb so the track keeps its M3 feel.
 private val PressedWidthReduction = 2.dp
 private val TrackInsideCornerSize = 2.dp
+private val CheckerboardCellSize = 6.dp
 
 /**
  * Gradient track with an M3-style gap around the thumb.
@@ -78,11 +80,11 @@ internal fun GradientTrack(
         thumbWidth
     }
 
-    val checkerboardBrush = if (showCheckerboard) {
+    val checkerboard = if (showCheckerboard) {
         rememberCheckerboardBrush(
-            cellSize = CheckerboardCellSize,
             light = checkerboardLight,
             dark = checkerboardDark,
+            cellSize = CheckerboardCellSize,
         )
     } else {
         null
@@ -139,7 +141,7 @@ internal fun GradientTrack(
         }
 
         clipPath(segmentsPath) {
-            if (checkerboardBrush != null) {
+            if (checkerboard != null) {
                 // The shader tiles from the Canvas origin, so a track whose height is not
                 // a whole number of cells shows a full cell along the top edge and a stub
                 // along the bottom — at 16dp over 6dp cells that is 6dp against 4dp, on a
@@ -151,7 +153,7 @@ internal fun GradientTrack(
                 val overshoot = ceil(size.height / cell) * cell - size.height
                 translate(top = -overshoot / 2f) {
                     drawRect(
-                        brush = checkerboardBrush,
+                        brush = checkerboard,
                         size = Size(size.width, size.height + overshoot),
                     )
                 }

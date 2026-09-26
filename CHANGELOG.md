@@ -49,6 +49,8 @@
 - **`ColorPickerDefaults.SliderThumb` and `ColorPickerDefaults.PlaneThumb`,** the default slider and plane thumbs, for a `thumb` slot that draws them beside something of its own.
 - **`ColorPickerDefaults.plane()`, `channelSlider()` and `alphaSlider()`,** the slots a picker draws by default, for a slot that wraps one.
 - **`orientation` and `dimensions` on every picker.** `Orientation.Horizontal` puts the plane beside the sliders.
+- **`LocalColorPickerEnabled`,** false inside a disabled `BasicColorPicker`: for a label or frame of your own, outside every slot's scope, that should look disabled with the picker.
+- **`rememberCheckerboardBrush(light, dark)`,** the checkerboard `Modifier.checkerboard` draws, as a `Brush` for a shape of your own.
 
 ## 1.2.1
 
