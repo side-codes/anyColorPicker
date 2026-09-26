@@ -10,6 +10,8 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -24,6 +26,7 @@ import codes.side.colorpicker.state.ColorPickerState
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
 class StringsInComponentsTest {
@@ -52,6 +55,42 @@ class StringsInComponentsTest {
         onAllNodesWithText("Opacity").assertCountEquals(1)
         val plane = onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNode()
         assertEquals("Field", plane.config[SemanticsProperties.ContentDescription].single())
+    }
+
+    // Says which member each text came from, and whether it was asked for the screen reader.
+    private object Wording : ColorPickerStrings {
+        @Composable
+        override fun channelName(channel: ColorChannel): String = "name ${channel.id}"
+
+        @Composable
+        override fun channelValue(channel: ColorChannel, value: Double, forAccessibility: Boolean): String =
+            if (forAccessibility) "spoken ${channel.id}" else "shown ${channel.id}"
+
+        @Composable
+        override fun planeValue(x: ColorChannel, xValue: Double, y: ColorChannel, yValue: Double): String = "at ${x.id} ${y.id}"
+
+        @Composable
+        override fun planeActions(x: ColorChannel, y: ColorChannel): PlaneActionLabels =
+            PlaneActionLabels(increaseX = "more ${x.id}", decreaseX = "less ${x.id}", increaseY = "more ${y.id}", decreaseY = "less ${y.id}")
+    }
+
+    @Test
+    fun providedWordsReachTheLabelsTheValuesAndThePlanesActions() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 40.0, 60.0))
+        setContent {
+            ProvideColorPickerStrings(Wording) {
+                Column {
+                    ChannelSlider(state, Hsl.S, Modifier.testTag("slider"))
+                    ChannelPlane(state, Hsl.S, Hsl.L, Modifier.testTag("plane"))
+                }
+            }
+        }
+        onNodeWithText("name s").assertExists()
+        onNodeWithText("shown s").assertExists()
+        assertEquals("spoken s", sliderIn("slider").fetchSemanticsNode().config[SemanticsProperties.StateDescription])
+        val plane = onNodeWithTag("plane").fetchSemanticsNode().config
+        assertEquals("at s l", plane[SemanticsProperties.StateDescription])
+        assertEquals(listOf("more s", "less s", "more l", "less l"), plane[SemanticsActions.CustomActions].map { it.label })
     }
 
     @Test
@@ -109,6 +148,10 @@ class StringsInComponentsTest {
             }
             val spoken = sliderIn("slider").fetchSemanticsNode().config[SemanticsProperties.StateDescription]
             assertEquals("٤٠٪", spoken.visible())
+            // The value label above the track, not only what a screen reader hears.
+            val labels = onAllNodes(hasAnyAncestor(hasTestTag("slider")) and SemanticsMatcher.keyIsDefined(SemanticsProperties.Text))
+                .fetchSemanticsNodes().map { node -> node.config[SemanticsProperties.Text].joinToString("") { it.text }.visible() }
+            assertTrue("٤٠٪" in labels, "the slider's labels read $labels")
             val plane = onNodeWithTag("plane").fetchSemanticsNode().config[SemanticsProperties.StateDescription]
             assertEquals("٤٠٪ saturation, ٦٠٪ lightness", plane.visible())
         }
