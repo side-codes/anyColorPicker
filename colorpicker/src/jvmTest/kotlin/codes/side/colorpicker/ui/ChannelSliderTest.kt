@@ -2,6 +2,9 @@ package codes.side.colorpicker.ui
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toPixelMap
@@ -103,7 +106,7 @@ class ChannelSliderTest {
         show(state, OkLch.C)
         press(Key.DirectionRight)
         assertNear(0.101, state[OkLch.C], 1e-12)
-        press(Key.DirectionDown, times = 2)
+        press(Key.DirectionLeft, times = 2)
         assertNear(0.099, state[OkLch.C], 1e-12)
     }
 
@@ -166,8 +169,38 @@ class ChannelSliderTest {
         show(state, Hsl.S, direction = LayoutDirection.Rtl)
         press(Key.DirectionRight)
         assertNear(49.0, state[Hsl.S])
+        press(Key.DirectionLeft)
+        assertNear(50.0, state[Hsl.S], message = "left raises")
+    }
+
+    @Test
+    fun upAndDownLeaveTheSliderAlone() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        show(state, Hsl.S)
         press(Key.DirectionUp)
-        assertNear(50.0, state[Hsl.S], message = "up still raises")
+        assertNear(50.0, state[Hsl.S], message = "up")
+        press(Key.DirectionDown)
+        assertNear(50.0, state[Hsl.S], message = "down")
+    }
+
+    @Test
+    fun homeAndEndJumpToTheEndsOfTheRange() = runComposeUiTest {
+        var finished = 0
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        show(state, Hsl.S, range = 20.0..60.0, onValueChangeFinished = { finished++ })
+        press(Key.MoveEnd)
+        assertNear(60.0, state[Hsl.S])
+        press(Key.MoveHome)
+        assertNear(20.0, state[Hsl.S])
+        assertEquals(2, finished)
+    }
+
+    @Test
+    fun endTakesAHueToItsRightEndNotRoundToZero() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        show(state, Hsl.H)
+        press(Key.MoveEnd)
+        assertEquals(LAST_HUE, state[Hsl.H])
     }
 
     @Test
@@ -233,10 +266,16 @@ class ChannelSliderTest {
     @Test
     fun aDisabledSliderSaysSoAndIgnoresKeys() = runComposeUiTest {
         val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
-        setContent { ChannelSlider(state, Hsl.S, Modifier.testTag("slider"), enabled = false) }
+        var enabled by mutableStateOf(true)
+        setContent { ChannelSlider(state, Hsl.S, Modifier.testTag("slider"), enabled = enabled) }
+        // Focused while enabled, so a key would reach it if disabling left it listening.
+        sliderIn("slider").requestFocus()
+        enabled = false
+        waitForIdle()
         val config = sliderIn("slider").fetchSemanticsNode().config
         assertTrue(SemanticsProperties.Disabled in config)
         assertTrue(SemanticsProperties.Focused !in config, "nothing to focus")
+        sliderIn("slider").performKeyInput { pressKey(Key.DirectionRight) }
         assertNear(50.0, state[Hsl.S])
     }
 
@@ -248,12 +287,38 @@ class ChannelSliderTest {
             down(center)
             moveBy(Offset(20f, 0f))
         }
-        // Material's slider reports a drag from a coroutine of its own, after the touch slop.
+        // The slider reports a drag once the finger passes the touch slop.
         waitForIdle()
         assertTrue(state.isInteracting)
         sliderIn("slider").performTouchInput { up() }
         waitForIdle()
         assertFalse(state.isInteracting)
+    }
+
+    @Test
+    fun disablingMidDragEndsTheInteraction() = runComposeUiTest {
+        val state = ColorPickerState(Hsl(200.0, 50.0, 50.0))
+        var enabled by mutableStateOf(true)
+        var finished = 0
+        setContent {
+            ChannelSlider(
+                state,
+                Hsl.S,
+                Modifier.size(width = 300.dp, height = 60.dp).testTag("slider"),
+                enabled = enabled,
+                onValueChangeFinished = { finished++ },
+            )
+        }
+        sliderIn("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(viewConfiguration.touchSlop * 2, 0f))
+        }
+        waitForIdle()
+        assertTrue(state.isInteracting)
+        enabled = false
+        waitForIdle()
+        assertFalse(state.isInteracting, "a drag cut off by disabling has ended")
+        assertEquals(1, finished)
     }
 
     @Test

@@ -10,14 +10,14 @@ import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 
 /**
- * The Material slider inside the component tagged [tag]. The tag lands on the column that holds the
+ * The slider inside the component tagged [tag]. The tag lands on the column that holds the
  * labels and the slider, and the slider's own node is the one with a progress range.
  */
 @OptIn(ExperimentalTestApi::class)
 internal fun ComposeUiTest.sliderIn(tag: String): SemanticsNodeInteraction =
     onNode(hasAnyAncestor(hasTestTag(tag)) and SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))
 
-/** The Material slider a screen reader calls [name], such as "Hue" or "Alpha". */
+/** The slider a screen reader calls [name], such as "Hue" or "Alpha". */
 @OptIn(ExperimentalTestApi::class)
 internal fun ComposeUiTest.sliderNamed(name: String): SemanticsNodeInteraction =
     onNode(hasContentDescription(name) and SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo))

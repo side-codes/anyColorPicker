@@ -9,30 +9,36 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
+import codes.side.colorpicker.foundation.BasicColorSlider
+import codes.side.colorpicker.foundation.BasicColorSliderImpl
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.rememberFractionSteps
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
 import kotlinx.collections.immutable.ImmutableList
 
+// How far a key moves this slider, a hundredth of the track and a tenth for a page, as
+// BasicColorSlider's defaults do.
+private const val COLOR_SLIDER_STEP = 0.01f
+private const val COLOR_SLIDER_PAGE_STEP = 0.1f
+
 /**
- * Building block for a single-channel color slider: an M3 [Slider] with a gradient
+ * Building block for a single-channel color slider: a [BasicColorSlider] with a gradient
  * track, optional label row, and optional transparency checkerboard.
  *
  * [ChannelSlider] and [AlphaSlider] are drawn by the same slider. Use this one for a track
- * no [ColorChannel] describes, such as a value of your own.
+ * no [ColorChannel] describes, such as a value of your own. Left and Right move it by a
+ * hundredth, Page Up and Page Down by a tenth, and Home and End to the ends; Up and Down are
+ * left for moving focus. A screen reader steps by a hundredth.
  *
  * @param value current position in `0..1`; callers map their channel range to this.
  * @param gradientColors color stops of the track gradient, from `0` to `1`.
@@ -41,14 +47,16 @@ import kotlinx.collections.immutable.ImmutableList
  * @param showCheckerboard draws a transparency checkerboard under the gradient, for
  * gradients with translucent stops (used by [AlphaSlider]).
  * @param semanticLabel accessibility content description of the slider (what channel
- * it controls); merged with the M3 slider's own progress semantics.
+ * it controls).
  * @param semanticValueText accessibility state description of the current value: the position as a
  * percentage of the track by default, in the locale's number format. Pass the value in its own units
- * where it has them; `null` leaves Material's reading of the raw fraction.
+ * where it has them; `null` omits it.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param shapes track shape; see [ColorPickerDefaults.shapes].
- * @param thumb optional replacement for the slider thumb. `null` keeps the Material 3
- * default thumb tinted with [thumbColor]; pass a composable to control its size, shape
+ * @param interactionSource receives the slider's press, drag, focus and hover interactions, and is what
+ * [thumb] is handed. Note that if `null` is provided, interactions will still happen internally.
+ * @param thumb optional replacement for the slider thumb. `null` keeps the default handle, a
+ * rounded bar in [thumbColor]; pass a composable to control its size, shape
  * and stroke entirely. It receives the slider's [InteractionSource], so a thumb can react
  * to press and drag; the current value and color need no parameter, since the caller
  * already passed them as [value] and [thumbColor].
@@ -74,6 +82,7 @@ public fun ColorSlider(
     semanticValueText: String? = ColorPickerStrings.current.sliderPosition(value),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
@@ -82,6 +91,8 @@ public fun ColorSlider(
     ColorSliderImpl(
         value = value,
         onValueChange = onValueChange,
+        onStep = rememberFractionSteps(value, COLOR_SLIDER_STEP, COLOR_SLIDER_PAGE_STEP, onValueChange),
+        accessibilitySteps = accessibilitySteps(0.0..1.0, COLOR_SLIDER_STEP.toDouble()),
         stops = stops,
         thumbColor = thumbColor,
         modifier = modifier,
@@ -95,6 +106,7 @@ public fun ColorSlider(
         semanticValueText = semanticValueText,
         colors = colors,
         shapes = shapes,
+        interactionSource = interactionSource,
         thumb = thumb,
         thumbWidth = thumbWidth,
         thumbTrackGap = thumbTrackGap,
@@ -102,19 +114,20 @@ public fun ColorSlider(
 }
 
 /**
- * [ColorSlider] with stops at their own positions, and [sliderModifier] applied to the Material slider
- * itself, ahead of its own modifiers: a key handler there sees the slider's keys first, and a semantics
- * block there overrides what the slider sets.
+ * The Material look of [ColorSlider], [ChannelSlider] and [AlphaSlider] over [BasicColorSliderImpl]: the
+ * label row, the gradient track with its gap at the thumb, the handle, the minimum touch size, and the
+ * disabled look. [stops] sit at their own positions; [onStep] and [accessibilitySteps] are
+ * [BasicColorSliderImpl]'s.
  */
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 internal fun ColorSliderImpl(
     value: Float,
     onValueChange: (Float) -> Unit,
+    onStep: (direction: Int, page: Boolean) -> Boolean,
+    accessibilitySteps: Int,
     stops: TrackStops,
     thumbColor: Color,
     modifier: Modifier = Modifier,
-    sliderModifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     valueLabel: (@Composable () -> Unit)? = null,
     onValueChangeFinished: (() -> Unit)? = null,
@@ -125,16 +138,11 @@ internal fun ColorSliderImpl(
     semanticValueText: String? = null,
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
+    interactionSource: MutableInteractionSource? = null,
     thumb: (@Composable (InteractionSource) -> Unit)? = null,
     thumbWidth: Dp = ColorPickerDefaults.currentDimensions().thumbWidth,
     thumbTrackGap: Dp = ColorPickerDefaults.currentDimensions().thumbTrackGap,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val sliderColors = SliderDefaults.colors(
-        thumbColor = thumbColor.asOpaqueThumb(),
-        activeTrackColor = Color.Transparent,
-        inactiveTrackColor = Color.Transparent,
-    )
     val active = enabled && LocalPickerEnabled.current
 
     Column(modifier = modifier.fillMaxWidth().disabledAppearance(active, colors)) {
@@ -150,26 +158,27 @@ internal fun ColorSliderImpl(
             }
         }
 
-        Slider(
+        BasicColorSliderImpl(
             value = value,
             onValueChange = onValueChange,
-            onValueChangeFinished = onValueChangeFinished,
-            enabled = active,
+            onStep = onStep,
+            accessibilitySteps = accessibilitySteps,
             modifier = Modifier
                 .fillMaxWidth()
-                .then(sliderModifier)
-                // Merged semantics only — M3 Slider's own progress semantics
-                // must survive.
-                .semantics {
-                    semanticLabel?.let { contentDescription = it }
-                    semanticValueText?.let { stateDescription = it }
-                },
+                .minimumInteractiveComponentSize(),
+            enabled = enabled,
+            thumbColor = thumbColor,
+            onValueChangeFinished = onValueChangeFinished,
+            semanticLabel = semanticLabel,
+            semanticValueText = semanticValueText,
             interactionSource = interactionSource,
+            // The slots read the scope's interactionSource and thumbColor, not this function's parameters
+            // of the same names: the scope's source is the resolved one, and its color is opaque.
             track = {
                 GradientTrack(
                     stops = stops,
-                    thumbFraction = value,
-                    interactionSource = interactionSource,
+                    thumbFraction = fraction,
+                    interactionSource = this.interactionSource,
                     checkerboardLight = colors.checkerboardLight,
                     checkerboardDark = colors.checkerboardDark,
                     trackShape = shapes.trackShape,
@@ -181,24 +190,9 @@ internal fun ColorSliderImpl(
                         .height(trackHeight),
                 )
             },
-            // The slot takes the InteractionSource rather than M3's SliderState. Two
-            // reasons: SliderState is experimental, so naming it here would force an
-            // opt-in on everyone calling ColorSlider, and it is not what a thumb is
-            // missing. Value and color are already in scope at the call site, captured
-            // by the lambda; press and drag state is the only thing a caller cannot
-            // reach, because this source is created here.
             thumb = {
-                if (thumb != null) thumb(interactionSource)
-                else SliderDefaults.Thumb(interactionSource, colors = sliderColors)
+                if (thumb != null) thumb(this.interactionSource) else SliderThumb(this.interactionSource, this.thumbColor)
             },
-            colors = sliderColors,
         )
     }
 }
-
-/**
- * A thumb is always painted opaque. One that inherited the color's alpha would vanish
- * exactly when the color became transparent, leaving nothing to grab — and on the alpha
- * slider that is the thumb you need in order to drag back.
- */
-private fun Color.asOpaqueThumb(): Color = if (alpha == 1f) this else copy(alpha = 1f)

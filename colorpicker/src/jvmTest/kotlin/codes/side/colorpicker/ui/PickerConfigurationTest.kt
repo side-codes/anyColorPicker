@@ -147,8 +147,8 @@ class PickerConfigurationTest {
     }
 
     /**
-     * The track is one part of a slider's height, and a Material slider will not measure below its own
-     * minimum, so the size here has to clear that before the change shows at all.
+     * The track is one part of a slider's height, and a slider never measures below the 48 dp minimum
+     * touch size, so the size here has to clear that before the change shows at all.
      */
     @Test
     fun aThemedTrackHeightReachesAChannelSlider() = runComposeUiTest {

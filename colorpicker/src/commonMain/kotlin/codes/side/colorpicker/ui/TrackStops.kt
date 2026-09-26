@@ -23,7 +23,7 @@ internal class TrackStops(val colors: List<Color>, val positions: FloatArray?) {
         require(positions == null || positions.size == colors.size) { "Each stop needs a position" }
     }
 
-    /** The gradient, mirrored in right-to-left layouts as Material's slider is. */
+    /** The gradient, mirrored in right-to-left layouts as the slider is. */
     fun brush(direction: LayoutDirection): Brush {
         val mirrored = direction == LayoutDirection.Rtl
         if (positions == null) return Brush.horizontalGradient(if (mirrored) colors.reversed() else colors)

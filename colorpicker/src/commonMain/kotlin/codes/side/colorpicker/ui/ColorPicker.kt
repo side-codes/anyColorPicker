@@ -105,7 +105,7 @@ internal fun defaultAlphaSlider(
  * @param enabled when false the picker is dimmed, refuses input and reports itself disabled.
  * @param coloringMode how the channel tracks are drawn: [ColoringMode.Independent] by default for a
  * space with a hue, so a hue track stays a full spectrum, else [ColoringMode.Contextual].
- * @param onValueChangeFinished called when a drag ends, and after each key press or accessibility step.
+ * @param onValueChangeFinished called when a tap or drag ends, and after each key press or accessibility step.
  * @param colors checkerboard and disabled colors; see [ColorPickerDefaults.colors].
  * @param shapes track and plane shapes; see [ColorPickerDefaults.shapes].
  * @param thumb optional replacement for every slider's thumb; see [ColorSlider].

@@ -8,8 +8,8 @@ import kotlin.test.assertTrue
 
 /**
  * Regression tests for [SliderInteractionGuard]: `isInteracting` must never be left
- * stuck at `true` when a slider leaves composition mid-drag, because M3 Slider does
- * not invoke `onValueChangeFinished` when its node is disposed during a gesture.
+ * stuck at `true` when a slider leaves composition mid-drag, because its gesture
+ * handler is cancelled, not finished, when its node is disposed during a gesture.
  */
 class SliderInteractionGuardTest {
 
