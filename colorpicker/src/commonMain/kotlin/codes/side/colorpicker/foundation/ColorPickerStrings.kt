@@ -37,7 +37,8 @@ public interface ColorPickerStrings {
     /**
      * [channel]'s [value] as its slider shows it, or, when [forAccessibility], as a screen reader announces it. RGB reads
      * in 0 to 255, a hue in degrees, lightness and saturation in percent, and an app channel with the decimals its step
-     * needs.
+     * needs. The library's text is the same either way; [forAccessibility] lets an implementation speak what it shows
+     * differently, such as "40 percent" for a visible "40%".
      */
     @Composable
     public fun channelValue(channel: ColorChannel, value: Double, forAccessibility: Boolean): String =
@@ -47,7 +48,10 @@ public interface ColorPickerStrings {
     @Composable
     public fun alphaName(): String = EnglishText.alphaName()
 
-    /** [alpha] as its slider shows it, 0 to 255, or, when [forAccessibility], as a screen reader announces it. */
+    /**
+     * [alpha] as its slider shows it, 0 to 255, or, when [forAccessibility], as a screen reader announces it. The
+     * library's text is the same either way; see [channelValue].
+     */
     @Composable
     public fun alphaValue(alpha: Double, forAccessibility: Boolean): String =
         EnglishText.alphaValue(alpha, rememberNumberFormatter())

@@ -93,8 +93,8 @@ internal fun planeYFraction(y: Float, height: Int): Float =
  *
  * @param surface paints the field, filling the whole drawing area. It is drawn under the
  * position indicator and clipped to [ColorPickerShapes.planeShape].
- * @param semanticLabel accessibility description of the surface; pass a localized string to
- * replace the English default, or `null` to omit.
+ * @param semanticLabel accessibility description of the surface; `null` by default, since the plane
+ * does not know what it shows. A [ChannelPlane] names its channels.
  * @param semanticValueText accessibility announcement of the current pair of values.
  * @param actionLabels names the four accessibility actions that move the plane, since a screen
  * reader has no gesture for a surface with two degrees of freedom; `null` omits them and leaves
