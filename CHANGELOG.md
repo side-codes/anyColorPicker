@@ -2,10 +2,12 @@
 
 ## 2.0.0 (unreleased)
 
-2.0 builds the pickers on a color model of its own, following CSS Color 4, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](README.md#-migrating-from-1x) maps each removed declaration to its replacement.
+2.0 builds the pickers on a color model of its own, following CSS Color 4, publishes them as Material 3 components over a foundation any design system can draw, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](README.md#-migrating-from-1x) maps each removed declaration to its replacement.
 
 ### Breaking changes
 
+- **`codes.side:colorpicker` stops at 1.2.1.** 2.0 is `codes.side:colorpicker-material3`, which brings `codes.side:colorpicker-foundation`: the state, the `Basic*` components and the strings, with no Material dependency, for an app on another design system.
+- **The Material components, `ColorPickerTheme`, `ColorPickerDefaults` and the theme classes are in `codes.side.colorpicker.material3`,** one package as `androidx.compose.material3` is, where 1.x had `codes.side.colorpicker.ui` and `codes.side.colorpicker.theme`.
 - **A color is a `ColorValue`.** The `model`, `conversion` and `util` packages are gone: `HslColor`, `RgbColor`, `CmykColor`, `LabColor`, `OklabColor`, `OklchColor`, `OkhslColor`, `OkhsvColor`, `PickerColor`, their conversions and hex functions, and `randomHslColor`. A `ColorValue` is a color in one of fifteen spaces, in CSS's units, so HSL's saturation and lightness run 0–100 rather than 0–1.
 - **`ColorPickerState` holds a `ColorValue`.** It is built from a `ColorValue` or a Compose `Color`, with no default. `state.value`, `state[channel]` and fifteen typed views (`state.hsl`, `state.okLch`, …) replace the eight typed getters, `pickerColor` and `argbInt`, and `state[channel] = x` and `state.set(view)` replace the thirty `update…` functions. Writing NaN or a value outside a channel's limit throws where 1.x ignored or clamped it.
 - **The 21 channel sliders and the three planes are gone.** `ChannelSlider(state, channel)` and `ChannelPlane(state, x, y)` take any channel of any space.
@@ -24,7 +26,7 @@
 - **`PlaneActionLabels` moves to `codes.side.colorpicker.foundation`.**
 - **`ColorPickerColors`, `ColorPickerShapes` and `ColorPickerDimensions` are no longer data classes,** so they have no `componentN`. `copy` keeps a color or size left `Unspecified` and a shape left `null`, as Material's own color and shape classes do, and so do `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()`.
 - **`LocalColorPickerColors`, `LocalColorPickerShapes` and `LocalColorPickerDimensions` are no longer public.** `ColorPickerTheme` provides the values, and `ColorPickerDefaults.currentColors()`, `currentShapes()` and `currentDimensions()` read them.
-- **A `thumb` slot reads its component's scope** instead of being handed an `InteractionSource`: `thumb = { MyThumb(interactionSource, thumbColor) }`. A slider's scope carries its position, whether it is enabled, its interactions and the opaque color under the thumb, and a channel or alpha slider's its channel and value, or its alpha, too; a plane's carries its position, and a channel plane's its channels and the color under the thumb. A picker's `thumb` reaches its sliders the same way.
+- **A `thumb` slot reads its component's scope** instead of being handed an `InteractionSource`: `thumb = { MyThumb(interactionSource, thumbColor) }`. A slider's scope carries its position, whether it is enabled, its interactions and the opaque color under the thumb, and a channel or alpha slider's its channel and value, or its alpha, too; a plane's carries its position, and a channel plane's its channels and the color under the thumb. A picker's `thumb` reaches its sliders the same way. It is no longer nullable: leave it out for the default.
 - **Sliders and planes take `dimensions`** in place of `thumbWidth`, `thumbTrackGap` and `ColorSlider`'s `trackHeight`. `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)` changes one size and keeps the theme's others.
 - **`ColorSlider` takes `trackColors: List<Color>`** in place of `gradientColors: ImmutableList<Color>`. kotlinx-collections-immutable is no longer a dependency.
 
