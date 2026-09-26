@@ -17,7 +17,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - A grey keeps its hue: dragged to grey and back, a color returns in the hue it had rather than red
 - Two-dimensional planes over any two channels of a space
 - Alpha channel support
-- Color picker dialog
+- A color dialog showing the original color beside the new one, with a switcher between spaces
 - Material 3 theming via `ColorPickerDefaults` and `ColorPickerTheme`
 - The same components without Material, as `Basic*` components that draw what their slots draw, for any other design system
 - Accessibility semantics throughout — sliders step by each channel's own unit, and planes take focus, move with the arrow keys, and offer a screen reader one named action per direction
@@ -523,38 +523,60 @@ ColorSwatch(
 
 ### Dialog
 
-A Material 3 `AlertDialog` with a `ColorPicker` and a live swatch. The value and the callbacks
-come first; everything else has defaults:
+A Material 3 `AlertDialog`: the original color beside the one being edited, with its hex, a
+switcher between Okhsl, OkLCh, HSV and RGB, and the picker for the space shown. The value and the
+callbacks come first; everything else has defaults:
 
 ```kotlin
 ColorPickerDialog(
     initialValue = state.value,
     onValueSelected = { value -> state.value = value /* and close */ },
-    onDismiss = { /* close */ },
-    space = Okhsl,
-    title = "Select color",
-    confirmText = "OK",
-    dismissText = "Cancel",
+    onDismissRequest = { /* close */ },
 )
 ```
 
-Confirming returns exactly the initial value if nothing was edited, so an untouched Display P3
-color is not clipped into sRGB on the way out. An edit of alpha alone keeps the initial value's
-space; any other edit returns the value in the dialog's space.
-`ColorPickerDialog(initialColor, onColorSelected, onDismiss)` does the same over a Compose
-`Color`.
+![Color picker dialog](images/dialog.png)
 
-In-progress edits inside the dialog survive configuration changes; passing a new initial value
-resets the picker.
+Switching space redraws the color without converting it. Confirming returns exactly the initial
+value if nothing was edited, or if the original half of the swatch was pressed to restore it, so an
+untouched Display P3 color is not clipped into sRGB on the way out. An edit of alpha alone keeps the
+value's own space; any other edit returns the value in the space it was made in, and passing that
+value back opens the dialog in that space again.
+`ColorPickerDialog(initialColor, onColorSelected, onDismissRequest)` does the same over a Compose
+`Color`, opening in the first space.
 
-The dialog builds its own state, so its slots are handed that state — without it a replacement
-would have nothing to read or write:
+`spaces` sets what the switcher offers: one space leaves it out, up to five are segmented buttons,
+and more are a menu. The body stacks when that fits the dialog's height, and otherwise, where the
+dialog is wide enough, puts the plane beside the sliders. A phone's dialog is not that wide even in
+landscape, so there the body scrolls.
+
+![Color picker dialog on a landscape tablet](images/dialog-horizontal.png)
+
+In-progress edits and the space shown survive configuration changes; passing a new initial value
+resets the dialog.
+
+Every part is a slot. The title, header, switcher and buttons are handed a `ColorPickerDialogScope`,
+which reads the dialog's state and confirms or dismisses it:
 
 ```kotlin
 ColorPickerDialog(
     initialValue = state.value,
     onValueSelected = { /* ... */ },
-    onDismiss = { /* ... */ },
+    onDismissRequest = { /* ... */ },
+    confirmButton = {
+        TextButton(onClick = { confirm() }, enabled = state.isModified) { Text("Apply") }
+    },
+)
+```
+
+The picker's slots are handed the dialog's own `ColorPickerState` — without it a replacement would
+have nothing to read or write:
+
+```kotlin
+ColorPickerDialog(
+    initialValue = state.value,
+    onValueSelected = { /* ... */ },
+    onDismissRequest = { /* ... */ },
     channelSlider = { state, channel ->
         if (channel === Okhsl.H) {
             val hue = stringResource(Res.string.hue)
@@ -640,15 +662,17 @@ whether it is enabled, a plane's position, a channel slider's gradient. Dragging
 screen reader and the picker's disabled state work as they do in the Material components, which are
 built on these.
 
-| Material 3      | Foundation                                       |
-|-----------------|--------------------------------------------------|
-| `ColorPicker`   | `BasicColorPicker`                               |
-| `ChannelSlider` | `BasicChannelSlider`                             |
-| `AlphaSlider`   | `BasicAlphaSlider`                               |
-| `ColorSlider`   | `BasicColorSlider`                               |
-| `ChannelPlane`  | `BasicChannelPlane`                              |
-| `ColorPlane`    | `BasicColorPlane`                                |
-| `ColorSwatch`   | a clip, `Modifier.checkerboard` and a background |
+| Material 3          | Foundation                                                                               |
+|---------------------|------------------------------------------------------------------------------------------|
+| `ColorPicker`       | `BasicColorPicker`                                                                       |
+| `ChannelSlider`     | `BasicChannelSlider`                                                                     |
+| `AlphaSlider`       | `BasicAlphaSlider`                                                                       |
+| `ColorSlider`       | `BasicColorSlider`                                                                       |
+| `ChannelPlane`      | `BasicChannelPlane`                                                                      |
+| `ColorPlane`        | `BasicColorPlane`                                                                        |
+| `ColorSwatch`       | a clip, `Modifier.checkerboard` and a background                                         |
+| `ColorComparison`   | `BasicColorComparison`                                                                   |
+| `ColorPickerDialog` | `BasicColorPickerDialogContent` over a `ColorPickerDialogState`, in a window of your own |
 
 A picker with round thumbs and pill tracks, and nothing from Material:
 
@@ -813,7 +837,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |
 | `ColorSlider(gradientColors = persistentListOf(…))`                                         | `ColorSlider(trackColors = listOf(…))`                                                   |                                                            |
 | `LocalColorPickerColors.current`, …                                                         | `ColorPickerDefaults.currentColors()`, …                                                 | provided by `ColorPickerTheme`                             |
-| `ColorPickerDialog(onColorSelected: (HslColor) -> Unit, initialColor: HslColor)`            | `ColorPickerDialog(initialValue, onValueSelected, …, space = Okhsl)` or the `Color` form |                                                            |
+| `ColorPickerDialog(onColorSelected: (HslColor) -> Unit, initialColor: HslColor)`            | `ColorPickerDialog(initialValue, onValueSelected, onDismissRequest)` or the `Color` form | the title and buttons are slots                            |
 | per-component `String` parameters to localize                                               | `ProvideColorPickerStrings(yourStrings) { … }`                                           | the parameters still win                                   |
 | a saved 1.x state                                                                           | not restored; the state starts from its initial value                                    |                                                            |
 | `randomHslColor()`                                                                          | removed                                                                                  |                                                            |

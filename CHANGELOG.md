@@ -13,7 +13,7 @@
 - **The 21 channel sliders and the three planes are gone.** `ChannelSlider(state, channel)` and `ChannelPlane(state, x, y)` take any channel of any space.
 - **The pickers' value forms are fully controlled.** They take a `ColorValue` or a Compose `Color` in place of 1.x's color classes. A change reaches the callback in the same event, and the picker draws only what the caller passes back, where 1.x applied the caller's value when the gesture ended.
 - **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider. The plane's is handed its axes as well as the state, and `null` leaves the plane or alpha out, in place of `showAlpha = false`, on the pickers and the dialog alike.
-- **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and a `space`,** Okhsl by default, where 1.x's was fixed to HSL.
+- **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and switches between `spaces`,** Okhsl, OkLCh, HSV and RGB by default, where 1.x's was fixed to HSL. `onDismiss` is `onDismissRequest`, as Material's dialogs name it, and the title and buttons are slots in place of `title`, `confirmText` and `dismissText`.
 - **State saved by 1.x is not restored.** It starts again from its initial value.
 - **Numbers follow the device's locale.** Values and spoken descriptions read `40 %` in French, `%40` in Turkish and `٤٠٪` in Egyptian Arabic, where 1.x wrote `40%` with a `.` separator everywhere.
 - **`ColorPickerDialog` reads "Select color" and "OK" by default,** as Material's own pickers do, where 1.x read "Pick a Color" and "Select".
@@ -53,6 +53,9 @@
 - **`orientation` and `dimensions` on every picker.** `Orientation.Horizontal` puts the plane beside the sliders.
 - **`LocalColorPickerEnabled`,** false inside a disabled `BasicColorPicker`: for a label or frame of your own, outside every slot's scope, that should look disabled with the picker.
 - **`rememberCheckerboardBrush(light, dark)`,** the checkerboard `Modifier.checkerboard` draws, as a `Brush` for a shape of your own.
+- **`ColorComparison`,** the original color beside the new one in one swatch, whose original half can restore it.
+- **`ColorPickerDialogDefaults` and `ColorPickerDialogScope`,** the dialog's default spaces, title, header, switcher and buttons, and the scope its slots read the dialog's state from and confirm or dismiss it through.
+- **`ColorPickerDialogState`, `BasicColorPickerDialogContent` and `BasicColorComparison`,** the dialog without Material: its state, saved with `ColorPickerDialogState.Saver`; its body, which puts the plane beside the sliders in a window too short to stack them; and the split swatch.
 
 ## 1.2.1
 
