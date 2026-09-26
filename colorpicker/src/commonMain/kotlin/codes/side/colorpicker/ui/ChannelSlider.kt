@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.accessibilitySteps
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults
 import codes.side.colorpicker.theme.ColorPickerShapes
-import kotlin.math.roundToInt
 
 /**
  * A slider for one [channel] of any color space, the library's or an app's. It shows the channel's
@@ -129,11 +129,3 @@ public fun ChannelSlider(
         thumbTrackGap = thumbTrackGap,
     )
 }
-
-/**
- * The steps a slider over [range] reports to accessibility services. Compose moves a slider by a
- * (steps + 1)th of its range per screen reader increment, so a range [step] fits into n times takes
- * n − 1.
- */
-internal fun accessibilitySteps(range: ClosedFloatingPointRange<Double>, step: Double): Int =
-    (((range.endInclusive - range.start) / step).roundToInt() - 1).coerceAtLeast(0)

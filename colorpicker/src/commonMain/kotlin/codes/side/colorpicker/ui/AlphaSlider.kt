@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import codes.side.color.GamutMapping
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.accessibilitySteps
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults

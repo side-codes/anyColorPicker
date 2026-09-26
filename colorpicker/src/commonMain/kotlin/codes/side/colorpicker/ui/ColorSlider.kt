@@ -20,6 +20,7 @@ import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicColorSlider
 import codes.side.colorpicker.foundation.BasicColorSliderImpl
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.accessibilitySteps
 import codes.side.colorpicker.foundation.rememberFractionSteps
 import codes.side.colorpicker.theme.ColorPickerColors
 import codes.side.colorpicker.theme.ColorPickerDefaults

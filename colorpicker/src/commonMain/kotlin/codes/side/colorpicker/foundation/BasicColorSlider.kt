@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.offset
 import codes.side.colorpicker.ui.LocalPickerEnabled
-import codes.side.colorpicker.ui.accessibilitySteps
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
@@ -140,7 +139,7 @@ public fun BasicColorSlider(
  * [BasicColorSlider] with the keys' steps left to [onStep], which gets the direction, `1` toward the end
  * and `-1` toward the start, and whether a page was asked for, and returns false when the step changes
  * nothing. [accessibilitySteps] is what the progress range reports; see
- * [codes.side.colorpicker.ui.accessibilitySteps].
+ * [accessibilitySteps].
  */
 @Composable
 internal fun BasicColorSliderImpl(

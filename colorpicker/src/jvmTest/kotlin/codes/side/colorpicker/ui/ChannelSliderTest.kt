@@ -35,6 +35,7 @@ import codes.side.color.Hsl
 import codes.side.color.Lab
 import codes.side.color.OkLch
 import codes.side.color.Srgb
+import codes.side.colorpicker.foundation.accessibilitySteps
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.assertNear
