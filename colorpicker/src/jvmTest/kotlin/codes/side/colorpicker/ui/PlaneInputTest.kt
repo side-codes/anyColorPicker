@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.PixelMap
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputModeManager
@@ -21,6 +22,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.unit.dp
 import codes.side.color.Hsl
+import codes.side.colorpicker.foundation.BasicColorPlaneImpl
 import codes.side.colorpicker.state.ColorPickerState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -90,7 +92,7 @@ class PlaneInputTest {
         var x = 0.5f
         var y = 0.5f
         setContent {
-            ColorPlaneImpl(
+            BasicColorPlaneImpl(
                 xValue = x,
                 yValue = y,
                 onValueChange = { newX, newY ->
@@ -105,6 +107,14 @@ class PlaneInputTest {
                 },
                 surface = {},
                 modifier = Modifier.testTag("plane").size(200.dp),
+                enabled = true,
+                onValueChangeFinished = null,
+                shape = RectangleShape,
+                semanticLabel = null,
+                semanticValueText = null,
+                actionLabels = null,
+                interactionSource = null,
+                thumb = {},
             )
         }
         onNodeWithTag("plane").requestFocus()

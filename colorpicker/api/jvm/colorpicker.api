@@ -7,12 +7,26 @@ public final class codes/side/colorpicker/foundation/BasicAlphaSliderKt {
 	public static final fun BasicAlphaSlider (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class codes/side/colorpicker/foundation/BasicChannelPlaneKt {
+	public static final fun BasicChannelPlane (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/graphics/Shape;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
 public final class codes/side/colorpicker/foundation/BasicChannelSliderKt {
 	public static final fun BasicChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
+public final class codes/side/colorpicker/foundation/BasicColorPlaneKt {
+	public static final fun BasicColorPlane (FFLkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/graphics/Shape;Ljava/lang/String;Ljava/lang/String;Lcodes/side/colorpicker/foundation/PlaneActionLabels;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
 public final class codes/side/colorpicker/foundation/BasicColorSliderKt {
 	public static final fun BasicColorSlider-2Tede64 (FLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZJLkotlin/jvm/functions/Function0;FFLjava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
+public abstract interface class codes/side/colorpicker/foundation/ChannelPlaneScope : codes/side/colorpicker/foundation/ColorPlaneScope {
+	public abstract fun getThumbColor-0d7_KjU ()J
+	public abstract fun getX ()Lcodes/side/color/ColorChannel;
+	public abstract fun getY ()Lcodes/side/color/ColorChannel;
 }
 
 public abstract interface class codes/side/colorpicker/foundation/ChannelSliderScope : codes/side/colorpicker/foundation/ColorSliderScope {
@@ -73,6 +87,13 @@ public final class codes/side/colorpicker/foundation/ColorPickerStrings$DefaultI
 
 public final class codes/side/colorpicker/foundation/ColorPickerStringsKt {
 	public static final fun ProvideColorPickerStrings (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
+}
+
+public abstract interface class codes/side/colorpicker/foundation/ColorPlaneScope {
+	public abstract fun getEnabled ()Z
+	public abstract fun getInteractionSource ()Landroidx/compose/foundation/interaction/InteractionSource;
+	public abstract fun getXFraction ()F
+	public abstract fun getYFraction ()F
 }
 
 public abstract interface class codes/side/colorpicker/foundation/ColorSliderScope {

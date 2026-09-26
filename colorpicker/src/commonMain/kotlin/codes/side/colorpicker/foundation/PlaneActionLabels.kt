@@ -7,8 +7,8 @@ import androidx.compose.runtime.Immutable
  *
  * A plane has two degrees of freedom and the adjustable semantics a slider uses carry one, so
  * the way to move it without a pointer is a set of named actions. The defaults come from
- * [ColorPickerStrings]: a [codes.side.colorpicker.ui.ChannelPlane]'s name its channels, and a
- * [codes.side.colorpicker.ui.ColorPlane]'s its axes, since it does not know what it is showing.
+ * [ColorPickerStrings]: a [BasicChannelPlane]'s name its channels, and a [BasicColorPlane]'s its
+ * axes, since it does not know what it is showing.
  */
 @Immutable
 public class PlaneActionLabels(
