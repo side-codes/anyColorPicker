@@ -113,8 +113,15 @@ internal object EnglishText {
     /** Alpha as its slider shows it, 0 to 255. */
     fun alphaValue(alpha: Double, numbers: NumberFormatter): String = numbers.integer(roundHalfAwayFromZero(alpha * 255.0))
 
-    /** Where the thumb of a slider with no channel sits, in percent of its track. */
-    fun sliderPosition(fraction: Float, numbers: NumberFormatter): String = numbers.percent(roundHalfAwayFromZero(fraction * 100.0))
+    /**
+     * Where the thumb of a slider with no channel sits, in percent of its track. A value past an end reads as that end
+     * and NaN as the start, where the thumb is drawn; coerceIn alone would pass NaN through to the rounding, which
+     * throws.
+     */
+    fun sliderPosition(fraction: Float, numbers: NumberFormatter): String {
+        val onTrack = if (fraction.isNaN()) 0f else fraction.coerceIn(0f, 1f)
+        return numbers.percent(roundHalfAwayFromZero(onTrack * 100.0))
+    }
 
     fun spaceName(space: ColorSpace): String = when (space) {
         Srgb -> "RGB"

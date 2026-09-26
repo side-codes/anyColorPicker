@@ -115,6 +115,14 @@ class EnglishTextTest {
     }
 
     @Test
+    fun aPositionOffTheTrackReadsWhereTheThumbIs() {
+        // A caller's value can be NaN (0/0 from an empty range) or past an end; the thumb then sits at an end.
+        assertEquals("0%", EnglishText.sliderPosition(Float.NaN, en))
+        assertEquals("100%", EnglishText.sliderPosition(1.2f, en))
+        assertEquals("0%", EnglishText.sliderPosition(-0.3f, en))
+    }
+
+    @Test
     fun anAppChannelShowsItsIdAndTheDecimalsItsStepNeeds() {
         val hsl = ColorSpace.hsl("--text-hsl", DisplayP3)
         assertShows(hsl.H, 200.4, "h", "200°")
