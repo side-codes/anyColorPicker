@@ -21,6 +21,7 @@
 - **`ColorSlider`'s Page Up raises its value,** as the channel and alpha sliders' does; 1.x's lowered it.
 - **A screen reader moves `ColorSlider` and `AlphaSlider` a hundredth at a time,** as their arrow keys do.
 - **A slider reports presses** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags: a tap, a drag, a mouse button, or a finger held still for a tenth of a second, but not a scroll that starts on the slider. The default thumb narrows while pressed, and keeps its layout width as it does, so the track beside it no longer shifts.
+- **`PlaneActionLabels` moves to `codes.side.colorpicker.foundation`.**
 
 ### Added
 
@@ -35,6 +36,7 @@
 - **`ColorPickerStrings`,** every word and number the components show or speak. Implement the members you need and provide them once with `ProvideColorPickerStrings`; a string passed to a component still wins. The library's own words are English.
 - **`BasicColorSlider`,** a slider that draws only what its `track` and `thumb` slots draw, which read its position, whether it is enabled, its interactions and the thumb's color from `ColorSliderScope`. A tap jumps and a drag follows the finger past the touch slop; Left and Right move by `step`, Page Up and Page Down by `pageStep`, Home and End to the ends, and a screen reader steps by `step`.
 - **`ColorSlider`, `ChannelSlider`, `AlphaSlider`, `ColorPlane` and `ChannelPlane` take an `interactionSource`.**
+- **`ColoringMode.defaultFor(space)`,** the coloring the sliders take unless given another: independent for a space with a hue, contextual otherwise.
 
 ## 1.2.1
 

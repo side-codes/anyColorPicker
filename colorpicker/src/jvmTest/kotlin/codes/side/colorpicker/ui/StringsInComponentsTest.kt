@@ -19,6 +19,7 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import codes.side.color.ColorChannel
 import codes.side.color.Hsl
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.PlaneActionLabels
 import codes.side.colorpicker.foundation.ProvideColorPickerStrings
 import codes.side.colorpicker.foundation.visible
 import codes.side.colorpicker.foundation.withDefaultLocale

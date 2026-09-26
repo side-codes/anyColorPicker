@@ -21,7 +21,6 @@ import codes.side.color.TransferFunction
 import codes.side.color.WhitePoint
 import codes.side.color.XyzD50
 import codes.side.color.XyzD65
-import codes.side.colorpicker.ui.PlaneActionLabels
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

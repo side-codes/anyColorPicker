@@ -1,14 +1,14 @@
-package codes.side.colorpicker.ui
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Immutable
 
 /**
- * What a screen reader calls the four directions a [ColorPlane] can be moved in.
+ * What a screen reader calls the four directions a plane can be moved in.
  *
  * A plane has two degrees of freedom and the adjustable semantics a slider uses carry one, so
  * the way to move it without a pointer is a set of named actions. The defaults come from
- * [codes.side.colorpicker.foundation.ColorPickerStrings]: a [ChannelPlane]'s name its channels, and
- * a [ColorPlane]'s its axes, since it does not know what it is showing.
+ * [ColorPickerStrings]: a [codes.side.colorpicker.ui.ChannelPlane]'s name its channels, and a
+ * [codes.side.colorpicker.ui.ColorPlane]'s its axes, since it does not know what it is showing.
  */
 @Immutable
 public class PlaneActionLabels(

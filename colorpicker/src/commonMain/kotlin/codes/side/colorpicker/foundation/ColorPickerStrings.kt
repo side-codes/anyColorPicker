@@ -8,7 +8,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalLocale
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.colorpicker.ui.PlaneActionLabels
 
 /**
  * Every word and number the picker components show or speak.

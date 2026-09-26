@@ -64,7 +64,7 @@ public fun ChannelSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     range: ClosedFloatingPointRange<Double> = channel.referenceRange,
-    coloringMode: ColoringMode = defaultColoringMode(channel.space),
+    coloringMode: ColoringMode = ColoringMode.defaultFor(channel.space),
     onValueChangeFinished: () -> Unit = {},
     label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
     valueLabel: (@Composable () -> Unit)? = {
