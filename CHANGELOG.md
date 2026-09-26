@@ -37,6 +37,7 @@
 - **`BasicColorSlider`,** a slider that draws only what its `track` and `thumb` slots draw, which read its position, whether it is enabled, its interactions and the thumb's color from `ColorSliderScope`. A tap jumps and a drag follows the finger past the touch slop; Left and Right move by `step`, Page Up and Page Down by `pageStep`, Home and End to the ends, and a screen reader steps by `step`.
 - **`ColorSlider`, `ChannelSlider`, `AlphaSlider`, `ColorPlane` and `ChannelPlane` take an `interactionSource`.**
 - **`ColoringMode.defaultFor(space)`,** the coloring the sliders take unless given another: independent for a space with a hue, contextual otherwise.
+- **`Modifier.checkerboard(light, dark)`,** the transparency checkerboard the swatch draws a color over.
 
 ## 1.2.1
 
