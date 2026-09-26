@@ -20,7 +20,7 @@
 - **Up and Down no longer move a slider,** so focus can leave one on a device with only a D-pad. Left and Right still do.
 - **`ColorSlider`'s Page Up raises its value,** as the channel and alpha sliders' does; 1.x's lowered it.
 - **A screen reader moves `ColorSlider` and `AlphaSlider` a hundredth at a time,** as their arrow keys do.
-- **A slider reports a press the moment a finger lands,** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags. The default thumb narrows then, and keeps its layout width as it does, so the track beside it no longer shifts.
+- **A slider reports presses** to a `thumb` that reads its `InteractionSource`, where 1.x reported only drags: a tap, a drag, a mouse button, or a finger held still for a tenth of a second, but not a scroll that starts on the slider. The default thumb narrows while pressed, and keeps its layout width as it does, so the track beside it no longer shifts.
 
 ### Added
 

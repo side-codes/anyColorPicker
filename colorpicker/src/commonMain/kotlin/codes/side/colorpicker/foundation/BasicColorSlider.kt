@@ -28,6 +28,8 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -234,9 +236,18 @@ internal fun BasicColorSliderImpl(
                     // Emitted at once rather than from a coroutine, so they stay in order and a gesture
                     // torn down with the slider still ends on the caller's source.
                     val press = PressInteraction.Press(down.position)
-                    source.tryEmit(press)
+                    var pressed = false
                     var drag: DragInteraction.Start? = null
                     var last = currentFraction
+
+                    // The press shows once the gesture is known to be the slider's: a tap, a drag, or a
+                    // finger held still. A scroll that starts on the slider takes the touch before any of
+                    // them, so a thumb drawn from the source stays still as a list scrolls under it.
+                    fun showPress() {
+                        if (pressed) return
+                        pressed = true
+                        source.tryEmit(press)
+                    }
 
                     // Reports where a pointer at [x] points, unless the thumb is already there.
                     fun report(x: Float) {
@@ -247,8 +258,19 @@ internal fun BasicColorSliderImpl(
                     }
 
                     try {
-                        val slop = awaitHorizontalPointerSlopOrCancellation(down.id, down.type) { change, _ ->
-                            change.consume()
+                        // A mouse starts no scroll by dragging, so its press shows at once.
+                        if (down.type == PointerType.Mouse) showPress()
+                        var early: PointerInputChange? = null
+                        val settled = withTimeoutOrNull(PressDelayMillis) {
+                            early = awaitHorizontalPointerSlopOrCancellation(down.id, down.type) { change, _ ->
+                                change.consume()
+                            }
+                        } != null
+                        val slop = if (settled) {
+                            early
+                        } else {
+                            showPress()
+                            awaitHorizontalPointerSlopOrCancellation(down.id, down.type) { change, _ -> change.consume() }
                         }
                         if (slop == null) {
                             // Lifted over the slider before the slop, it is a tap. Taken by another
@@ -256,12 +278,16 @@ internal fun BasicColorSliderImpl(
                             val up = currentEvent.changes.firstOrNull { it.id == down.id }
                             val tapped = up != null && up.changedToUp() && isOver(up.position)
                             if (tapped) {
+                                showPress()
                                 up.consume()
                                 report(down.position.x)
                                 currentOnFinished?.invoke()
                             }
-                            source.tryEmit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                            if (pressed) {
+                                source.tryEmit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                            }
                         } else {
+                            showPress()
                             val start = DragInteraction.Start()
                             drag = start
                             source.tryEmit(start)
@@ -281,7 +307,7 @@ internal fun BasicColorSliderImpl(
                         // the finger: a thumb drawn from the source would otherwise stay pressed, and a
                         // drag that moved the value has still ended.
                         drag?.let { source.tryEmit(DragInteraction.Cancel(it)) }
-                        source.tryEmit(PressInteraction.Cancel(press))
+                        if (pressed) source.tryEmit(PressInteraction.Cancel(press))
                         if (drag != null) currentOnFinished?.invoke()
                         throw e
                     }
@@ -309,6 +335,11 @@ internal fun BasicColorSliderImpl(
 // The keys a slider takes. Up and Down are not among them: a horizontal slider that kept them would
 // trap focus on a device driven by a D-pad alone.
 private val SliderKeys = setOf(Key.DirectionRight, Key.DirectionLeft, Key.PageUp, Key.PageDown, Key.MoveHome, Key.MoveEnd)
+
+// How long a finger resting on a slider waits before it shows as a press: Android's tap timeout, which
+// clickable waits inside a scrolling container. A scroll that starts on the slider takes the touch well
+// within it.
+private const val PressDelayMillis = 100L
 
 private class SliderSlots(
     override val fraction: Float,

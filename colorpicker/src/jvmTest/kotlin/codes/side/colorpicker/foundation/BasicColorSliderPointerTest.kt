@@ -159,16 +159,68 @@ class BasicColorSliderPointerTest {
     fun aDragPressesDragsAndReleases() = runComposeUiTest {
         val seen = mutableListOf<Interaction>()
         showSlider(HeldSlider(), thumb = recordingThumb(seen))
-        onNodeWithTag("slider").performTouchInput { down(center) }
-        waitForIdle()
-        assertEquals(listOf("Press"), seen.names(), "a press as the finger lands")
-        onNodeWithTag("slider").performTouchInput { moveBy(Offset(viewConfiguration.touchSlop * 2, 0f)) }
+        onNodeWithTag("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(viewConfiguration.touchSlop * 2, 0f))
+        }
         onNodeWithTag("slider").performTouchInput { up() }
         waitForIdle()
+        assertTrue(seen[0] is PressInteraction.Press, "$seen")
         assertTrue(seen[1] is DragInteraction.Start, "$seen")
         assertTrue(seen[2] is DragInteraction.Stop, "$seen")
         assertTrue(seen[3] is PressInteraction.Release, "$seen")
         assertEquals(4, seen.size)
+    }
+
+    @Test
+    fun aFingerHeldStillShowsAPress() = runComposeUiTest {
+        val seen = mutableListOf<Interaction>()
+        showSlider(HeldSlider(), thumb = recordingThumb(seen))
+        onNodeWithTag("slider").performTouchInput { down(center) }
+        mainClock.advanceTimeBy(500)
+        waitForIdle()
+        assertEquals(listOf("Press"), seen.names())
+        onNodeWithTag("slider").performTouchInput { up() }
+        waitForIdle()
+        assertEquals(listOf("Press", "Release"), seen.names())
+    }
+
+    @Test
+    fun aMousePressShowsAtOnce() = runComposeUiTest {
+        val seen = mutableListOf<Interaction>()
+        showSlider(HeldSlider(), thumb = recordingThumb(seen))
+        // No time passes, so only a press shown on the button's way down is seen.
+        mainClock.autoAdvance = false
+        onNodeWithTag("slider").performMouseInput {
+            moveTo(center)
+            press()
+        }
+        waitForIdle()
+        assertTrue(seen.any { it is PressInteraction.Press }, "$seen")
+    }
+
+    @Test
+    fun aScrollThatStartsOnASliderShowsNoPress() = runComposeUiTest {
+        val seen = mutableListOf<Interaction>()
+        setContent {
+            Column(Modifier.height(300.dp).verticalScroll(ScrollState(0))) {
+                BasicColorSlider(
+                    value = 0.5f,
+                    onValueChange = {},
+                    modifier = Modifier.width(220.dp).testTag("slider"),
+                    track = {},
+                    thumb = recordingThumb(seen),
+                )
+                Spacer(Modifier.height(2000.dp))
+            }
+        }
+        onNodeWithTag("slider").performTouchInput {
+            down(center)
+            moveBy(Offset(0f, -viewConfiguration.touchSlop * 4))
+        }
+        onNodeWithTag("slider").performTouchInput { up() }
+        waitForIdle()
+        assertEquals(emptyList(), seen, "the thumb shows nothing for a scroll")
     }
 
     @Test
