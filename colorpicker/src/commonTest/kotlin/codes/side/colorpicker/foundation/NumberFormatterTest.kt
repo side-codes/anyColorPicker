@@ -23,7 +23,7 @@ class NumberFormatterTest {
         val fr = NumberFormatter("fr-FR")
         val percent = fr.percent(50)
         // A no-break space on some platforms, a narrow one on others.
-        assertTrue(Regex("50[  ]%").matches(percent), percent)
+        assertTrue(Regex("50[\u00A0\u202F]%").matches(percent), percent)
         assertEquals("0,500", fr.decimal(0.5, 3))
     }
 
@@ -41,14 +41,14 @@ class NumberFormatterTest {
 
     @Test
     fun swedishWritesItsOwnMinus() {
-        assertEquals("−0,125", NumberFormatter("sv-SE").decimal(-0.125, 3).visible())
+        assertEquals("\u22120,125", NumberFormatter("sv-SE").decimal(-0.125, 3).visible())
     }
 
     @Test
     fun zeroKeepsNoSignInAnyLocale() {
         for (tag in listOf("en-US", "fr-FR", "sv-SE", "ar-EG")) {
             val zero = NumberFormatter(tag).decimal(roundHalfAwayFromZero(-0.0004, 3), 3).visible()
-            assertFalse(zero.any { it == '-' || it == '−' }, "$tag wrote $zero")
+            assertFalse(zero.any { it == '-' || it == '\u2212' }, "$tag wrote $zero")
         }
     }
 }

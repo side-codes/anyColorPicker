@@ -86,7 +86,7 @@ class ColorPickerStringsTest {
             setContent { read = ColorPickerStrings.current.channelValue(Hsl.S, 40.0, false) }
             waitForIdle()
             val text = checkNotNull(read)
-            assertTrue(Regex("40[  ]%").matches(text), text)
+            assertTrue(Regex("40[\u00A0\u202F]%").matches(text), text)
         }
     }
 }

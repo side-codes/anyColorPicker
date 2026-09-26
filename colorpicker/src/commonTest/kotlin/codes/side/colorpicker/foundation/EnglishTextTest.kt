@@ -133,7 +133,7 @@ class EnglishTextTest {
     @Test
     fun aLibraryValueFollowsTheLocale() {
         val text = EnglishText.channelValue(Hsl.S, 40.0, NumberFormatter("fr-FR"))
-        assertTrue(Regex("40[  ]%").matches(text), text)
+        assertTrue(Regex("40[\u00A0\u202F]%").matches(text), text)
     }
 
     @Test
