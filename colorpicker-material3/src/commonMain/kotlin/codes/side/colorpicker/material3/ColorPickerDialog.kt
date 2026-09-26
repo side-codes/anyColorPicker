@@ -1,92 +1,134 @@
 package codes.side.colorpicker.material3
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
-import codes.side.color.Okhsl
 import codes.side.color.compose.toColorValue
+import codes.side.colorpicker.foundation.BasicColorPickerDialogContent
+import codes.side.colorpicker.foundation.ColorPickerDialogState
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.rememberColorPickerDialogState
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
+
+// The space between the dialog's header, switcher and picker.
+private val DialogSpacing = 16.dp
 
 /**
- * An [AlertDialog] hosting a [ColorPicker] for [space], with a swatch of the color and confirm and
- * dismiss buttons.
+ * What a [ColorPickerDialog] hands its title, header, switcher and button slots: the dialog's state, and the
+ * two ways out of it. A slot can read the state and act on it, as an "Apply" button enabled only while
+ * [ColorPickerDialogState.isModified] would.
+ */
+@Stable
+public interface ColorPickerDialogScope {
+
+    /** The dialog's state: the color it opened with, the color being edited, and the spaces. */
+    public val state: ColorPickerDialogState
+
+    /** Hands [ColorPickerDialogState.result] to the dialog's caller, as the default confirm button does. */
+    public fun confirm()
+
+    /** Tells the dialog's caller the dialog was dismissed, as the default dismiss button does. */
+    public fun dismiss()
+}
+
+/**
+ * A Material [AlertDialog] for picking a color: a [ColorComparison] of the original color and the edited one,
+ * with the edited one in hex; a switcher between [spaces]; and a [ColorPicker] for the space shown; over OK
+ * and Cancel.
  *
- * The dialog owns its picker state, saved with [initialValue] as the key: an edit in progress survives
- * configuration changes and process death, and a different [initialValue] starts the dialog over from
- * it.
+ * The dialog keeps its own [ColorPickerDialogState], saved with [initialValue] as the key: an edit in progress
+ * and the space shown survive configuration changes and process death, and a different [initialValue] starts
+ * the dialog over. Showing another space redraws the color in it without converting it.
  *
- * @param onValueSelected called with the color when the confirm button is pressed: exactly [initialValue]
- * if nothing was edited, in its own space if only alpha was, and otherwise in [space]. The caller
- * dismisses the dialog.
- * @param onDismiss called when the user cancels or dismisses the dialog.
- * @param space the picker's space; Okhsl by default.
- * @param title dialog title; [confirmText] and [dismissText] label the buttons. The defaults come from
- * [ColorPickerStrings]: "Select color", "OK" and "Cancel".
- * @param enabled when false the picker is dimmed and refuses input. The buttons stay live, so the dialog
- * can still be dismissed.
- * @param colors checkerboard and disabled colors, used by the swatch and the picker; see
- * [ColorPickerDefaults.colors].
- * @param plane slot for the plane, handed the state the dialog owns and the plane's axes; `null` leaves
- * it out.
- * @param channelSlider slot for each channel's slider. Every slot is handed the state the dialog owns,
- * which a replacement needs to read and write.
+ * Every part is a slot. The title, header, switcher and buttons are handed a [ColorPickerDialogScope], which
+ * reads the state and can confirm or dismiss; the picker's slots are handed the state's
+ * [ColorPickerDialogState.pickerState]. Every slot inherits the dialog's colors, shapes and dimensions through
+ * [ColorPickerTheme]. The body is laid out as [BasicColorPickerDialogContent] lays it out: with the plane
+ * beside the sliders when the dialog is too short to stack them and wide enough not to.
+ *
+ * A screen reader announces the dialog by [ColorPickerStrings.dialogTitle], "Select color".
+ *
+ * @param onValueSelected called by [ColorPickerDialogScope.confirm] with [ColorPickerDialogState.result]:
+ * exactly [initialValue] when nothing was edited or the original was restored; otherwise the color as last
+ * edited, in the space of the channel last moved, or in its own space when only alpha moved. The caller
+ * closes the dialog.
+ * @param onDismissRequest called when the user cancels, presses outside the dialog, or presses Back or Escape.
+ * @param spaces the spaces the switcher offers, in its order; [ColorPickerDialogDefaults.Spaces] by default.
+ * @param initialSpace the space shown first: [initialValue]'s own when [spaces] holds it, so a color the
+ * dialog returned opens again in the space it was picked in, else the first of [spaces].
+ * @param enabled when false the picker, the restore and the switcher are disabled. The buttons stay live, so
+ * the dialog can still be closed.
+ * @param properties the dialog window's properties.
+ * @param colors checkerboard and disabled colors; see [ColorPickerDefaults.colors].
+ * @param shapes track, swatch and plane shapes; see [ColorPickerDefaults.shapes].
+ * @param dimensions track and plane sizes; see [ColorPickerDefaults.dimensions].
+ * @param title slot for the title, [ColorPickerDialogDefaults.Title] by default; `null` leaves it out.
+ * @param header slot above the switcher, [ColorPickerDialogDefaults.Header] by default; `null` leaves it out.
+ * @param spaceSwitcher slot for the switcher, [ColorPickerDialogDefaults.SpaceSwitcher] by default; `null`
+ * leaves it out.
+ * @param confirmButton slot for the confirm button, [ColorPickerDialogDefaults.ConfirmButton] by default.
+ * @param dismissButton slot for the dismiss button, [ColorPickerDialogDefaults.DismissButton] by default;
+ * `null` leaves it out.
+ * @param thumb draws every slider's thumb from its [ColorSliderScope]; [ColorPickerDefaults.SliderThumb] by
+ * default.
+ * @param plane slot for the plane, handed the picker's state and the plane's axes; `null` leaves it out.
+ * @param channelSlider slot for each channel's slider. The default colors each channel as its space's sliders
+ * are colored by default.
  * @param alphaSlider slot for the alpha slider; `null` leaves it out.
- *
- * The remaining parameters are [ColorPicker]'s.
+ * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
  */
 @Composable
 public fun ColorPickerDialog(
     initialValue: ColorValue,
     onValueSelected: (ColorValue) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    space: ColorSpace = Okhsl,
-    title: String = ColorPickerStrings.current.dialogTitle(),
-    confirmText: String = ColorPickerStrings.current.confirm(),
-    dismissText: String = ColorPickerStrings.current.dismiss(),
+    spaces: List<ColorSpace> = ColorPickerDialogDefaults.Spaces,
+    initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else spaces.first(),
     enabled: Boolean = true,
-    coloringMode: ColoringMode = ColoringMode.defaultFor(space),
+    properties: DialogProperties = DialogProperties(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    title: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Title() },
+    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(state, enabled = enabled) },
+    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(state, enabled = enabled) },
+    confirmButton: @Composable ColorPickerDialogScope.() -> Unit = { ColorPickerDialogDefaults.ConfirmButton(onClick = { confirm() }) },
+    dismissButton: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.DismissButton(onClick = { dismiss() }) },
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished = {}, thumb),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, onValueChangeFinished = {}, thumb),
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished = {}, thumb),
 ) {
-    val state = rememberDialogState(initialValue, initialValue, space)
-    DialogContent(
+    val state = rememberColorPickerDialogState(initialValue, spaces, initialSpace)
+    DialogBody(
         state = state,
-        onConfirm = { onValueSelected(state.value) },
-        onDismiss = onDismiss,
+        onConfirm = { onValueSelected(state.result) },
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
-        space = space,
-        title = title,
-        confirmText = confirmText,
-        dismissText = dismissText,
         enabled = enabled,
+        properties = properties,
         colors = colors,
         shapes = shapes,
         dimensions = dimensions,
+        title = title,
+        header = header,
+        spaceSwitcher = spaceSwitcher,
+        confirmButton = confirmButton,
+        dismissButton = dismissButton,
         plane = plane,
         channelSlider = channelSlider,
         alphaSlider = alphaSlider,
@@ -94,111 +136,129 @@ public fun ColorPickerDialog(
 }
 
 /**
- * [ColorPickerDialog] over a Compose [Color]. [onColorSelected] receives exactly [initialColor] if
- * nothing was edited, and otherwise the color as `toComposeColor()`: brought into sRGB by CSS gamut
- * mapping, eight bits a channel. The rest is the [ColorValue] form's.
+ * [ColorPickerDialog] over a Compose [Color]. [onColorSelected] receives exactly [initialColor] when nothing
+ * was edited or the original was restored, and otherwise the color as `toComposeColor()`: brought into sRGB by
+ * CSS gamut mapping, eight bits a channel.
  *
- * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which
- * [toColorValue] refuses.
+ * [initialSpace] is the first of [spaces] by default: a Compose color is sRGB whatever space the user last
+ * picked it in, so its space says nothing about where they were. Pass the space yourself to open where they
+ * left off.
+ *
+ * The rest is the [ColorValue] form's.
+ *
+ * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which [toColorValue]
+ * refuses, and if [spaces] lists a space twice or does not hold [initialSpace].
  */
 @Composable
 public fun ColorPickerDialog(
     initialColor: Color,
     onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    space: ColorSpace = Okhsl,
-    title: String = ColorPickerStrings.current.dialogTitle(),
-    confirmText: String = ColorPickerStrings.current.confirm(),
-    dismissText: String = ColorPickerStrings.current.dismiss(),
+    spaces: List<ColorSpace> = ColorPickerDialogDefaults.Spaces,
+    initialSpace: ColorSpace = spaces.first(),
     enabled: Boolean = true,
-    coloringMode: ColoringMode = ColoringMode.defaultFor(space),
+    properties: DialogProperties = DialogProperties(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    title: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Title() },
+    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(state, enabled = enabled) },
+    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(state, enabled = enabled) },
+    confirmButton: @Composable ColorPickerDialogScope.() -> Unit = { ColorPickerDialogDefaults.ConfirmButton(onClick = { confirm() }) },
+    dismissButton: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.DismissButton(onClick = { dismiss() }) },
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
     plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)? = ColorPickerDefaults.plane(enabled, onValueChangeFinished = {}),
-    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, coloringMode, onValueChangeFinished = {}, thumb),
+    channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = ColorPickerDefaults.channelSlider(enabled, onValueChangeFinished = {}, thumb),
     alphaSlider: (@Composable (ColorPickerState) -> Unit)? = ColorPickerDefaults.alphaSlider(enabled, onValueChangeFinished = {}, thumb),
 ) {
     val initialValue = remember(initialColor) { initialColor.toColorValue() }
-    val state = rememberDialogState(initialColor, initialValue, space)
-    DialogContent(
+    val state = rememberColorPickerDialogState(initialValue, spaces, initialSpace)
+    DialogBody(
         state = state,
         // Mapped into sRGB, an untouched Display P3 color would come back clipped.
-        onConfirm = { onColorSelected(if (state.value == initialValue) initialColor else state.color) },
-        onDismiss = onDismiss,
+        onConfirm = { onColorSelected(if (state.isModified) state.pickerState.color else initialColor) },
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
-        space = space,
-        title = title,
-        confirmText = confirmText,
-        dismissText = dismissText,
         enabled = enabled,
+        properties = properties,
         colors = colors,
         shapes = shapes,
         dimensions = dimensions,
+        title = title,
+        header = header,
+        spaceSwitcher = spaceSwitcher,
+        confirmButton = confirmButton,
+        dismissButton = dismissButton,
         plane = plane,
         channelSlider = channelSlider,
         alphaSlider = alphaSlider,
     )
 }
 
-// The dialog's own state, saved under [key]: a new key starts over from [initialValue], while a
-// configuration change restores the edit in progress.
-@Composable
-private fun rememberDialogState(key: Any, initialValue: ColorValue, space: ColorSpace): ColorPickerState {
-    val saver = remember(space, initialValue.space) { ColorPickerState.Saver(ColorSpaces.all + space + initialValue.space) }
-    return rememberSaveable(key, saver = saver) { ColorPickerState(initialValue) }
+private class DialogScope(
+    override val state: ColorPickerDialogState,
+    private val onConfirm: () -> Unit,
+    private val onDismiss: () -> Unit,
+) : ColorPickerDialogScope {
+    override fun confirm() = onConfirm()
+
+    override fun dismiss() = onDismiss()
 }
 
 @Composable
-private fun DialogContent(
-    state: ColorPickerState,
+private fun DialogBody(
+    state: ColorPickerDialogState,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier,
-    space: ColorSpace,
-    title: String,
-    confirmText: String,
-    dismissText: String,
     enabled: Boolean,
+    properties: DialogProperties,
     colors: ColorPickerColors,
     shapes: ColorPickerShapes,
     dimensions: ColorPickerDimensions,
+    title: (@Composable ColorPickerDialogScope.() -> Unit)?,
+    header: (@Composable ColorPickerDialogScope.() -> Unit)?,
+    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)?,
+    confirmButton: @Composable ColorPickerDialogScope.() -> Unit,
+    dismissButton: (@Composable ColorPickerDialogScope.() -> Unit)?,
     plane: (@Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit)?,
     channelSlider: @Composable (ColorPickerState, ColorChannel) -> Unit,
     alphaSlider: (@Composable (ColorPickerState) -> Unit)?,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        modifier = modifier,
-        title = { Text(title) },
-        text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                ColorSwatch(
-                    color = state.color,
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = colors,
-                )
-                Spacer(Modifier.height(16.dp))
-                ColorPicker(
+    val currentOnConfirm by rememberUpdatedState(onConfirm)
+    val currentOnDismiss by rememberUpdatedState(onDismissRequest)
+    val scope = remember(state) { DialogScope(state, { currentOnConfirm() }, { currentOnDismiss() }) }
+    // Material's dialog window announces itself as "Dialog"; the title's words say which one.
+    val paneTitle = ColorPickerStrings.current.dialogTitle()
+    // Provided rather than passed down, so a replaced slot inherits the dialog's theme, as a picker's does.
+    ColorPickerTheme(colors = colors, shapes = shapes, dimensions = dimensions) {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            confirmButton = { scope.confirmButton() },
+            modifier = modifier.semantics { this.paneTitle = paneTitle },
+            dismissButton = dismissButton?.let { slot -> { scope.slot() } },
+            title = title?.let { slot -> { scope.slot() } },
+            text = {
+                BasicColorPickerDialogContent(
                     state = state,
-                    space = space,
-                    enabled = enabled,
-                    colors = colors,
-                    shapes = shapes,
-                    dimensions = dimensions,
-                    plane = plane,
-                    channelSlider = channelSlider,
-                    alphaSlider = alphaSlider,
+                    picker = { orientation ->
+                        ColorPicker(
+                            state = state.pickerState,
+                            space = state.space,
+                            enabled = enabled,
+                            orientation = orientation,
+                            plane = plane,
+                            channelSlider = channelSlider,
+                            alphaSlider = alphaSlider,
+                        )
+                    },
+                    header = header?.let { slot -> { scope.slot() } },
+                    spaceSwitcher = spaceSwitcher?.let { slot -> { scope.slot() } },
+                    spacing = DialogSpacing,
                 )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) { Text(confirmText) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(dismissText) }
-        },
-    )
+            },
+            properties = properties,
+        )
+    }
 }

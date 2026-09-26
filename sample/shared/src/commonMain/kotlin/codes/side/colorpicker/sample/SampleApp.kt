@@ -231,6 +231,8 @@ fun SampleApp() {
             }
         }
 
+        // The dialog offers Okhsl, OkLCh, HSV and RGB, and opens in the color's own space when it is one of
+        // them: a color the dialog returned opens again in the space it was picked in.
         if (showDialog) {
             ColorPickerDialog(
                 initialValue = state.value,
@@ -238,8 +240,7 @@ fun SampleApp() {
                     state.value = value
                     showDialog = false
                 },
-                onDismiss = { showDialog = false },
-                space = space,
+                onDismissRequest = { showDialog = false },
             )
         }
     }
