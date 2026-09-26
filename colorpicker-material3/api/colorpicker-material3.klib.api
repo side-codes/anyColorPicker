@@ -6,7 +6,7 @@
 // - Show declarations: true
 
 // Library unique name: <codes.side:colorpicker-material3>
-abstract interface codes.side.colorpicker.material3/ColorPickerDialogScope { // codes.side.colorpicker.material3/ColorPickerDialogScope|null[0]
+sealed interface codes.side.colorpicker.material3/ColorPickerDialogScope { // codes.side.colorpicker.material3/ColorPickerDialogScope|null[0]
     abstract val state // codes.side.colorpicker.material3/ColorPickerDialogScope.state|{}state[0]
         abstract fun <get-state>(): codes.side.colorpicker.foundation/ColorPickerDialogState // codes.side.colorpicker.material3/ColorPickerDialogScope.state.<get-state>|<get-state>(){}[0]
 

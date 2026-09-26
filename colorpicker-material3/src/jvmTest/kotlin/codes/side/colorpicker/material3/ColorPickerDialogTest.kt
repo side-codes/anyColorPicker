@@ -40,6 +40,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import androidx.compose.ui.graphics.colorspace.ColorSpaces as ComposeSpaces
 
 @OptIn(ExperimentalTestApi::class)
@@ -48,6 +49,12 @@ class ColorPickerDialogTest {
     private val teal = Okhsl(200.0, 0.8, 0.5)
 
     private val radioButton = SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.RadioButton)
+
+    @Test
+    fun onlyTheLibraryImplementsTheScope() {
+        // Sealed, so a member added later breaks no app: nothing outside the library can implement it.
+        assertTrue(ColorPickerDialogScope::class.java.isSealed)
+    }
 
     @Test
     fun aReplacedSliderReadsAndWritesTheDialogsState() = runComposeUiTest {

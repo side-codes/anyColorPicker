@@ -30,9 +30,11 @@ private val DialogSpacing = 16.dp
  * What a [ColorPickerDialog] hands its title, header, switcher and button slots: the dialog's state, and the
  * two ways out of it. A slot can read the state and act on it, as an "Apply" button enabled only while
  * [ColorPickerDialogState.isModified] would.
+ *
+ * Only the library implements it, so it can gain members without breaking a slot.
  */
 @Stable
-public interface ColorPickerDialogScope {
+public sealed interface ColorPickerDialogScope {
 
     /** The dialog's state: the color it opened with, the color being edited, and the spaces. */
     public val state: ColorPickerDialogState
