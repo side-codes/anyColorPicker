@@ -20,6 +20,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Color picker dialog
 - Material 3 theming via `ColorPickerDefaults` and `ColorPickerTheme`
 - Accessibility semantics throughout — sliders step by each channel's own unit, and planes take focus, move with the arrow keys, and offer a screen reader one named action per direction
+- Words and numbers from one `ColorPickerStrings`, with numbers in the device's format — `40 %` in French, `٤٠٪` in Egyptian Arabic; reword or translate by providing your own
 - RTL layout support everywhere but the planes, which map a color space rather than showing progress
 
 ## 📦 Setup
@@ -285,8 +286,7 @@ The eleven named pickers are `RgbColorPicker` (sRGB), `HslColorPicker`, `HsvColo
 space fixed and takes the same parameters.
 
 Every part of a picker is a slot, handed the state, and for a slider the channel. Replace one to
-relabel it — which is how a picker is localized, since its labels are English and the library
-ships no translations:
+change that part alone — here, the label of one slider:
 
 ```kotlin
 HslColorPicker(
@@ -517,8 +517,8 @@ ColorPickerDialog(
     onValueSelected = { value -> state.value = value /* and close */ },
     onDismiss = { /* close */ },
     space = Okhsl,
-    title = "Pick a Color",
-    confirmText = "Select",
+    title = "Select color",
+    confirmText = "OK",
     dismissText = "Cancel",
     showAlpha = true,
 )
@@ -534,7 +534,7 @@ In-progress edits inside the dialog survive configuration changes; passing a new
 resets the picker.
 
 The dialog builds its own state, so its slots are handed that state — without it a replacement
-would have nothing to read or write, which is what localizing a dialog's sliders needs:
+would have nothing to read or write:
 
 ```kotlin
 ColorPickerDialog(
@@ -551,6 +551,33 @@ ColorPickerDialog(
     },
 )
 ```
+
+### Words and numbers
+
+Every label, spoken description and value the components show comes from `ColorPickerStrings`:
+English words, with numbers in the device's format — `40%`, `40 %` in French, `%40` in Turkish,
+`٤٠٪` in Egyptian Arabic — and every slider and plane announces its value to a screen reader in
+the channel's own units. To reword or translate, implement the members you need and provide the
+result once, around a screen or the whole app:
+
+```kotlin
+object GermanPickerStrings : ColorPickerStrings {
+    @Composable
+    override fun channelName(channel: ColorChannel): String =
+        if (channel === Hsl.H) stringResource(Res.string.hue) else super.channelName(channel)
+
+    @Composable
+    override fun dialogTitle(): String = stringResource(Res.string.select_color)
+}
+
+ProvideColorPickerStrings(GermanPickerStrings) {
+    HslColorPicker(state = state)
+}
+```
+
+Members are composable, so an implementation reads your own resources. Every member has a body
+in the library's words, so a member you do not override — or one added in a later version —
+keeps them. A string passed to a component still wins over the provided ones.
 
 ### Theming
 
@@ -691,10 +718,12 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker` 
 | `updateFromArgbInt(i)`                                                                      | `state.value = Color(i).toColorValue()`                                                  |                                                            |
 | `HueSlider(state)`, `RedSlider(state)`, … (21)                                              | `ChannelSlider(state, Hsl.H)`, `ChannelSlider(state, Srgb.R)`                            |                                                            |
 | `HslPlane`, `OkhslPlane`, `OkhsvPlane`                                                      | `ChannelPlane(state, Hsl.S, Hsl.L)`, …                                                   |                                                            |
+| `PlaneActionLabels.Default` | `ColorPickerStrings.current.planeAxisActions()` | |
 | `HslColorPicker(color: HslColor, onColorChange)`                                            | `HslColorPicker(value: ColorValue, onValueChange)` or `(color: Color, onColorChange)`    | fully controlled                                           |
 | a caller's value applied when the gesture ends                                              | applied at once; the callback is synchronous                                             |                                                            |
 | per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { state, channel -> … }`                                                |                                                            |
 | `ColorPickerDialog(onColorSelected: (HslColor) -> Unit, initialColor: HslColor)`            | `ColorPickerDialog(initialValue, onValueSelected, …, space = Okhsl)` or the `Color` form |                                                            |
+| per-component `String` parameters to localize | `ProvideColorPickerStrings(yourStrings) { … }` | the parameters still win |
 | a saved 1.x state                                                                           | not restored; the state starts from its initial value                                    |                                                            |
 | `randomHslColor()`                                                                          | removed                                                                                  |                                                            |
 

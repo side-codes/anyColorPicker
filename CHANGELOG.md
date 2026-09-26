@@ -13,6 +13,10 @@
 - **A picker's slots are `plane`, `channelSlider` and `alphaSlider`,** in place of one slot per slider.
 - **`ColorPickerDialog` takes a `ColorValue` or a Compose `Color`, and a `space`,** Okhsl by default, where 1.x's was fixed to HSL.
 - **State saved by 1.x is not restored.** It starts again from its initial value.
+- **Numbers follow the device's locale.** Values and spoken descriptions read `40 %` in French, `%40` in Turkish and `٤٠٪` in Egyptian Arabic, where 1.x wrote `40%` with a `.` separator everywhere.
+- **`ColorPickerDialog` reads "Select color" and "OK" by default,** as Material's own pickers do, where 1.x read "Pick a Color" and "Select".
+- **`PlaneActionLabels.Default` is gone.** Its words are `ColorPickerStrings.current.planeAxisActions()`.
+- **`ColorSlider` announces its position as a percentage by default,** where 1.x left Material's raw fraction.
 
 ### Added
 
@@ -24,6 +28,7 @@
 - **`AlphaSlider` takes `onValueChangeFinished`.**
 - **`ColorPickerState.Saver(knownSpaces)`,** for saving a state wherever Compose takes a `Saver`. It and `rememberSaveableColorPickerState(…, knownSpaces)` restore a value in a space the app defines.
 - **`ColorPickerState.displayValue(channel)`,** what a slider on that channel shows: a grey's remembered hue, and 0 for any other missing component.
+- **`ColorPickerStrings`,** every word and number the components show or speak. Implement the members you need and provide them once with `ProvideColorPickerStrings`; a string passed to a component still wins. The library's own words are English.
 
 ## 1.2.1
 
