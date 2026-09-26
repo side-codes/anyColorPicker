@@ -1,3 +1,7 @@
+public final class codes/side/colorpicker/foundation/BasicColorSliderKt {
+	public static final fun BasicColorSlider-2Tede64 (FLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZJLkotlin/jvm/functions/Function0;FFLjava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+}
+
 public abstract interface class codes/side/colorpicker/foundation/ColorPickerStrings {
 	public static final field Companion Lcodes/side/colorpicker/foundation/ColorPickerStrings$Companion;
 	public fun alphaName (Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
@@ -45,6 +49,13 @@ public final class codes/side/colorpicker/foundation/ColorPickerStrings$DefaultI
 
 public final class codes/side/colorpicker/foundation/ColorPickerStringsKt {
 	public static final fun ProvideColorPickerStrings (Lcodes/side/colorpicker/foundation/ColorPickerStrings;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;I)V
+}
+
+public abstract interface class codes/side/colorpicker/foundation/ColorSliderScope {
+	public abstract fun getEnabled ()Z
+	public abstract fun getFraction ()F
+	public abstract fun getInteractionSource ()Landroidx/compose/foundation/interaction/InteractionSource;
+	public abstract fun getThumbColor-0d7_KjU ()J
 }
 
 public final class codes/side/colorpicker/state/ColorPickerState {
