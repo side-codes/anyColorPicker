@@ -139,7 +139,8 @@ public fun BasicColorSlider(
 /**
  * [BasicColorSlider] with the keys' steps left to [onStep], which gets the direction, `1` toward the end
  * and `-1` toward the start, and whether a page was asked for, and returns false when the step changes
- * nothing. [accessibilitySteps] is what the progress range reports; see [accessibilitySteps].
+ * nothing. [accessibilitySteps] is what the progress range reports; see
+ * [codes.side.colorpicker.ui.accessibilitySteps].
  */
 @Composable
 internal fun BasicColorSliderImpl(

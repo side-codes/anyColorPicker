@@ -313,7 +313,7 @@ HslColorPicker(state = state, enabled = false)   // dimmed, inert, and disabled 
 
 `thumb` reaches every slider in the picker, so [the custom thumb below](#custom-thumb) works
 here too rather than only on a slider built by hand. `onValueChangeFinished` is called when a
-drag ends, and after each key press or screen reader step, whichever part moved.
+tap or drag ends, and after each key press or screen reader step, whichever part moved.
 
 ### Over a value you hold
 

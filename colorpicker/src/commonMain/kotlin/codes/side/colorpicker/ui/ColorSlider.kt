@@ -37,7 +37,8 @@ private const val COLOR_SLIDER_PAGE_STEP = 0.1f
  *
  * [ChannelSlider] and [AlphaSlider] are drawn by the same slider. Use this one for a track
  * no [ColorChannel] describes, such as a value of your own. Left and Right move it by a
- * hundredth and Page Up and Page Down by a tenth, and a screen reader steps by a hundredth.
+ * hundredth, Page Up and Page Down by a tenth, and Home and End to the ends; Up and Down are
+ * left for moving focus. A screen reader steps by a hundredth.
  *
  * @param value current position in `0..1`; callers map their channel range to this.
  * @param gradientColors color stops of the track gradient, from `0` to `1`.

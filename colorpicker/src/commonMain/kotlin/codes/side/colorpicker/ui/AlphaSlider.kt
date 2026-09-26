@@ -28,8 +28,8 @@ private const val ALPHA_PAGE_STEP = 0.1
  * Left and Right move alpha by 0.01, Page Up and Page Down by 0.1, and Home and End to transparent and
  * opaque; a screen reader steps by 0.01.
  *
- * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
- * that changes the value.
+ * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
+ * step that changes the value.
  * @param semanticLabel accessibility description of the slider; "Alpha" from [ColorPickerStrings] by
  * default.
  * @param semanticValueText accessibility announcement of the current value (`0..255`), in the locale's

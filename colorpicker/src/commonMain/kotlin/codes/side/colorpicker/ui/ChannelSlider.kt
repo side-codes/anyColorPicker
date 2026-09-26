@@ -40,8 +40,8 @@ import kotlin.math.roundToInt
  * @param range the values the track spans, within [ColorChannel.limit].
  * @param coloringMode [ColoringMode.Independent] by default for a space with a hue, else
  * [ColoringMode.Contextual].
- * @param onValueChangeFinished called when a drag ends, and after each key press or screen reader step
- * that changes the value.
+ * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
+ * step that changes the value.
  * @param label slot above the track's start; the channel's name from [ColorPickerStrings] by default.
  * See [SliderLabel].
  * @param valueLabel slot above the track's end; the value in the channel's usual units, in the locale's
