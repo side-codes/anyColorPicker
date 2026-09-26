@@ -6,6 +6,7 @@ import platform.Foundation.NSNumberFormatter
 import platform.Foundation.NSNumberFormatterDecimalStyle
 import platform.Foundation.NSNumberFormatterPercentStyle
 import platform.Foundation.NSNumberFormatterStyle
+import platform.Foundation.canonicalLocaleIdentifierFromString
 
 // NSLocale takes identifiers such as fr_FR; canonicalising accepts the BCP 47 fr-FR too.
 internal actual fun NumberFormatter(localeTag: String): NumberFormatter =
