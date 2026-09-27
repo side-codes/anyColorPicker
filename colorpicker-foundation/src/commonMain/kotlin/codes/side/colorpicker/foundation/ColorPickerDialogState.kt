@@ -37,13 +37,12 @@ public class ColorPickerDialogState internal constructor(
      *
      * @param spaces the spaces the dialog offers, in the order a switcher lists them.
      * @param initialSpace [initialValue]'s own space when [spaces] holds it, else the first of [spaces].
-     * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
-     * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
+     * @throws IllegalArgumentException if [spaces] is empty, lists a space twice or does not hold [initialSpace].
      */
     public constructor(
         initialValue: ColorValue,
         spaces: List<ColorSpace>,
-        initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else spaces.first(),
+        initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else requireNotNull(spaces.firstOrNull()) { "No spaces to offer" },
     ) : this(initialValue, spaces, initialSpace, ColorPickerState(initialValue))
 
     init {
@@ -107,14 +106,13 @@ public class ColorPickerDialogState internal constructor(
  *
  * The saver knows every space in [spaces] and [initialValue]'s own.
  *
- * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
- * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
+ * @throws IllegalArgumentException if [spaces] is empty, lists a space twice or does not hold [initialSpace].
  */
 @Composable
 public fun rememberColorPickerDialogState(
     initialValue: ColorValue,
     spaces: List<ColorSpace>,
-    initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else spaces.first(),
+    initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else requireNotNull(spaces.firstOrNull()) { "No spaces to offer" },
 ): ColorPickerDialogState {
     val saver = remember(spaces, initialValue.space) { ColorPickerDialogState.Saver(spaces + initialValue.space) }
     return rememberSaveable(initialValue, spaces, saver = saver) {

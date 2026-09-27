@@ -92,8 +92,7 @@ public sealed interface ColorPickerDialogScope {
  * @param channelSlider slot for each channel's slider. The default colors each channel as its space's sliders
  * are colored by default.
  * @param alphaSlider slot for the alpha slider; `null` leaves it out.
- * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
- * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
+ * @throws IllegalArgumentException if [spaces] is empty, lists a space twice or does not hold [initialSpace].
  */
 @Composable
 public fun ColorPickerDialog(
@@ -102,7 +101,7 @@ public fun ColorPickerDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     spaces: List<ColorSpace> = ColorPickerDialogDefaults.Spaces,
-    initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else spaces.first(),
+    initialSpace: ColorSpace = if (initialValue.space in spaces) initialValue.space else requireNotNull(spaces.firstOrNull()) { "No spaces to offer" },
     enabled: Boolean = true,
     properties: DialogProperties = DialogProperties(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
@@ -152,8 +151,7 @@ public fun ColorPickerDialog(
  * The rest is the [ColorValue] form's.
  *
  * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which [toColorValue]
- * refuses, and if [spaces] lists a space twice or does not hold [initialSpace].
- * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
+ * refuses, and if [spaces] is empty, lists a space twice or does not hold [initialSpace].
  */
 @Composable
 public fun ColorPickerDialog(
@@ -162,7 +160,7 @@ public fun ColorPickerDialog(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     spaces: List<ColorSpace> = ColorPickerDialogDefaults.Spaces,
-    initialSpace: ColorSpace = spaces.first(),
+    initialSpace: ColorSpace = requireNotNull(spaces.firstOrNull()) { "No spaces to offer" },
     enabled: Boolean = true,
     properties: DialogProperties = DialogProperties(),
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),

@@ -109,8 +109,8 @@ class ColorPickerDialogStateTest {
     @Test
     fun noSpacesAreRefused() {
         assertFailsWith<IllegalArgumentException> { ColorPickerDialogState(teal, emptyList(), Hsv) }
-        // The default initial space is the first of none.
-        assertFailsWith<NoSuchElementException> { ColorPickerDialogState(teal, emptyList()) }
+        // The default initial space, the first of none, refuses them as the constructor would.
+        assertFailsWith<IllegalArgumentException> { ColorPickerDialogState(teal, emptyList()) }
     }
 
     @Test
