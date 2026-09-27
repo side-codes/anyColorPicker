@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +31,7 @@ import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.test.swipeRight
+import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -94,6 +96,40 @@ class BasicColorSliderPointerTest {
         showSlider(held, direction = LayoutDirection.Rtl)
         onNodeWithTag("slider").performTouchInput { click(Offset(alongTrack(0.25f), centerY)) }
         assertEquals(0.75f, held.value, 0.01f)
+    }
+
+    @Test
+    fun aTapThatStopsAFlingMovesNothing() = runComposeUiTest {
+        val held = HeldSlider()
+        val scroll = ScrollState(0)
+        setContent {
+            Column(Modifier.size(300.dp, 800.dp).verticalScroll(scroll).testTag("column")) {
+                Spacer(Modifier.height(1100.dp))
+                BasicColorSlider(
+                    value = held.value,
+                    onValueChange = { held.reported += it },
+                    modifier = Modifier.width(220.dp).testTag("slider"),
+                    onValueChangeFinished = { held.finished++ },
+                    track = { Box(Modifier.fillMaxWidth().height(8.dp)) },
+                    thumb = { Box(Modifier.size(20.dp)) },
+                )
+                Spacer(Modifier.height(3000.dp))
+            }
+        }
+        runOnIdle { scroll.dispatchRawDelta(with(density) { 1000.dp.toPx() }) }
+        waitForIdle()
+        mainClock.autoAdvance = false
+        // A quick flick beside the slider, which the column goes on scrolling after the finger lifts.
+        onNodeWithTag("column").performTouchInput {
+            val x = with(density) { 260.dp.toPx() }
+            swipeWithVelocity(Offset(x, with(density) { 20.dp.toPx() }), Offset(x, with(density) { 220.dp.toPx() }), endVelocity = 4000f, durationMillis = 100)
+        }
+        mainClock.advanceTimeBy(32)
+        assertTrue(scroll.isScrollInProgress, "the column is flinging")
+        onNodeWithTag("slider").performTouchInput { click(Offset(alongTrack(0.9f), centerY)) }
+        mainClock.advanceTimeBy(100)
+        assertEquals(emptyList(), held.reported, "the tap stopped the fling, and set nothing")
+        assertEquals(0, held.finished)
     }
 
     @Test

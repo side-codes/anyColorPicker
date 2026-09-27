@@ -1,7 +1,10 @@
 package codes.side.colorpicker.foundation
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +29,7 @@ import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.test.requestFocus
+import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.test.withKeyDown
 import androidx.compose.ui.unit.dp
@@ -86,6 +90,32 @@ class BasicColorPlaneTest {
         val plane = onNodeWithTag("plane").getUnclippedBoundsInRoot()
         assertEquals(0f, (plane.right - plane.left).value)
         assertEquals(0f, (plane.bottom - plane.top).value)
+    }
+
+    @Test
+    fun aTapThatStopsAFlingMovesNothing() = runComposeUiTest {
+        var reported = 0
+        val scroll = ScrollState(0)
+        setContent {
+            Column(Modifier.size(300.dp, 800.dp).verticalScroll(scroll).testTag("column")) {
+                Spacer(Modifier.height(1100.dp))
+                BasicColorPlane(0.5f, 0.5f, { _, _ -> reported++ }, surface = {}, modifier = Modifier.size(200.dp).testTag("plane"), thumb = {})
+                Spacer(Modifier.height(3000.dp))
+            }
+        }
+        runOnIdle { scroll.dispatchRawDelta(with(density) { 1000.dp.toPx() }) }
+        waitForIdle()
+        mainClock.autoAdvance = false
+        // A quick flick beside the plane, which the column goes on scrolling after the finger lifts.
+        onNodeWithTag("column").performTouchInput {
+            val x = with(density) { 260.dp.toPx() }
+            swipeWithVelocity(Offset(x, with(density) { 20.dp.toPx() }), Offset(x, with(density) { 220.dp.toPx() }), endVelocity = 4000f, durationMillis = 100)
+        }
+        mainClock.advanceTimeBy(32)
+        assertTrue(scroll.isScrollInProgress, "the column is flinging")
+        onNodeWithTag("plane").performTouchInput { click(center) }
+        mainClock.advanceTimeBy(100)
+        assertEquals(0, reported, "the tap stopped the fling, and set nothing")
     }
 
     @Test
