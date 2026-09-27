@@ -123,6 +123,15 @@ class HueMemoryTest {
     }
 
     @Test
+    fun aHueWrittenOnAnAppsGreyCarriesAcross() {
+        // Carried by a reference color at the hue, with the space's other channels at their anchors: for an app's
+        // HWB, whiteness and blackness 0, as for the library's, not the middle of their ranges, which is grey.
+        val p3Hwb = ColorSpace.hwb("--hwb-p3", DisplayP3)
+        val memory = memoryOf(p3Hwb.color(doubleArrayOf(30.0, 10.0, 10.0)), p3Hwb.color(doubleArrayOf(250.0, 60.0, 40.0)))
+        assertNear(p3Hwb.color(doubleArrayOf(250.0, 0.0, 0.0)).to(Oklch)[Oklch.H]!!, memory.hue(Oklch.H))
+    }
+
+    @Test
     fun aFamilyNeverSeenTakesItsHueFromOneThatWas() {
         val p3Hsl = ColorSpace.hsl("--hsl-p3", DisplayP3)
         val memory = memoryOf(Hsl(200.0, 80.0, 50.0), grey)

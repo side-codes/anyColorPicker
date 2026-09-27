@@ -1,6 +1,7 @@
 package codes.side.colorpicker.foundation
 
 import codes.side.color.ColorChannel
+import codes.side.color.ColorSpace
 import codes.side.color.ColorSpaces
 import codes.side.color.Hsl
 import codes.side.color.Lab
@@ -47,6 +48,28 @@ class TrackStopsTest {
         val rgb = DoubleArray(3)
         Srgb.gamut.mapper(channel.space).convert(color, rgb)
         return rgb
+    }
+
+    @Test
+    fun anAppsHueSaturationSpacesShowTheirHuesAtFullColor() {
+        // An independent hue track holds the space's other channels where a hue shows at its most colorful, for an
+        // app's HSL, HSV and HWB as for the library's: not at the middle of their ranges, which is grey for HWB.
+        // Over sRGB, so a hue at its most colorful is a primary or secondary the track draws exactly.
+        val spaces = listOf(
+            ColorSpace.hsl("--anchor-hsl", Srgb),
+            ColorSpace.hsv("--anchor-hsv", Srgb),
+            ColorSpace.hwb("--anchor-hwb", Srgb),
+        )
+        for (space in spaces) {
+            val hue = space.channels.first { it.isHue }
+            val displayed = doubleArrayOf(0.0, 20.0, 60.0)
+            val held = heldComponents(hue, displayed, ColoringMode.Independent)
+            for (at in listOf(0.0, 120.0, 240.0)) {
+                val color = trackColorAt(hue, held, at)
+                val spread = max(color.red, max(color.green, color.blue)) - min(color.red, min(color.green, color.blue))
+                assertTrue(spread > 0.99f, "${space.id} at hue $at: $color")
+            }
+        }
     }
 
     @Test
