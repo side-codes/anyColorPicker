@@ -41,6 +41,7 @@ import codes.side.color.Srgb
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertSame
@@ -58,6 +59,16 @@ class ColorPickerDialogTest {
     fun onlyTheLibraryImplementsTheScope() {
         // Sealed, so a member added later breaks no app: nothing outside the library can implement it.
         assertTrue(ColorPickerDialogScope::class.java.isSealed)
+    }
+
+    @Test
+    fun noSpacesAreRefused() {
+        assertFailsWith<IllegalArgumentException> {
+            runComposeUiTest { setContent { ColorPickerDialog(teal, onValueSelected = {}, onDismissRequest = {}, spaces = emptyList()) } }
+        }
+        assertFailsWith<IllegalArgumentException> {
+            runComposeUiTest { setContent { ColorPickerDialog(Color.Red, onColorSelected = {}, onDismissRequest = {}, spaces = emptyList()) } }
+        }
     }
 
     @Test

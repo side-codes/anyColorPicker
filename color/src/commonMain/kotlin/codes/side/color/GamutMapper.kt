@@ -92,7 +92,7 @@ public class GamutMapper internal constructor(
      * Maps [count] colors packed in [src] from [srcOffset] into opaque `0xAARRGGBB` pixels in [dst]
      * from [dstOffset], one [Int] a color: each channel what [convert] gives, clamped to `0..1`, times
      * 255 and rounded. On a gamut with the sRGB curve the bytes come from where that rounding steps
-     * rather than from the curve, and match it exactly.
+     * rather than from the curve, and match it exactly. A NaN channel packs as 0.
      */
     public fun convertToArgb(src: DoubleArray, srcOffset: Int, dst: IntArray, dstOffset: Int, count: Int) {
         checkBulk(sourceSize, 1, src.size, srcOffset, dst.size, dstOffset, count, false, source.id, gamut.space.id)
