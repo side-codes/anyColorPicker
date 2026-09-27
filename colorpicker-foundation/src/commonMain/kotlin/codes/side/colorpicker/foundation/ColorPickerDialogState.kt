@@ -38,6 +38,7 @@ public class ColorPickerDialogState internal constructor(
      * @param spaces the spaces the dialog offers, in the order a switcher lists them.
      * @param initialSpace [initialValue]'s own space when [spaces] holds it, else the first of [spaces].
      * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
+     * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
      */
     public constructor(
         initialValue: ColorValue,
@@ -105,6 +106,9 @@ public class ColorPickerDialogState internal constructor(
  * them. A different [initialValue] or [spaces] starts the state over.
  *
  * The saver knows every space in [spaces] and [initialValue]'s own.
+ *
+ * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
+ * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
  */
 @Composable
 public fun rememberColorPickerDialogState(

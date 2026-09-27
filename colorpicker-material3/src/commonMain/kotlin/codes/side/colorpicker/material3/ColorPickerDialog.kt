@@ -61,7 +61,9 @@ public sealed interface ColorPickerDialogScope {
  * [ColorPickerTheme]. The body is laid out as [BasicColorPickerDialogContent] lays it out: with the plane
  * beside the sliders when the dialog is too short to stack them and wide enough not to.
  *
- * A screen reader announces the dialog by [ColorPickerStrings.dialogTitle], "Select color".
+ * A screen reader announces the dialog by [ColorPickerStrings.dialogTitle], "Select color", whatever the [title]
+ * slot shows. Strings provided with `ProvideColorPickerStrings` change it, and so does a `paneTitle` set in
+ * [modifier].
  *
  * @param onValueSelected called by [ColorPickerDialogScope.confirm] with [ColorPickerDialogState.result]:
  * exactly [initialValue] when nothing was edited or the original was restored; otherwise the color as last
@@ -91,6 +93,7 @@ public sealed interface ColorPickerDialogScope {
  * are colored by default.
  * @param alphaSlider slot for the alpha slider; `null` leaves it out.
  * @throws IllegalArgumentException if [spaces] lists a space twice or does not hold [initialSpace].
+ * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
  */
 @Composable
 public fun ColorPickerDialog(
@@ -150,6 +153,7 @@ public fun ColorPickerDialog(
  *
  * @throws IllegalArgumentException for [Color.Unspecified] and Compose's HDR spaces, which [toColorValue]
  * refuses, and if [spaces] lists a space twice or does not hold [initialSpace].
+ * @throws NoSuchElementException if [spaces] is empty and [initialSpace] is left to its default.
  */
 @Composable
 public fun ColorPickerDialog(
@@ -238,6 +242,7 @@ private fun DialogBody(
         AlertDialog(
             onDismissRequest = onDismissRequest,
             confirmButton = { scope.confirmButton() },
+            // Inside the caller's modifier, so a paneTitle set there wins.
             modifier = modifier.semantics { this.paneTitle = paneTitle },
             dismissButton = dismissButton?.let { slot -> { scope.slot() } },
             title = title?.let { slot -> { scope.slot() } },

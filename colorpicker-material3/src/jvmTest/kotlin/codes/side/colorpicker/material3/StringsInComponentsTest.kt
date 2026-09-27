@@ -114,6 +114,16 @@ class StringsInComponentsTest {
     }
 
     @Test
+    fun providedStringsNameTheDialogWithoutATitle() = runComposeUiTest {
+        setContent {
+            ProvideColorPickerStrings(Custom) {
+                ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismissRequest = {}, title = null)
+            }
+        }
+        onNode(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Choose")).assertExists()
+    }
+
+    @Test
     fun theDialogReadsSelectColorAndOkByDefault() = runComposeUiTest {
         setContent { ColorPickerDialog(initialValue = Hsl(200.0, 40.0, 50.0), onValueSelected = {}, onDismissRequest = {}) }
         onNodeWithText("Select color").assertExists()
