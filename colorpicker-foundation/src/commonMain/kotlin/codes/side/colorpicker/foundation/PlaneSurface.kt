@@ -29,7 +29,9 @@ import codes.side.color.Okhsv
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 
@@ -99,12 +101,15 @@ internal fun gridSample(index: Int, count: Int): Double = if (count <= 1) 0.0 el
 internal class PlaneRows(
     private val x: ColorChannel,
     private val y: ColorChannel,
-    held: DoubleArray,
+    private val held: DoubleArray,
     private val columns: Int,
     private val rows: Int,
-    rendering: PlaneRendering = PlaneRendering.Canonical,
+    private val rendering: PlaneRendering = PlaneRendering.Canonical,
     val pixels: IntArray = IntArray(columns * rows),
 ) {
+    /** How many rows [pixels] holds. */
+    val rowCount: Int get() = rows
+
     private val size = x.space.channels.size
     private val fast = rendering === PlaneRendering.Fast
     private val mapper = Srgb.gamut.mapper(x.space, if (fast) GamutMapping.ChromaReduction(EdgeSolver.Iterative) else GamutMapping.ChromaReduction())
@@ -134,6 +139,9 @@ internal class PlaneRows(
         }
     }
 
+    /** Another set of scratch rows for another worker, filling the same [pixels]. */
+    fun sharingPixels(): PlaneRows = PlaneRows(x, y, held, columns, rows, rendering, pixels)
+
     private fun holdRow(r: Int) {
         val yValue = channelValueAt(y, y.referenceRange, 1.0 - gridSample(r, rows))
         for (column in 0 until columns) row[column * size + y.index] = yValue
@@ -161,13 +169,40 @@ internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray,
 // raster that never yielded would hold every event until it finished.
 private const val ROWS_PER_YIELD = 16
 
-/** [rasterizePlane], yielding every few rows, and stopping there when cancelled. */
+// The most workers a Fast plane's rows are shared among: past four the gain measured small beside what they
+// would take from the rest of the app.
+private const val MOST_WORKERS = 4
+
+/** How many workers build a plane with [rendering]: [PlaneRendering.Fast]'s rows are shared out, Canonical's are not. */
+internal fun planeWorkerCount(rendering: PlaneRendering): Int =
+    if (rendering === PlaneRendering.Fast) planeWorkers().coerceIn(1, MOST_WORKERS) else 1
+
+/**
+ * Fills every row of [pixels][PlaneRows.pixels], shared among [workers] coroutines in the caller's
+ * context, each yielding every few rows and stopping there when cancelled. Row r is worker r % workers's:
+ * how much of a row lies outside sRGB changes down a plane, so interleaved rows share the work more evenly
+ * than bands would.
+ */
+internal suspend fun PlaneRows.fillInSteps(workers: Int) {
+    coroutineScope {
+        for (worker in 0 until workers) {
+            val rows = if (worker == 0) this@fillInSteps else sharingPixels()
+            launch {
+                var filled = 0
+                for (r in worker until rowCount step workers) {
+                    if (filled % ROWS_PER_YIELD == 0) yield()
+                    rows.fill(r)
+                    filled++
+                }
+            }
+        }
+    }
+}
+
+/** [rasterizePlane], built by [fillInSteps] with [rendering]'s workers. */
 internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid, rendering: PlaneRendering = PlaneRendering.Canonical): ImageBitmap {
     val rows = PlaneRows(x, y, held, grid.columns, grid.rows, rendering)
-    for (r in 0 until grid.rows) {
-        if (r % ROWS_PER_YIELD == 0) yield()
-        rows.fill(r)
-    }
+    rows.fillInSteps(planeWorkerCount(rendering))
     return imageBitmapFromPixels(rows.pixels, grid.columns, grid.rows)
 }
 

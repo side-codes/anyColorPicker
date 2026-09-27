@@ -14,7 +14,8 @@ public abstract class PlaneRendering internal constructor() {
      * The default. Each row goes straight to pixels through
      * [GamutMapper.convertToArgb][codes.side.color.GamutMapper.convertToArgb], and a color outside sRGB
      * has its chroma reduced by [EdgeSolver.Iterative][codes.side.color.EdgeSolver.Iterative]. Its pixels
-     * are [Canonical]'s to within one level of each channel.
+     * are [Canonical]'s to within one level of each channel. Its rows are shared among up to four threads
+     * where the platform has them; the browser has one.
      */
     public object Fast : PlaneRendering() {
         override fun toString(): String = "Fast"
