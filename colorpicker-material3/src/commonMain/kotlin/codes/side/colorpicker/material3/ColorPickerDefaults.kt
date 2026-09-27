@@ -24,10 +24,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
-import codes.side.color.ColorChannel
-import codes.side.colorpicker.foundation.ColorSliderScope
-import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.foundation.PlanePart
 import kotlin.math.roundToInt
 
 // Material's slider handle height (SliderTokens.HandleHeight).
@@ -56,7 +53,7 @@ private fun Modifier.planeSize(): Modifier = layout { measurable, constraints ->
 /**
  * Defaults for the Material color picker components: the theme values, whose composable factories read the ambient
  * [MaterialTheme] at the call site and so follow the app's color scheme and shape system; the slider and plane
- * thumbs; and the slots a picker draws unless given others.
+ * thumbs; and the plane a picker draws unless given another.
  */
 public object ColorPickerDefaults {
 
@@ -245,65 +242,16 @@ public object ColorPickerDefaults {
     }
 
     /**
-     * The plane a picker draws unless given another: a [ChannelPlane] over the axes the picker hands it,
-     * filling the width the picker gives it, the whole picker's or its start half's, at 1.6 times its height;
-     * beside the sliders, as tall as they are.
+     * The plane a picker draws unless given another: a [ChannelPlane] over [part]'s axes, filling the width
+     * the picker gives it, the whole picker's or its start half's, at 1.6 times its height; beside the sliders,
+     * as tall as they are. For a plane slot that wraps it or adds to [modifier].
+     *
+     * The channel and alpha sliders a picker draws unless given others need no such function:
+     * `ChannelSlider(part.state, part.channel)` and `AlphaSlider(part.state)` take the picker's thumb, coloring,
+     * enabled state and theme, and report to its `onValueChangeFinished`, from inside it.
      */
-    public fun plane(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit = { state, x, y ->
-        ChannelPlane(
-            state,
-            x,
-            y,
-            Modifier.planeSize(),
-            enabled = enabled,
-            onValueChangeFinished = onValueChangeFinished,
-        )
-    }
-
-    /** The slider a picker draws for each channel unless given another: a [ChannelSlider] coloured by [coloringMode]. */
-    public fun channelSlider(
-        enabled: Boolean,
-        coloringMode: ColoringMode,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
-        ChannelSlider(
-            state,
-            channel,
-            enabled = enabled,
-            coloringMode = coloringMode,
-            onValueChangeFinished = onValueChangeFinished,
-            thumb = thumb,
-        )
-    }
-
-    /**
-     * [channelSlider] with each channel coloured as its own space's sliders are by default:
-     * [ColoringMode.defaultFor] that space.
-     */
-    public fun channelSlider(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
-        ChannelSlider(
-            state,
-            channel,
-            enabled = enabled,
-            onValueChangeFinished = onValueChangeFinished,
-            thumb = thumb,
-        )
-    }
-
-    /** The alpha slider a picker draws unless given another: an [AlphaSlider]. */
-    public fun alphaSlider(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState) -> Unit = { state ->
-        AlphaSlider(state, enabled = enabled, onValueChangeFinished = onValueChangeFinished, thumb = thumb)
+    @Composable
+    public fun Plane(part: PlanePart, modifier: Modifier = Modifier) {
+        ChannelPlane(part.state, part.x, part.y, modifier.planeSize())
     }
 }

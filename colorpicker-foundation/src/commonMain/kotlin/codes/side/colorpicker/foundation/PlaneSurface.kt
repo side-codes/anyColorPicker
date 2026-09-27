@@ -246,22 +246,22 @@ internal suspend fun PlaneRows.fillInSteps(workers: Int, yields: Boolean = plane
 }
 
 /** One band's raster, to be drawn scaled over the band. */
-internal class PlanePart(val band: PlaneBand, val bitmap: ImageBitmap)
+internal class BandRaster(val band: PlaneBand, val bitmap: ImageBitmap)
 
 /** The parts of a plane, as [planeBands] divides it, each built by [fillInSteps] with [rendering]'s workers. */
-internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlanePart> =
+internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<BandRaster> =
     planeBands(x, y, held, rendering).map { band ->
         val rows = PlaneRows(x, y, held, band.grid.columns, band.grid.rows, rendering, yFrom = band.from, yTo = band.to)
         rows.fillInSteps(planeWorkerCount(rendering))
-        PlanePart(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
+        BandRaster(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
     }
 
 /** [rasterizePlaneInSteps] at once, for a preview's single frame. */
-internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlanePart> =
+internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<BandRaster> =
     planeBands(x, y, held, rendering).map { band ->
         val rows = PlaneRows(x, y, held, band.grid.columns, band.grid.rows, rendering, yFrom = band.from, yTo = band.to)
         for (r in 0 until band.grid.rows) rows.fill(r)
-        PlanePart(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
+        BandRaster(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
     }
 
 /**
@@ -277,7 +277,7 @@ internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray,
  * overhangs the band by half a cell, and only a cell of a pixel or more covers the half pixel a rounded
  * edge can move.
  */
-internal fun DrawScope.drawPlaneParts(parts: List<PlanePart>, rendering: PlaneRendering) {
+internal fun DrawScope.drawPlaneParts(parts: List<BandRaster>, rendering: PlaneRendering) {
     for (part in parts) {
         val top = if (part.band.to == 1.0) 0 else ((1.0 - part.band.to) * size.height).roundToInt()
         val bottom = if (part.band.from == 0.0) size.height.toInt() else ((1.0 - part.band.from) * size.height).roundToInt()
@@ -317,12 +317,12 @@ internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
 internal data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>, val rendering: PlaneRendering)
 
 // Every plane's rasters: a raster is 256 KB at most, and Okhsl's two bands less, so three kept cost under 1 MB.
-private val planeRasters = PlaneRasters<List<PlanePart>>(kept = 3)
+private val planeRasters = PlaneRasters<List<BandRaster>>(kept = 3)
 
 /** A built raster, the pair of channels it shows and how it was built. */
-internal class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val rendering: PlaneRendering, val parts: List<PlanePart>) {
+internal class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val rendering: PlaneRendering, val parts: List<BandRaster>) {
     /** Its parts, if they are what a plane over [x] and [y] with [rendering] draws. */
-    fun partsFor(x: ColorChannel, y: ColorChannel, rendering: PlaneRendering): List<PlanePart>? =
+    fun partsFor(x: ColorChannel, y: ColorChannel, rendering: PlaneRendering): List<BandRaster>? =
         parts.takeIf { x === this.x && y === this.y && rendering === this.rendering }
 }
 

@@ -52,22 +52,22 @@ class BasicColorPickerTest {
     private val teal = Hsl(200.0, 80.0, 50.0)
 
     // Each part as a box tagged with what it is: the plane 40 dp tall, each channel and alpha 20 dp.
-    private val boxPlane: @Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit = { _, _, _ ->
+    private val boxPlane: @Composable (PlanePart) -> Unit = {
         Box(Modifier.fillMaxWidth().height(40.dp).testTag("plane"))
     }
-    private val boxSlider: @Composable (ColorPickerState, ColorChannel) -> Unit = { _, channel ->
-        Box(Modifier.fillMaxWidth().height(20.dp).testTag(channel.id))
+    private val boxSlider: @Composable (ChannelSliderPart) -> Unit = { part ->
+        Box(Modifier.fillMaxWidth().height(20.dp).testTag(part.channel.id))
     }
-    private val boxAlpha: @Composable (ColorPickerState) -> Unit = {
+    private val boxAlpha: @Composable (AlphaSliderPart) -> Unit = {
         Box(Modifier.fillMaxWidth().height(20.dp).testTag("alpha"))
     }
 
     // Each channel as a BasicChannelSlider tagged with the channel's id.
-    private val channelSliders: @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
+    private val channelSliders: @Composable (ChannelSliderPart) -> Unit = { part ->
         BasicChannelSlider(
-            state,
-            channel,
-            Modifier.fillMaxWidth().testTag(channel.id),
+            part.state,
+            part.channel,
+            Modifier.fillMaxWidth().testTag(part.channel.id),
             track = { Box(Modifier.fillMaxWidth().height(8.dp)) },
             thumb = { Box(Modifier.size(20.dp)) },
         )
@@ -82,8 +82,8 @@ class BasicColorPickerTest {
             BasicColorPicker(
                 ColorPickerState(teal),
                 Hsl,
-                plane = { _, x, y ->
-                    axes = x to y
+                plane = { part ->
+                    axes = part.x to part.y
                     Box(Modifier.fillMaxWidth().height(40.dp).testTag("plane"))
                 },
                 channelSlider = boxSlider,
@@ -177,7 +177,7 @@ class BasicColorPickerTest {
             BasicColorPicker(
                 ColorPickerState(teal),
                 Hsl,
-                plane = { _, _, _ -> Box(Modifier.fillMaxWidth().testTag("plane")) },
+                plane = { Box(Modifier.fillMaxWidth().testTag("plane")) },
                 channelSlider = boxSlider,
                 alphaSlider = boxAlpha,
                 modifier = Modifier.width(400.dp),
@@ -199,7 +199,7 @@ class BasicColorPickerTest {
             BasicColorPicker(
                 ColorPickerState(teal),
                 Hsl,
-                plane = { _, _, _ -> Box(Modifier.fillMaxWidth().height(200.dp).testTag("plane")) },
+                plane = { Box(Modifier.fillMaxWidth().height(200.dp).testTag("plane")) },
                 channelSlider = boxSlider,
                 alphaSlider = boxAlpha,
                 modifier = Modifier.width(400.dp),
@@ -218,11 +218,11 @@ class BasicColorPickerTest {
                 ColorPickerState(teal),
                 Hsl,
                 plane = null,
-                channelSlider = { state, channel ->
-                    if (channel === Hsl.H) {
-                        channelSliders(state, channel)
+                channelSlider = { part ->
+                    if (part.channel === Hsl.H) {
+                        channelSliders(part)
                     } else {
-                        Box(Modifier.fillMaxWidth().height(20.dp).testTag(channel.id).clickable { clicks++ })
+                        Box(Modifier.fillMaxWidth().height(20.dp).testTag(part.channel.id).clickable { clicks++ })
                     }
                 },
                 alphaSlider = null,
@@ -315,7 +315,7 @@ class BasicColorPickerTest {
                 ColorPickerState(teal),
                 Hsl,
                 plane = null,
-                channelSlider = { _, _ -> seen = LocalColorPickerEnabled.current },
+                channelSlider = { seen = LocalColorPickerEnabled.current },
                 alphaSlider = null,
                 enabled = enabled,
             )
@@ -324,6 +324,35 @@ class BasicColorPickerTest {
         enabled = false
         waitForIdle()
         assertEquals(false, seen, "a disabled picker says so to a part never handed enabled")
+    }
+
+    @Test
+    fun aLibrarySliderInAPartReportsTheEndOfAnEditToThePicker() = runComposeUiTest {
+        var finished = 0
+        var own = 0
+        setContent {
+            BasicColorPicker(
+                ColorPickerState(teal),
+                Hsl,
+                plane = null,
+                channelSlider = { part ->
+                    BasicChannelSlider(
+                        part.state,
+                        part.channel,
+                        Modifier.fillMaxWidth().testTag(part.channel.id),
+                        onValueChangeFinished = { own++ },
+                        track = { Box(Modifier.fillMaxWidth().height(8.dp)) },
+                        thumb = { Box(Modifier.size(20.dp)) },
+                    )
+                },
+                alphaSlider = null,
+                modifier = Modifier.width(300.dp),
+                onValueChangeFinished = { finished++ },
+            )
+        }
+        onNodeWithTag("h").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        assertEquals(1, own, "the slider's own")
+        assertEquals(1, finished, "and the picker's, which the slot never passed on")
     }
 
     @Test

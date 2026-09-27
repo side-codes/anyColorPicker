@@ -233,12 +233,12 @@ class ControlledPickerTest {
                 space = Hsl,
                 plane = null,
                 // A replaced slot is handed the picker's state, and writing it is how a custom control edits.
-                channelSlider = { state, channel ->
-                    if (channel === Hsl.H) {
-                        TextButton(onClick = { state[Hsl.H] = 120.0 }) { Text("Grün") }
-                        TextButton(onClick = { state.value = Hsl(40.0, 50.0, 60.0) }) { Text("Ocker") }
+                channelSlider = { part ->
+                    if (part.channel === Hsl.H) {
+                        TextButton(onClick = { part.state[Hsl.H] = 120.0 }) { Text("Grün") }
+                        TextButton(onClick = { part.state.value = Hsl(40.0, 50.0, 60.0) }) { Text("Ocker") }
                     } else {
-                        ChannelSlider(state, channel)
+                        ChannelSlider(part.state, part.channel)
                     }
                 },
             )

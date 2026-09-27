@@ -54,7 +54,8 @@ import codes.side.colorpicker.foundation.LocalColorPickerEnabled
  * @param label optional slot shown above the track's start; see [SliderLabel].
  * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
  * @param thumb draws the thumb, reading where it is, whether the slider is enabled, its interactions and
- * its opaque color from [ColorSliderScope]; [ColorPickerDefaults.SliderThumb], a rounded bar, by default.
+ * its opaque color from [ColorSliderScope]; the picker's inside a picker, else
+ * [ColorPickerDefaults.SliderThumb], a rounded bar.
  */
 @Composable
 public fun ColorSlider(
@@ -74,9 +75,7 @@ public fun ColorSlider(
     interactionSource: MutableInteractionSource? = null,
     label: (@Composable () -> Unit)? = null,
     valueLabel: (@Composable () -> Unit)? = null,
-    // this., or this function's own interactionSource and thumbColor would shadow the scope's: the
-    // scope's source is the resolved one, and its color is opaque.
-    thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, this.thumbColor) },
+    thumb: @Composable ColorSliderScope.() -> Unit = pickerThumb(),
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val gradient = remember(trackColors, layoutDirection) { trackBrush(trackColors, layoutDirection) }

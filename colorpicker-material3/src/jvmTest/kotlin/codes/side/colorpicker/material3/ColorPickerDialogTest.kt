@@ -81,12 +81,12 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                channelSlider = { state, channel ->
-                    if (channel === Okhsl.H) {
-                        Text("Farbton ${state.displayValue(channel).roundToInt()}")
-                        TextButton(onClick = { state[Okhsl.H] = 120.0 }) { Text("Grün") }
+                channelSlider = { part ->
+                    if (part.channel === Okhsl.H) {
+                        Text("Farbton ${part.state.displayValue(part.channel).roundToInt()}")
+                        TextButton(onClick = { part.state[Okhsl.H] = 120.0 }) { Text("Grün") }
                     } else {
-                        ChannelSlider(state, channel)
+                        ChannelSlider(part.state, part.channel)
                     }
                 },
             )
@@ -105,7 +105,7 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = {},
                 onDismissRequest = {},
-                channelSlider = { state, channel -> if (channel === Okhsl.H) Text("Farbton") else ChannelSlider(state, channel) },
+                channelSlider = { part -> if (part.channel === Okhsl.H) Text("Farbton") else ChannelSlider(part.state, part.channel) },
             )
         }
         onNodeWithText("Farbton").assertExists()

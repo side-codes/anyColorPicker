@@ -296,35 +296,39 @@ The eleven named pickers are `RgbColorPicker` (sRGB), `HslColorPicker`, `HsvColo
 `OkhslColorPicker`, `OkhsvColorPicker` and `CmykColorPicker`. Each is `ColorPicker` with its
 space fixed and takes the same parameters.
 
-Every part of a picker is a slot, handed the state, and the channel for a slider or the two axes for
-the plane. Replace one to change that part alone — here, the label of one slider:
+Every part of a picker is a slot, handed a part: the state, and the channel for a slider or the two
+axes for the plane. Replace one to change that part alone — here, the label of one slider:
 
 ```kotlin
 HslColorPicker(
     state = state,
-    channelSlider = { state, channel ->
-        if (channel === Hsl.H) {
+    channelSlider = { part ->
+        if (part.channel === Hsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(state, channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
         } else {
-            ChannelSlider(state, channel)
+            ChannelSlider(part.state, part.channel)
         }
     },
 )
 ```
 
-A replacement inherits the picker's colors, shapes and dimensions through the theme, so only
-what you actually want to change has to be named. `enabled` reaches it the same way: in a
-disabled picker, the library's sliders and planes are disabled whether or not they were told,
-and any other control in a slot is refused the pointer:
+A replacement built from the library's sliders and planes inherits the picker's settings, so only
+what you actually want to change has to be named: its colors, shapes and dimensions through the
+theme, its `thumb` and `coloringMode`, and whether it is enabled. In a disabled picker the
+library's sliders and planes are disabled whether or not they were told, and any other control in
+a slot is refused the pointer:
 
 ```kotlin
 HslColorPicker(state = state, enabled = false)   // dimmed, inert, and disabled to a screen reader
 ```
 
-`thumb` reaches every slider in the picker, so [the custom thumb below](#custom-thumb) works
-here too rather than only on a slider built by hand. `onValueChangeFinished` is called when a
-tap or drag ends, and after each key press or screen reader step, whichever part moved.
+`thumb` reaches every slider in the picker that is not given one of its own, so
+[the custom thumb below](#custom-thumb) works here too rather than only on a slider built by hand.
+`onValueChangeFinished` is called when a tap or drag ends, and after each key press or screen
+reader step, whichever part moved; a replaced slider or plane reports to it as well as to its own.
+`ColorPickerDefaults.Plane(part)` is the plane a picker draws unless given another, sized as the
+picker sizes it, for a plane slot that wraps it.
 
 ### Over a value you hold
 
@@ -573,20 +577,20 @@ ColorPickerDialog(
 )
 ```
 
-The picker's slots are handed the dialog's own `ColorPickerState` — without it a replacement would
-have nothing to read or write:
+The picker's slots are handed parts holding the dialog's own `ColorPickerState` — without it a
+replacement would have nothing to read or write:
 
 ```kotlin
 ColorPickerDialog(
     initialValue = state.value,
     onValueSelected = { /* ... */ },
     onDismissRequest = { /* ... */ },
-    channelSlider = { state, channel ->
-        if (channel === Okhsl.H) {
+    channelSlider = { part ->
+        if (part.channel === Okhsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(state, channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
         } else {
-            ChannelSlider(state, channel)
+            ChannelSlider(part.state, part.channel)
         }
     },
 )
@@ -678,30 +682,33 @@ built on these.
 | `ColorComparison`   | `BasicColorComparison`                                                                   |
 | `ColorPickerDialog` | `BasicColorPickerDialogContent` over a `ColorPickerDialogState`, in a window of your own |
 
-A picker with round thumbs and pill tracks, and nothing from Material:
+`BasicColorPicker` hands each slot a part, the state and the channel or the plane's axes, and a
+library slider or plane in a slot takes the picker's `coloringMode` and reports to its
+`onValueChangeFinished` without being told. A picker with round thumbs and pill tracks, and nothing
+from Material:
 
 ```kotlin
 BasicColorPicker(
     state = state,
     space = Okhsv,
-    plane = { s, x, y ->
+    plane = { part ->
         BasicChannelPlane(
-            s, x, y,
+            part.state, part.x, part.y,
             Modifier.fillMaxWidth().aspectRatio(1.6f),
             shape = RoundedCornerShape(16.dp),
             thumb = { RoundThumb(thumbColor) },
         )
     },
-    channelSlider = { s, channel ->
+    channelSlider = { part ->
         BasicChannelSlider(
-            s, channel, Modifier.fillMaxWidth(),
+            part.state, part.channel, Modifier.fillMaxWidth(),
             track = { Box(Modifier.fillMaxWidth().height(12.dp).clip(CircleShape).background(gradient)) },
             thumb = { RoundThumb(thumbColor) },
         )
     },
-    alphaSlider = { s ->
+    alphaSlider = { part ->
         BasicAlphaSlider(
-            s, Modifier.fillMaxWidth(),
+            part.state, Modifier.fillMaxWidth(),
             track = {
                 Box(
                     Modifier.fillMaxWidth().height(12.dp).clip(CircleShape)
@@ -836,7 +843,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | `PlaneActionLabels.Default`                                                                 | `ColorPickerStrings.current.planeAxisActions()`                                          |                                                            |
 | `HslColorPicker(color: HslColor, onColorChange)`                                            | `HslColorPicker(value: ColorValue, onValueChange)` or `(color: Color, onColorChange)`    | fully controlled                                           |
 | a caller's value applied when the gesture ends                                              | applied at once; the callback is synchronous                                             |                                                            |
-| per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { state, channel -> … }`                                                |                                                            |
+| per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { part -> … }`                                                          |                                                            |
 | `showAlpha = false`                                                                         | `alphaSlider = null`                                                                     | `plane = null` leaves the plane out                        |
 | `thumb = { source -> MyThumb(source) }`                                                     | `thumb = { MyThumb(interactionSource) }`                                                 | the slot reads its scope                                   |
 | `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |

@@ -1,6 +1,9 @@
 package codes.side.colorpicker.state
 
+import androidx.compose.runtime.Composable
+import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
+import codes.side.colorpicker.foundation.LocalPickerColoringMode
 
 /**
  * Controls how a slider's gradient track is rendered with respect to other channels.
@@ -28,5 +31,12 @@ public enum class ColoringMode {
          */
         public fun defaultFor(space: ColorSpace): ColoringMode =
             if (space.channels.any { it.isHue }) Independent else Contextual
+
+        /**
+         * The coloring a slider over [channel] takes unless given another: the coloring of the picker it is a part
+         * of, or [defaultFor] the channel's space outside one.
+         */
+        @Composable
+        public fun current(channel: ColorChannel): ColoringMode = LocalPickerColoringMode.current ?: defaultFor(channel.space)
     }
 }

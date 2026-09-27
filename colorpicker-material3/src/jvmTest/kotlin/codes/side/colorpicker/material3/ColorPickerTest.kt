@@ -20,6 +20,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
@@ -33,8 +34,10 @@ import codes.side.color.ColorSpaces
 import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
+import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.state.ColorPickerState
+import codes.side.colorpicker.state.ColoringMode
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -83,7 +86,7 @@ class ColorPickerTest {
             ColorPicker(
                 teal(),
                 space = Hsl,
-                channelSlider = { state, channel -> if (channel === Hsl.H) Text("Farbton") else ChannelSlider(state, channel) },
+                channelSlider = { part -> if (part.channel === Hsl.H) Text("Farbton") else ChannelSlider(part.state, part.channel) },
             )
         }
         onNodeWithText("Farbton").assertExists()
@@ -117,8 +120,8 @@ class ColorPickerTest {
                 plane = null,
                 enabled = false,
                 // The trap this guards: replacing a slider to relabel it, and not forwarding enabled.
-                channelSlider = { s, channel ->
-                    Box(Modifier.testTag(channel.id).width(200.dp)) { ChannelSlider(s, channel, label = null, valueLabel = null) }
+                channelSlider = { part ->
+                    Box(Modifier.testTag(part.channel.id).width(200.dp)) { ChannelSlider(part.state, part.channel, label = null, valueLabel = null) }
                 },
             )
         }
@@ -135,9 +138,9 @@ class ColorPickerTest {
                 teal(),
                 space = Hsl,
                 enabled = false,
-                plane = { s, x, y -> ChannelPlane(s, x, y, Modifier.testTag("plane").size(100.dp)) },
-                channelSlider = { s, channel -> ChannelSlider(s, channel, Modifier.testTag(channel.id)) },
-                alphaSlider = { s -> AlphaSlider(s, Modifier.testTag("alpha")) },
+                plane = { ChannelPlane(it.state, it.x, it.y, Modifier.testTag("plane").size(100.dp)) },
+                channelSlider = { ChannelSlider(it.state, it.channel, Modifier.testTag(it.channel.id)) },
+                alphaSlider = { AlphaSlider(it.state, Modifier.testTag("alpha")) },
             )
         }
         for (tag in listOf("h", "alpha")) {
@@ -170,9 +173,65 @@ class ColorPickerTest {
     }
 
     @Test
+    fun aReplacedPartReportsTheEndOfAnEditToThePicker() = runComposeUiTest {
+        var finished = 0
+        setContent {
+            // Replaced, as a caller relabelling a part does, and never handed the picker's onValueChangeFinished.
+            ColorPicker(
+                ColorPickerState(Okhsl(30.0, 0.5, 0.5)),
+                onValueChangeFinished = { finished++ },
+                plane = { ChannelPlane(it.state, it.x, it.y, Modifier.size(100.dp)) },
+                channelSlider = { ChannelSlider(it.state, it.channel) },
+                alphaSlider = { AlphaSlider(it.state) },
+            )
+        }
+        sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        sliderNamed("Alpha").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        val actions = onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).fetchSemanticsNode()
+            .config[SemanticsActions.CustomActions]
+        runOnUiThread { actions[0].action() }
+        assertEquals(3, finished)
+    }
+
+    @Test
+    fun aReplacedSliderTakesThePickersThumb() = runComposeUiTest {
+        setContent {
+            ColorPicker(
+                teal(),
+                space = Hsl,
+                plane = null,
+                thumb = { Box(Modifier.size(4.dp).testTag("picker thumb")) },
+                channelSlider = { ChannelSlider(it.state, it.channel) },
+                alphaSlider = { AlphaSlider(it.state) },
+            )
+        }
+        assertEquals(4, onAllNodesWithTag("picker thumb", useUnmergedTree = true).fetchSemanticsNodes().size)
+    }
+
+    @Test
+    fun aReplacedSliderTakesThePickersColoringMode() = runComposeUiTest {
+        // HSL's lightness track holds saturation at the color's 80 in context, and at its anchor, 100, on its own.
+        var underThumb: Color? = null
+        setContent {
+            ColorPicker(
+                teal(),
+                space = Hsl,
+                plane = null,
+                coloringMode = ColoringMode.Contextual,
+                channelSlider = { part ->
+                    ChannelSlider(part.state, part.channel, thumb = { if (part.channel === Hsl.L) underThumb = thumbColor })
+                },
+            )
+        }
+        val expected = Hsl(200.0, 80.0, 50.0).toComposeColor()
+        val actual = underThumb!!
+        assertTrue(abs(actual.red - expected.red) < 0.01f && abs(actual.blue - expected.blue) < 0.01f, "expected $expected, was $actual")
+    }
+
+    @Test
     fun thePlaneSlotIsHandedItsAxes() = runComposeUiTest {
         var axes: Pair<ColorChannel, ColorChannel>? = null
-        setContent { ColorPicker(teal(), space = Hsl, plane = { _, x, y -> axes = x to y }) }
+        setContent { ColorPicker(teal(), space = Hsl, plane = { axes = it.x to it.y }) }
         assertEquals(Hsl.S to Hsl.L, axes)
     }
 
@@ -210,17 +269,12 @@ class ColorPickerTest {
     }
 
     @Test
-    fun theDefaultSlotFactoriesBuildWhatThePickerDraws() = runComposeUiTest {
+    fun aPlaneSlotWrappingTheDefaultKeepsItsSize() = runComposeUiTest {
         setContent {
-            ColorPicker(
-                teal(),
-                space = Hsl,
-                plane = ColorPickerDefaults.plane(enabled = true, onValueChangeFinished = {}),
-                channelSlider = ColorPickerDefaults.channelSlider(enabled = true, onValueChangeFinished = {}, thumb = {}),
-                alphaSlider = ColorPickerDefaults.alphaSlider(enabled = true, onValueChangeFinished = {}, thumb = {}),
-            )
+            ColorPicker(teal(), Modifier.width(320.dp), space = Hsl, plane = { ColorPickerDefaults.Plane(it, Modifier.testTag("plane")) })
         }
-        assertEquals(listOf("Hue", "Saturation", "Lightness", "Alpha"), sliderLabels())
+        val plane = onNodeWithTag("plane").getUnclippedBoundsInRoot()
+        assertEquals(200f, (plane.bottom - plane.top).value, 0.5f)
         assertEquals(1, planeCount())
     }
 
@@ -233,8 +287,8 @@ class ColorPickerTest {
                 teal(),
                 Hsl,
                 plane = null,
-                channelSlider = { s, channel ->
-                    if (channel === Hsl.H) ChannelSlider(s, channel, Modifier.width(300.dp).testTag("hue"), colors = drained)
+                channelSlider = { part ->
+                    if (part.channel === Hsl.H) ChannelSlider(part.state, part.channel, Modifier.width(300.dp).testTag("hue"), colors = drained)
                 },
                 alphaSlider = null,
                 enabled = false,

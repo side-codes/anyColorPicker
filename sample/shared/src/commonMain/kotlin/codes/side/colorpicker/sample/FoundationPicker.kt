@@ -37,11 +37,11 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
     BasicColorPicker(
         state = state,
         space = Okhsv,
-        plane = { planeState, x, y ->
+        plane = { part ->
             BasicChannelPlane(
-                planeState,
-                x,
-                y,
+                part.state,
+                part.x,
+                part.y,
                 // The plane draws its surface itself, outside any slot, so it is dimmed here as a whole, thumb and
                 // all, from the picker's state.
                 Modifier
@@ -52,18 +52,18 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
                 thumb = { RoundThumb(thumbColor, 28.dp, dimmed = false) },
             )
         },
-        channelSlider = { sliderState, channel ->
+        channelSlider = { part ->
             BasicChannelSlider(
-                sliderState,
-                channel,
+                part.state,
+                part.channel,
                 Modifier.fillMaxWidth(),
                 track = { PillTrack(gradient, this.enabled) },
                 thumb = { RoundThumb(thumbColor, 24.dp, dimmed = !this.enabled) },
             )
         },
-        alphaSlider = { sliderState ->
+        alphaSlider = { part ->
             BasicAlphaSlider(
-                sliderState,
+                part.state,
                 Modifier.fillMaxWidth(),
                 track = { PillTrack(gradient, this.enabled, checkerboard = true) },
                 thumb = { RoundThumb(thumbColor, 24.dp, dimmed = !this.enabled) },
