@@ -19,14 +19,14 @@ class PlaneThroughputTest {
             plane[i + 2] = 360.0 * x / side
         }
         val out = DoubleArray(count * 4)
-        val converters = listOf(OkLch to Srgb, OkLch to DisplayP3, OkLch to Okhsl, Srgb to OkLch, Hsl to Srgb)
+        val converters = listOf(Oklch to Srgb, Oklch to DisplayP3, Oklch to Okhsl, Srgb to Oklch, Hsl to Srgb)
         for ((from, to) in converters) {
-            val source = if (from == OkLch) plane else DoubleArray(count * 3).also { OkLch.converterTo(from).convert(plane, 0, it, 0, count) }
+            val source = if (from == Oklch) plane else DoubleArray(count * 3).also { Oklch.converterTo(from).convert(plane, 0, it, 0, count) }
             val converter = from.converterTo(to)
             report("${from.id} → ${to.id}", count) { converter.convert(source, 0, out, 0, count) }
         }
         for (method in listOf(GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Css(), GamutMapping.Clip)) {
-            val mapper = Srgb.gamut.mapper(OkLch, method)
+            val mapper = Srgb.gamut.mapper(Oklch, method)
             report("oklch into sRGB, $method", count) { mapper.convert(plane, 0, out, 0, count) }
         }
     }

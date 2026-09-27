@@ -64,10 +64,10 @@ class ColorViewsTest {
     }
 
     @Test
-    fun okLchNamesItsComponents() {
-        val color = OkLch(0.5, 0.1, 120.0, 0.5).asOkLch()
+    fun oklchNamesItsComponents() {
+        val color = Oklch(0.5, 0.1, 120.0, 0.5).asOklch()
         assertEquals(listOf(0.5, 0.1, 120.0, 0.5), listOf(color.l, color.c, color.h, color.alpha))
-        assertEquals(OkLch(0.5, 0.1, 240.0, 0.5), color.with(h = 240.0).value)
+        assertEquals(Oklch(0.5, 0.1, 240.0, 0.5), color.with(h = 240.0).value)
     }
 
     @Test
@@ -133,13 +133,13 @@ class ColorViewsTest {
 
     @Test
     fun aViewPrintsAsItsValue() {
-        val color = OkLch(0.5, 0.1, 120.0)
-        assertEquals(color.toString(), color.asOkLch().toString())
+        val color = Oklch(0.5, 0.1, 120.0)
+        assertEquals(color.toString(), color.asOklch().toString())
     }
 
     @Test
     fun everyLibrarySpaceHasAViewThatConvertsIntoIt() {
-        val color = OkLch(0.6, 0.1, 200.0)
+        val color = Oklch(0.6, 0.1, 200.0)
         val views: Map<ColorSpace, ColorValue> = mapOf(
             Srgb to color.toSrgb().value,
             SrgbLinear to color.toSrgbLinear().value,
@@ -149,7 +149,7 @@ class ColorViewsTest {
             Lab to color.toLab().value,
             Lch to color.toLch().value,
             Oklab to color.toOklab().value,
-            OkLch to color.toOkLch().value,
+            Oklch to color.toOklch().value,
             Hsl to color.toHsl().value,
             Hwb to color.toHwb().value,
             Hsv to color.toHsv().value,

@@ -163,9 +163,9 @@ class ColorValueTest {
         // HWB's grey short of W + B = 100 is W, as browsers give it.
         assertComponents(doubleArrayOf(0.49999, 0.49999, 0.49999), Hwb(180.0, 49.999, 50.0).to(Srgb), 1e-15)
         assertComponents(doubleArrayOf(0.5, 0.5, 0.5), Hwb(180.0, 60.0, 60.0).to(Srgb), 1e-15)
-        val grey = Lch(20.0, 0.0015, 180.0).to(OkLch)
-        assertTrue(grey.isMissing(OkLch.H))
-        assertEquals(0.0, grey[OkLch.C])
+        val grey = Lch(20.0, 0.0015, 180.0).to(Oklch)
+        assertTrue(grey.isMissing(Oklch.H))
+        assertEquals(0.0, grey[Oklch.C])
         assertTrue(Lch(20.0, 0.00151, 180.0).to(Lab)[Lab.A]!! < 0.0)
     }
 

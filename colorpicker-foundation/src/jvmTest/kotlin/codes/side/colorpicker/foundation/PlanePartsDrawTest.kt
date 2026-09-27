@@ -21,7 +21,7 @@ class PlanePartsDrawTest {
         var red = -1f
         runComposeUiTest {
             val raster = imageBitmapFromPixels(intArrayOf(0xFF000000.toInt(), 0xFF000000.toInt(), -1, -1), 2, 2)
-            val parts = listOf(PlanePart(PlaneBand(0.0, 1.0, PlaneGrid(2, 2)), raster))
+            val parts = listOf(BandRaster(PlaneBand(0.0, 1.0, PlaneGrid(2, 2)), raster))
             setContent { Canvas(Modifier.size(100.dp).testTag("plane")) { drawPlaneParts(parts, rendering) } }
             val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
             red = pixels[pixels.width / 2, pixels.height / 4].red

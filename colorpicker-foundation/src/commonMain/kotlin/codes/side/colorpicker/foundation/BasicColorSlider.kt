@@ -229,6 +229,9 @@ internal fun BasicColorSliderImpl(
                 if (!active) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Taken by an ancestor before the slider saw it: a scrolling parent does so with the
+                    // touch that stops its fling, which is not a tap on the slider.
+                    if (down.isConsumed) return@awaitEachGesture
                     // Consumed, so a clickable row or card around the slider does not take the touch
                     // as its own. A scrolling parent still starts from a consumed down.
                     down.consume()

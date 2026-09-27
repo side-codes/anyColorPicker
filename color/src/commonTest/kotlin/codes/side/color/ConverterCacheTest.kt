@@ -9,7 +9,7 @@ class ConverterCacheTest {
     @Test
     fun aTargetIsCachedOnce() {
         val cache = ConverterCache(Srgb)
-        assertSame(cache.converterTo(OkLch), cache.converterTo(OkLch))
+        assertSame(cache.converterTo(Oklch), cache.converterTo(Oklch))
         assertEquals(1, cache.size)
     }
 

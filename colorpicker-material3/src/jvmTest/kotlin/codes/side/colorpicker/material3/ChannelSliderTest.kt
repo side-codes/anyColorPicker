@@ -32,7 +32,7 @@ import codes.side.color.ColorSpace
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
 import codes.side.color.Lab
-import codes.side.color.OkLch
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
@@ -100,12 +100,12 @@ class ChannelSliderTest {
 
     @Test
     fun arrowKeysMoveByTheChannelsStep() = runComposeUiTest {
-        val state = ColorPickerState(OkLch(0.6, 0.1, 30.0))
-        show(state, OkLch.C)
+        val state = ColorPickerState(Oklch(0.6, 0.1, 30.0))
+        show(state, Oklch.C)
         press(Key.DirectionRight)
-        assertNear(0.101, state[OkLch.C], 1e-12)
+        assertNear(0.101, state[Oklch.C], 1e-12)
         press(Key.DirectionLeft, times = 2)
-        assertNear(0.099, state[OkLch.C], 1e-12)
+        assertNear(0.099, state[Oklch.C], 1e-12)
     }
 
     @Test
@@ -183,21 +183,21 @@ class ChannelSliderTest {
 
     @Test
     fun aScreenReaderStepsByTheChannelsStep() = runComposeUiTest {
-        show(ColorPickerState(OkLch(0.6, 0.1, 30.0)), OkLch.C)
+        show(ColorPickerState(Oklch(0.6, 0.1, 30.0)), Oklch.C)
         // Compose moves a slider by a (steps + 1)th of its range per increment: 0.4 in steps of 0.001.
         assertEquals(399, progress().steps)
     }
 
     @Test
     fun aValueOutsideTheRangePinsTheThumbAndKeepsItsNumber() = runComposeUiTest {
-        val vivid = OkLch(0.7, 0.5, 150.0)
+        val vivid = Oklch(0.7, 0.5, 150.0)
         val state = ColorPickerState(vivid)
-        show(state, OkLch.C)
+        show(state, Oklch.C)
         assertEquals(1f, progress().current)
         onNodeWithText("0.500").assertExists()
         assertSame(vivid, state.value, "showing the value must not write it")
         press(Key.DirectionLeft)
-        assertNear(0.4, state[OkLch.C], message = "a key press moves it into range")
+        assertNear(0.4, state[Oklch.C], message = "a key press moves it into range")
     }
 
     @Test

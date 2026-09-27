@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
-import codes.side.color.OkLch
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
@@ -97,8 +97,8 @@ class BasicChannelSliderTest {
         var seenFraction = -1f
         var seenValue = -1.0
         showChannel(
-            ColorPickerState(OkLch(0.7, 0.5, 150.0)),
-            OkLch.C,
+            ColorPickerState(Oklch(0.7, 0.5, 150.0)),
+            Oklch.C,
             thumb = {
                 seenFraction = fraction
                 seenValue = value
@@ -158,11 +158,11 @@ class BasicChannelSliderTest {
 
     @Test
     fun keysStepByTheChannelsStep() = runComposeUiTest {
-        val state = ColorPickerState(OkLch(0.6, 0.1, 30.0))
-        showChannel(state, OkLch.C)
+        val state = ColorPickerState(Oklch(0.6, 0.1, 30.0))
+        showChannel(state, Oklch.C)
         onNodeWithTag("slider").requestFocus()
         onNodeWithTag("slider").performKeyInput { pressKey(Key.DirectionRight) }
-        assertNear(0.101, state[OkLch.C], 1e-12)
+        assertNear(0.101, state[Oklch.C], 1e-12)
     }
 
     @Test

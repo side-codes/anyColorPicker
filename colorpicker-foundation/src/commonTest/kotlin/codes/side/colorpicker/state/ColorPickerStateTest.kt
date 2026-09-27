@@ -6,9 +6,9 @@ import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.isInGamut
 import kotlin.test.Test
@@ -51,18 +51,18 @@ class ColorPickerStateTest {
     fun setLeavesTheValueInTheChannelsSpace() {
         val red = Srgb(1.0, 0.0, 0.0)
         val state = ColorPickerState(red)
-        state[OkLch.C] = 0.1
-        assertEquals(OkLch, state.value.space)
-        assertEquals(0.1, state.value[OkLch.C])
-        assertNear(red.to(OkLch)[OkLch.L]!!, state.value[OkLch.L])
-        assertNear(red.to(OkLch)[OkLch.H]!!, state.value[OkLch.H])
+        state[Oklch.C] = 0.1
+        assertEquals(Oklch, state.value.space)
+        assertEquals(0.1, state.value[Oklch.C])
+        assertNear(red.to(Oklch)[Oklch.L]!!, state.value[Oklch.L])
+        assertNear(red.to(Oklch)[Oklch.H]!!, state.value[Oklch.H])
     }
 
     @Test
     fun setNullWritesNone() {
-        val state = ColorPickerState(OkLch(0.5, 0.1, 200.0))
-        state[OkLch.L] = null
-        assertTrue(state.value.isMissing(OkLch.L))
+        val state = ColorPickerState(Oklch(0.5, 0.1, 200.0))
+        state[Oklch.L] = null
+        assertTrue(state.value.isMissing(Oklch.L))
     }
 
     @Test
@@ -98,10 +98,10 @@ class ColorPickerStateTest {
 
     @Test
     fun aMissingComponentOtherThanTheHueStaysMissing() {
-        val state = ColorPickerState(OkLch(null, 0.1, 200.0))
-        state[OkLch.C] = 0.2
-        assertTrue(state.value.isMissing(OkLch.L))
-        assertEquals(0.0, state.displayValue(OkLch.L))
+        val state = ColorPickerState(Oklch(null, 0.1, 200.0))
+        state[Oklch.C] = 0.2
+        assertTrue(state.value.isMissing(Oklch.L))
+        assertEquals(0.0, state.displayValue(Oklch.L))
     }
 
     @Test
@@ -139,7 +139,7 @@ class ColorPickerStateTest {
 
     @Test
     fun eachOkSpaceReadsBackWhatWasWrittenToIt() {
-        for (white in listOf(Okhsl(0.0, 0.0, 1.0), Okhsv(0.0, 0.0, 1.0), OkLch(1.0, 0.0, 0.0))) {
+        for (white in listOf(Okhsl(0.0, 0.0, 1.0), Okhsv(0.0, 0.0, 1.0), Oklch(1.0, 0.0, 0.0))) {
             val state = ColorPickerState(Okhsl(140.0, 0.9, 0.5))
             state.value = white
             assertEquals(white, state.value)

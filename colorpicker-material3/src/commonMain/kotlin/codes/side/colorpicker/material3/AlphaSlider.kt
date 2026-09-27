@@ -17,7 +17,7 @@ import codes.side.colorpicker.state.ColorPickerState
  * opaque; a screen reader steps by 0.01.
  *
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
- * step that changes the value.
+ * step that changes the value. Inside a picker the picker's is called too.
  * @param semanticLabel accessibility description of the slider; "Alpha" from [ColorPickerStrings] by
  * default.
  * @param semanticValueText accessibility announcement of the current value (`0..255`), in the locale's
@@ -25,8 +25,8 @@ import codes.side.colorpicker.state.ColorPickerState
  * @param dimensions the track's height and the room it leaves for the thumb; see [ColorSlider].
  * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
  * provided, interactions will still happen internally.
- * @param thumb draws the thumb, reading the alpha and the opaque color from [AlphaSliderScope];
- * [ColorPickerDefaults.SliderThumb] by default.
+ * @param thumb draws the thumb, reading the alpha and the opaque color from [AlphaSliderScope]; the picker's
+ * inside a picker, else [ColorPickerDefaults.SliderThumb].
  */
 @Composable
 public fun AlphaSlider(
@@ -42,8 +42,7 @@ public fun AlphaSlider(
     interactionSource: MutableInteractionSource? = null,
     label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.alphaName()) },
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
-    // this., or this function's own interactionSource would shadow the scope's resolved one.
-    thumb: @Composable AlphaSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(this.interactionSource, thumbColor) },
+    thumb: @Composable AlphaSliderScope.() -> Unit = pickerThumb(),
 ) {
     SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
         BasicAlphaSlider(

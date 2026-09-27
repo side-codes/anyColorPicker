@@ -22,6 +22,16 @@ class HueSaturationTest {
     }
 
     @Test
+    fun aHwbHueThatComesOutPowerlessLeavesAnExactGrey() {
+        // W + B at 99.9996 makes the hue powerless, and CSS Color 4 §4.4.1 then sets B to 100 − W: kept as it was, the
+        // chroma left over would come back under the hue missing reads as, red, rather than the blue it was.
+        val hwb = Srgb(0.5, 0.5, 0.500004).to(Hwb)
+        assertTrue(hwb.isMissing(Hwb.H))
+        assertComponents(doubleArrayOf(0.0, 50.0, 50.0), hwb, 1e-9)
+        assertComponents(doubleArrayOf(0.5, 0.5, 0.5), hwb.to(Srgb), 1e-9)
+    }
+
+    @Test
     fun hsvBothWays() {
         assertComponents(doubleArrayOf(210.0, 88.8888888888889, 90.0), Srgb(0.1, 0.5, 0.9).to(Hsv), 1e-12)
         assertComponents(doubleArrayOf(0.1, 0.5, 0.9), Hsv(210.0, 88.8888888888889, 90.0).to(Srgb), 1e-12)

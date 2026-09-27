@@ -17,7 +17,7 @@ class GamutMapperTest {
         val random = Random(20260927)
         val count = 200
         val sources: List<Pair<ColorSpace, () -> DoubleArray>> = listOf(
-            OkLch to { doubleArrayOf(random.nextDouble(0.0, 1.1), random.nextDouble(0.0, 0.4), random.nextDouble(0.0, 360.0)) },
+            Oklch to { doubleArrayOf(random.nextDouble(0.0, 1.1), random.nextDouble(0.0, 0.4), random.nextDouble(0.0, 360.0)) },
             Okhsl to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(), random.nextDouble()) },
             Okhsv to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(), random.nextDouble()) },
             Oklab to { doubleArrayOf(random.nextDouble(0.0, 1.1), random.nextDouble(-0.4, 0.4), random.nextDouble(-0.4, 0.4)) },
@@ -50,13 +50,13 @@ class GamutMapperTest {
     @Test
     fun oneColorMapsInPlace() {
         val color = doubleArrayOf(0.7, 0.35, 30.0)
-        Srgb.gamut.mapper(OkLch, GamutMapping.Css()).convert(color, color)
-        assertComponents(OkLch(0.7, 0.35, 30.0).toGamut(Srgb.gamut).components(), Srgb(color[0], color[1], color[2]), 0.0)
+        Srgb.gamut.mapper(Oklch, GamutMapping.Css()).convert(color, color)
+        assertComponents(Oklch(0.7, 0.35, 30.0).toGamut(Srgb.gamut).components(), Srgb(color[0], color[1], color[2]), 0.0)
     }
 
     @Test
     fun aMapperReducesChromaUnlessToldOtherwise() {
-        assertEquals(GamutMapping.ChromaReduction(), Srgb.gamut.mapper(OkLch).method)
+        assertEquals(GamutMapping.ChromaReduction(), Srgb.gamut.mapper(Oklch).method)
     }
 
     @Test
@@ -76,11 +76,11 @@ class GamutMapperTest {
         for (step in 0 until 360) {
             for (lightness in listOf(0.1, 0.3, 0.5, 0.7, 0.9, 0.99)) {
                 val edge = Srgb.gamut.maxChroma(lightness, step.toDouble())
-                for (scale in listOf(1.0 - 1e-15, 1.0, 1.0 + 1e-15, 1.0 + 1e-12, 1.0 + 1e-9)) colors += OkLch(lightness, edge * scale, step.toDouble())
+                for (scale in listOf(1.0 - 1e-15, 1.0, 1.0 + 1e-15, 1.0 + 1e-12, 1.0 + 1e-9)) colors += Oklch(lightness, edge * scale, step.toDouble())
             }
         }
         for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
-            val mapper = gamut.mapper(OkLch, GamutMapping.ChromaReduction())
+            val mapper = gamut.mapper(Oklch, GamutMapping.ChromaReduction())
             val mapped = DoubleArray(3)
             for (color in colors) {
                 mapper.convert(color.components(), mapped)
@@ -96,7 +96,7 @@ class GamutMapperTest {
         val random = Random(20261001)
         val count = 300
         val sources: List<Pair<ColorSpace, () -> DoubleArray>> = listOf(
-            OkLch to { doubleArrayOf(random.nextDouble(0.0, 1.05), random.nextDouble(0.0, 0.4), random.nextDouble(0.0, 360.0)) },
+            Oklch to { doubleArrayOf(random.nextDouble(0.0, 1.05), random.nextDouble(0.0, 0.4), random.nextDouble(0.0, 360.0)) },
             Okhsl to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(), random.nextDouble()) },
             Lch to { doubleArrayOf(random.nextDouble(0.0, 105.0), random.nextDouble(0.0, 150.0), random.nextDouble(0.0, 360.0)) },
             Hwb to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(0.0, 100.0), random.nextDouble(0.0, 100.0)) },
@@ -129,10 +129,10 @@ class GamutMapperTest {
         for (step in 0 until 360) {
             for (lightness in listOf(0.1, 0.3, 0.5, 0.7, 0.9, 0.99)) {
                 val edge = Srgb.gamut.maxChroma(lightness, step.toDouble())
-                for (scale in listOf(1.0 - 1e-15, 1.0, 1.0 + 1e-15, 1.0 + 1e-12, 1.0 + 1e-9)) colors += OkLch(lightness, edge * scale, step.toDouble())
+                for (scale in listOf(1.0 - 1e-15, 1.0, 1.0 + 1e-15, 1.0 + 1e-12, 1.0 + 1e-9)) colors += Oklch(lightness, edge * scale, step.toDouble())
             }
         }
-        val mapper = Srgb.gamut.mapper(OkLch)
+        val mapper = Srgb.gamut.mapper(Oklch)
         val mapped = DoubleArray(3)
         val pixel = IntArray(1)
         for (color in colors) {
@@ -144,7 +144,7 @@ class GamutMapperTest {
 
     @Test
     fun packingChecksItsBounds() {
-        val mapper = Srgb.gamut.mapper(OkLch)
+        val mapper = Srgb.gamut.mapper(Oklch)
         assertFailsWith<IllegalArgumentException> { mapper.convertToArgb(DoubleArray(6), 0, IntArray(1), 0, 2) }
         assertFailsWith<IllegalArgumentException> { mapper.convertToArgb(DoubleArray(5), 0, IntArray(2), 0, 2) }
     }
@@ -154,7 +154,7 @@ class GamutMapperTest {
         // Through the table and through encoding alike: from these colors convert carries the NaN into every channel,
         // and each packs as 0.
         val gamma = ColorSpace.rgb("--gamma-nan", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.gamma(2.2))
-        val sources = listOf(OkLch to doubleArrayOf(0.5, 0.1, 120.0), Srgb to doubleArrayOf(0.5, 0.4, 0.3))
+        val sources = listOf(Oklch to doubleArrayOf(0.5, 0.1, 120.0), Srgb to doubleArrayOf(0.5, 0.4, 0.3))
         for ((space, color) in sources) {
             for (gamut in listOf(Srgb.gamut, gamma.gamut)) {
                 for (method in methods) {

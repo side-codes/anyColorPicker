@@ -34,10 +34,11 @@ import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
+import codes.side.colorpicker.state.rememberColorPickerState
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -80,12 +81,12 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                channelSlider = { state, channel ->
-                    if (channel === Okhsl.H) {
-                        Text("Farbton ${state.displayValue(channel).roundToInt()}")
-                        TextButton(onClick = { state[Okhsl.H] = 120.0 }) { Text("Grün") }
+                channelSlider = { part ->
+                    if (part.channel === Okhsl.H) {
+                        Text("Farbton ${part.state.displayValue(part.channel).roundToInt()}")
+                        TextButton(onClick = { part.state[Okhsl.H] = 120.0 }) { Text("Grün") }
                     } else {
-                        ChannelSlider(state, channel)
+                        ChannelSlider(part.state, part.channel)
                     }
                 },
             )
@@ -104,7 +105,7 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = {},
                 onDismissRequest = {},
-                channelSlider = { state, channel -> if (channel === Okhsl.H) Text("Farbton") else ChannelSlider(state, channel) },
+                channelSlider = { part -> if (part.channel === Okhsl.H) Text("Farbton") else ChannelSlider(part.state, part.channel) },
             )
         }
         onNodeWithText("Farbton").assertExists()
@@ -267,7 +268,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun sevenSpacesAreAMenu() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
         onAllNodes(radioButton).assertCountEquals(0)
         onNodeWithText("Okhsl").performClick()
@@ -279,7 +280,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun theMenuIsAListOfRadioButtons() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
         onNodeWithText("Okhsl")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.DropdownList))
@@ -292,7 +293,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun aDisabledMenuDoesNotOpen() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces, enabled = false) }
         onNodeWithText("Okhsl").assertIsNotEnabled().performClick()
         onAllNodes(radioButton).assertCountEquals(0)
@@ -353,7 +354,7 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                header = { ColorPickerDialogDefaults.Header(state, enabled = false) },
+                header = { ColorPickerDialogDefaults.Header(dialogState, enabled = false) },
             )
         }
         sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
@@ -376,11 +377,14 @@ class ColorPickerDialogTest {
     fun aSlotConfirmsThroughTheScope() = runComposeUiTest {
         var selected: ColorValue? = null
         setContent {
+            // A caller that opens the dialog from a picker holds a state of its own, and whatever it is called must not
+            // hide the scope's member from the slot.
+            val state = rememberColorPickerState(teal)
             ColorPickerDialog(
-                initialValue = teal,
+                initialValue = state.value,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                confirmButton = { TextButton(onClick = { confirm() }, enabled = state.isModified) { Text("Apply") } },
+                confirmButton = { TextButton(onClick = { confirm() }, enabled = dialogState.isModified) { Text("Apply") } },
             )
         }
         onNodeWithText("Apply").assertIsNotEnabled()

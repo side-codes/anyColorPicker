@@ -131,9 +131,23 @@ class OkhsxTest {
     }
 
     @Test
+    fun okhsvRoundTripsJustPastPureBlue() {
+        // Just past pure blue's hue sRGB's edge has a gap, a sliver outside it, and Okhsv's square reaches a little past
+        // sRGB's outer edge there. A color the model puts there comes back as it went, not drawn in to the edge first.
+        for (step in 0..60) {
+            val hue = 264.0 + step * 0.005
+            for (s in listOf(0.5, 0.75, 0.9, 0.97, 0.99, 1.0)) for (v in listOf(0.5, 0.75, 0.9, 0.97, 1.0)) {
+                val back = Okhsv(hue, s, v).to(Oklab).to(Okhsv)
+                assertNear(s, back[Okhsv.S]!!, 1e-9, "s at $hue°, s $s, v $v")
+                assertNear(v, back[Okhsv.V]!!, 1e-9, "v at $hue°, s $s, v $v")
+            }
+        }
+    }
+
+    @Test
     fun outsideSrgbTheChromaStopsAtSrgbsEdge() {
         val p3Red = DisplayP3(1.0, 0.0, 0.0)
-        val original = p3Red.to(OkLch)
+        val original = p3Red.to(Oklch)
         assertNear(1.0, p3Red.to(Okhsl)[Okhsl.S]!!, 1e-9)
         // It reaches sRGB's edge through red's ceiling, and Okhsv's s = 1 is the floor's edge.
         assertNear(1.0, p3Red.to(Okhsv)[Okhsv.V]!!, 1e-9)
@@ -142,9 +156,9 @@ class OkhsxTest {
             val rgb = reduced.to(Srgb).components()
             assertTrue(rgb.all { it in -1e-9..1.0 + 1e-9 }, "${space.id} lands in sRGB: ${rgb.toList()}")
             assertNear(1.0, rgb.max(), 1e-9, "${space.id} keeps red at full")
-            val back = reduced.to(OkLch)
-            assertNear(original[OkLch.L]!!, back[OkLch.L]!!, 1e-9, "${space.id} lightness")
-            assertNear(original[OkLch.H]!!, back[OkLch.H]!!, 1e-9, "${space.id} hue")
+            val back = reduced.to(Oklch)
+            assertNear(original[Oklch.L]!!, back[Oklch.L]!!, 1e-9, "${space.id} lightness")
+            assertNear(original[Oklch.H]!!, back[Oklch.H]!!, 1e-9, "${space.id} hue")
         }
     }
 
@@ -154,14 +168,14 @@ class OkhsxTest {
         // which the 0..1 range turns into grey rather than the most colorful sRGB color there.
         for (chroma in doubleArrayOf(0.3, 0.5, 1.0, 3.0)) {
             for (hue in doubleArrayOf(30.0, 100.0, 110.0, 250.0, 264.1)) {
-                val color = OkLch(0.97, chroma, hue)
+                val color = Oklch(0.97, chroma, hue)
                 val at = "chroma $chroma, $hue°"
                 assertNear(1.0, color.to(Okhsl)[Okhsl.S]!!, 1e-9, "okhsl s at $at")
                 for (space in listOf(Okhsl, Okhsv)) {
                     val reduced = color.to(space)
-                    val back = reduced.to(OkLch)
-                    assertNear(0.97, back[OkLch.L]!!, 1e-9, "${space.id} lightness at $at")
-                    assertNear(hue, back[OkLch.H]!!, 1e-9, "${space.id} hue at $at")
+                    val back = reduced.to(Oklch)
+                    assertNear(0.97, back[Oklch.L]!!, 1e-9, "${space.id} lightness at $at")
+                    assertNear(hue, back[Oklch.H]!!, 1e-9, "${space.id} hue at $at")
                     val rgb = reduced.to(Srgb).components()
                     assertTrue(rgb.all { it in -1e-9..1.0 + 1e-9 }, "${space.id} at $at lands in sRGB: ${rgb.toList()}")
                     assertTrue(rgb.any { abs(it) <= 1e-9 || abs(it - 1.0) <= 1e-9 }, "${space.id} at $at sits on sRGB's edge: ${rgb.toList()}")
@@ -171,7 +185,7 @@ class OkhsxTest {
     }
 
     @Test
-    fun okhsxHueIsPowerlessAtOkLchsThreshold() {
+    fun okhsxHueIsPowerlessAtOklchsThreshold() {
         for (space in listOf(Okhsl, Okhsv)) {
             assertTrue(Oklab(0.5, 0.0000039, 0.0).to(space).isMissing(space.channels[0]), space.id)
             assertFalse(Oklab(0.5, 0.0000041, 0.0).to(space).isMissing(space.channels[0]), space.id)
@@ -227,11 +241,11 @@ class OkhsxTest {
 
         override fun toBase(src: DoubleArray, dst: DoubleArray) {
             toBaseCalls++
-            OkLch.toBase(src, dst)
+            Oklch.toBase(src, dst)
         }
 
         override fun fromBase(src: DoubleArray, dst: DoubleArray) {
-            OkLch.fromBase(src, dst)
+            Oklch.fromBase(src, dst)
         }
 
         override val powerlessFromBase: Boolean get() = true

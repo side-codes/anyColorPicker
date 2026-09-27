@@ -51,12 +51,12 @@ class RememberedGamutTest {
         // order. The hues include −0.0 beside 0.0.
         val random = Random(20260930)
         val rowHues = hues + listOf(-0.0, 0.0)
-        for (space in listOf(Okhsl, Okhsv, OkLch, Lch)) {
+        for (space in listOf(Okhsl, Okhsv, Oklch, Lch)) {
             val colors = rowHues.flatMap { hue ->
                 List(12) { row ->
                     List(16) { column ->
                         when (space) {
-                            OkLch -> OkLch(0.04 + row * 0.08, column * 0.4 / 15, hue)
+                            Oklch -> Oklch(0.04 + row * 0.08, column * 0.4 / 15, hue)
                             Lch -> Lch(4.0 + row * 8.0, column * 150.0 / 15, hue)
                             else -> space.color(doubleArrayOf(hue, column / 15.0, 0.04 + row * 0.08))
                         }
@@ -82,7 +82,7 @@ class RememberedGamutTest {
     fun chromaReductionGivesTheSameInAnyOrder() {
         // A plane's rows, chroma across and lightness down, beyond sRGB for most of them.
         val random = Random(20260929)
-        val colors = hues.flatMap { hue -> List(24) { row -> List(32) { column -> OkLch(0.04 + row * 0.04, column * 0.4 / 31, hue) } }.flatten() }
+        val colors = hues.flatMap { hue -> List(24) { row -> List(32) { column -> Oklch(0.04 + row * 0.04, column * 0.4 / 31, hue) } }.flatten() }
         for (method in listOf(GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative))) {
             val inRows = colors.associateWith { it.toGamut(Srgb.gamut, method).components().toList() }
             for (k in colors.indices.shuffled(random)) {

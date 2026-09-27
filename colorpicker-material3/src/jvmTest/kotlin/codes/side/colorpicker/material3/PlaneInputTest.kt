@@ -82,7 +82,7 @@ class PlaneInputTest {
     }
 }
 
-private fun changedPixels(before: PixelMap, after: PixelMap): Int {
+internal fun changedPixels(before: PixelMap, after: PixelMap): Int {
     var changed = 0
     for (x in 0 until before.width) {
         for (y in 0 until before.height) {
@@ -97,5 +97,5 @@ private fun inputMode(mode: InputMode) = object : InputModeManager {
     override fun requestInputMode(inputMode: InputMode): Boolean = false
 }
 
-private val TouchInputMode = inputMode(InputMode.Touch)
-private val KeyboardInputMode = inputMode(InputMode.Keyboard)
+internal val TouchInputMode: InputModeManager = inputMode(InputMode.Touch)
+internal val KeyboardInputMode: InputModeManager = inputMode(InputMode.Keyboard)

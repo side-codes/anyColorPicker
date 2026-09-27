@@ -39,9 +39,9 @@ import codes.side.color.DisplayP3
 import codes.side.color.GamutMapping
 import codes.side.color.Hsl
 import codes.side.color.Hsv
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
@@ -175,15 +175,15 @@ class ChannelPlaneTest {
 
     @Test
     fun stepsComeFromTheChannels() = runComposeUiTest {
-        val state = ColorPickerState(OkLch(0.5, 0.1, 30.0))
-        show(state, OkLch.C, OkLch.L)
+        val state = ColorPickerState(Oklch(0.5, 0.1, 30.0))
+        show(state, Oklch.C, Oklch.L)
         onNodeWithTag("plane").requestFocus()
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
-        assertNear(0.101, state[OkLch.C], 1e-12)
+        assertNear(0.101, state[Oklch.C], 1e-12)
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionUp) }
-        assertNear(0.51, state[OkLch.L], 1e-12)
+        assertNear(0.51, state[Oklch.L], 1e-12)
         onNodeWithTag("plane").performKeyInput { withKeyDown(Key.ShiftLeft) { pressKey(Key.DirectionLeft) } }
-        assertNear(0.091, state[OkLch.C], 1e-12)
+        assertNear(0.091, state[Oklch.C], 1e-12)
     }
 
     @Test
@@ -330,7 +330,7 @@ class ChannelPlaneTest {
             }
         }
         waitUntil(timeoutMillis = 5_000) { vivid(pixels().at(0.85f, 0.95f)) }
-        axes = OkLch.C to OkLch.L
+        axes = Oklch.C to Oklch.L
         val topRight = pixels().at(0.85f, 0.95f)
         assertFalse(vivid(topRight), "Okhsv's raster is drawn under OkLCh's axes: $topRight")
     }

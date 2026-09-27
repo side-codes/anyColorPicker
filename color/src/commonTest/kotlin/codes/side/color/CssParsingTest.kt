@@ -64,7 +64,7 @@ class CssParsingTest {
         assertSame(Lab, ColorValue.parseCss("lab(1 2 3)").space)
         assertSame(Lch, ColorValue.parseCss("lch(1 2 3)").space)
         assertSame(Oklab, ColorValue.parseCss("oklab(0.1 0.2 0.3)").space)
-        assertSame(OkLch, ColorValue.parseCss("oklch(0.1 0.2 3)").space)
+        assertSame(Oklch, ColorValue.parseCss("oklch(0.1 0.2 3)").space)
         assertSame(DisplayP3, ColorValue.parseCss("color(display-p3 1 0 0)").space)
         assertSame(XyzD65, ColorValue.parseCss("color(xyz 1 0 0)").space)
         assertSame(Hsv, ColorValue.parseCss("color(--hsv 1 2 3)").space)

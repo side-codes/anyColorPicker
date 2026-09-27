@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
@@ -163,8 +163,8 @@ class ControlledPickerTest {
 
     @Test
     fun anEditOutsideSrgbSurvivesAColorRoundTrip() = runComposeUiTest {
-        var color by mutableStateOf(OkLch(0.7, 0.1, 150.0).toComposeColor())
-        setContent { ColorPicker(color, { color = it }, space = OkLch, plane = null) }
+        var color by mutableStateOf(Oklch(0.7, 0.1, 150.0).toComposeColor())
+        setContent { ColorPicker(color, { color = it }, space = Oklch, plane = null) }
         setProgress("Chroma", 0.875f)
         waitForIdle()
         onNodeWithText("0.350").assertExists()
@@ -233,12 +233,12 @@ class ControlledPickerTest {
                 space = Hsl,
                 plane = null,
                 // A replaced slot is handed the picker's state, and writing it is how a custom control edits.
-                channelSlider = { state, channel ->
-                    if (channel === Hsl.H) {
-                        TextButton(onClick = { state[Hsl.H] = 120.0 }) { Text("Grün") }
-                        TextButton(onClick = { state.value = Hsl(40.0, 50.0, 60.0) }) { Text("Ocker") }
+                channelSlider = { part ->
+                    if (part.channel === Hsl.H) {
+                        TextButton(onClick = { part.state[Hsl.H] = 120.0 }) { Text("Grün") }
+                        TextButton(onClick = { part.state.value = Hsl(40.0, 50.0, 60.0) }) { Text("Ocker") }
                     } else {
-                        ChannelSlider(state, channel)
+                        ChannelSlider(part.state, part.channel)
                     }
                 },
             )

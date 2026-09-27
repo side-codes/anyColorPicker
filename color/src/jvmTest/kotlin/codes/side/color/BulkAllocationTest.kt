@@ -38,7 +38,7 @@ class BulkAllocationTest {
         val threads = ManagementFactory.getThreadMXBean() as ThreadMXBean
         val count = 10_000
         val report = StringBuilder()
-        for (from in listOf(OkLch, Srgb, Okhsl, Cmyk)) {
+        for (from in listOf(Oklch, Srgb, Okhsl, Cmyk)) {
             for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
                 for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Clip)) {
                     val mapper = gamut.mapper(from, method)

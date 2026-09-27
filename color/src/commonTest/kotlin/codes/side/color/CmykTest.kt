@@ -12,6 +12,14 @@ class CmykTest {
     }
 
     @Test
+    fun aColorWithEveryChannelBelowZeroComesBack() {
+        // Its key is past 1, 1.2 here, which the formula takes in its stride: only a key of exactly 1 leaves the rest
+        // undefined.
+        assertComponents(doubleArrayOf(0.0, -1.5, -1.0, 1.2), Srgb(-0.2, -0.5, -0.4).to(Cmyk), 1e-12)
+        assertComponents(doubleArrayOf(-0.2, -0.5, -0.4), Srgb(-0.2, -0.5, -0.4).to(Cmyk).to(Srgb), 1e-12)
+    }
+
+    @Test
     fun blackIsAllKey() {
         assertComponents(doubleArrayOf(0.0, 0.0, 0.0, 1.0), Srgb(0.0, 0.0, 0.0).to(Cmyk), 0.0)
     }

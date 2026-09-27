@@ -26,11 +26,11 @@ class HexTest {
 
     @Test
     fun colorsOutsideSrgbAreMappedFirst() {
-        val vivid = OkLch(0.7, 0.4, 30.0)
+        val vivid = Oklch(0.7, 0.4, 30.0)
         val css = vivid.toHexString(HexAlpha.None)
         assertEquals(vivid.toGamut(Srgb.gamut).toHexString(HexAlpha.None), css)
         assertNotEquals(css, vivid.toHexString(HexAlpha.None, GamutMapping.Clip))
-        assertEquals("#FFFFFF", OkLch(1.2, 0.1, 30.0).toHexString(HexAlpha.None))
+        assertEquals("#FFFFFF", Oklch(1.2, 0.1, 30.0).toHexString(HexAlpha.None))
     }
 
     @Test

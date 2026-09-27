@@ -11,7 +11,7 @@ class EdgeSolverTimingTest {
         // Recorded, not gated: an LCH C × L and an OkLCh C × L plane at hue 200 on their 256 × 256 grids, taken to
         // Oklab once, then each color brought into sRGB by each solver. The median of 15 runs after 5.
         record("LCH C × L", Lch.converterTo(Oklab)) { row, column -> doubleArrayOf(100.0 * (255 - row) / 255, 150.0 * column / 255, 200.0) }
-        record("OkLCh C × L", OkLch.converterTo(Oklab)) { row, column -> doubleArrayOf((255 - row) / 255.0, 0.4 * column / 255, 200.0) }
+        record("OkLCh C × L", Oklch.converterTo(Oklab)) { row, column -> doubleArrayOf((255 - row) / 255.0, 0.4 * column / 255, 200.0) }
     }
 
     private fun record(label: String, toOklab: ColorConverter, color: (Int, Int) -> DoubleArray) {

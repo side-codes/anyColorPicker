@@ -44,7 +44,7 @@ public sealed interface AlphaSliderScope : ColorSliderScope {
  * the color itself, opaque, so a thumb stays visible at alpha 0.
  *
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
- * step that changes the value.
+ * step that changes the value. Inside a picker the picker's is called too.
  * @param semanticLabel what a screen reader calls the slider, "Alpha" from [ColorPickerStrings] by
  * default; `null` omits it.
  * @param semanticValueText how a screen reader announces the value (`0..255`), in the locale's number
@@ -77,6 +77,7 @@ public fun BasicAlphaSlider(
     }
     val interaction = remember(state) { SliderInteractionGuard(state) }
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
+    val pickerFinished by rememberUpdatedState(LocalPickerEditFinished.current)
 
     // A key press moves from the alpha edits build on, so two presses before a recomposition move two
     // steps.
@@ -102,6 +103,7 @@ public fun BasicAlphaSlider(
         onValueChangeFinished = {
             interaction.end()
             currentFinished()
+            pickerFinished?.invoke()
         },
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,

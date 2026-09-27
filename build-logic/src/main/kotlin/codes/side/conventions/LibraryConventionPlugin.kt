@@ -44,9 +44,11 @@ class LibraryConventionPlugin : Plugin<Project> {
 
             // The JVM default-method mode is pinned on both JVM targets: under a Kotlin release that changed the
             // default, an interface with bodies, such as ColorPickerStrings, would drop its DefaultImpls class, which
-            // code compiled with -jvm-default=disable calls.
+            // code compiled with -jvm-default=disable calls. The bytecode level is pinned too: left alone it follows
+            // the JDK the build runs on, and a desktop app on an older JDK then fails to load the classes.
             jvm {
                 compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_17)
                     jvmDefault.set(JvmDefaultMode.ENABLE)
                 }
             }

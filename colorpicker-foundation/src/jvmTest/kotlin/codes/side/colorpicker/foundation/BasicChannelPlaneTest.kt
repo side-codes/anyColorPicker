@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.assertNear
@@ -65,9 +65,9 @@ class BasicChannelPlaneTest {
     fun aValuePastTheRangeIsDrawnAtTheEdge() = runComposeUiTest {
         var seen = -1f
         showChannels(
-            ColorPickerState(OkLch(0.7, 0.5, 150.0)),
-            OkLch.C,
-            OkLch.L,
+            ColorPickerState(Oklch(0.7, 0.5, 150.0)),
+            Oklch.C,
+            Oklch.L,
             thumb = {
                 seen = xFraction
                 Box(Modifier.size(20.dp))
@@ -105,8 +105,8 @@ class BasicChannelPlaneTest {
 
     @Test
     fun twoChannelsMustBeDifferentChannelsOfOneSpace() {
-        requirePlaneChannels(OkLch.C, OkLch.L)
-        assertFailsWith<IllegalArgumentException> { requirePlaneChannels(Hsl.S, OkLch.L) }
+        requirePlaneChannels(Oklch.C, Oklch.L)
+        assertFailsWith<IllegalArgumentException> { requirePlaneChannels(Hsl.S, Oklch.L) }
         assertFailsWith<IllegalArgumentException> { requirePlaneChannels(Hsl.S, Hsl.S) }
     }
 

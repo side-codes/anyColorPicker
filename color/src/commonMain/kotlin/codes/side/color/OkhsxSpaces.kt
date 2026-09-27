@@ -21,6 +21,11 @@ import kotlin.math.sqrt
  * the gamut. A color converted in from outside sRGB has its chroma reduced to sRGB's edge at the
  * same Oklab lightness and hue, and its lightness held to 0..1. Fitted rather than exact: its
  * mid-chroma anchor is Ottosson's polynomial.
+ *
+ * Just past pure blue's hue, 264.05–264.21°, sRGB's chroma at some lightnesses has a gap, a sliver
+ * outside sRGB between two stretches inside it. The edge the chroma is reduced to is the outer one,
+ * so a color in the sliver keeps its chroma, and a saturation just below 1 there lands in it, by
+ * under a thousandth of a linear channel.
  */
 @OptIn(ExperimentalColorSpaceApi::class)
 public object Okhsl : ColorSpace(
@@ -158,6 +163,10 @@ public object Okhsl : ColorSpace(
  *
  * Like [Okhsl], it describes sRGB only: a color converted in from outside sRGB has its chroma
  * reduced to sRGB's edge at the same Oklab lightness and hue, and its lightness held to 0..1.
+ *
+ * Just past pure blue's hue, 264.05–264.21°, its square reaches a little past sRGB, by under a
+ * thousandth of a linear channel: over the sliver there, and past the outer edge near the cusp. A
+ * color it puts there converts back to the S and V it came from.
  */
 @OptIn(ExperimentalColorSpaceApi::class)
 public object Okhsv : ColorSpace(
@@ -174,6 +183,9 @@ public object Okhsv : ColorSpace(
     public val V: ColorChannel get() = channels[2]
 
     private const val S0 = 0.5
+
+    // How far past 0..1 a color's own S or V may land and still be inside the square: what the round trip rounds off.
+    private const val SQUARE_ROUNDING = 1e-9
 
     override val gamut: RgbGamut get() = Srgb.gamut
 
@@ -214,8 +226,8 @@ public object Okhsv : ColorSpace(
     }
 
     override fun fromBase(src: DoubleArray, dst: DoubleArray) {
-        var l = src[0]
-        var chroma = hypot(src[1], src[2])
+        val l = src[0]
+        val chroma = hypot(src[1], src[2])
         var hue = atan2(src[2], src[1]) * 180.0 / PI
         if (hue < 0.0) hue += 360.0
         if (l <= 0.0 || l >= 1.0) {
@@ -229,8 +241,22 @@ public object Okhsv : ColorSpace(
         val cusp = gamutMemo().cusp(LMS_TO_SRGB_LINEAR, a, b)
         val sMax = cusp.cuspSaturation
         val lCusp = cusp.cuspLightness
-        val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
-        if (chroma > cMax) chroma = cMax
+        dst[0] = if (chroma == 0.0) 0.0 else hue
+        // The model's own inverse first, and the chroma drawn in to sRGB's edge only for a color outside its square,
+        // give or take the rounding at the square's own edges. Just past pure blue's hue the square reaches a little
+        // past sRGB's outer edge, and a color it put there must come back as it went.
+        saturationAndValue(l, chroma, a, b, sMax, lCusp, dst)
+        if (dst[1] !in -SQUARE_ROUNDING..1.0 + SQUARE_ROUNDING || dst[2] !in -SQUARE_ROUNDING..1.0 + SQUARE_ROUNDING) {
+            val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
+            if (chroma > cMax) saturationAndValue(l, cMax, a, b, sMax, lCusp, dst)
+        }
+        dst[1] = dst[1].coerceIn(0.0, 1.0)
+        dst[2] = dst[2].coerceIn(0.0, 1.0)
+    }
+
+    // S and V at Oklab lightness [l] and [chroma] along hue ([a], [b]), whose cusp is [sMax] at [lCusp], into dst[1]
+    // and dst[2], outside 0..1 for a color outside the model's square.
+    private fun saturationAndValue(l: Double, chroma: Double, a: Double, b: Double, sMax: Double, lCusp: Double, dst: DoubleArray) {
         val tMax = cuspT(sMax, lCusp)
         val k = 1.0 - S0 / sMax
         val t = tMax / (chroma + l * tMax)
@@ -239,10 +265,8 @@ public object Okhsv : ColorSpace(
         val lvt = toeInverse(lv)
         val cvt = cv * lvt / lv
         val scaleL = cbrt(1.0 / max(highestLinear(LMS_TO_SRGB_LINEAR, lvt, a * cvt, b * cvt), 0.0))
-        l = toe(l / scaleL)
-        dst[0] = if (chroma == 0.0) 0.0 else hue
-        dst[1] = ((S0 + tMax) * cv / (tMax * S0 + tMax * k * cv)).coerceIn(0.0, 1.0)
-        dst[2] = (l / lv).coerceIn(0.0, 1.0)
+        dst[1] = (S0 + tMax) * cv / (tMax * S0 + tMax * k * cv)
+        dst[2] = toe(l / scaleL) / lv
     }
 
     /** The hue is powerless where the Oklab chroma is at or below OkLCh's 0.000004. */

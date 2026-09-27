@@ -256,6 +256,9 @@ internal fun BasicColorPlaneImpl(
                 if (!active) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
+                    // Taken by an ancestor before the plane saw it: a scrolling parent does so with the
+                    // touch that stops its fling, which is not a touch on the plane.
+                    if (down.isConsumed) return@awaitEachGesture
                     // Pressing takes focus, so the arrow keys carry on from where the finger
                     // left off rather than doing nothing until something is tabbed to.
                     focusRequester.requestFocus()

@@ -51,4 +51,4 @@ public object Oklab : ColorSpace(
 }
 
 /** OkLCh, the polar form of [Oklab]. CSS `oklch()`; its hue is powerless at C ≤ 0.000004. */
-public object OkLch : PolarColorSpace("oklch", Oklab, 0.4, ColorRules.OKLCH_POWERLESS_CHROMA, HueFamily.Oklab)
+public object Oklch : PolarColorSpace("oklch", Oklab, 0.4, ColorRules.OKLCH_POWERLESS_CHROMA, HueFamily.Oklab)

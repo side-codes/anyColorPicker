@@ -9,8 +9,8 @@ import codes.side.color.Hsl
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 import codes.side.color.XyzD50
@@ -59,7 +59,7 @@ internal class CssColorParser(private val text: String, knownSpaces: Collection<
             "lab" -> Lab
             "lch" -> Lch
             "oklab" -> Oklab
-            "oklch" -> OkLch
+            "oklch" -> Oklch
             "color" -> null
             in UNSUPPORTED_FUNCTIONS, in MATH_FUNCTIONS -> fail(token, "$name() is not supported")
             else -> fail(token, "Unknown color function ${token.name}()")

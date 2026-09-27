@@ -24,10 +24,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
-import codes.side.color.ColorChannel
-import codes.side.colorpicker.foundation.ColorSliderScope
-import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
+import codes.side.colorpicker.foundation.PlanePart
 import kotlin.math.roundToInt
 
 // Material's slider handle height (SliderTokens.HandleHeight).
@@ -35,6 +32,10 @@ private val SliderThumbHeight = 44.dp
 
 // How far outside the indicator the focus ring sits.
 private val FocusRingGap = 4.dp
+
+// How far outside the slider thumb its focus ring sits. With the halo's half width, 5 dp past the bar's edge, the ring
+// stays inside the 6 dp gap the track leaves at the default thumb width.
+private val SliderFocusRingGap = 3.dp
 
 // A picker's plane, width over height.
 private const val PLANE_ASPECT_RATIO = 1.6f
@@ -56,7 +57,7 @@ private fun Modifier.planeSize(): Modifier = layout { measurable, constraints ->
 /**
  * Defaults for the Material color picker components: the theme values, whose composable factories read the ambient
  * [MaterialTheme] at the call site and so follow the app's color scheme and shape system; the slider and plane
- * thumbs; and the slots a picker draws unless given others.
+ * thumbs; and the plane a picker draws unless given another.
  */
 public object ColorPickerDefaults {
 
@@ -183,21 +184,36 @@ public object ColorPickerDefaults {
 
     /**
      * The sliders' default thumb, drawn as Material draws its handle: a bar in [color] with round ends,
-     * half as wide while [interactionSource] reports a press or drag. The narrowing is drawn inside a
-     * fixed layout width, so the track beside the thumb does not move as it narrows.
+     * half as wide while [interactionSource] reports a press or drag, and ringed while it holds focus from
+     * the keyboard. The narrowing is drawn inside a fixed layout width, so the track beside the thumb does
+     * not move as it narrows, and the ring stays within the gap the track leaves around it.
      */
     @Composable
     public fun SliderThumb(interactionSource: InteractionSource, color: Color, modifier: Modifier = Modifier) {
         val pressed by interactionSource.collectIsPressedAsState()
         val dragged by interactionSource.collectIsDraggedAsState()
+        // Only for whoever needs it, as on the plane: a ring left after a touch marks a thing a toucher has no way
+        // to act on.
+        val focused by interactionSource.collectIsFocusedAsState()
+        val showFocus = focused && LocalInputModeManager.current.inputMode == InputMode.Keyboard
         Canvas(modifier.size(ThumbWidth, SliderThumbHeight)) {
             val width = if (pressed || dragged) size.width / 2f else size.width
+            val left = (size.width - width) / 2f
             drawRoundRect(
                 color = color,
-                topLeft = Offset((size.width - width) / 2f, 0f),
+                topLeft = Offset(left, 0f),
                 size = Size(width, size.height),
                 cornerRadius = CornerRadius(width / 2f),
             )
+            if (showFocus) {
+                // A white ring over a dark halo, as the plane's indicator, so it reads over any track color.
+                val inset = -SliderFocusRingGap.toPx()
+                val ringLeft = left + inset
+                val ringSize = Size(width - 2 * inset, size.height - 2 * inset)
+                val corner = CornerRadius(ringSize.width / 2f)
+                drawRoundRect(Color.Black.copy(alpha = 0.35f), Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 4.dp.toPx()))
+                drawRoundRect(Color.White, Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 2.dp.toPx()))
+            }
         }
     }
 
@@ -245,65 +261,16 @@ public object ColorPickerDefaults {
     }
 
     /**
-     * The plane a picker draws unless given another: a [ChannelPlane] over the axes the picker hands it,
-     * filling the width the picker gives it, the whole picker's or its start half's, at 1.6 times its height;
-     * beside the sliders, as tall as they are.
+     * The plane a picker draws unless given another: a [ChannelPlane] over [part]'s axes, filling the width
+     * the picker gives it, the whole picker's or its start half's, at 1.6 times its height; beside the sliders,
+     * as tall as they are. For a plane slot that wraps it or adds to [modifier].
+     *
+     * The channel and alpha sliders a picker draws unless given others need no such function:
+     * `ChannelSlider(part.state, part.channel)` and `AlphaSlider(part.state)` take the picker's thumb, coloring,
+     * enabled state and theme, and report to its `onValueChangeFinished`, from inside it.
      */
-    public fun plane(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel, ColorChannel) -> Unit = { state, x, y ->
-        ChannelPlane(
-            state,
-            x,
-            y,
-            Modifier.planeSize(),
-            enabled = enabled,
-            onValueChangeFinished = onValueChangeFinished,
-        )
-    }
-
-    /** The slider a picker draws for each channel unless given another: a [ChannelSlider] coloured by [coloringMode]. */
-    public fun channelSlider(
-        enabled: Boolean,
-        coloringMode: ColoringMode,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
-        ChannelSlider(
-            state,
-            channel,
-            enabled = enabled,
-            coloringMode = coloringMode,
-            onValueChangeFinished = onValueChangeFinished,
-            thumb = thumb,
-        )
-    }
-
-    /**
-     * [channelSlider] with each channel coloured as its own space's sliders are by default:
-     * [ColoringMode.defaultFor] that space.
-     */
-    public fun channelSlider(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState, ColorChannel) -> Unit = { state, channel ->
-        ChannelSlider(
-            state,
-            channel,
-            enabled = enabled,
-            onValueChangeFinished = onValueChangeFinished,
-            thumb = thumb,
-        )
-    }
-
-    /** The alpha slider a picker draws unless given another: an [AlphaSlider]. */
-    public fun alphaSlider(
-        enabled: Boolean,
-        onValueChangeFinished: () -> Unit,
-        thumb: @Composable ColorSliderScope.() -> Unit,
-    ): @Composable (ColorPickerState) -> Unit = { state ->
-        AlphaSlider(state, enabled = enabled, onValueChangeFinished = onValueChangeFinished, thumb = thumb)
+    @Composable
+    public fun Plane(part: PlanePart, modifier: Modifier = Modifier) {
+        ChannelPlane(part.state, part.x, part.y, modifier.planeSize())
     }
 }

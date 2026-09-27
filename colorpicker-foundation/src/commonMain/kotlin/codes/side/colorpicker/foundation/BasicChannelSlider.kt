@@ -56,9 +56,10 @@ public sealed interface ChannelSliderScope : ColorSliderScope {
  * its ends.
  *
  * @param range the values the track spans, within [ColorChannel.limit].
- * @param coloringMode how the gradient holds the other channels.
+ * @param coloringMode how the gradient holds the other channels: the picker's inside a picker, else
+ * [ColoringMode.defaultFor] the channel's space.
  * @param onValueChangeFinished called when a tap or drag ends, and after each key press or screen reader
- * step that changes the value.
+ * step that changes the value. Inside a picker the picker's is called too.
  * @param semanticLabel what a screen reader calls the slider; `null` omits it.
  * @param semanticValueText how a screen reader announces the value, in the channel's units by default;
  * `null` omits it.
@@ -76,7 +77,7 @@ public fun BasicChannelSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     range: ClosedFloatingPointRange<Double> = channel.referenceRange,
-    coloringMode: ColoringMode = ColoringMode.defaultFor(channel.space),
+    coloringMode: ColoringMode = ColoringMode.current(channel),
     onValueChangeFinished: () -> Unit = {},
     semanticLabel: String? = ColorPickerStrings.current.channelSpokenName(channel),
     semanticValueText: String? = ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), true),
@@ -99,6 +100,7 @@ public fun BasicChannelSlider(
     val fraction = fractionOf(value, range)
     val interaction = remember(state) { SliderInteractionGuard(state) }
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
+    val pickerFinished by rememberUpdatedState(LocalPickerEditFinished.current)
 
     // A key press moves from the value edits build on: the state's, or the last one emitted and not
     // yet answered, so two presses before a recomposition move two steps.
@@ -124,6 +126,7 @@ public fun BasicChannelSlider(
         onValueChangeFinished = {
             interaction.end()
             currentFinished()
+            pickerFinished?.invoke()
         },
         semanticLabel = semanticLabel,
         semanticValueText = semanticValueText,

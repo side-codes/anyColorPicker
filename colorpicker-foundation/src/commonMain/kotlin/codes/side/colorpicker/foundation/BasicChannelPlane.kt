@@ -50,7 +50,7 @@ public sealed interface ChannelPlaneScope : ColorPlaneScope {
  * [LocalColorPickerEnabled] inside a picker.
  *
  * @param onValueChangeFinished called when a drag ends, and after each key press or accessibility
- * action that changes the value.
+ * action that changes the value. Inside a picker the picker's is called too.
  * @param shape clips the field. The thumb is drawn outside it, so it stays whole at the edges.
  * @param semanticLabel accessibility description of the surface, "Saturation and lightness" by
  * default; `null` omits it.
@@ -83,6 +83,7 @@ public fun BasicChannelPlane(
     val thumbColor = remember(x, y, displayedKey) { planeThumbColor(x, y, displayed) }
     val interaction = remember(state) { SliderInteractionGuard(state) }
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
+    val pickerFinished by rememberUpdatedState(LocalPickerEditFinished.current)
 
     BasicColorPlaneImpl(
         xValue = fractionOf(displayed[x.index], x.referenceRange),
@@ -117,6 +118,7 @@ public fun BasicChannelPlane(
         onValueChangeFinished = {
             interaction.end()
             currentFinished()
+            pickerFinished?.invoke()
         },
         shape = shape,
         semanticLabel = semanticLabel,

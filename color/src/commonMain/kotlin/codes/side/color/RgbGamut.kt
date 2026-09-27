@@ -41,14 +41,14 @@ public class RgbGamut internal constructor(
         return maxChroma(lmsToLinear, lightness, a, b, cusp.cuspSaturation, cusp.cuspLightness)
     }
 
-    /** The most colorful color of [hue], in degrees, that this gamut holds, in [OkLch]. */
+    /** The most colorful color of [hue], in degrees, that this gamut holds, in [Oklch]. */
     public fun cusp(hue: Double): ColorValue {
         require(hue.isFinite()) { "Hue must be finite, was $hue" }
         val radians = hue * PI / 180.0
         val a = cos(radians)
         val b = sin(radians)
         val cusp = gamutMemo().cusp(lmsToLinear, a, b)
-        return OkLch(cusp.cuspLightness, cusp.cuspLightness * cusp.cuspSaturation, hue)
+        return Oklch(cusp.cuspLightness, cusp.cuspLightness * cusp.cuspSaturation, hue)
     }
 
     /**

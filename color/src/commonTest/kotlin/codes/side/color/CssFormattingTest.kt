@@ -23,7 +23,7 @@ class CssFormattingTest {
         assertEquals("lab(53.241 80.093 67.203)", Lab(53.2408, 80.0925, 67.2032).toCssString())
         assertEquals("lch(53.241 104.55 39.999)", Lch(53.2408, 104.5518, 39.9990).toCssString())
         assertEquals("oklab(0.62796 0.22486 0.12585)", Oklab(0.627955, 0.224863, 0.125846).toCssString())
-        assertEquals("oklch(0.7 0.15 140)", OkLch(0.7, 0.15, 140.0).toCssString())
+        assertEquals("oklch(0.7 0.15 140)", Oklch(0.7, 0.15, 140.0).toCssString())
         assertEquals("color(--hsv 120 50 25)", Hsv(120.0, 50.0, 25.0).toCssString())
         assertEquals("color(--okhsl 120 0.5 0.25)", Okhsl(120.0, 0.5, 0.25).toCssString())
         assertEquals("color(--okhsv 120 0.5 0.25)", Okhsv(120.0, 0.5, 0.25).toCssString())
@@ -42,10 +42,10 @@ class CssFormattingTest {
 
     @Test
     fun missingComponentsAreNoneAndAlphaIsLeftOutAtOne() {
-        assertEquals("oklch(0.5 0 none)", OkLch(0.5, 0.0, null).toCssString())
-        assertEquals("oklch(0.5 0 none / 0.5)", OkLch(0.5, 0.0, null, alpha = 0.5).toCssString())
-        assertEquals("oklch(0.5 0 30 / none)", OkLch(0.5, 0.0, 30.0, alpha = null).toCssString())
-        assertEquals("oklch(0.5 0 30)", OkLch(0.5, 0.0, 30.0, alpha = 0.9999999).toCssString())
+        assertEquals("oklch(0.5 0 none)", Oklch(0.5, 0.0, null).toCssString())
+        assertEquals("oklch(0.5 0 none / 0.5)", Oklch(0.5, 0.0, null, alpha = 0.5).toCssString())
+        assertEquals("oklch(0.5 0 30 / none)", Oklch(0.5, 0.0, 30.0, alpha = null).toCssString())
+        assertEquals("oklch(0.5 0 30)", Oklch(0.5, 0.0, 30.0, alpha = 0.9999999).toCssString())
     }
 
     @Test
@@ -80,7 +80,7 @@ class CssFormattingTest {
         assertEquals("rgb(306, -25.5, 0)", Srgb(1.2, -0.1, 0.0).toCssString(syntax = CssSyntax.Legacy))
         assertEquals("hsl(120, 50%, 25%)", Hsl(120.0, 50.0, 25.0).toCssString(syntax = CssSyntax.Legacy))
         assertEquals("hsla(0, 50%, 25%, 0.25)", Hsl(null, 50.0, 25.0, alpha = 0.25).toCssString(syntax = CssSyntax.Legacy))
-        assertEquals("oklch(0.7 0.15 140)", OkLch(0.7, 0.15, 140.0).toCssString(syntax = CssSyntax.Legacy))
+        assertEquals("oklch(0.7 0.15 140)", Oklch(0.7, 0.15, 140.0).toCssString(syntax = CssSyntax.Legacy))
     }
 
     @Test
