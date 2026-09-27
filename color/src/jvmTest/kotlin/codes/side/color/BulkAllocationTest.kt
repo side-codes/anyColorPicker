@@ -49,6 +49,12 @@ class BulkAllocationTest {
                     mapper.convert(src, 0, dst, 0, count)
                     val allocated = threads.currentThreadAllocatedBytes - before
                     if (allocated >= count) report.appendLine("$mapper: $allocated bytes for $count colors")
+                    val pixels = IntArray(count)
+                    mapper.convertToArgb(src, 0, pixels, 0, 1)
+                    val beforePixels = threads.currentThreadAllocatedBytes
+                    mapper.convertToArgb(src, 0, pixels, 0, count)
+                    val allocatedPixels = threads.currentThreadAllocatedBytes - beforePixels
+                    if (allocatedPixels >= count) report.appendLine("$mapper to pixels: $allocatedPixels bytes for $count colors")
                 }
             }
         }

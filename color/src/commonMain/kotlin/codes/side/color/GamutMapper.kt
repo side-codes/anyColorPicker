@@ -1,8 +1,12 @@
 package codes.side.color
 
+import codes.side.color.internal.ByteCurve
 import codes.side.color.internal.MAX_COMPONENTS
 import codes.side.color.internal.Step
+import codes.side.color.internal.argb
 import codes.side.color.internal.checkBulk
+import codes.side.color.internal.encodedByte
+import codes.side.color.internal.srgbBytes
 
 /**
  * A prepared mapping from [source] into [gamut]'s encoded RGB with [method], for drawing: one color
@@ -84,7 +88,46 @@ public class GamutMapper internal constructor(
         }
     }
 
+    /**
+     * Maps [count] colors packed in [src] from [srcOffset] into opaque `0xAARRGGBB` pixels in [dst]
+     * from [dstOffset], one [Int] a color: each channel what [convert] gives, clamped to `0..1`, times
+     * 255 and rounded. On a gamut with the sRGB curve the bytes come from where that rounding steps
+     * rather than from the curve, and match it exactly.
+     */
+    public fun convertToArgb(src: DoubleArray, srcOffset: Int, dst: IntArray, dstOffset: Int, count: Int) {
+        checkBulk(sourceSize, 1, src.size, srcOffset, dst.size, dstOffset, count, false, source.id, gamut.space.id)
+        val buffer = DoubleArray(2 * MAX_COMPONENTS)
+        val linear = toLinear
+        for (k in 0 until count) {
+            val from = srcOffset + k * sourceSize
+            for (i in 0 until sourceSize) {
+                buffer[i] = src[from + i]
+                buffer[MAX_COMPONENTS + i] = src[from + i]
+            }
+            dst[dstOffset + k] = if (linear == null) {
+                map(buffer)
+                argb(encodedByte(buffer[0]), encodedByte(buffer[1]), encodedByte(buffer[2]))
+            } else {
+                argbThroughLinear(buffer, linear, srgbBytes)
+            }
+        }
+    }
+
     override fun toString(): String = "GamutMapper(${source.id} → $gamut, $method)"
+
+    // As map, ending in a pixel: a color the cube holds in linear light, whose curve keeps it in the cube, goes
+    // straight to the table.
+    private fun argbThroughLinear(buffer: DoubleArray, linear: Array<Step>, bytes: ByteCurve): Int {
+        toLinearLight(buffer, linear)
+        if (!inCube(buffer)) {
+            if (!clearlyOutside(buffer)) {
+                gamut.space.encodeStep.apply(buffer)
+                if (inCube(buffer)) return argb(encodedByte(buffer[0]), encodedByte(buffer[1]), encodedByte(buffer[2]))
+            }
+            mapOutside(buffer)
+        }
+        return argb(bytes.byteOf(buffer[0]), bytes.byteOf(buffer[1]), bytes.byteOf(buffer[2]))
+    }
 
     // Maps the source color held twice in [buffer], at 0 and at MAX_COMPONENTS, to encoded RGB in
     // buffer[0..2]: straight through when the gamut holds it, as toGamut does, else through Oklab.
