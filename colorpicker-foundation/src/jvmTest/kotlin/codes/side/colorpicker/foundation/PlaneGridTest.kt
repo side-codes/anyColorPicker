@@ -112,24 +112,23 @@ class PlaneGridTest {
     private fun okhslBands(hue: Double) = planeBands(Okhsl.S, Okhsl.L, doubleArrayOf(hue, 0.0, 0.0), PlaneRendering.Fast)
 
     // No band grid holds 2.5/255: the plane's right edge, where a channel reaches zero and the sRGB curve rises
-    // steeply from it, is what the error comes from, and more columns only whittle it. The bands hold what they
-    // measure, which is less than the single 256 × 256 grid's 29.34.
+    // steeply from it, is what the error comes from, and more columns only whittle it. The bands keep the single
+    // grid's 256 columns, so that edge is no worse than the single grid draws it, and hold what it costs there,
+    // less than the single grid's 29.34, which its crease adds to.
     @Test
-    fun okhslBandsHoldTheirRecordedError() {
+    fun okhslBandsHoldTheRightEdgesError() {
         for (index in 0..1) {
             val worst = hues(OKHSL_BAND_PEAK).maxOf { hue -> okhslBands(hue)[index].let { worstBandError(hue, it, it.grid.columns, it.grid.rows) } }
-            assertTrue(worst <= 25.05, "Okhsl band $index: ${decimals(worst, 2)}/255, over 25.05")
+            assertTrue(worst <= 12.83, "Okhsl band $index: ${decimals(worst, 2)}/255, over 12.83")
         }
     }
 
-    // The bands' grids are the smallest that do better than the single grid: halving either axis does not.
+    // Each band's rows are the fewest that leave only the right edge's error: halving them adds to it.
     @Test
-    fun okhslBandGridsAreTheSmallest() {
+    fun okhslBandRowsAreTheFewest() {
         for (index in 0..1) {
-            val narrower = hues(OKHSL_BAND_PEAK).maxOf { hue -> okhslBands(hue)[index].let { worstBandError(hue, it, it.grid.columns / 2, it.grid.rows) } }
             val shorter = hues(OKHSL_BAND_PEAK).maxOf { hue -> okhslBands(hue)[index].let { worstBandError(hue, it, it.grid.columns, it.grid.rows / 2) } }
-            assertTrue(narrower > 29.34, "band $index: half the columns would do, ${decimals(narrower, 2)}/255")
-            assertTrue(shorter > 29.34, "band $index: half the rows would do, ${decimals(shorter, 2)}/255")
+            assertTrue(shorter > 12.83, "band $index: half the rows would do, ${decimals(shorter, 2)}/255")
         }
     }
 

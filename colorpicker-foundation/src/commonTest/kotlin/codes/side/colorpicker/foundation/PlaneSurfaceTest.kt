@@ -104,7 +104,7 @@ class PlaneSurfaceTest {
             val crease = okhslCrease(hue)
             val bands = planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Fast)
             assertEquals(listOf(crease to 1.0, 0.0 to crease), bands.map { it.from to it.to }, "at $hue°")
-            assertEquals(listOf(listOf(96, 16), listOf(96, 16)), bands.map { listOf(it.grid.columns, it.grid.rows) }, "at $hue°")
+            assertEquals(listOf(listOf(256, 64), listOf(256, 16)), bands.map { listOf(it.grid.columns, it.grid.rows) }, "at $hue°")
             assertEquals(listOf(0.0 to 1.0), planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Canonical).map { it.from to it.to })
         }
         assertEquals(1, planeBands(OkLch.C, OkLch.L, doubleArrayOf(0.0, 0.0, 200.0), PlaneRendering.Fast).size)

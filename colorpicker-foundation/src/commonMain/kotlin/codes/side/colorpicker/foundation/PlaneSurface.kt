@@ -64,12 +64,15 @@ private val OKHSV_GRID = PlaneGrid(64, 32)
 private val OKHSL_GRID = PlaneGrid(256, 256)
 
 /**
- * Each of Okhsl's saturation × lightness bands under [PlaneRendering.Fast], split at the crease:
- * 25.04/255 at worst, at hue 110, measured as the grids above over the band's own range. What is left is
- * the right edge, which more columns only whittle; halving either axis measures more than the single
- * grid's 29.34.
+ * Okhsl's saturation × lightness above its crease under [PlaneRendering.Fast]: 12.82/255 at worst, at
+ * hue 110, measured as the grids above over the band's own range. What is left is the right edge's,
+ * which more columns only whittle, so the band keeps the single grid's 256 columns and draws that edge
+ * no worse; 32 rows measure 14.53.
  */
-private val OKHSL_BAND_GRID = PlaneGrid(96, 16)
+private val OKHSL_UPPER_GRID = PlaneGrid(256, 64)
+
+/** Okhsl's saturation × lightness below its crease: 12.82/255 at worst, at hue 110; 8 rows measure 35.90. */
+private val OKHSL_LOWER_GRID = PlaneGrid(256, 16)
 
 /**
  * OkLCh's chroma × lightness: no grid holds 2.5/255, because the color creases where chroma reduction
@@ -106,7 +109,7 @@ internal class PlaneBand(val from: Double, val to: Double, val grid: PlaneGrid)
 internal fun planeBands(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlaneBand> {
     if (rendering !== PlaneRendering.Fast || x !== Okhsl.S || y !== Okhsl.L) return listOf(PlaneBand(0.0, 1.0, planeGridOf(x, y)))
     val crease = okhslCrease(held[Okhsl.H.index])
-    return listOf(PlaneBand(crease, 1.0, OKHSL_BAND_GRID), PlaneBand(0.0, crease, OKHSL_BAND_GRID))
+    return listOf(PlaneBand(crease, 1.0, OKHSL_UPPER_GRID), PlaneBand(0.0, crease, OKHSL_LOWER_GRID))
 }
 
 /** The grid a plane over [x] and [y] is rasterized at. */
@@ -259,11 +262,12 @@ internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray,
  * nothing. The plane's own top and bottom are its drawing area's.
  *
  * [PlaneRendering.Fast] puts each sample where the grids are measured with it: the first and last rows
- * and columns on the band's edges. Scaled whole, a raster's outer samples sit half a cell in, and the
- * filter holds the edge over the half cell outside them, a flat strip ten pixels tall on a band of
- * sixteen rows; [PlaneRendering.Canonical] is still drawn that way. So is a band whose cells are smaller
- * than a pixel, where the strip cannot be seen: drawn aligned, its raster overhangs the band by half a
- * cell, and only a cell of a pixel or more covers the half pixel a rounded edge can move.
+ * and columns on the band's edges. Scaled whole, as [PlaneRendering.Canonical]'s rasters are, a
+ * raster's outer samples sit half a cell in, and the filter holds the edge over the half cell outside
+ * them: on a band of 16 rows 160 pixels tall, a flat strip five pixels deep. A band whose cells are
+ * smaller than a pixel is scaled whole too, where the strip cannot be seen: drawn aligned, its raster
+ * overhangs the band by half a cell, and only a cell of a pixel or more covers the half pixel a rounded
+ * edge can move.
  */
 internal fun DrawScope.drawPlaneParts(parts: List<PlanePart>, rendering: PlaneRendering) {
     for (part in parts) {

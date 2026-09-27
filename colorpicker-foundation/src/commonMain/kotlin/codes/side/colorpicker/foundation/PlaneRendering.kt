@@ -15,10 +15,11 @@ public abstract class PlaneRendering internal constructor() {
      * [GamutMapper.convertToArgb][codes.side.color.GamutMapper.convertToArgb], and a color outside sRGB
      * has its chroma reduced by [EdgeSolver.Iterative][codes.side.color.EdgeSolver.Iterative]. Its pixels
      * are [Canonical]'s to within one level of each channel, except Okhsl's saturation × lightness, which
-     * is two bands split at its cusp's lightness, each on a 96 × 16 grid that follows the crease exactly
-     * and measures less error than Canonical's 256 × 256. Its rows are shared among up to four threads
-     * where the platform has them; the browser has one. Its samples are drawn where its grids are
-     * measured with them, the outermost on the plane's edges, where Canonical's sit half a cell in.
+     * is two bands split at its cusp's lightness, with Canonical's 256 columns and fewer rows, that follow
+     * the crease exactly: 12.82/255 at worst, where Canonical measures 29.34. Its rows are shared among
+     * up to four threads where the platform has them; the browser has one. Its samples are drawn where
+     * its grids are measured with them, the outermost on the plane's edges, where Canonical's sit half a
+     * cell in.
      */
     public object Fast : PlaneRendering() {
         override fun toString(): String = "Fast"
