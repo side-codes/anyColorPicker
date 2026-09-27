@@ -96,7 +96,28 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
     }
 }
 
+abstract class codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver|null[0]
+    final object ClosedForm : codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver.ClosedForm|null[0]
+        final fun toString(): kotlin/String // codes.side.color/EdgeSolver.ClosedForm.toString|toString(){}[0]
+    }
+
+    final object Iterative : codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver.Iterative|null[0]
+        final fun toString(): kotlin/String // codes.side.color/EdgeSolver.Iterative.toString|toString(){}[0]
+    }
+}
+
 abstract class codes.side.color/GamutMapping { // codes.side.color/GamutMapping|null[0]
+    final class ChromaReduction : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.ChromaReduction|null[0]
+        constructor <init>(codes.side.color/EdgeSolver = ...) // codes.side.color/GamutMapping.ChromaReduction.<init>|<init>(codes.side.color.EdgeSolver){}[0]
+
+        final val solver // codes.side.color/GamutMapping.ChromaReduction.solver|{}solver[0]
+            final fun <get-solver>(): codes.side.color/EdgeSolver // codes.side.color/GamutMapping.ChromaReduction.solver.<get-solver>|<get-solver>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/GamutMapping.ChromaReduction.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // codes.side.color/GamutMapping.ChromaReduction.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // codes.side.color/GamutMapping.ChromaReduction.toString|toString(){}[0]
+    }
+
     final class Css : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.Css|null[0]
         constructor <init>(kotlin/Double = ..., kotlin/Double = ...) // codes.side.color/GamutMapping.Css.<init>|<init>(kotlin.Double;kotlin.Double){}[0]
 
@@ -108,10 +129,6 @@ abstract class codes.side.color/GamutMapping { // codes.side.color/GamutMapping|
         final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/GamutMapping.Css.equals|equals(kotlin.Any?){}[0]
         final fun hashCode(): kotlin/Int // codes.side.color/GamutMapping.Css.hashCode|hashCode(){}[0]
         final fun toString(): kotlin/String // codes.side.color/GamutMapping.Css.toString|toString(){}[0]
-    }
-
-    final object ChromaReduction : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.ChromaReduction|null[0]
-        final fun toString(): kotlin/String // codes.side.color/GamutMapping.ChromaReduction.toString|toString(){}[0]
     }
 
     final object Clip : codes.side.color/GamutMapping { // codes.side.color/GamutMapping.Clip|null[0]

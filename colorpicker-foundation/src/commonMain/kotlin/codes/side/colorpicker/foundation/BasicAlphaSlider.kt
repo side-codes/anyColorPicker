@@ -70,7 +70,7 @@ public fun BasicAlphaSlider(
     val opaque = value.withAlpha(1.0)
     // The color itself, brought into sRGB as the other tracks are, faded in from transparent so the
     // gradient previews the color instead of fading through transparent black.
-    val opaqueColor = remember(opaque) { opaque.toComposeColor(mapping = GamutMapping.ChromaReduction) }
+    val opaqueColor = remember(opaque) { opaque.toComposeColor(mapping = GamutMapping.ChromaReduction()) }
     val layoutDirection = LocalLayoutDirection.current
     val gradient = remember(opaqueColor, layoutDirection) {
         TrackStops(listOf(opaqueColor.copy(alpha = 0f), opaqueColor), null).brush(layoutDirection)

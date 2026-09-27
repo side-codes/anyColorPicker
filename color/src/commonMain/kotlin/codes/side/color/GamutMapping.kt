@@ -96,13 +96,16 @@ public abstract class GamutMapping internal constructor() {
 
     /**
      * Exact chroma reduction at constant OkLCh lightness and hue: the most chroma the gamut holds
-     * there up to the color's own, solved from each channel's cubic, then a clip of the last rounding.
+     * there up to the color's own, found by [solver], then a clip of the last rounding.
      * The method for planes, gradients and boundaries.
      */
-    public object ChromaReduction : GamutMapping() {
+    public class ChromaReduction(public val solver: EdgeSolver = EdgeSolver.ClosedForm) : GamutMapping() {
+        private val iterative = solver === EdgeSolver.Iterative
+
         override fun reduce(gamut: RgbGamut, l: Double, a: Double, b: Double, out: DoubleArray) {
             if (whiteOrBlack(l, out)) return
-            val chroma = hypot(a, b)
+            // Oklab's a and b are far from overflowing, so the iterative solver spares hypot's care.
+            val chroma = if (iterative) sqrt(a * a + b * b) else hypot(a, b)
             // A grey outside the cube is only rounding a hair past black or white; it has no hue to keep.
             if (chroma == 0.0) {
                 clamp(out)
@@ -110,12 +113,16 @@ public abstract class GamutMapping internal constructor() {
             }
             val hueA = a / chroma
             val hueB = b / chroma
-            val kept = chromaWithin(gamut.lmsToLinear, l, hueA, hueB, chroma)
+            val kept = chromaWithin(gamut.lmsToLinear, l, hueA, hueB, chroma, iterative)
             toLinear(gamut.lmsToLinear, l, kept * hueA, kept * hueB, out)
             clamp(out)
         }
 
-        override fun toString(): String = "ChromaReduction"
+        override fun equals(other: Any?): Boolean = other is ChromaReduction && other.solver == solver
+
+        override fun hashCode(): Int = solver.hashCode()
+
+        override fun toString(): String = "ChromaReduction($solver)"
     }
 
     /** Each channel clamped to `0..1` in the gamut's space: fast, and free to shift hue and lightness. */

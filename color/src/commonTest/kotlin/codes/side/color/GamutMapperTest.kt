@@ -4,11 +4,10 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertSame
 
 class GamutMapperTest {
 
-    private val methods = listOf(GamutMapping.Css(), GamutMapping.ChromaReduction, GamutMapping.Clip)
+    private val methods = listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Clip)
 
     @Test
     fun bulkMappingGivesWhatToGamutGives() {
@@ -46,7 +45,7 @@ class GamutMapperTest {
 
     @Test
     fun aMapperReducesChromaUnlessToldOtherwise() {
-        assertSame(GamutMapping.ChromaReduction, Srgb.gamut.mapper(OkLch).method)
+        assertEquals(GamutMapping.ChromaReduction(), Srgb.gamut.mapper(OkLch).method)
     }
 
     @Test
@@ -70,11 +69,11 @@ class GamutMapperTest {
             }
         }
         for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
-            val mapper = gamut.mapper(OkLch, GamutMapping.ChromaReduction)
+            val mapper = gamut.mapper(OkLch, GamutMapping.ChromaReduction())
             val mapped = DoubleArray(3)
             for (color in colors) {
                 mapper.convert(color.components(), mapped)
-                assertEquals(color.toGamut(gamut, GamutMapping.ChromaReduction).components().toList(), mapped.toList(), "$color into $gamut")
+                assertEquals(color.toGamut(gamut, GamutMapping.ChromaReduction()).components().toList(), mapped.toList(), "$color into $gamut")
             }
         }
     }

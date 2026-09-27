@@ -25,7 +25,7 @@ class PlaneThroughputTest {
             val converter = from.converterTo(to)
             report("${from.id} → ${to.id}", count) { converter.convert(source, 0, out, 0, count) }
         }
-        for (method in listOf(GamutMapping.ChromaReduction, GamutMapping.Css(), GamutMapping.Clip)) {
+        for (method in listOf(GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Css(), GamutMapping.Clip)) {
             val mapper = Srgb.gamut.mapper(OkLch, method)
             report("oklch into sRGB, $method", count) { mapper.convert(plane, 0, out, 0, count) }
         }

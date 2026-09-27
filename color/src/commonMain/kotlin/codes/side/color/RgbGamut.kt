@@ -56,7 +56,7 @@ public class RgbGamut internal constructor(
      * [GamutMapping.ChromaReduction], the method for planes and gradients: being exact, it keeps a
      * ramp's chroma smooth where [GamutMapping.Css]'s search stops anywhere within its epsilon.
      */
-    public fun mapper(from: ColorSpace, method: GamutMapping = GamutMapping.ChromaReduction): GamutMapper =
+    public fun mapper(from: ColorSpace, method: GamutMapping = GamutMapping.ChromaReduction()): GamutMapper =
         GamutMapper(from, this, method)
 
     override fun toString(): String = "RgbGamut(${space.id})"

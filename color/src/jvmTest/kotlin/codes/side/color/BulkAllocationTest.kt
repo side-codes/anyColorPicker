@@ -40,7 +40,7 @@ class BulkAllocationTest {
         val report = StringBuilder()
         for (from in listOf(OkLch, Srgb, Okhsl, Cmyk)) {
             for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
-                for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction, GamutMapping.Clip)) {
+                for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Clip)) {
                     val mapper = gamut.mapper(from, method)
                     val src = DoubleArray(count * from.channels.size) { i -> if (from === Srgb) 1.2 - i % 7 * 0.2 else 0.1 + i % 7 * 0.1 }
                     val dst = DoubleArray(count * 3)
