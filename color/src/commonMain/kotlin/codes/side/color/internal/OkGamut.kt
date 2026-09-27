@@ -63,7 +63,7 @@ internal fun cuspLightness(t: DoubleArray, a: Double, b: Double, saturation: Dou
  * in, and the edge is where it leaves for good.
  */
 internal fun maxChroma(t: DoubleArray, l: Double, a: Double, b: Double, sMax: Double, lCusp: Double): Double =
-    if (l <= lCusp) l * sMax else largestEdge(t, l, a, b, withCeiling = true, limit = Double.POSITIVE_INFINITY)
+    if (l <= lCusp) l * sMax else gamutMemo().outerEdge(t, l, a, b)
 
 /**
  * The largest chroma up to [chroma] that the gamut of [t] holds at Oklab lightness [l], strictly
@@ -71,12 +71,81 @@ internal fun maxChroma(t: DoubleArray, l: Double, a: Double, b: Double, sMax: Do
  * edge below it. Inside the sliver past pure blue that is the edge before the sliver, not the one
  * beyond it.
  */
-internal fun chromaWithin(t: DoubleArray, l: Double, a: Double, b: Double, chroma: Double): Double =
-    if (inside(t, l, chroma * a, chroma * b, 1.0 + EDGE_TOLERANCE)) {
-        chroma
-    } else {
-        largestEdge(t, l, a, b, withCeiling = true, limit = chroma)
+internal fun chromaWithin(t: DoubleArray, l: Double, a: Double, b: Double, chroma: Double): Double {
+    if (inside(t, l, chroma * a, chroma * b, 1.0 + EDGE_TOLERANCE)) return chroma
+    // At or past the outer edge, the nearest edge below is the outer edge itself, which is what the search would
+    // find. Only a chroma inside the sliver, short of the outer edge, needs the search for the edge before it.
+    val outer = gamutMemo().outerEdge(t, l, a, b)
+    return if (chroma >= outer) outer else largestEdge(t, l, a, b, withCeiling = true, limit = chroma)
+}
+
+/** This thread's [GamutMemo]. */
+internal expect fun gamutMemo(): GamutMemo
+
+/**
+ * One thread's last cusp and last few outer edges. A plane or a gradient asks the same question once per color, and
+ * the answer depends on the matrix, the hue and, for an edge, the lightness alone. Keyed by the exact bits asked
+ * with, so a remembered answer is the one a fresh solve gives. Each thread keeps its own and overwrites it in place,
+ * so remembering allocates nothing, and no thread reads an entry another is halfway through writing.
+ */
+internal class GamutMemo {
+    private var cuspT: DoubleArray? = null
+    private var cuspA = 0.0
+    private var cuspB = 0.0
+
+    /** The S of the cusp last asked for by [cusp]. */
+    var cuspSaturation: Double = 0.0
+        private set
+
+    /** The Oklab lightness of the cusp last asked for by [cusp]. */
+    var cuspLightness: Double = 0.0
+        private set
+
+    // Enough for a plane's row, whose colors reach the gamut along a few hue directions that differ in their last
+    // bits. Overwritten oldest first.
+    private val edgeT = arrayOfNulls<DoubleArray>(EDGES_KEPT)
+    private val edgeKeys = DoubleArray(EDGES_KEPT * 3)
+    private val edgeChroma = DoubleArray(EDGES_KEPT)
+    private var nextEdge = 0
+
+    /** The cusp of hue ([a], [b]) in the gamut of [t], as [maxSaturation] and [cuspLightness] give it, into [cuspSaturation] and [cuspLightness]. */
+    fun cusp(t: DoubleArray, a: Double, b: Double): GamutMemo {
+        if (cuspT !== t || !cuspA.sameBits(a) || !cuspB.sameBits(b)) {
+            val saturation = maxSaturation(t, a, b)
+            cuspLightness = cuspLightness(t, a, b, saturation)
+            cuspSaturation = saturation
+            cuspT = t
+            cuspA = a
+            cuspB = b
+        }
+        return this
     }
+
+    /** The largest chroma at which the line of lightness [l] and hue ([a], [b]) leaves the gamut of [t] for good. */
+    fun outerEdge(t: DoubleArray, l: Double, a: Double, b: Double): Double {
+        for (i in 0 until EDGES_KEPT) {
+            val key = i * 3
+            if (edgeT[i] === t && edgeKeys[key].sameBits(l) && edgeKeys[key + 1].sameBits(a) && edgeKeys[key + 2].sameBits(b)) {
+                return edgeChroma[i]
+            }
+        }
+        val chroma = largestEdge(t, l, a, b, withCeiling = true, limit = Double.POSITIVE_INFINITY)
+        val i = nextEdge
+        edgeT[i] = t
+        edgeKeys[i * 3] = l
+        edgeKeys[i * 3 + 1] = a
+        edgeKeys[i * 3 + 2] = b
+        edgeChroma[i] = chroma
+        nextEdge = (i + 1) % EDGES_KEPT
+        return chroma
+    }
+
+    private companion object {
+        const val EDGES_KEPT = 16
+    }
+}
+
+private fun Double.sameBits(other: Double): Boolean = toRawBits() == other.toRawBits()
 
 // The largest positive x up to [limit] at which a channel along (l, x·a, x·b) reaches 0, or 1
 // [withCeiling], while every channel stays in 0..1 (0..∞ without the ceiling), give or take

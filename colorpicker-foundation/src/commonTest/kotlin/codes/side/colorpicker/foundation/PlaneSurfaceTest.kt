@@ -61,7 +61,17 @@ class PlaneSurfaceTest {
         val held = doubleArrayOf(40.0, 0.0, 0.0)
         val rows = PlaneRows(Okhsv.S, Okhsv.V, held, columns = 8, rows = 5)
         for (r in 4 downTo 0) rows.fill(r)
-        assertEquals(planeColors(Okhsv.S, Okhsv.V, held, columns = 8, rows = 5).toList(), rows.rgb.toList())
+        assertEquals(planePixels(Okhsv.S, Okhsv.V, held, PlaneGrid(8, 5)).toList(), rows.pixels.toList())
+    }
+
+    @Test
+    fun thePixelsAreTheColorsPacked() {
+        for ((x, y) in listOf(Okhsl.S to Okhsl.L, OkLch.C to OkLch.L, Lch.C to Lch.L, Okhsv.S to Okhsv.V, Hwb.W to Hwb.B)) {
+            val held = DoubleArray(3)
+            held[x.space.channels.first { it.isHue }.index] = 264.1
+            val colors = planeColors(x, y, held, columns = 9, rows = 7)
+            assertEquals(List(63) { srgbArgb(colors, 3 * it) }, planePixels(x, y, held, PlaneGrid(9, 7)).toList(), "$x × $y")
+        }
     }
 
     @Test

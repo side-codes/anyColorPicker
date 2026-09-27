@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -232,6 +233,33 @@ class BasicColorPickerDialogContentTest {
         onNodeWithTag("picker ${Orientation.Horizontal}").requestFocus()
         waitForIdle()
         onNodeWithTag("picker ${Orientation.Horizontal}").assertIsFocused()
+    }
+
+    @Test
+    fun theStackedFormMeasuredToDecideBuildsNoTrack() = runComposeUiTest {
+        // The gradients each form's track is handed, in order.
+        val gradients = mapOf(Orientation.Vertical to mutableListOf<Brush>(), Orientation.Horizontal to mutableListOf())
+        setContent {
+            Content(width = 600.dp, height = 300.dp) { orientation ->
+                Column {
+                    Box(Modifier.fillMaxWidth().height(if (orientation == Orientation.Vertical) 300.dp else 100.dp))
+                    BasicChannelSlider(
+                        state.pickerState,
+                        Hsv.S,
+                        track = {
+                            gradients.getValue(orientation) += gradient
+                            Box(Modifier.fillMaxWidth().height(8.dp))
+                        },
+                        thumb = { Box(Modifier.size(20.dp)) },
+                    )
+                }
+            }
+        }
+        state.pickerState.value = Hsv(100.0, 70.0, 60.0)
+        waitForIdle()
+        val shown = gradients.getValue(Orientation.Horizontal)
+        assertEquals(2, shown.distinct().size, "the form shown is handed each hue's track")
+        assertFalse(shown.last() in gradients.getValue(Orientation.Vertical), "the stacked form, only measured, built the new hue's track")
     }
 
     @Test

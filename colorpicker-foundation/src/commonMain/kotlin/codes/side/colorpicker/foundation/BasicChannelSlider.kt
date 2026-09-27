@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalLayoutDirection
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.state.ColorPickerState
@@ -87,11 +89,13 @@ public fun BasicChannelSlider(
     val value = displayed[channel.index]
     val held = heldComponents(channel, displayed, coloringMode)
     val heldKey = held.toList()
-    val stops = remember(channel, range, heldKey) { trackStops(channel, held, range) }
+    // Measured only, the track and the color under the thumb are never seen, so they are not built.
+    val measuredOnly = LocalMeasuredOnly.current
+    val stops = if (measuredOnly) null else remember(channel, range, heldKey) { trackStops(channel, held, range) }
     val layoutDirection = LocalLayoutDirection.current
-    val gradient = remember(stops, layoutDirection) { stops.brush(layoutDirection) }
+    val gradient = if (stops == null) UnbuiltTrack else remember(stops, layoutDirection) { stops.brush(layoutDirection) }
     val shown = value.coerceIn(range.start, range.endInclusive)
-    val thumbColor = remember(channel, heldKey, shown) { trackColorAt(channel, held, shown) }
+    val thumbColor = if (measuredOnly) Color.Transparent else remember(channel, heldKey, shown) { trackColorAt(channel, held, shown) }
     val fraction = fractionOf(value, range)
     val interaction = remember(state) { SliderInteractionGuard(state) }
     val currentFinished by rememberUpdatedState(onValueChangeFinished)
@@ -128,6 +132,9 @@ public fun BasicChannelSlider(
         thumb = { channelSlots(this, channel, value, gradient).thumb() },
     )
 }
+
+// The gradient a slider measured only is handed in place of its track's.
+private val UnbuiltTrack: Brush = SolidColor(Color.Transparent)
 
 // The plain slider's scope with the channel's own members added.
 @Composable

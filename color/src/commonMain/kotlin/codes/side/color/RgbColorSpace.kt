@@ -134,6 +134,9 @@ public open class RgbColorSpace internal constructor(
     }
     private val isLinear = transfer === TransferFunction.Linear
 
+    /** The last step of every route into this space from outside it, unless its curve is [TransferFunction.Linear]. */
+    internal val encodeStep: Step get() = encode
+
     // With a linear twin as its base, this space is only the curve; otherwise it is the curve
     // and the matrix to XYZ-D65.
     private val toBaseSteps: List<Step> = when {

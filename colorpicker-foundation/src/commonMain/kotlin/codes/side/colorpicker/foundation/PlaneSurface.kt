@@ -88,10 +88,10 @@ internal fun planeGridOf(x: ColorChannel, y: ColorChannel): PlaneGrid = when {
 internal fun gridSample(index: Int, count: Int): Double = if (count <= 1) 0.0 else index.toDouble() / (count - 1)
 
 /**
- * The sRGB colors of the plane over [x] and [y] on a [columns] × [rows] grid, filled a row at a time
- * so a caller can pause between rows. Three values a sample in [rgb], row 0 at the top, where [y] is at
- * the end of its range; the other channels are at [held]. Each row goes through one bulk call into sRGB
- * by chroma reduction.
+ * The plane over [x] and [y] on a [columns] × [rows] grid, filled a row at a time so a caller can pause
+ * between rows: [pixels], opaque `0xAARRGGBB`, row 0 at the top, where [y] is at the end of its range; the
+ * other channels are at [held]. Each row goes through one bulk call into sRGB by chroma reduction, into one
+ * row of colors reused for every row, so a plane holds its pixels rather than three Doubles for each.
  */
 internal class PlaneRows(
     private val x: ColorChannel,
@@ -108,27 +108,37 @@ internal class PlaneRows(
             row[column * size + x.index] = channelValueAt(x, x.referenceRange, gridSample(column, columns))
         }
     }
+    private val rowColors = DoubleArray(columns * 3)
 
-    val rgb: DoubleArray = DoubleArray(columns * rows * 3)
+    val pixels: IntArray = IntArray(columns * rows)
 
-    /** Fills row [r] of [rgb]. */
-    fun fill(r: Int) {
+    /** The sRGB colors of row [r], three values a sample, into [into] from [offset]. */
+    fun colors(r: Int, into: DoubleArray, offset: Int) {
         val yValue = channelValueAt(y, y.referenceRange, 1.0 - gridSample(r, rows))
         for (column in 0 until columns) row[column * size + y.index] = yValue
-        mapper.convert(row, 0, rgb, r * columns * 3, columns)
+        mapper.convert(row, 0, into, offset, columns)
+    }
+
+    /** Fills row [r] of [pixels]. */
+    fun fill(r: Int) {
+        colors(r, rowColors, 0)
+        val start = r * columns
+        for (column in 0 until columns) pixels[start + column] = srgbArgb(rowColors, 3 * column)
     }
 }
 
-/** Every row of [PlaneRows] at once. */
+/** The sRGB colors of every row of [PlaneRows], three values a sample, as the grids above are measured. */
 internal fun planeColors(x: ColorChannel, y: ColorChannel, held: DoubleArray, columns: Int, rows: Int): DoubleArray {
     val grid = PlaneRows(x, y, held, columns, rows)
-    for (r in 0 until rows) grid.fill(r)
-    return grid.rgb
+    return DoubleArray(columns * rows * 3).also { rgb -> for (r in 0 until rows) grid.colors(r, rgb, r * columns * 3) }
 }
 
-/** [planeColors] packed as opaque `0xAARRGGBB`, a pixel per sample. */
-internal fun planePixels(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): IntArray =
-    packPixels(planeColors(x, y, held, grid.columns, grid.rows), grid)
+/** Every row of [PlaneRows] at once. */
+internal fun planePixels(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): IntArray {
+    val rows = PlaneRows(x, y, held, grid.columns, grid.rows)
+    for (r in 0 until grid.rows) rows.fill(r)
+    return rows.pixels
+}
 
 /** The plane over [x] and [y] as an image of [grid]'s size, to be drawn scaled. */
 internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid): ImageBitmap =
@@ -145,17 +155,18 @@ internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, hel
         if (r % ROWS_PER_YIELD == 0) yield()
         rows.fill(r)
     }
-    return imageBitmapFromPixels(packPixels(rows.rgb, grid), grid.columns, grid.rows)
+    return imageBitmapFromPixels(rows.pixels, grid.columns, grid.rows)
 }
-
-private fun packPixels(rgb: DoubleArray, grid: PlaneGrid): IntArray = IntArray(grid.columns * grid.rows) { srgbArgb(rgb, 3 * it) }
 
 /** Whether two brushes draw the plane over [x] and [y] exactly: HSL's S × L and HSV's S × V. */
 internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
     (x === Hsl.S && y === Hsl.L) || (x === Hsv.S && y === Hsv.V)
 
-// What a raster is built from: the pair of channels and every held component.
-private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
+/** What a raster is built from: the pair of channels and every held component. */
+internal data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
+
+// Every plane's rasters: a raster is 256 KB at most, so three kept cost under 1 MB.
+private val planeRasters = PlaneRasters<ImageBitmap>(kept = 3)
 
 // A built raster and the pair of channels it shows.
 private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: ImageBitmap)
@@ -163,7 +174,8 @@ private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: 
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
  * are two brushes, exactly. Any other pair is a raster, built on [Dispatchers.Default] whenever a held
- * channel changes, with the previous one drawn until it arrives. A raster of another pair is another
+ * channel changes, and shared with any other plane asking for the same, with the previous one drawn until
+ * it arrives. A raster of another pair is another
  * space's colors rather than an earlier state of these, so after a change of channels nothing is drawn
  * until the new pair's arrives. A preview draws one frame and has no later one to wait for, so there the
  * raster is built at once.
@@ -185,8 +197,10 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
             // faster than a raster is built; cancelling the one in flight for each change would land
             // none until the drag stopped. Built in order, an older raster never lands after a newer one.
             snapshotFlow { request }.conflate().collect { next ->
-                val built = withContext(Dispatchers.Default) {
-                    rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
+                val built = planeRasters.raster(next) {
+                    withContext(Dispatchers.Default) {
+                        rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
+                    }
                 }
                 raster.value = PlaneRaster(next.x, next.y, built)
             }

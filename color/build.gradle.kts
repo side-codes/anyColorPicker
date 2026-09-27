@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+
 plugins {
     alias(libs.plugins.library)
     // Tests only: they decode their reference data from JSON files under src/commonTest/resources.
@@ -8,6 +11,19 @@ plugins {
 kotlin {
     android {
         namespace = "codes.side.color"
+    }
+
+    // JVM and Android keep a thread's gamut memo in one java.lang.ThreadLocal, in jvmAndAndroidMain. A group in the
+    // default template rather than a dependsOn edge: an explicit dependsOn switches the template off, and iosMain
+    // goes with it.
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("jvmAndAndroid") {
+                withJvm()
+                withCompilations { it.platformType == KotlinPlatformType.androidJvm }
+            }
+        }
     }
 
     sourceSets {

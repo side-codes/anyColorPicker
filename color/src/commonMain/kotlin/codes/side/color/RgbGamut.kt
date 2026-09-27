@@ -1,8 +1,7 @@
 package codes.side.color
 
-import codes.side.color.internal.cuspLightness
+import codes.side.color.internal.gamutMemo
 import codes.side.color.internal.maxChroma
-import codes.side.color.internal.maxSaturation
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -38,8 +37,8 @@ public class RgbGamut internal constructor(
         val radians = hue * PI / 180.0
         val a = cos(radians)
         val b = sin(radians)
-        val sMax = maxSaturation(lmsToLinear, a, b)
-        return maxChroma(lmsToLinear, lightness, a, b, sMax, cuspLightness(lmsToLinear, a, b, sMax))
+        val cusp = gamutMemo().cusp(lmsToLinear, a, b)
+        return maxChroma(lmsToLinear, lightness, a, b, cusp.cuspSaturation, cusp.cuspLightness)
     }
 
     /** The most colorful color of [hue], in degrees, that this gamut holds, in [OkLch]. */
@@ -48,9 +47,8 @@ public class RgbGamut internal constructor(
         val radians = hue * PI / 180.0
         val a = cos(radians)
         val b = sin(radians)
-        val sMax = maxSaturation(lmsToLinear, a, b)
-        val lightness = cuspLightness(lmsToLinear, a, b, sMax)
-        return OkLch(lightness, lightness * sMax, hue)
+        val cusp = gamutMemo().cusp(lmsToLinear, a, b)
+        return OkLch(cusp.cuspLightness, cusp.cuspLightness * cusp.cuspSaturation, hue)
     }
 
     /**
