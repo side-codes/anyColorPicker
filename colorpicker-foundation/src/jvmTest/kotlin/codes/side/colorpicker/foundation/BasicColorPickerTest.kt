@@ -1,12 +1,15 @@
 package codes.side.colorpicker.foundation
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -23,6 +26,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.unit.DpRect
@@ -229,6 +233,31 @@ class BasicColorPickerTest {
         assertTrue(SemanticsProperties.Disabled in onNodeWithTag("h").fetchSemanticsNode().config, "a library slider in a slot is disabled with the picker")
         onNodeWithTag("s").performClick()
         assertEquals(0, clicks, "a slot the picker did not make is refused the touch")
+    }
+
+    @Test
+    fun theWheelOverADisabledPickerScrollsWhatHoldsIt() = runComposeUiTest {
+        val column = ScrollState(0)
+        setContent {
+            Column(Modifier.size(300.dp, 100.dp).verticalScroll(column)) {
+                BasicColorPicker(
+                    ColorPickerState(teal),
+                    Hsl,
+                    plane = boxPlane,
+                    channelSlider = channelSliders,
+                    alphaSlider = boxAlpha,
+                    modifier = Modifier.width(300.dp),
+                    enabled = false,
+                )
+                Box(Modifier.height(400.dp))
+            }
+        }
+        onNodeWithTag("h").performMouseInput {
+            moveTo(center)
+            scroll(3f)
+        }
+        waitForIdle()
+        assertTrue(column.value > 0, "the wheel over a disabled slider scrolled nothing")
     }
 
     @Test

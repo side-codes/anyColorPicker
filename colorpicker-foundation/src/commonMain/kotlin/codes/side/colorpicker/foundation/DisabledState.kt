@@ -5,6 +5,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.semantics
@@ -35,7 +36,8 @@ public val LocalColorPickerEnabled: CompositionLocal<Boolean> get() = LocalPicke
  * would otherwise be left with one live control inside a disabled picker.
  *
  * Events are consumed on [PointerEventPass.Initial], which is the pass that reaches an
- * ancestor before its children.
+ * ancestor before its children. The mouse wheel is left alone, so a disabled picker in a
+ * scrolling page still lets the page scroll.
  */
 internal fun Modifier.disabledInput(enabled: Boolean): Modifier =
     if (enabled) {
@@ -46,7 +48,8 @@ internal fun Modifier.disabledInput(enabled: Boolean): Modifier =
             .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
-                        awaitPointerEvent(PointerEventPass.Initial).changes.forEach { it.consume() }
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        if (event.type != PointerEventType.Scroll) event.changes.forEach { it.consume() }
                     }
                 }
             }
