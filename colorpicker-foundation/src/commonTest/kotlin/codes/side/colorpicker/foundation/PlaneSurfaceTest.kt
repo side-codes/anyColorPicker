@@ -6,9 +6,9 @@ import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -66,7 +66,7 @@ class PlaneSurfaceTest {
 
     @Test
     fun thePixelsAreTheColorsPacked() {
-        for ((x, y) in listOf(Okhsl.S to Okhsl.L, OkLch.C to OkLch.L, Lch.C to Lch.L, Okhsv.S to Okhsv.V, Hwb.W to Hwb.B)) {
+        for ((x, y) in listOf(Okhsl.S to Okhsl.L, Oklch.C to Oklch.L, Lch.C to Lch.L, Okhsv.S to Okhsv.V, Hwb.W to Hwb.B)) {
             val held = DoubleArray(3)
             held[x.space.channels.first { it.isHue }.index] = 264.1
             val colors = planeColors(x, y, held, columns = 9, rows = 7)
@@ -93,7 +93,7 @@ class PlaneSurfaceTest {
         assertEquals(listOf(64, 32), planeGridOf(Okhsv.S, Okhsv.V).let { listOf(it.columns, it.rows) })
         assertEquals(listOf(256, 256), planeGridOf(Okhsl.S, Okhsl.L).let { listOf(it.columns, it.rows) })
         assertEquals(listOf(256, 256), planeGridOf(Lch.C, Lch.L).let { listOf(it.columns, it.rows) })
-        assertEquals(listOf(256, 256), planeGridOf(OkLch.C, OkLch.L).let { listOf(it.columns, it.rows) })
+        assertEquals(listOf(256, 256), planeGridOf(Oklch.C, Oklch.L).let { listOf(it.columns, it.rows) })
         assertEquals(listOf(64, 64), planeGridOf(Lch.L, Lch.C).let { listOf(it.columns, it.rows) }, "any other pair")
     }
 
@@ -107,7 +107,7 @@ class PlaneSurfaceTest {
             assertEquals(listOf(listOf(256, 64), listOf(256, 16)), bands.map { listOf(it.grid.columns, it.grid.rows) }, "at $hue°")
             assertEquals(listOf(0.0 to 1.0), planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Canonical).map { it.from to it.to })
         }
-        assertEquals(1, planeBands(OkLch.C, OkLch.L, doubleArrayOf(0.0, 0.0, 200.0), PlaneRendering.Fast).size)
+        assertEquals(1, planeBands(Oklch.C, Oklch.L, doubleArrayOf(0.0, 0.0, 200.0), PlaneRendering.Fast).size)
     }
 
     @Test

@@ -168,7 +168,7 @@ public fun ColorValue.toGamut(gamut: RgbGamut, method: GamutMapping = GamutMappi
 // Resolved once, in OkLCh, so the gamut check and the mapping see one color: converted separately into
 // RGB and into Oklab, a missing Lab a would count as 0 in one and replace Oklab's a with 0 in the other.
 // A complete color needs no detour.
-private fun ColorValue.resolved(): ColorValue = if (missingMask == 0) this else to(OkLch)
+private fun ColorValue.resolved(): ColorValue = if (missingMask == 0) this else to(Oklch)
 
 // Linear RGB of the Oklab color (l, a, b) through LMS → linear RGB matrix [t], into out[0..2].
 internal fun toLinear(t: DoubleArray, l: Double, a: Double, b: Double, out: DoubleArray) {

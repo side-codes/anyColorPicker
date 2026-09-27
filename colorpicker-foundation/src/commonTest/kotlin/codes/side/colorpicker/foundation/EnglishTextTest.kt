@@ -10,10 +10,10 @@ import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.RgbPrimaries
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
@@ -58,13 +58,13 @@ class EnglishTextTest {
     }
 
     @Test
-    fun lchReadsInWholeUnitsAndOkLchLikeOklab() {
+    fun lchReadsInWholeUnitsAndOklchLikeOklab() {
         assertShows(Lch.L, 70.4, "Lightness", "70")
         assertShows(Lch.C, 50.5, "Chroma", "51")
         assertShows(Lch.H, 12.5, "Hue", "13°")
-        assertShows(OkLch.L, 0.754, "Lightness", "75%")
-        assertShows(OkLch.C, 0.1234, "Chroma", "0.123")
-        assertShows(OkLch.H, 264.05, "Hue", "264°")
+        assertShows(Oklch.L, 0.754, "Lightness", "75%")
+        assertShows(Oklch.C, 0.1234, "Chroma", "0.123")
+        assertShows(Oklch.H, 264.05, "Hue", "264°")
     }
 
     @Test
@@ -155,7 +155,7 @@ class EnglishTextTest {
                 increaseY = "Increase lightness",
                 decreaseY = "Decrease lightness",
             ),
-            EnglishText.planeActions(OkLch.C, OkLch.L),
+            EnglishText.planeActions(Oklch.C, Oklch.L),
         )
     }
 
@@ -176,7 +176,7 @@ class EnglishTextTest {
     fun everyLibrarySpaceHasItsOwnName() {
         val names = ColorSpaces.all.map { EnglishText.spaceName(it) }
         assertEquals(names.size, names.toSet().size, "two spaces share a name: $names")
-        assertEquals(listOf("Okhsl", "OkLCh", "HSV", "RGB"), listOf(Okhsl, OkLch, Hsv, Srgb).map { EnglishText.spaceName(it) })
+        assertEquals(listOf("Okhsl", "OkLCh", "HSV", "RGB"), listOf(Okhsl, Oklch, Hsv, Srgb).map { EnglishText.spaceName(it) })
         assertEquals("--text-hsl-name", EnglishText.spaceName(ColorSpace.hsl("--text-hsl-name", DisplayP3)))
     }
 

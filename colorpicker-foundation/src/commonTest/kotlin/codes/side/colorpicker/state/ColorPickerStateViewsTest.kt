@@ -7,10 +7,10 @@ import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 import codes.side.color.XyzD50
@@ -22,10 +22,10 @@ import codes.side.color.asHsv
 import codes.side.color.asHwb
 import codes.side.color.asLab
 import codes.side.color.asLch
-import codes.side.color.asOkLch
 import codes.side.color.asOkhsl
 import codes.side.color.asOkhsv
 import codes.side.color.asOklab
+import codes.side.color.asOklch
 import codes.side.color.asSrgb
 import codes.side.color.asSrgbLinear
 import codes.side.color.asXyzD50
@@ -38,7 +38,7 @@ class ColorPickerStateViewsTest {
 
     @Test
     fun eachViewIsTheValueConverted() {
-        val color = OkLch(0.6, 0.1, 200.0)
+        val color = Oklch(0.6, 0.1, 200.0)
         val state = ColorPickerState(color)
         assertEquals(color.to(Srgb), state.srgb.value)
         assertEquals(color.to(SrgbLinear), state.srgbLinear.value)
@@ -48,7 +48,7 @@ class ColorPickerStateViewsTest {
         assertEquals(color.to(Lab), state.lab.value)
         assertEquals(color.to(Lch), state.lch.value)
         assertEquals(color.to(Oklab), state.oklab.value)
-        assertEquals(color, state.okLch.value)
+        assertEquals(color, state.oklch.value)
         assertEquals(color.to(Hsl), state.hsl.value)
         assertEquals(color.to(Hwb), state.hwb.value)
         assertEquals(color.to(Hsv), state.hsv.value)
@@ -93,9 +93,9 @@ class ColorPickerStateViewsTest {
         state.set(oklab.asOklab())
         assertEquals(oklab, state.value)
 
-        val okLch = OkLch(0.5, 0.1, 20.0)
-        state.set(okLch.asOkLch())
-        assertEquals(okLch, state.value)
+        val oklch = Oklch(0.5, 0.1, 20.0)
+        state.set(oklch.asOklch())
+        assertEquals(oklch, state.value)
 
         val hsl = Hsl(20.0, 50.0, 50.0)
         state.set(hsl.asHsl())

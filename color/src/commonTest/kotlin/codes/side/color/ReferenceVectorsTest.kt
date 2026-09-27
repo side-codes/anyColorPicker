@@ -15,7 +15,7 @@ class ReferenceVectorsTest {
             val target = ColorSpaces.all.first { it.id == spaceId }
             var converted = ColorValue.parseCss(source).to(target)
             // The result is a CSS function's value, whose lightness clamps as parsing clamps it.
-            if (target in listOf(Lab, Lch, Oklab, OkLch)) {
+            if (target in listOf(Lab, Lch, Oklab, Oklch)) {
                 val lightness = target.channels[0]
                 converted[lightness]?.let { converted = converted.with(lightness, it.coerceIn(lightness.referenceRange)) }
             }

@@ -3,9 +3,9 @@ package codes.side.colorpicker.foundation
 import codes.side.color.ColorChannel
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.test.Test
@@ -78,7 +78,7 @@ class PlaneGridTest {
     fun okhslHoldsItsRecordedError() = assertHolds(Okhsl.S, Okhsl.L, peak = 111.0, budget = 29.35)
 
     @Test
-    fun okLchHoldsItsRecordedError() = assertHolds(OkLch.C, OkLch.L, peak = 110.0, budget = 34.15)
+    fun oklchHoldsItsRecordedError() = assertHolds(Oklch.C, Oklch.L, peak = 110.0, budget = 34.15)
 
     @Test
     fun lchHoldsItsRecordedError() = assertHolds(Lch.C, Lch.L, peak = 43.0, budget = 80.30)

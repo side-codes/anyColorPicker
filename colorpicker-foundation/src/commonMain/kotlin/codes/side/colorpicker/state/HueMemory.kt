@@ -8,7 +8,7 @@ import codes.side.color.ColorValue
 import codes.side.color.Hsl
 import codes.side.color.HueFamily
 import codes.side.color.Lch
-import codes.side.color.OkLch
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 
 // The hue a picker shows for a color that has none, one per HueFamily. A grey has no hue to
@@ -31,7 +31,7 @@ internal class HueMemory {
     // any other the first space seen with it.
     private val spaces = linkedMapOf<HueFamily, ColorSpace>(
         HueFamily.rgbHexcone(Srgb) to Hsl,
-        HueFamily.Oklab to OkLch,
+        HueFamily.Oklab to Oklch,
         HueFamily.CieLab to Lch,
     )
 

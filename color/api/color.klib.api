@@ -451,24 +451,6 @@ final value class codes.side.color/LchColor { // codes.side.color/LchColor|null[
     final fun with(kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ...): codes.side.color/LchColor // codes.side.color/LchColor.with|with(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
 }
 
-final value class codes.side.color/OkLchColor { // codes.side.color/OkLchColor|null[0]
-    final val alpha // codes.side.color/OkLchColor.alpha|{}alpha[0]
-        final fun <get-alpha>(): kotlin/Double? // codes.side.color/OkLchColor.alpha.<get-alpha>|<get-alpha>(){}[0]
-    final val c // codes.side.color/OkLchColor.c|{}c[0]
-        final fun <get-c>(): kotlin/Double? // codes.side.color/OkLchColor.c.<get-c>|<get-c>(){}[0]
-    final val h // codes.side.color/OkLchColor.h|{}h[0]
-        final fun <get-h>(): kotlin/Double? // codes.side.color/OkLchColor.h.<get-h>|<get-h>(){}[0]
-    final val l // codes.side.color/OkLchColor.l|{}l[0]
-        final fun <get-l>(): kotlin/Double? // codes.side.color/OkLchColor.l.<get-l>|<get-l>(){}[0]
-    final val value // codes.side.color/OkLchColor.value|{}value[0]
-        final fun <get-value>(): codes.side.color/ColorValue // codes.side.color/OkLchColor.value.<get-value>|<get-value>(){}[0]
-
-    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/OkLchColor.equals|equals(kotlin.Any?){}[0]
-    final fun hashCode(): kotlin/Int // codes.side.color/OkLchColor.hashCode|hashCode(){}[0]
-    final fun toString(): kotlin/String // codes.side.color/OkLchColor.toString|toString(){}[0]
-    final fun with(kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ...): codes.side.color/OkLchColor // codes.side.color/OkLchColor.with|with(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
-}
-
 final value class codes.side.color/OkhslColor { // codes.side.color/OkhslColor|null[0]
     final val alpha // codes.side.color/OkhslColor.alpha|{}alpha[0]
         final fun <get-alpha>(): kotlin/Double? // codes.side.color/OkhslColor.alpha.<get-alpha>|<get-alpha>(){}[0]
@@ -521,6 +503,24 @@ final value class codes.side.color/OklabColor { // codes.side.color/OklabColor|n
     final fun hashCode(): kotlin/Int // codes.side.color/OklabColor.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // codes.side.color/OklabColor.toString|toString(){}[0]
     final fun with(kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ...): codes.side.color/OklabColor // codes.side.color/OklabColor.with|with(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
+}
+
+final value class codes.side.color/OklchColor { // codes.side.color/OklchColor|null[0]
+    final val alpha // codes.side.color/OklchColor.alpha|{}alpha[0]
+        final fun <get-alpha>(): kotlin/Double? // codes.side.color/OklchColor.alpha.<get-alpha>|<get-alpha>(){}[0]
+    final val c // codes.side.color/OklchColor.c|{}c[0]
+        final fun <get-c>(): kotlin/Double? // codes.side.color/OklchColor.c.<get-c>|<get-c>(){}[0]
+    final val h // codes.side.color/OklchColor.h|{}h[0]
+        final fun <get-h>(): kotlin/Double? // codes.side.color/OklchColor.h.<get-h>|<get-h>(){}[0]
+    final val l // codes.side.color/OklchColor.l|{}l[0]
+        final fun <get-l>(): kotlin/Double? // codes.side.color/OklchColor.l.<get-l>|<get-l>(){}[0]
+    final val value // codes.side.color/OklchColor.value|{}value[0]
+        final fun <get-value>(): codes.side.color/ColorValue // codes.side.color/OklchColor.value.<get-value>|<get-value>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // codes.side.color/OklchColor.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // codes.side.color/OklchColor.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // codes.side.color/OklchColor.toString|toString(){}[0]
+    final fun with(kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ..., kotlin/Double? = ...): codes.side.color/OklchColor // codes.side.color/OklchColor.with|with(kotlin.Double?;kotlin.Double?;kotlin.Double?;kotlin.Double?){}[0]
 }
 
 final value class codes.side.color/SrgbColor { // codes.side.color/SrgbColor|null[0]
@@ -746,8 +746,6 @@ final object codes.side.color/Lab : codes.side.color/ColorSpace { // codes.side.
 
 final object codes.side.color/Lch : codes.side.color/PolarColorSpace // codes.side.color/Lch|null[0]
 
-final object codes.side.color/OkLch : codes.side.color/PolarColorSpace // codes.side.color/OkLch|null[0]
-
 final object codes.side.color/Okhsl : codes.side.color/ColorSpace { // codes.side.color/Okhsl|null[0]
     final val H // codes.side.color/Okhsl.H|{}H[0]
         final fun <get-H>(): codes.side.color/ColorChannel // codes.side.color/Okhsl.H.<get-H>|<get-H>(){}[0]
@@ -797,6 +795,8 @@ final object codes.side.color/Oklab : codes.side.color/ColorSpace { // codes.sid
     final fun toBase(kotlin/DoubleArray, kotlin/DoubleArray) // codes.side.color/Oklab.toBase|toBase(kotlin.DoubleArray;kotlin.DoubleArray){}[0]
 }
 
+final object codes.side.color/Oklch : codes.side.color/PolarColorSpace // codes.side.color/Oklch|null[0]
+
 final object codes.side.color/Srgb : codes.side.color/RgbColorSpace // codes.side.color/Srgb|null[0]
 
 final object codes.side.color/SrgbLinear : codes.side.color/RgbColorSpace // codes.side.color/SrgbLinear|null[0]
@@ -836,10 +836,10 @@ final fun (codes.side.color/ColorValue).codes.side.color/asHsv(): codes.side.col
 final fun (codes.side.color/ColorValue).codes.side.color/asHwb(): codes.side.color/HwbColor // codes.side.color/asHwb|asHwb@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asLab(): codes.side.color/LabColor // codes.side.color/asLab|asLab@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asLch(): codes.side.color/LchColor // codes.side.color/asLch|asLch@codes.side.color.ColorValue(){}[0]
-final fun (codes.side.color/ColorValue).codes.side.color/asOkLch(): codes.side.color/OkLchColor // codes.side.color/asOkLch|asOkLch@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asOkhsl(): codes.side.color/OkhslColor // codes.side.color/asOkhsl|asOkhsl@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asOkhsv(): codes.side.color/OkhsvColor // codes.side.color/asOkhsv|asOkhsv@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asOklab(): codes.side.color/OklabColor // codes.side.color/asOklab|asOklab@codes.side.color.ColorValue(){}[0]
+final fun (codes.side.color/ColorValue).codes.side.color/asOklch(): codes.side.color/OklchColor // codes.side.color/asOklch|asOklch@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asSrgb(): codes.side.color/SrgbColor // codes.side.color/asSrgb|asSrgb@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asSrgbLinear(): codes.side.color/SrgbLinearColor // codes.side.color/asSrgbLinear|asSrgbLinear@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/asXyzD50(): codes.side.color/XyzD50Color // codes.side.color/asXyzD50|asXyzD50@codes.side.color.ColorValue(){}[0]
@@ -855,10 +855,10 @@ final fun (codes.side.color/ColorValue).codes.side.color/toHsv(): codes.side.col
 final fun (codes.side.color/ColorValue).codes.side.color/toHwb(): codes.side.color/HwbColor // codes.side.color/toHwb|toHwb@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toLab(): codes.side.color/LabColor // codes.side.color/toLab|toLab@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toLch(): codes.side.color/LchColor // codes.side.color/toLch|toLch@codes.side.color.ColorValue(){}[0]
-final fun (codes.side.color/ColorValue).codes.side.color/toOkLch(): codes.side.color/OkLchColor // codes.side.color/toOkLch|toOkLch@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toOkhsl(): codes.side.color/OkhslColor // codes.side.color/toOkhsl|toOkhsl@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toOkhsv(): codes.side.color/OkhsvColor // codes.side.color/toOkhsv|toOkhsv@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toOklab(): codes.side.color/OklabColor // codes.side.color/toOklab|toOklab@codes.side.color.ColorValue(){}[0]
+final fun (codes.side.color/ColorValue).codes.side.color/toOklch(): codes.side.color/OklchColor // codes.side.color/toOklch|toOklch@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toSrgb(): codes.side.color/SrgbColor // codes.side.color/toSrgb|toSrgb@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toSrgbLinear(): codes.side.color/SrgbLinearColor // codes.side.color/toSrgbLinear|toSrgbLinear@codes.side.color.ColorValue(){}[0]
 final fun (codes.side.color/ColorValue).codes.side.color/toXyzD50(): codes.side.color/XyzD50Color // codes.side.color/toXyzD50|toXyzD50@codes.side.color.ColorValue(){}[0]

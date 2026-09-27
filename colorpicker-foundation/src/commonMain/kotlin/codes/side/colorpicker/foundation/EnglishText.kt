@@ -9,10 +9,10 @@ import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 import codes.side.color.XyzD50
@@ -53,11 +53,11 @@ internal object EnglishText {
         Lab.B -> symbol("b", Format.Whole, spoken = "b*")
         Lch.L -> word("Lightness", Format.Whole)
         Lch.C -> word("Chroma", Format.Whole)
-        Oklab.L, OkLch.L -> word("Lightness", Format.PercentOfOne)
+        Oklab.L, Oklch.L -> word("Lightness", Format.PercentOfOne)
         Oklab.A -> symbol("a", Format.Thousandths)
         Oklab.B -> symbol("b", Format.Thousandths)
-        OkLch.C -> word("Chroma", Format.Thousandths)
-        Lch.H, OkLch.H, Hsl.H, Hsv.H, Hwb.H, Okhsl.H, Okhsv.H -> word("Hue", Format.Degrees)
+        Oklch.C -> word("Chroma", Format.Thousandths)
+        Lch.H, Oklch.H, Hsl.H, Hsv.H, Hwb.H, Okhsl.H, Okhsv.H -> word("Hue", Format.Degrees)
         Hsl.S, Hsv.S -> word("Saturation", Format.Percent)
         Hsl.L -> word("Lightness", Format.Percent)
         Hsv.V -> word("Value", Format.Percent)
@@ -131,7 +131,7 @@ internal object EnglishText {
         Lab -> "Lab"
         Lch -> "LCH"
         Oklab -> "Oklab"
-        OkLch -> "OkLCh"
+        Oklch -> "OkLCh"
         Hsl -> "HSL"
         Hwb -> "HWB"
         Hsv -> "HSV"

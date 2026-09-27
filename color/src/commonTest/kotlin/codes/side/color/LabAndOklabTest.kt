@@ -22,29 +22,29 @@ class LabAndOklabTest {
     }
 
     @Test
-    fun srgbRedInOklabAndOkLch() {
+    fun srgbRedInOklabAndOklch() {
         assertComponents(doubleArrayOf(0.6279553639214311, 0.2248630684262744, 0.125846277330585), Srgb(1.0, 0.0, 0.0).to(Oklab), 1e-12)
-        assertComponents(doubleArrayOf(0.6279553639214311, 0.2576833038053608, 29.23388027962784), Srgb(1.0, 0.0, 0.0).to(OkLch), 1e-9)
-        assertComponents(doubleArrayOf(0.49931445584520834, 0.09866437712418327, 250.4330574201754), Srgb(0.2, 0.4, 0.6).to(OkLch), 1e-9)
+        assertComponents(doubleArrayOf(0.6279553639214311, 0.2576833038053608, 29.23388027962784), Srgb(1.0, 0.0, 0.0).to(Oklch), 1e-9)
+        assertComponents(doubleArrayOf(0.49931445584520834, 0.09866437712418327, 250.4330574201754), Srgb(0.2, 0.4, 0.6).to(Oklch), 1e-9)
     }
 
     @Test
-    fun okLchToSrgb() {
-        assertComponents(doubleArrayOf(0.4070375553869942, 0.7077423917482657, 0.339612790200408), OkLch(0.7, 0.15, 140.0).to(Srgb), 1e-12)
+    fun oklchToSrgb() {
+        assertComponents(doubleArrayOf(0.4070375553869942, 0.7077423917482657, 0.339612790200408), Oklch(0.7, 0.15, 140.0).to(Srgb), 1e-12)
     }
 
     @Test
     fun chromaBeyondTheOldCapIsHeld() {
         // 1.x rejected chroma above 0.4; CSS takes any non-negative chroma.
-        assertEquals(0.45, OkLch(0.7, 0.45, 140.0)[OkLch.C])
+        assertEquals(0.45, Oklch(0.7, 0.45, 140.0)[Oklch.C])
     }
 
     @Test
     fun greysComeOutWithoutAHue() {
         for (grey in doubleArrayOf(0.0, 0.18, 0.5, 1.0)) {
-            val oklch = Srgb(grey, grey, grey).to(OkLch)
-            assertTrue(oklch.isMissing(OkLch.H), "oklch of grey $grey")
-            assertEquals(0.0, oklch[OkLch.C], "oklch chroma of grey $grey")
+            val oklch = Srgb(grey, grey, grey).to(Oklch)
+            assertTrue(oklch.isMissing(Oklch.H), "oklch of grey $grey")
+            assertEquals(0.0, oklch[Oklch.C], "oklch chroma of grey $grey")
             val lch = Srgb(grey, grey, grey).to(Lch)
             assertTrue(lch.isMissing(Lch.H), "lch of grey $grey")
             assertEquals(0.0, lch[Lch.C], "lch chroma of grey $grey")
@@ -56,8 +56,8 @@ class LabAndOklabTest {
         // WPT's boundary cases: at the threshold the hue is powerless, just above it is kept.
         assertTrue(Lab(50.0, 0.0015, 0.0).to(Lch).isMissing(Lch.H))
         assertFalse(Lab(50.0, 0.00151, 0.0).to(Lch).isMissing(Lch.H))
-        assertTrue(Oklab(0.5, 0.000004, 0.0).to(OkLch).isMissing(OkLch.H))
-        assertFalse(Oklab(0.5, 0.0000041, 0.0).to(OkLch).isMissing(OkLch.H))
+        assertTrue(Oklab(0.5, 0.000004, 0.0).to(Oklch).isMissing(Oklch.H))
+        assertFalse(Oklab(0.5, 0.0000041, 0.0).to(Oklch).isMissing(Oklch.H))
     }
 
     @Test
@@ -87,19 +87,19 @@ class LabAndOklabTest {
     @Test
     fun aMissingHueCountsAsZeroOutsideItsFamily() {
         // CSS treats none as 0 in the arithmetic: oklch(0.6 0.1 none) is oklch(0.6 0.1 0).
-        val withoutHue = OkLch(0.6, 0.1, null).to(Srgb)
-        val atZero = OkLch(0.6, 0.1, 0.0).to(Srgb)
+        val withoutHue = Oklch(0.6, 0.1, null).to(Srgb)
+        val atZero = Oklch(0.6, 0.1, 0.0).to(Srgb)
         assertComponents(atZero.components(), withoutHue, 1e-15)
     }
 
     @Test
     fun aMissingHueCarriesToAnotherPolarSpace() {
-        assertTrue(OkLch(0.6, 0.1, null).to(Lch).isMissing(Lch.H))
+        assertTrue(Oklch(0.6, 0.1, null).to(Lch).isMissing(Lch.H))
     }
 
     @Test
     fun equivalentColorsInDifferentSpaces() {
-        assertTrue(Srgb(1.0, 0.0, 0.0).isEquivalentTo(Srgb(1.0, 0.0, 0.0).to(OkLch)))
+        assertTrue(Srgb(1.0, 0.0, 0.0).isEquivalentTo(Srgb(1.0, 0.0, 0.0).to(Oklch)))
         assertTrue(Srgb(1.0, 0.0, 0.0).isEquivalentTo(Srgb(1.0, 0.0, 0.0).to(Lab)))
         assertFalse(Srgb(1.0, 0.0, 0.0).isEquivalentTo(Srgb(1.0, 0.001, 0.0)))
         assertFalse(Srgb(1.0, 0.0, 0.0).isEquivalentTo(Srgb(1.0, 0.0, 0.0, alpha = 0.5)))

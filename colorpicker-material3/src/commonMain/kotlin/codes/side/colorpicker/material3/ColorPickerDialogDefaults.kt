@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorSpace
 import codes.side.color.HexAlpha
 import codes.side.color.Hsv
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.color.toHexString
@@ -63,7 +63,7 @@ private val SegmentPadding = PaddingValues(
 public object ColorPickerDialogDefaults {
 
     /** The spaces a [ColorPickerDialog] offers unless given others: Okhsl, OkLCh, HSV and sRGB. */
-    public val Spaces: List<ColorSpace> = listOf(Okhsl, OkLch, Hsv, Srgb)
+    public val Spaces: List<ColorSpace> = listOf(Okhsl, Oklch, Hsv, Srgb)
 
     /** The dialog's title: [ColorPickerStrings.dialogTitle], "Select color". */
     @Composable

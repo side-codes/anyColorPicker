@@ -205,19 +205,19 @@ public final class codes/side/colorpicker/state/ColorPickerStateViewsKt {
 	public static final fun getHwb (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getLab (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getLch (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
-	public static final fun getOkLch (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getOkhsl (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getOkhsv (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getOklab (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
+	public static final fun getOklch (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getSrgb (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getSrgbLinear (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD50 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD65 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun set-11RcLd0 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
+	public static final fun set-1Y7pCtI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-7jXRPvs (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-9Crj1pI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-BJ8B4ww (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-E_3oONA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-Fmdgyq8 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-LTCmHu4 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 	public static final fun set-QdQAm9Q (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V

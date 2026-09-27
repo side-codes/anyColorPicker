@@ -33,15 +33,15 @@ public fun ColorValue.asOklab(): OklabColor = OklabColor(requireIn(Oklab))
 public fun ColorValue.toOklab(): OklabColor = OklabColor(to(Oklab))
 
 /**
- * A color in [OkLch], its components by name: L 0–1, chroma from 0 (0.4 is CSS's 100%), hue in
- * degrees. A null component is `none`. Get one with [asOkLch] or [toOkLch].
+ * A color in [Oklch], its components by name: L 0–1, chroma from 0 (0.4 is CSS's 100%), hue in
+ * degrees. A null component is `none`. Get one with [asOklch] or [toOklch].
  */
 @Immutable
 @JvmInline
-public value class OkLchColor internal constructor(public val value: ColorValue) {
-    public val l: Double? get() = value[OkLch.L]
-    public val c: Double? get() = value[OkLch.C]
-    public val h: Double? get() = value[OkLch.H]
+public value class OklchColor internal constructor(public val value: ColorValue) {
+    public val l: Double? get() = value[Oklch.L]
+    public val c: Double? get() = value[Oklch.C]
+    public val h: Double? get() = value[Oklch.H]
     public val alpha: Double? get() = value.alphaOrNull
 
     /** A copy with the components given; the rest are kept, `none` included. Null writes `none`. */
@@ -50,13 +50,13 @@ public value class OkLchColor internal constructor(public val value: ColorValue)
         c: Double? = this.c,
         h: Double? = this.h,
         alpha: Double? = this.alpha,
-    ): OkLchColor = OkLchColor(OkLch(l, c, h, alpha))
+    ): OklchColor = OklchColor(Oklch(l, c, h, alpha))
 
     override fun toString(): String = value.toString()
 }
 
-/** This color as an [OkLchColor]. It must be in [OkLch] already; [toOkLch] converts. */
-public fun ColorValue.asOkLch(): OkLchColor = OkLchColor(requireIn(OkLch))
+/** This color as an [OklchColor]. It must be in [Oklch] already; [toOklch] converts. */
+public fun ColorValue.asOklch(): OklchColor = OklchColor(requireIn(Oklch))
 
-/** This color converted to [OkLch], as an [OkLchColor]. */
-public fun ColorValue.toOkLch(): OkLchColor = OkLchColor(to(OkLch))
+/** This color converted to [Oklch], as an [OklchColor]. */
+public fun ColorValue.toOklch(): OklchColor = OklchColor(to(Oklch))

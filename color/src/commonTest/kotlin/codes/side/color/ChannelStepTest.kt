@@ -15,7 +15,7 @@ class ChannelStepTest {
 
     @Test
     fun hueStepsByADegree() {
-        assertSteps(1.0, 10.0, Hsl.H, Hwb.H, Hsv.H, Lch.H, OkLch.H, Okhsl.H, Okhsv.H)
+        assertSteps(1.0, 10.0, Hsl.H, Hwb.H, Hsv.H, Lch.H, Oklch.H, Okhsl.H, Okhsv.H)
     }
 
     @Test
@@ -34,7 +34,7 @@ class ChannelStepTest {
         assertSteps(
             0.01,
             0.1,
-            Okhsl.S, Okhsl.L, Okhsv.S, Okhsv.V, Oklab.L, OkLch.L,
+            Okhsl.S, Okhsl.L, Okhsv.S, Okhsv.V, Oklab.L, Oklch.L,
             Cmyk.C, Cmyk.M, Cmyk.Y, Cmyk.K,
             XyzD65.X, XyzD65.Y, XyzD65.Z, XyzD50.X, XyzD50.Y, XyzD50.Z,
         )
@@ -42,7 +42,7 @@ class ChannelStepTest {
 
     @Test
     fun okChromaAndOpponentAxesStepByAThousandth() {
-        assertSteps(0.001, 0.01, Oklab.A, Oklab.B, OkLch.C)
+        assertSteps(0.001, 0.01, Oklab.A, Oklab.B, Oklch.C)
     }
 
     @Test

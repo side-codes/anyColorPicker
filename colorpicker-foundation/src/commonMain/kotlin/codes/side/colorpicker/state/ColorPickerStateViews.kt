@@ -7,10 +7,10 @@ import codes.side.color.HsvColor
 import codes.side.color.HwbColor
 import codes.side.color.LabColor
 import codes.side.color.LchColor
-import codes.side.color.OkLchColor
 import codes.side.color.OkhslColor
 import codes.side.color.OkhsvColor
 import codes.side.color.OklabColor
+import codes.side.color.OklchColor
 import codes.side.color.SrgbColor
 import codes.side.color.SrgbLinearColor
 import codes.side.color.XyzD50Color
@@ -22,10 +22,10 @@ import codes.side.color.toHsv
 import codes.side.color.toHwb
 import codes.side.color.toLab
 import codes.side.color.toLch
-import codes.side.color.toOkLch
 import codes.side.color.toOkhsl
 import codes.side.color.toOkhsv
 import codes.side.color.toOklab
+import codes.side.color.toOklch
 import codes.side.color.toSrgb
 import codes.side.color.toSrgbLinear
 import codes.side.color.toXyzD50
@@ -99,10 +99,10 @@ public fun ColorPickerState.set(color: OklabColor) {
 }
 
 /** The color in OkLCh. A grey's hue is null. */
-public val ColorPickerState.okLch: OkLchColor get() = value.toOkLch()
+public val ColorPickerState.oklch: OklchColor get() = value.toOklch()
 
 /** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: OkLchColor) {
+public fun ColorPickerState.set(color: OklchColor) {
     value = color.value
 }
 

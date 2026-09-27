@@ -7,8 +7,8 @@ import codes.side.color.ColorSpace
 import codes.side.color.DisplayP3
 import codes.side.color.Hsl
 import codes.side.color.Lab
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,7 +34,7 @@ class ColorPickerStateSaverTest {
             Okhsl(140.0, 0.9, 0.5),
             Cmyk(0.1, 0.2, 0.3, 0.4, 0.5),
             Lab(50.0, 150.0, -150.0),
-            OkLch(null, 0.1, 200.0, null),
+            Oklch(null, 0.1, 200.0, null),
         )
         for (value in values) assertEquals(value, roundTrip(ColorPickerState(value)).value)
     }
@@ -45,7 +45,7 @@ class ColorPickerStateSaverTest {
         state.value = grey
         val restored = roundTrip(state)
         assertEquals(200.0, restored.displayValue(Hsl.H))
-        assertEquals(state.displayValue(OkLch.H), restored.displayValue(OkLch.H))
+        assertEquals(state.displayValue(Oklch.H), restored.displayValue(Oklch.H))
     }
 
     @Test

@@ -10,10 +10,10 @@ import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 
@@ -28,8 +28,8 @@ internal fun anchorOf(channel: ColorChannel): Double = when (channel) {
     Lch.C -> 50.0
     Oklab.L -> 0.7
     Oklab.A, Oklab.B -> 0.0
-    OkLch.L -> 0.75
-    OkLch.C -> 0.12
+    Oklch.L -> 0.75
+    Oklch.C -> 0.12
     Hsl.S -> 100.0
     Hsl.L -> 50.0
     Hsv.S, Hsv.V -> 100.0

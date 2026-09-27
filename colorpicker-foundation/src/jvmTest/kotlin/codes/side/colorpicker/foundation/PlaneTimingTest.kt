@@ -2,7 +2,7 @@ package codes.side.colorpicker.foundation
 
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.OkLch
+import codes.side.color.Oklch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,7 @@ class PlaneTimingTest {
     fun recordRasterTimes() {
         // Recorded, not gated: each library plane at hue 200 under each preset, the median of 15 builds after 5,
         // off the main thread, with the preset's workers and bands, printed to the test's output.
-        val planes = listOf(Hwb.W to Hwb.B, Lch.C to Lch.L, OkLch.C to OkLch.L, Okhsl.S to Okhsl.L, Okhsv.S to Okhsv.V)
+        val planes = listOf(Hwb.W to Hwb.B, Lch.C to Lch.L, Oklch.C to Oklch.L, Okhsl.S to Okhsl.L, Okhsv.S to Okhsv.V)
         for (rendering in listOf(PlaneRendering.Canonical, PlaneRendering.Fast)) {
             for ((x, y) in planes) {
                 val held = DoubleArray(3)

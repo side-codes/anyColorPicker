@@ -46,10 +46,10 @@ import codes.side.colorpicker.material3.HsvColorPicker
 import codes.side.colorpicker.material3.HwbColorPicker
 import codes.side.colorpicker.material3.LabColorPicker
 import codes.side.colorpicker.material3.LchColorPicker
-import codes.side.colorpicker.material3.OkLchColorPicker
 import codes.side.colorpicker.material3.OkhslColorPicker
 import codes.side.colorpicker.material3.OkhsvColorPicker
 import codes.side.colorpicker.material3.OklabColorPicker
+import codes.side.colorpicker.material3.OklchColorPicker
 import codes.side.colorpicker.material3.RgbColorPicker
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
@@ -181,12 +181,12 @@ fun OklabContextualPreview() = Frame { OklabColorPicker(state = ColorPickerState
 @PreviewTest
 @Preview(name = "OkLCh independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkLchIndependentPreview() = Frame { OkLchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Independent) }
+fun OklchIndependentPreview() = Frame { OklchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "OkLCh contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkLchContextualPreview() = Frame { OkLchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Contextual) }
+fun OklchContextualPreview() = Frame { OklchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "Okhsl independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)

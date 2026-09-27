@@ -472,29 +472,6 @@ public final class codes/side/color/LchColor {
 	public static synthetic fun with-8kjQ_X4$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
-public final class codes/side/color/OkLch : codes/side/color/PolarColorSpace {
-	public static final field INSTANCE Lcodes/side/color/OkLch;
-}
-
-public final class codes/side/color/OkLchColor {
-	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OkLchColor;
-	public fun equals (Ljava/lang/Object;)Z
-	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
-	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
-	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
-	public static final fun getC-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
-	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
-	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
-	public final fun getValue ()Lcodes/side/color/ColorValue;
-	public fun hashCode ()I
-	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
-	public fun toString ()Ljava/lang/String;
-	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
-	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
-	public static final fun with-t3s4fNg (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
-	public static synthetic fun with-t3s4fNg$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
-}
-
 public final class codes/side/color/Okhsl : codes/side/color/ColorSpace {
 	public static final field INSTANCE Lcodes/side/color/Okhsl;
 	public fun fromBase ([D[D)V
@@ -599,10 +576,33 @@ public final class codes/side/color/OklabColor {
 }
 
 public final class codes/side/color/OklabViewsKt {
-	public static final fun asOkLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
 	public static final fun asOklab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
-	public static final fun toOkLch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun asOklch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
 	public static final fun toOklab (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+	public static final fun toOklch (Lcodes/side/color/ColorValue;)Lcodes/side/color/ColorValue;
+}
+
+public final class codes/side/color/Oklch : codes/side/color/PolarColorSpace {
+	public static final field INSTANCE Lcodes/side/color/Oklch;
+}
+
+public final class codes/side/color/OklchColor {
+	public static final synthetic fun box-impl (Lcodes/side/color/ColorValue;)Lcodes/side/color/OklchColor;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lcodes/side/color/ColorValue;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lcodes/side/color/ColorValue;Lcodes/side/color/ColorValue;)Z
+	public static final fun getAlpha-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getC-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getH-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public static final fun getL-impl (Lcodes/side/color/ColorValue;)Ljava/lang/Double;
+	public final fun getValue ()Lcodes/side/color/ColorValue;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lcodes/side/color/ColorValue;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lcodes/side/color/ColorValue;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lcodes/side/color/ColorValue;
+	public static final fun with-a2ZIOJ0 (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;)Lcodes/side/color/ColorValue;
+	public static synthetic fun with-a2ZIOJ0$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
 public class codes/side/color/PolarColorSpace : codes/side/color/ColorSpace {

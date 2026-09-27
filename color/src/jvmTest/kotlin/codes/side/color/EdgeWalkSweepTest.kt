@@ -13,7 +13,7 @@ class EdgeWalkSweepTest {
     @Test
     fun theWalkLandsWhereTheClosedFormsDoEverywhere() {
         val rec2020 = ColorSpace.rgb("--rec2020-sweep", RgbPrimaries(0.708, 0.292, 0.170, 0.797, 0.131, 0.046), WhitePoint.D65, TransferFunction.Srgb)
-        val pureBlue = Srgb(0.0, 0.0, 1.0).to(OkLch)[OkLch.H]!!
+        val pureBlue = Srgb(0.0, 0.0, 1.0).to(Oklch)[Oklch.H]!!
         val hues = List(7200) { it * 0.05 } + listOf(245.1, 245.2, 264.05, 264.1, 264.2, pureBlue)
         val failures = ArrayList<String>()
         for (gamut in listOf(Srgb.gamut, DisplayP3.gamut, rec2020.gamut)) {

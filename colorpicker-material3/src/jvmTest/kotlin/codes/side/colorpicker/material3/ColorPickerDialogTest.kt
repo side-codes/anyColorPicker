@@ -34,9 +34,9 @@ import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import kotlin.math.roundToInt
 import kotlin.test.Test
@@ -267,7 +267,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun sevenSpacesAreAMenu() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
         onAllNodes(radioButton).assertCountEquals(0)
         onNodeWithText("Okhsl").performClick()
@@ -279,7 +279,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun theMenuIsAListOfRadioButtons() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
         onNodeWithText("Okhsl")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.DropdownList))
@@ -292,7 +292,7 @@ class ColorPickerDialogTest {
 
     @Test
     fun aDisabledMenuDoesNotOpen() = runComposeUiTest {
-        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        val spaces = listOf<ColorSpace>(Okhsl, Oklch, Oklab, Hsv, Hsl, Lab, Lch)
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces, enabled = false) }
         onNodeWithText("Okhsl").assertIsNotEnabled().performClick()
         onAllNodes(radioButton).assertCountEquals(0)

@@ -8,9 +8,9 @@ import codes.side.color.Hsv
 import codes.side.color.HueFamily
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,7 +45,7 @@ class HueMemoryTest {
         val chosen = Hsl(200.0, 80.0, 50.0)
         val memory = memoryOf(chosen, grey)
         assertEquals(200.0, memory.hue(Hsl.H))
-        assertNear(chosen.to(OkLch)[OkLch.H]!!, memory.hue(Okhsl.H), message = "Oklab's family")
+        assertNear(chosen.to(Oklch)[Oklch.H]!!, memory.hue(Okhsl.H), message = "Oklab's family")
         assertNear(chosen.to(Lch)[Lch.H]!!, memory.hue(Lch.H), message = "CIELab's family")
     }
 
@@ -60,7 +60,7 @@ class HueMemoryTest {
         val memory = memoryOf(Okhsl(140.0, 0.9, 0.5), grey)
         assertEquals(140.0, memory.hue(Okhsl.H))
         assertEquals(140.0, memory.hue(Okhsv.H))
-        assertEquals(140.0, memory.hue(OkLch.H))
+        assertEquals(140.0, memory.hue(Oklch.H))
     }
 
     @Test
@@ -68,7 +68,7 @@ class HueMemoryTest {
         val blue = Srgb(0.2, 0.4, 0.8)
         val memory = memoryOf(blue)
         assertNear(blue.to(Hsl)[Hsl.H]!!, memory.hue(Hsl.H))
-        assertNear(blue.to(OkLch)[OkLch.H]!!, memory.hue(OkLch.H))
+        assertNear(blue.to(Oklch)[Oklch.H]!!, memory.hue(Oklch.H))
         assertNear(blue.to(Lch)[Lch.H]!!, memory.hue(Lch.H))
     }
 
@@ -77,7 +77,7 @@ class HueMemoryTest {
         val red = Srgb(1.0, 0.0, 0.0)
         val memory = memoryOf(Hsl(200.0, 80.0, 50.0), red, grey)
         assertNear(0.0, memory.hue(Hsl.H))
-        assertNear(red.to(OkLch)[OkLch.H]!!, memory.hue(Okhsl.H))
+        assertNear(red.to(Oklch)[Oklch.H]!!, memory.hue(Okhsl.H))
     }
 
     @Test
@@ -91,22 +91,22 @@ class HueMemoryTest {
         // exact angle from the colored value, where the reference color is a few degrees off.
         val chosen = Hsl(200.0, 80.0, 50.0)
         val memory = memoryOf(chosen, Hsl(200.0, 80.0, 100.0))
-        assertNear(chosen.to(OkLch)[OkLch.H]!!, memory.hue(Okhsl.H))
+        assertNear(chosen.to(Oklch)[Oklch.H]!!, memory.hue(Okhsl.H))
     }
 
     @Test
     fun aHueGivenAtWhiteCarriesAcrossFromTheStart() {
         val hsl = memoryOf(Hsl(200.0, 100.0, 100.0))
-        assertNear(Hsl(200.0, 100.0, 50.0).to(OkLch)[OkLch.H]!!, hsl.hue(OkLch.H), message = "HSL into OkLCh")
+        assertNear(Hsl(200.0, 100.0, 50.0).to(Oklch)[Oklch.H]!!, hsl.hue(Oklch.H), message = "HSL into OkLCh")
         val ok = memoryOf(Okhsl(140.0, 1.0, 1.0))
-        assertNear(OkLch(0.75, 0.12, 140.0).to(Hsl)[Hsl.H]!!, ok.hue(Hsl.H), message = "Okhsl into HSL")
-        assertNear(OkLch(0.75, 0.12, 140.0).to(Lch)[Lch.H]!!, ok.hue(Lch.H), message = "Okhsl into LCH")
+        assertNear(Oklch(0.75, 0.12, 140.0).to(Hsl)[Hsl.H]!!, ok.hue(Hsl.H), message = "Okhsl into HSL")
+        assertNear(Oklch(0.75, 0.12, 140.0).to(Lch)[Lch.H]!!, ok.hue(Lch.H), message = "Okhsl into LCH")
     }
 
     @Test
     fun aNewHueWrittenAtWhiteCarriesAcross() {
         val memory = memoryOf(Hsl(200.0, 80.0, 50.0), Hsl(120.0, 100.0, 100.0))
-        assertNear(Hsl(120.0, 100.0, 50.0).to(OkLch)[OkLch.H]!!, memory.hue(OkLch.H))
+        assertNear(Hsl(120.0, 100.0, 50.0).to(Oklch)[Oklch.H]!!, memory.hue(Oklch.H))
     }
 
     @Test

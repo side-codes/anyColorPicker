@@ -73,7 +73,7 @@ with a hue defaults to `Independent`; the RGB, Lab, Oklab and CMYK pickers defau
 | **Lab**<br>`LabColorPicker`     | ![Lab independent](docs/images/lab-independent.png)     | ![Lab contextual](docs/images/lab-contextual.png)     |
 | **LCH**<br>`LchColorPicker`     | ![LCH independent](docs/images/lch-independent.png)     | ![LCH contextual](docs/images/lch-contextual.png)     |
 | **Oklab**<br>`OklabColorPicker` | ![Oklab independent](docs/images/oklab-independent.png) | ![Oklab contextual](docs/images/oklab-contextual.png) |
-| **OkLCh**<br>`OkLchColorPicker` | ![OkLCh independent](docs/images/oklch-independent.png) | ![OkLCh contextual](docs/images/oklch-contextual.png) |
+| **OkLCh**<br>`OklchColorPicker` | ![OkLCh independent](docs/images/oklch-independent.png) | ![OkLCh contextual](docs/images/oklch-contextual.png) |
 | **Okhsl**<br>`OkhslColorPicker` | ![Okhsl independent](docs/images/okhsl-independent.png) | ![Okhsl contextual](docs/images/okhsl-contextual.png) |
 | **Okhsv**<br>`OkhsvColorPicker` | ![Okhsv independent](docs/images/okhsv-independent.png) | ![Okhsv contextual](docs/images/okhsv-contextual.png) |
 | **CMYK**<br>`CmykColorPicker`   | ![CMYK independent](docs/images/cmyk-independent.png)   | ![CMYK contextual](docs/images/cmyk-contextual.png)   |
@@ -103,7 +103,7 @@ fun MyScreen() {
 
 `ColorPicker` is an Okhsl picker unless given a `space`: its lightness is perceived lightness and
 its saturation is measured against the display, so every position is a color the screen shows.
-`ColorPicker(state, space = OkLch)` picks in any other space, and the named pickers,
+`ColorPicker(state, space = Oklch)` picks in any other space, and the named pickers,
 `HslColorPicker` to `CmykColorPicker`, fix one.
 
 A picker can equally sit over a value you hold yourself:
@@ -122,11 +122,11 @@ Each space builds one:
 ```kotlin
 val teal = Okhsl(200.0, 0.8, 0.5)            // hue, saturation, lightness
 val halfRed = Srgb(1.0, 0.0, 0.0, 0.5)       // alpha comes last
-val vivid = OkLch(0.7, 0.3, 150.0)           // more chroma than sRGB can show
+val vivid = Oklch(0.7, 0.3, 150.0)           // more chroma than sRGB can show
 
 teal.space                  // Okhsl
 teal[Okhsl.L]               // 0.5
-teal.to(OkLch)              // the same color, in OkLCh
+teal.to(Oklch)              // the same color, in OkLCh
 teal.with(Okhsl.L, 0.7)     // lighter, and still Okhsl
 teal.withAlpha(0.5)
 ```
@@ -144,7 +144,7 @@ The units are CSS's, so a number copied from a stylesheet or a design tool means
 | `Lab`                             | `L`, `A`, `B`                               | L 0–100; a and b about ±125                    |
 | `Lch`                             | `L`, `C`, `H`                               | L 0–100, C 0–150, H 0–360                      |
 | `Oklab`                           | `L`, `A`, `B`                               | L 0–1; a and b about ±0.4                      |
-| `OkLch`                           | `L`, `C`, `H`                               | L 0–1, C 0–0.4, H 0–360                        |
+| `Oklch`                           | `L`, `C`, `H`                               | L 0–1, C 0–0.4, H 0–360                        |
 | `Hsl`, `Hsv`, `Hwb`               | `H`, `S`, `L`; `H`, `S`, `V`; `H`, `W`, `B` | H 0–360, the rest 0–100                        |
 | `Okhsl`, `Okhsv`                  | `H`, `S`, `L`; `H`, `S`, `V`                | H 0–360, the rest 0–1                          |
 | `Cmyk`                            | `C`, `M`, `Y`, `K`                          | 0–1                                            |
@@ -196,7 +196,7 @@ binary search down the chroma axis, comparing each candidate against its clipped
 once the two are within a just-noticeable difference. Lightness and hue survive and chroma pays.
 
 ```kotlin
-val vivid = OkLch(0.7, 0.3, 150.0)
+val vivid = Oklch(0.7, 0.3, 150.0)
 
 vivid.isInGamut(Srgb.gamut)                     // false
 vivid.toGamut(Srgb.gamut)                       // the same lightness and hue, less chroma
@@ -211,7 +211,7 @@ measured against the gamut, so they are inside it by construction.
 ### CSS and hex
 
 ```kotlin
-OkLch(0.7, 0.15, 140.0).toCssString()     // "oklch(0.7 0.15 140)"
+Oklch(0.7, 0.15, 140.0).toCssString()     // "oklch(0.7 0.15 140)"
 Hsl(120.0, 50.0, 25.0).toCssString()      // "hsl(120 50% 25%)"
 Okhsl(120.0, 0.5, 0.25).toCssString()     // "color(--okhsl 120 0.5 0.25)"
 Hsl(120.0, 50.0, null).toCssString()      // "hsl(120 50% none)"
@@ -271,8 +271,8 @@ clipped into sRGB.
 val state = rememberColorPickerState(Okhsl(250.0, 0.8, 0.6))
 
 ColorPicker(state)                          // Okhsl: a plane, three sliders and alpha
-ColorPicker(state, space = OkLch)           // any space, the library's or an app's
-OkLchColorPicker(state)                     // the same, by name
+ColorPicker(state, space = Oklch)           // any space, the library's or an app's
+OklchColorPicker(state)                     // the same, by name
 ColorPicker(
     state = state,
     space = Cmyk,
@@ -292,7 +292,7 @@ puts the plane beside the sliders, in the start half:
 ![Horizontal picker](docs/images/horizontal-picker.png)
 
 The eleven named pickers are `RgbColorPicker` (sRGB), `HslColorPicker`, `HsvColorPicker`,
-`HwbColorPicker`, `LabColorPicker`, `LchColorPicker`, `OklabColorPicker`, `OkLchColorPicker`,
+`HwbColorPicker`, `LabColorPicker`, `LchColorPicker`, `OklabColorPicker`, `OklchColorPicker`,
 `OkhslColorPicker`, `OkhsvColorPicker` and `CmykColorPicker`. Each is `ColorPicker` with its
 space fixed and takes the same parameters.
 
@@ -359,8 +359,8 @@ one for alpha. Compose any set of them against a shared state:
 
 ```kotlin
 ChannelSlider(state, Okhsl.H)
-ChannelSlider(state, OkLch.C)                       // 0 to 0.4, CSS's reference range
-ChannelSlider(state, OkLch.C, range = 0.0..0.2)     // a narrower track
+ChannelSlider(state, Oklch.C)                       // 0 to 0.4, CSS's reference range
+ChannelSlider(state, Oklch.C, range = 0.0..0.2)     // a narrower track
 ChannelSlider(state, Srgb.R)
 AlphaSlider(state)
 ```
@@ -740,7 +740,7 @@ state[Hsl.H]                      // one channel, converted; null for a grey's h
 state.displayValue(Hsl.H)         // what a slider shows: for a grey, the hue last chosen
 state.hsl.l                       // a typed view; there is one for each of the fifteen spaces
 
-state.value = OkLch(0.7, 0.15, 140.0)
+state.value = Oklch(0.7, 0.15, 140.0)
 state[Hsl.L] = 40.0               // leaves the color in HSL
 state.set(state.okhsl.with(l = 0.4))
 state.value = state.value.withAlpha(0.5)
@@ -817,8 +817,8 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | `implementation("codes.side:colorpicker:1.2.1")`                                            | `implementation("codes.side:colorpicker-material3:2.0.0")`                               | `codes.side:colorpicker` stops at 1.2.1                    |
 | `codes.side.colorpicker.ui.*`, `codes.side.colorpicker.theme.*`                             | `codes.side.colorpicker.material3.*`                                                     |                                                            |
 | `HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)`                                 | `Hsl(200.0, 80.0, 50.0)`                                                                 | CSS's units: HSL's S and L are 0–100                       |
-| `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `OkLch(…)`           | each a `ColorValue`                                        |
-| `hsl.toRgb()`, `rgb.toOklch()`, …                                                           | `value.to(Srgb)`, `value.to(OkLch)`                                                      |                                                            |
+| `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `Oklch(…)`           | each a `ColorValue`                                        |
+| `hsl.toRgb()`, `rgb.toOklch()`, …                                                           | `value.to(Srgb)`, `value.to(Oklch)`                                                      |                                                            |
 | `codes.side.colorpicker.conversion.HexAlpha`                                                | `codes.side.color.HexAlpha`                                                              |                                                            |
 | `color.toHexString(HexAlpha.First)`                                                         | `value.toHexString(HexAlpha.First)`                                                      |                                                            |
 | `"#3380CC".toRgbColorOrNull(HexAlpha.None)`                                                 | `ColorValue.parseHexOrNull("#3380CC", HexAlpha.None)`                                    |                                                            |

@@ -10,8 +10,8 @@ import codes.side.color.DisplayP3
 import codes.side.color.GamutMapping
 import codes.side.color.HexAlpha
 import codes.side.color.Lab
-import codes.side.color.OkLch
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.RgbPrimaries
 import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
@@ -89,14 +89,14 @@ class ComposeBridgeTest {
         for (composeSpace in spaces) {
             val grey = Color(0.5f, 0.5f, 0.5f, 1f, composeSpace).toColorValue().to(Oklab).components()
             assertTrue(abs(grey[1]) <= 1e-12 && abs(grey[2]) <= 1e-12, "${composeSpace.name}: a ${grey[1]}, b ${grey[2]}")
-            assertNull(Color(0.5f, 0.5f, 0.5f, 1f, composeSpace).toColorValue().to(OkLch)[OkLch.H], composeSpace.name)
+            assertNull(Color(0.5f, 0.5f, 0.5f, 1f, composeSpace).toColorValue().to(Oklch)[Oklch.H], composeSpace.name)
         }
     }
 
     @Test
     fun srgbIsTheDefaultAndMapsFirst() {
         assertEquals(Color(0xFF336699), Srgb(0.2, 0.4, 0.6).toComposeColor())
-        val vivid = OkLch(0.7, 0.4, 30.0)
+        val vivid = Oklch(0.7, 0.4, 30.0)
         assertEquals(Color(vivid.toHexString(HexAlpha.First).substring(1).toLong(16)), vivid.toComposeColor())
         assertEquals(
             Color(vivid.toHexString(HexAlpha.First, GamutMapping.Clip).substring(1).toLong(16)),

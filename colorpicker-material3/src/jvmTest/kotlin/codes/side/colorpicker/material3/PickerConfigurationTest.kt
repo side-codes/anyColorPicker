@@ -37,10 +37,10 @@ import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lab
 import codes.side.color.Lch
-import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Oklab
+import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import kotlin.test.Test
@@ -66,7 +66,7 @@ class PickerConfigurationTest {
         NamedPicker(Lab) { LabColorPicker(it) },
         NamedPicker(Lch) { LchColorPicker(it) },
         NamedPicker(Oklab) { OklabColorPicker(it) },
-        NamedPicker(OkLch) { OkLchColorPicker(it) },
+        NamedPicker(Oklch) { OklchColorPicker(it) },
         NamedPicker(Okhsl) { OkhslColorPicker(it) },
         NamedPicker(Okhsv) { OkhsvColorPicker(it) },
         NamedPicker(Cmyk) { CmykColorPicker(it) },
@@ -105,7 +105,7 @@ class PickerConfigurationTest {
             { LabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { LchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OklabColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
-            { OkLchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklchColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhslColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhsvColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { CmykColorPicker(it, enabled = false, thumb = {}, onValueChangeFinished = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
@@ -119,7 +119,7 @@ class PickerConfigurationTest {
             { LabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { LchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OklabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
-            { OkLchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { CmykColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
@@ -133,7 +133,7 @@ class PickerConfigurationTest {
             { LabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { LchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OklabColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
-            { OkLchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
+            { OklchColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhslColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { OkhsvColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },
             { CmykColorPicker(it, {}, enabled = false, thumb = {}, orientation = Orientation.Horizontal, alphaSlider = null) },

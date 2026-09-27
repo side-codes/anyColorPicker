@@ -38,7 +38,7 @@ class GamutGeometryTest {
         )
         for ((gamut, points, limit) in cases) {
             for ((hue, lightness) in points) {
-                val scanned = scannedEdge(limit) { c -> OkLch(lightness, c, hue).to(gamut.space).components().all { it in 0.0..1.0 } }
+                val scanned = scannedEdge(limit) { c -> Oklch(lightness, c, hue).to(gamut.space).components().all { it in 0.0..1.0 } }
                 assertNear(scanned, gamut.maxChroma(lightness, hue), 1e-9, "$gamut at $hue°, L $lightness")
             }
         }
@@ -69,7 +69,7 @@ class GamutGeometryTest {
     fun huesOutsideOneTurnAnswerAsTheirWrappedHue() {
         assertEquals(Srgb.gamut.maxChroma(0.6, 330.0), Srgb.gamut.maxChroma(0.6, -30.0), 1e-12)
         assertEquals(Srgb.gamut.maxChroma(0.6, 30.0), Srgb.gamut.maxChroma(0.6, 390.0), 1e-12)
-        assertNear(330.0, Srgb.gamut.cusp(-30.0)[OkLch.H]!!, 1e-9)
+        assertNear(330.0, Srgb.gamut.cusp(-30.0)[Oklch.H]!!, 1e-9)
     }
 
     @Test
@@ -77,7 +77,7 @@ class GamutGeometryTest {
         for (gamut in gamuts) {
             for (hue in (0 until 360 step 15).map { it.toDouble() } + listOf(245.2, 264.1)) {
                 val cusp = gamut.cusp(hue)
-                assertNear(hue, cusp[OkLch.H]!!, 1e-9, "$gamut cusp hue at $hue°")
+                assertNear(hue, cusp[Oklch.H]!!, 1e-9, "$gamut cusp hue at $hue°")
                 val linear = linear(cusp, gamut)
                 assertNear(0.0, linear.min(), 1e-12, "$gamut lowest channel at $hue°")
                 assertNear(1.0, linear.max(), 1e-12, "$gamut highest channel at $hue°")
@@ -90,10 +90,10 @@ class GamutGeometryTest {
         for (gamut in gamuts) {
             for (hue in doubleArrayOf(30.0, 140.0, 250.0)) {
                 val cusp = gamut.cusp(hue)
-                val lightness = cusp[OkLch.L]!!
-                assertNear(cusp[OkLch.C]!!, gamut.maxChroma(lightness, hue), 1e-9, "$gamut at $hue°")
-                assertTrue(gamut.maxChroma(lightness - 0.01, hue) < cusp[OkLch.C]!!)
-                assertTrue(gamut.maxChroma(lightness + 0.01, hue) < cusp[OkLch.C]!!)
+                val lightness = cusp[Oklch.L]!!
+                assertNear(cusp[Oklch.C]!!, gamut.maxChroma(lightness, hue), 1e-9, "$gamut at $hue°")
+                assertTrue(gamut.maxChroma(lightness - 0.01, hue) < cusp[Oklch.C]!!)
+                assertTrue(gamut.maxChroma(lightness + 0.01, hue) < cusp[Oklch.C]!!)
             }
         }
     }

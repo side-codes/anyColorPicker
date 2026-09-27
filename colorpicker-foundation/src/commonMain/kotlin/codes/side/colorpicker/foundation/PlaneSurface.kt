@@ -26,7 +26,7 @@ import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.OkLch
+import codes.side.color.Oklch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.Srgb
@@ -119,7 +119,7 @@ internal fun planeGridOf(x: ColorChannel, y: ColorChannel): PlaneGrid = when {
     x === Hwb.W && y === Hwb.B -> HWB_GRID
     x === Okhsv.S && y === Okhsv.V -> OKHSV_GRID
     x === Okhsl.S && y === Okhsl.L -> OKHSL_GRID
-    x === OkLch.C && y === OkLch.L -> OKLCH_GRID
+    x === Oklch.C && y === Oklch.L -> OKLCH_GRID
     x === Lch.C && y === Lch.L -> LCH_GRID
     else -> DEFAULT_GRID
 }

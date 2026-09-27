@@ -36,7 +36,7 @@ class EdgeWalkTest {
         TransferFunction.Srgb,
     )
     private val gamuts = listOf(Srgb.gamut, DisplayP3.gamut, rec2020.gamut)
-    private val pureBlue = Srgb(0.0, 0.0, 1.0).to(OkLch)[OkLch.H]!!
+    private val pureBlue = Srgb(0.0, 0.0, 1.0).to(Oklch)[Oklch.H]!!
 
     // Every 1.5°, and the hues around sRGB's and Rec. 2020's slivers, pure blue's own among them.
     private val hues = List(240) { it * 1.5 } + listOf(245.1, 245.2, 264.05, 264.1, 264.2, pureBlue)
