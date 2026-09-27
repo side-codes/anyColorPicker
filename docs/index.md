@@ -717,9 +717,10 @@ fun RoundThumb(color: Color) {
 }
 ```
 
-A slot reads from its scope whether it is enabled. What lies outside every scope, such as a label
-drawn above a slider, reads `LocalColorPickerEnabled` to look disabled with the picker. The sample
-app's *Built on foundation* section runs a picker like this one.
+A slot reads from its scope whether it is enabled. What lies outside every scope reads
+`LocalColorPickerEnabled` to look disabled with the picker: a label drawn above a slider, or the field
+a `BasicChannelPlane` paints, which it leaves undimmed when disabled. The sample app's *Built on
+foundation* section runs a picker like this one, its plane dimmed through its modifier.
 
 ## 🔗 State Management
 

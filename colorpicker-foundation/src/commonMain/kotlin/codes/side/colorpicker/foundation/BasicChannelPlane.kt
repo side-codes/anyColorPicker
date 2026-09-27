@@ -46,6 +46,9 @@ public sealed interface ChannelPlaneScope : ColorPlaneScope {
  * passes the key on, so focus can leave. The four accessibility actions move by
  * [ColorChannel.pageStep].
  *
+ * Disabled, it paints the field unchanged, having no disabled look of its own: dim it through [modifier], reading
+ * [LocalColorPickerEnabled] inside a picker.
+ *
  * @param onValueChangeFinished called when a drag ends, and after each key press or accessibility
  * action that changes the value.
  * @param shape clips the field. The thumb is drawn outside it, so it stays whole at the edges.

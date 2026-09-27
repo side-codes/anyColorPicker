@@ -23,6 +23,7 @@ import codes.side.colorpicker.foundation.BasicAlphaSlider
 import codes.side.colorpicker.foundation.BasicChannelPlane
 import codes.side.colorpicker.foundation.BasicChannelSlider
 import codes.side.colorpicker.foundation.BasicColorPicker
+import codes.side.colorpicker.foundation.LocalColorPickerEnabled
 import codes.side.colorpicker.foundation.checkerboard
 import codes.side.colorpicker.state.ColorPickerState
 
@@ -41,9 +42,14 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
                 planeState,
                 x,
                 y,
-                Modifier.fillMaxWidth().aspectRatio(1.6f),
+                // The plane draws its surface itself, outside any slot, so it is dimmed here as a whole, thumb and
+                // all, from the picker's state.
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1.6f)
+                    .alpha(if (LocalColorPickerEnabled.current) 1f else DisabledAlpha),
                 shape = RoundedCornerShape(16.dp),
-                thumb = { RoundThumb(thumbColor, 28.dp, this.enabled) },
+                thumb = { RoundThumb(thumbColor, 28.dp, dimmed = false) },
             )
         },
         channelSlider = { sliderState, channel ->
@@ -52,7 +58,7 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
                 channel,
                 Modifier.fillMaxWidth(),
                 track = { PillTrack(gradient, this.enabled) },
-                thumb = { RoundThumb(thumbColor, 24.dp, this.enabled) },
+                thumb = { RoundThumb(thumbColor, 24.dp, dimmed = !this.enabled) },
             )
         },
         alphaSlider = { sliderState ->
@@ -60,7 +66,7 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
                 sliderState,
                 Modifier.fillMaxWidth(),
                 track = { PillTrack(gradient, this.enabled, checkerboard = true) },
-                thumb = { RoundThumb(thumbColor, 24.dp, this.enabled) },
+                thumb = { RoundThumb(thumbColor, 24.dp, dimmed = !this.enabled) },
             )
         },
         modifier = modifier,
@@ -69,13 +75,16 @@ fun FoundationPicker(state: ColorPickerState, enabled: Boolean, modifier: Modifi
     )
 }
 
+// The opacity Material gives disabled content.
+private const val DisabledAlpha = 0.38f
+
 // A 12 dp pill of the track's gradient, over a checkerboard when the gradient is translucent.
 @Composable
 private fun PillTrack(gradient: Brush, enabled: Boolean, checkerboard: Boolean = false) {
     val pill = Modifier
         .fillMaxWidth()
         .height(12.dp)
-        .alpha(if (enabled) 1f else 0.38f)
+        .alpha(if (enabled) 1f else DisabledAlpha)
         .clip(CircleShape)
     Box(
         (if (checkerboard) pill.checkerboard(Color.White, Color.LightGray) else pill).background(gradient),
@@ -84,11 +93,11 @@ private fun PillTrack(gradient: Brush, enabled: Boolean, checkerboard: Boolean =
 
 // The color in a white ring, lifted by a shadow so it reads against a track of the same color.
 @Composable
-private fun RoundThumb(color: Color, size: Dp, enabled: Boolean) {
+private fun RoundThumb(color: Color, size: Dp, dimmed: Boolean) {
     Box(
         Modifier
             .size(size)
-            .alpha(if (enabled) 1f else 0.38f)
+            .alpha(if (dimmed) DisabledAlpha else 1f)
             .shadow(2.dp, CircleShape)
             .background(Color.White, CircleShape)
             .padding(3.dp)
