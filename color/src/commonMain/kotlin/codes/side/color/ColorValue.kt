@@ -92,9 +92,8 @@ public class ColorValue internal constructor(
         val powerless = target.powerless(out)
         if (powerless != 0) {
             outMissing = outMissing or powerless
-            target.channels.forEachIndexed { j, channel ->
-                if (channel.analogous == AnalogousCategory.Colorfulness) out[j] = 0.0
-            }
+            // As the target takes a grey in: its colorfulness 0, or for HWB, which has none, B set to 100 − W.
+            target.makeAchromatic(out, powerless, outMissing)
         }
         for (j in out.indices) if (outMissing and (1 shl j) != 0) out[j] = 0.0
         return create(target, out, alphaOrNull, outMissing)
