@@ -535,7 +535,7 @@ ColorPickerDialog(
 )
 ```
 
-![Color picker dialog](images/dialog.png)
+<img src="images/dialog.png" alt="Color picker dialog" width="360">
 
 Switching space redraws the color without converting it. Confirming returns exactly the initial
 value if nothing was edited, or if the original half of the swatch was pressed to restore it, so an

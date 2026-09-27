@@ -279,11 +279,18 @@ fun OkhsvPlanePreview() = Frame {
     ChannelSlider(state, Okhsv.H)
 }
 
+// A phone's dialog window keeps the dialog clear of the screen's edges. The preview's window runs edge to edge, so
+// the margin is given here.
 @PreviewTest
 @Preview(name = "Dialog", widthDp = 440, heightDp = 960)
 @Composable
 fun DialogPreview() = Frame {
-    ColorPickerDialog(initialValue = Seed.withAlpha(0.8), onValueSelected = {}, onDismissRequest = {})
+    ColorPickerDialog(
+        initialValue = Seed.withAlpha(0.8),
+        onValueSelected = {},
+        onDismissRequest = {},
+        modifier = Modifier.padding(horizontal = 24.dp),
+    )
 }
 
 // A landscape tablet: too short to stack the picker, and wide enough to put the plane beside the sliders. A
