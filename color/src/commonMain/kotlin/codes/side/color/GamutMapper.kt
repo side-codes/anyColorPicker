@@ -29,6 +29,16 @@ public class GamutMapper internal constructor(
         .takeIf { gamut.space.transfer === TransferFunction.Srgb && it.lastOrNull() === gamut.space.encodeStep }
         ?.let { it.copyOfRange(0, it.size - 1) }
 
+    // Where the route to linear light passes through Oklab, as from OkLCh, Okhsl, Okhsv and Oklab itself, the route
+    // from Oklab on, so a color outside the gamut is mapped from the Oklab color on the way rather than converted
+    // again. Taken in two legs it is the same steps: the first leg ends in a step that is not a matrix, so nothing
+    // fuses across the join, which the step count confirms.
+    private val oklabToLinear: Array<Step>? = toLinear
+        ?.takeIf { generateSequence(source) { it.base }.any { it === Oklab } }
+        ?.let { Oklab.converterTo(gamut.space).steps }
+        ?.takeIf { it.lastOrNull() === gamut.space.encodeStep && toOklab.steps.size + it.size == toSpace.steps.size }
+        ?.let { it.copyOfRange(0, it.size - 1) }
+
     /** Maps one color from [src] into [dst], which may be the same array. */
     public fun convert(src: DoubleArray, dst: DoubleArray) {
         val buffer = DoubleArray(2 * MAX_COMPONENTS)
@@ -84,7 +94,7 @@ public class GamutMapper internal constructor(
             toSpace.convertInPlace(buffer)
             if (inCube(buffer)) return
         } else {
-            for (step in linear) step.apply(buffer)
+            toLinearLight(buffer, linear)
             // Within rounding of the cube the curve decides, as it does without this: encoding 1 gives
             // 0.9999999999999999, so a channel a few ulps past 1 can come back inside.
             if (!clearlyOutside(buffer)) {
@@ -92,11 +102,34 @@ public class GamutMapper internal constructor(
                 if (inCube(buffer)) return
             }
         }
-        buffer.copyInto(buffer, 0, MAX_COMPONENTS, 2 * MAX_COMPONENTS)
-        toOklab.convertInPlace(buffer)
-        method.map(gamut, buffer[0], buffer[1], buffer[2], buffer)
+        mapOutside(buffer)
         val transfer = gamut.space.transfer
         for (i in 0..2) buffer[i] = transfer.encode(buffer[i])
+    }
+
+    // Takes the source color at 0 to linear light along [linear], leaving at MAX_COMPONENTS the Oklab color it
+    // passes through, when it passes through one.
+    private fun toLinearLight(buffer: DoubleArray, linear: Array<Step>) {
+        val fromOklab = oklabToLinear
+        if (fromOklab == null) {
+            for (step in linear) step.apply(buffer)
+        } else {
+            toOklab.convertInPlace(buffer)
+            buffer.copyInto(buffer, MAX_COMPONENTS, 0, 3)
+            for (step in fromOklab) step.apply(buffer)
+        }
+    }
+
+    // Linear RGB in buffer[0..2] of the color the gamut does not hold, from the Oklab color at MAX_COMPONENTS or
+    // from the source color there.
+    private fun mapOutside(buffer: DoubleArray) {
+        if (oklabToLinear == null) {
+            buffer.copyInto(buffer, 0, MAX_COMPONENTS, 2 * MAX_COMPONENTS)
+            toOklab.convertInPlace(buffer)
+        } else {
+            buffer.copyInto(buffer, 0, MAX_COMPONENTS, MAX_COMPONENTS + 3)
+        }
+        method.map(gamut, buffer[0], buffer[1], buffer[2], buffer)
     }
 }
 

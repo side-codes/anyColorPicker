@@ -11,25 +11,34 @@ class GamutMapperTest {
 
     @Test
     fun bulkMappingGivesWhatToGamutGives() {
+        // Routes through Oklab (OkLCh, Okhsl, Okhsv, Oklab itself) and around it (LCH, HWB, sRGB), inside and far out.
         val random = Random(20260927)
         val count = 200
-        val source = DoubleArray(count * 3)
-        for (k in 0 until count) {
-            source[k * 3] = random.nextDouble(0.0, 1.1)
-            source[k * 3 + 1] = random.nextDouble(0.0, 0.4)
-            source[k * 3 + 2] = random.nextDouble(0.0, 360.0)
-        }
-        for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
-            for (method in methods) {
-                val mapped = DoubleArray(count * 3)
-                gamut.mapper(OkLch, method).convert(source, 0, mapped, 0, count)
-                val floats = FloatArray(count * 3)
-                gamut.mapper(OkLch, method).convert(FloatArray(count * 3) { source[it].toFloat() }, 0, floats, 0, count)
-                for (k in 0 until count) {
-                    val expected = OkLch(source[k * 3], source[k * 3 + 1], source[k * 3 + 2]).toGamut(gamut, method).components()
-                    for (i in 0..2) {
-                        assertNear(expected[i], mapped[k * 3 + i], 0.0, "$method to $gamut, color $k")
-                        assertNear(expected[i], floats[k * 3 + i].toDouble(), 1e-3, "$method to $gamut in floats, color $k")
+        val sources: List<Pair<ColorSpace, () -> DoubleArray>> = listOf(
+            OkLch to { doubleArrayOf(random.nextDouble(0.0, 1.1), random.nextDouble(0.0, 0.4), random.nextDouble(0.0, 360.0)) },
+            Okhsl to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(), random.nextDouble()) },
+            Okhsv to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(), random.nextDouble()) },
+            Oklab to { doubleArrayOf(random.nextDouble(0.0, 1.1), random.nextDouble(-0.4, 0.4), random.nextDouble(-0.4, 0.4)) },
+            Lch to { doubleArrayOf(random.nextDouble(0.0, 110.0), random.nextDouble(0.0, 150.0), random.nextDouble(0.0, 360.0)) },
+            Hwb to { doubleArrayOf(random.nextDouble(0.0, 360.0), random.nextDouble(0.0, 100.0), random.nextDouble(0.0, 100.0)) },
+            Srgb to { doubleArrayOf(random.nextDouble(-0.2, 1.2), random.nextDouble(-0.2, 1.2), random.nextDouble(-0.2, 1.2)) },
+        )
+        for ((space, next) in sources) {
+            val source = DoubleArray(count * 3)
+            for (k in 0 until count) next().copyInto(source, k * 3)
+            for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
+                for (method in methods) {
+                    val mapped = DoubleArray(count * 3)
+                    gamut.mapper(space, method).convert(source, 0, mapped, 0, count)
+                    val floats = FloatArray(count * 3)
+                    gamut.mapper(space, method).convert(FloatArray(count * 3) { source[it].toFloat() }, 0, floats, 0, count)
+                    for (k in 0 until count) {
+                        val color = space.color(source.copyOfRange(k * 3, k * 3 + 3))
+                        val expected = color.toGamut(gamut, method).components()
+                        for (i in 0..2) {
+                            assertNear(expected[i], mapped[k * 3 + i], 0.0, "$method from $space to $gamut, color $k")
+                            assertNear(expected[i], floats[k * 3 + i].toDouble(), 1e-3, "$method from $space to $gamut in floats, color $k")
+                        }
                     }
                 }
             }
