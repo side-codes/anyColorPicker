@@ -162,8 +162,11 @@ internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, hel
 internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
     (x === Hsl.S && y === Hsl.L) || (x === Hsv.S && y === Hsv.V)
 
-// What a raster is built from: the pair of channels and every held component.
-private data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
+/** What a raster is built from: the pair of channels and every held component. */
+internal data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>)
+
+// Every plane's rasters: a raster is 256 KB at most, so three kept cost under 1 MB.
+private val planeRasters = PlaneRasters<ImageBitmap>(kept = 3)
 
 // A built raster and the pair of channels it shows.
 private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: ImageBitmap)
@@ -171,7 +174,8 @@ private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: 
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
  * are two brushes, exactly. Any other pair is a raster, built on [Dispatchers.Default] whenever a held
- * channel changes, with the previous one drawn until it arrives. A raster of another pair is another
+ * channel changes, and shared with any other plane asking for the same, with the previous one drawn until
+ * it arrives. A raster of another pair is another
  * space's colors rather than an earlier state of these, so after a change of channels nothing is drawn
  * until the new pair's arrives. A preview draws one frame and has no later one to wait for, so there the
  * raster is built at once.
@@ -193,8 +197,10 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
             // faster than a raster is built; cancelling the one in flight for each change would land
             // none until the drag stopped. Built in order, an older raster never lands after a newer one.
             snapshotFlow { request }.conflate().collect { next ->
-                val built = withContext(Dispatchers.Default) {
-                    rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
+                val built = planeRasters.raster(next) {
+                    withContext(Dispatchers.Default) {
+                        rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y))
+                    }
                 }
                 raster.value = PlaneRaster(next.x, next.y, built)
             }
