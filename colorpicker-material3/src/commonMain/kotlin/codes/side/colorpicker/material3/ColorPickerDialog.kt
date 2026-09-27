@@ -36,8 +36,11 @@ private val DialogSpacing = 16.dp
 @Stable
 public sealed interface ColorPickerDialogScope {
 
-    /** The dialog's state: the color it opened with, the color being edited, and the spaces. */
-    public val state: ColorPickerDialogState
+    /**
+     * The dialog's state: the color it opened with, the color being edited, and the spaces. Not `state`, which a
+     * caller's own picker state, in scope where the dialog is written, would hide from the slot.
+     */
+    public val dialogState: ColorPickerDialogState
 
     /** Hands [ColorPickerDialogState.result] to the dialog's caller, as the default confirm button does. */
     public fun confirm()
@@ -108,8 +111,8 @@ public fun ColorPickerDialog(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     title: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Title() },
-    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(state, enabled = enabled) },
-    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(state, enabled = enabled) },
+    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(dialogState, enabled = enabled) },
+    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(dialogState, enabled = enabled) },
     confirmButton: @Composable ColorPickerDialogScope.() -> Unit = { ColorPickerDialogDefaults.ConfirmButton(onClick = { confirm() }) },
     dismissButton: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.DismissButton(onClick = { dismiss() }) },
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
@@ -167,8 +170,8 @@ public fun ColorPickerDialog(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     title: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Title() },
-    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(state, enabled = enabled) },
-    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(state, enabled = enabled) },
+    header: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.Header(dialogState, enabled = enabled) },
+    spaceSwitcher: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.SpaceSwitcher(dialogState, enabled = enabled) },
     confirmButton: @Composable ColorPickerDialogScope.() -> Unit = { ColorPickerDialogDefaults.ConfirmButton(onClick = { confirm() }) },
     dismissButton: (@Composable ColorPickerDialogScope.() -> Unit)? = { ColorPickerDialogDefaults.DismissButton(onClick = { dismiss() }) },
     thumb: @Composable ColorSliderScope.() -> Unit = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor) },
@@ -201,7 +204,7 @@ public fun ColorPickerDialog(
 }
 
 private class DialogScope(
-    override val state: ColorPickerDialogState,
+    override val dialogState: ColorPickerDialogState,
     private val onConfirm: () -> Unit,
     private val onDismiss: () -> Unit,
 ) : ColorPickerDialogScope {

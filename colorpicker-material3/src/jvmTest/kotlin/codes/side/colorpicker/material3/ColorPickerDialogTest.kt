@@ -38,6 +38,7 @@ import codes.side.color.Okhsl
 import codes.side.color.Oklab
 import codes.side.color.Oklch
 import codes.side.color.Srgb
+import codes.side.colorpicker.state.rememberColorPickerState
 import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -353,7 +354,7 @@ class ColorPickerDialogTest {
                 initialValue = teal,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                header = { ColorPickerDialogDefaults.Header(state, enabled = false) },
+                header = { ColorPickerDialogDefaults.Header(dialogState, enabled = false) },
             )
         }
         sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
@@ -376,11 +377,14 @@ class ColorPickerDialogTest {
     fun aSlotConfirmsThroughTheScope() = runComposeUiTest {
         var selected: ColorValue? = null
         setContent {
+            // A caller that opens the dialog from a picker holds a state of its own, and whatever it is called must not
+            // hide the scope's member from the slot.
+            val state = rememberColorPickerState(teal)
             ColorPickerDialog(
-                initialValue = teal,
+                initialValue = state.value,
                 onValueSelected = { selected = it },
                 onDismissRequest = {},
-                confirmButton = { TextButton(onClick = { confirm() }, enabled = state.isModified) { Text("Apply") } },
+                confirmButton = { TextButton(onClick = { confirm() }, enabled = dialogState.isModified) { Text("Apply") } },
             )
         }
         onNodeWithText("Apply").assertIsNotEnabled()

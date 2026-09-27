@@ -568,7 +568,7 @@ ColorPickerDialog(
     onValueSelected = { /* ... */ },
     onDismissRequest = { /* ... */ },
     confirmButton = {
-        TextButton(onClick = { confirm() }, enabled = state.isModified) { Text("Apply") }
+        TextButton(onClick = { confirm() }, enabled = dialogState.isModified) { Text("Apply") }
     },
 )
 ```

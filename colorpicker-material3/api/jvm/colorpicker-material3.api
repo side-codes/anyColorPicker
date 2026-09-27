@@ -78,7 +78,7 @@ public final class codes/side/colorpicker/material3/ColorPickerDialogKt {
 public abstract interface class codes/side/colorpicker/material3/ColorPickerDialogScope {
 	public abstract fun confirm ()V
 	public abstract fun dismiss ()V
-	public abstract fun getState ()Lcodes/side/colorpicker/foundation/ColorPickerDialogState;
+	public abstract fun getDialogState ()Lcodes/side/colorpicker/foundation/ColorPickerDialogState;
 }
 
 public final class codes/side/colorpicker/material3/ColorPickerDimensions {
