@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import kotlin.math.roundToInt
 
 /** The samples a plane is rasterized at, across and down. */
 @Immutable
@@ -53,10 +54,19 @@ private val OKHSV_GRID = PlaneGrid(64, 32)
 
 /**
  * Okhsl's saturation × lightness: no grid holds 2.5/255, because a crease runs along the cusp's
- * lightness where the gamut turns its corner. At 256 × 256 it measures 29.34 at worst, at hue 111,
- * with a median of 3.42 over the hues.
+ * lightness where the gamut turns its corner, and along the right edge a channel reaches zero, where the
+ * sRGB curve rises steeply from it. At 256 × 256 it measures 29.34 at worst, at hue 111, with a median
+ * of 3.42 over the hues.
  */
 private val OKHSL_GRID = PlaneGrid(256, 256)
+
+/**
+ * Each of Okhsl's saturation × lightness bands under [PlaneRendering.Fast], split at the crease:
+ * 25.04/255 at worst, at hue 110, measured as the grids above over the band's own range. What is left is
+ * the right edge, which more columns only whittle; halving either axis measures more than the single
+ * grid's 29.34.
+ */
+private val OKHSL_BAND_GRID = PlaneGrid(96, 16)
 
 /**
  * OkLCh's chroma × lightness: no grid holds 2.5/255, because the color creases where chroma reduction
@@ -74,6 +84,27 @@ private val LCH_GRID = PlaneGrid(256, 256)
 
 /** Any other pair of channels. */
 private val DEFAULT_GRID = PlaneGrid(64, 64)
+
+/**
+ * The Okhsl lightness, as a fraction of the axis, where the saturation × lightness plane at [hue] creases:
+ * sRGB's cusp at that hue, whose Oklab lightness Okhsl's toe carries over exactly. Below it an Okhsl
+ * row's chroma scales with lightness, above it follows the gamut's upper edge.
+ */
+internal fun okhslCrease(hue: Double): Double = Srgb.gamut.cusp(hue).to(Okhsl)[Okhsl.L]!!
+
+/** A band of a plane, [from]..[to] of its y axis from the bottom, rasterized on [grid] of its own. */
+internal class PlaneBand(val from: Double, val to: Double, val grid: PlaneGrid)
+
+/**
+ * The bands a plane over [x] and [y] is built in: one over the whole axis, but under
+ * [PlaneRendering.Fast] Okhsl's saturation × lightness is two that meet on its crease, each sampling it
+ * as its edge, so filtering never blends across it.
+ */
+internal fun planeBands(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlaneBand> {
+    if (rendering !== PlaneRendering.Fast || x !== Okhsl.S || y !== Okhsl.L) return listOf(PlaneBand(0.0, 1.0, planeGridOf(x, y)))
+    val crease = okhslCrease(held[Okhsl.H.index])
+    return listOf(PlaneBand(crease, 1.0, OKHSL_BAND_GRID), PlaneBand(0.0, crease, OKHSL_BAND_GRID))
+}
 
 /** The grid a plane over [x] and [y] is rasterized at. */
 internal fun planeGridOf(x: ColorChannel, y: ColorChannel): PlaneGrid = when {
@@ -93,8 +124,8 @@ internal fun gridSample(index: Int, count: Int): Double = if (count <= 1) 0.0 el
 
 /**
  * The plane over [x] and [y] on a [columns] × [rows] grid, filled a row at a time so a caller can pause
- * between rows: [pixels], opaque `0xAARRGGBB`, row 0 at the top, where [y] is at the end of its range; the
- * other channels are at [held]. Each row goes through one bulk call into sRGB by chroma reduction, with
+ * between rows: [pixels], opaque `0xAARRGGBB`, row 0 at the top, where [y] is at [yTo] of its range and
+ * the last row at [yFrom], as fractions; the other channels are at [held]. Each row goes through one bulk call into sRGB by chroma reduction, with
  * [rendering]'s solver: [PlaneRendering.Fast] packs it straight into pixels, [PlaneRendering.Canonical] maps
  * it to Doubles in one row of colors reused for every row and rounds them.
  */
@@ -106,6 +137,8 @@ internal class PlaneRows(
     private val rows: Int,
     private val rendering: PlaneRendering = PlaneRendering.Canonical,
     val pixels: IntArray = IntArray(columns * rows),
+    private val yFrom: Double = 0.0,
+    private val yTo: Double = 1.0,
 ) {
     /** How many rows [pixels] holds. */
     val rowCount: Int get() = rows
@@ -140,17 +173,20 @@ internal class PlaneRows(
     }
 
     /** Another set of scratch rows for another worker, filling the same [pixels]. */
-    fun sharingPixels(): PlaneRows = PlaneRows(x, y, held, columns, rows, rendering, pixels)
+    fun sharingPixels(): PlaneRows = PlaneRows(x, y, held, columns, rows, rendering, pixels, yFrom, yTo)
 
     private fun holdRow(r: Int) {
-        val yValue = channelValueAt(y, y.referenceRange, 1.0 - gridSample(r, rows))
+        val yValue = channelValueAt(y, y.referenceRange, yFrom + (yTo - yFrom) * (1.0 - gridSample(r, rows)))
         for (column in 0 until columns) row[column * size + y.index] = yValue
     }
 }
 
-/** The sRGB colors of every row of [PlaneRows], three values a sample, as the grids above are measured. */
-internal fun planeColors(x: ColorChannel, y: ColorChannel, held: DoubleArray, columns: Int, rows: Int): DoubleArray {
-    val grid = PlaneRows(x, y, held, columns, rows)
+/**
+ * The sRGB colors of every row of [PlaneRows], three values a sample, as the grids above are measured,
+ * over [yFrom]..[yTo] of the y axis.
+ */
+internal fun planeColors(x: ColorChannel, y: ColorChannel, held: DoubleArray, columns: Int, rows: Int, yFrom: Double = 0.0, yTo: Double = 1.0): DoubleArray {
+    val grid = PlaneRows(x, y, held, columns, rows, yFrom = yFrom, yTo = yTo)
     return DoubleArray(columns * rows * 3).also { rgb -> for (r in 0 until rows) grid.colors(r, rgb, r * columns * 3) }
 }
 
@@ -160,10 +196,6 @@ internal fun planePixels(x: ColorChannel, y: ColorChannel, held: DoubleArray, gr
     for (r in 0 until grid.rows) rows.fill(r)
     return rows.pixels
 }
-
-/** The plane over [x] and [y] as an image of [grid]'s size, to be drawn scaled. */
-internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid, rendering: PlaneRendering = PlaneRendering.Canonical): ImageBitmap =
-    imageBitmapFromPixels(planePixels(x, y, held, grid, rendering), grid.columns, grid.rows)
 
 // Rows filled between two yields. On wasm, Dispatchers.Default is the thread that handles input, so a
 // raster that never yielded would hold every event until it finished.
@@ -199,11 +231,36 @@ internal suspend fun PlaneRows.fillInSteps(workers: Int) {
     }
 }
 
-/** [rasterizePlane], built by [fillInSteps] with [rendering]'s workers. */
-internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, grid: PlaneGrid, rendering: PlaneRendering = PlaneRendering.Canonical): ImageBitmap {
-    val rows = PlaneRows(x, y, held, grid.columns, grid.rows, rendering)
-    rows.fillInSteps(planeWorkerCount(rendering))
-    return imageBitmapFromPixels(rows.pixels, grid.columns, grid.rows)
+/** One band's raster, to be drawn scaled over the band. */
+internal class PlanePart(val band: PlaneBand, val bitmap: ImageBitmap)
+
+/** The parts of a plane, as [planeBands] divides it, each built by [fillInSteps] with [rendering]'s workers. */
+internal suspend fun rasterizePlaneInSteps(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlanePart> =
+    planeBands(x, y, held, rendering).map { band ->
+        val rows = PlaneRows(x, y, held, band.grid.columns, band.grid.rows, rendering, yFrom = band.from, yTo = band.to)
+        rows.fillInSteps(planeWorkerCount(rendering))
+        PlanePart(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
+    }
+
+/** [rasterizePlaneInSteps] at once, for a preview's single frame. */
+internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray, rendering: PlaneRendering): List<PlanePart> =
+    planeBands(x, y, held, rendering).map { band ->
+        val rows = PlaneRows(x, y, held, band.grid.columns, band.grid.rows, rendering, yFrom = band.from, yTo = band.to)
+        for (r in 0 until band.grid.rows) rows.fill(r)
+        PlanePart(band, imageBitmapFromPixels(rows.pixels, band.grid.columns, band.grid.rows))
+    }
+
+/**
+ * Draws [parts] stretched over the drawing area, each over its band. Bands meet on the whole pixel
+ * nearest their shared edge, so neither overlaps nor leaves a gap, and a band too thin for a pixel draws
+ * nothing. The plane's own top and bottom are its drawing area's.
+ */
+internal fun DrawScope.drawPlaneParts(parts: List<PlanePart>) {
+    for (part in parts) {
+        val top = if (part.band.to == 1.0) 0 else ((1.0 - part.band.to) * size.height).roundToInt()
+        val bottom = if (part.band.from == 0.0) size.height.toInt() else ((1.0 - part.band.from) * size.height).roundToInt()
+        if (bottom > top) drawPlaneBitmap(part.bitmap, top, bottom - top)
+    }
 }
 
 /** Whether two brushes draw the plane over [x] and [y] exactly: HSL's S × L and HSV's S × V. */
@@ -213,11 +270,11 @@ internal fun isExactPlane(x: ColorChannel, y: ColorChannel): Boolean =
 /** What a raster is built from: the pair of channels, every held component, and how it is built. */
 internal data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val held: List<Double>, val rendering: PlaneRendering)
 
-// Every plane's rasters: a raster is 256 KB at most, so three kept cost under 1 MB.
-private val planeRasters = PlaneRasters<ImageBitmap>(kept = 3)
+// Every plane's rasters: a raster is 256 KB at most, and Okhsl's two bands less, so three kept cost under 1 MB.
+private val planeRasters = PlaneRasters<List<PlanePart>>(kept = 3)
 
 // A built raster and the pair of channels it shows.
-private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val bitmap: ImageBitmap)
+private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val parts: List<PlanePart>)
 
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
@@ -236,8 +293,8 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
         return remember(x, key) { if (x === Hsl.S) hslSurface(held[Hsl.H.index]) else hsvSurface(held[Hsv.H.index]) }
     }
     val rendering = LocalPlaneRendering.current
-    val bitmap = if (LocalInspectionMode.current) {
-        remember(x, y, key, rendering) { rasterizePlane(x, y, held, planeGridOf(x, y), rendering) }
+    val parts = if (LocalInspectionMode.current) {
+        remember(x, y, key, rendering) { rasterizePlane(x, y, held, rendering) }
     } else {
         val raster = remember { mutableStateOf<PlaneRaster?>(null) }
         val request by rememberUpdatedState(PlaneRequest(x, y, key, rendering))
@@ -247,16 +304,14 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
             // none until the drag stopped. Built in order, an older raster never lands after a newer one.
             snapshotFlow { request }.conflate().collect { next ->
                 val built = planeRasters.raster(next) {
-                    withContext(Dispatchers.Default) {
-                        rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), planeGridOf(next.x, next.y), next.rendering)
-                    }
+                    withContext(Dispatchers.Default) { rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), next.rendering) }
                 }
                 raster.value = PlaneRaster(next.x, next.y, built)
             }
         }
-        raster.value?.takeIf { it.x === x && it.y === y }?.bitmap
+        raster.value?.takeIf { it.x === x && it.y === y }?.parts
     }
-    return { if (bitmap != null) drawPlaneBitmap(bitmap) }
+    return { if (parts != null) drawPlaneParts(parts) }
 }
 
 // HSL's saturation × lightness at one hue: the mid-lightness ramp from grey to the pure hue, under white
@@ -290,20 +345,21 @@ private fun hsvSurface(hue: Double): DrawScope.() -> Unit {
 }
 
 /**
- * Draws [bitmap] stretched over the whole drawing area.
+ * Draws [bitmap] stretched across the drawing area, [dstHeight] pixels tall from [dstTop]: the whole
+ * area unless told otherwise.
  *
  * A ShaderBrush will not do it: an ImageShader paints the bitmap at its own size and clamps
  * outwards, so an 80-pixel box filled from a 4-pixel ramp comes back the ramp's last colour
  * across almost all of it. Scaling needs a destination size, and the low filter quality is
  * the bilinear read the grid sizes above are measured against.
  */
-internal fun DrawScope.drawPlaneBitmap(bitmap: ImageBitmap) {
+internal fun DrawScope.drawPlaneBitmap(bitmap: ImageBitmap, dstTop: Int = 0, dstHeight: Int = size.height.toInt()) {
     drawImage(
         image = bitmap,
         srcOffset = IntOffset.Zero,
         srcSize = IntSize(bitmap.width, bitmap.height),
-        dstOffset = IntOffset.Zero,
-        dstSize = IntSize(size.width.toInt(), size.height.toInt()),
+        dstOffset = IntOffset(0, dstTop),
+        dstSize = IntSize(size.width.toInt(), dstHeight),
         filterQuality = FilterQuality.Low,
     )
 }
