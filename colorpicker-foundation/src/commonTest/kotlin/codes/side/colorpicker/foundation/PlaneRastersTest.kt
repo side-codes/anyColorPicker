@@ -48,6 +48,15 @@ class PlaneRastersTest {
     }
 
     @Test
+    fun aPlaneDrawsNoRasterAnotherRenderingBuilt() {
+        // Each preset draws its rasters its own way, so after a switch the other's raster is not drawn at all.
+        val raster = PlaneRaster(Okhsl.S, Okhsl.L, PlaneRendering.Fast, emptyList())
+        assertEquals(emptyList(), raster.partsFor(Okhsl.S, Okhsl.L, PlaneRendering.Fast))
+        assertEquals(null, raster.partsFor(Okhsl.S, Okhsl.L, PlaneRendering.Canonical))
+        assertEquals(null, raster.partsFor(Okhsv.S, Okhsv.V, PlaneRendering.Fast))
+    }
+
+    @Test
     fun aRasterOfAnotherRenderingIsAnotherRaster() = runTest {
         val rasters = PlaneRasters<String>(kept = 2)
         val held = listOf(10.0, 0.0, 0.0)

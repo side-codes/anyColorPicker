@@ -307,17 +307,21 @@ internal data class PlaneRequest(val x: ColorChannel, val y: ColorChannel, val h
 // Every plane's rasters: a raster is 256 KB at most, and Okhsl's two bands less, so three kept cost under 1 MB.
 private val planeRasters = PlaneRasters<List<PlanePart>>(kept = 3)
 
-// A built raster and the pair of channels it shows.
-private class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val parts: List<PlanePart>)
+/** A built raster, the pair of channels it shows and how it was built. */
+internal class PlaneRaster(val x: ColorChannel, val y: ColorChannel, val rendering: PlaneRendering, val parts: List<PlanePart>) {
+    /** Its parts, if they are what a plane over [x] and [y] with [rendering] draws. */
+    fun partsFor(x: ColorChannel, y: ColorChannel, rendering: PlaneRendering): List<PlanePart>? =
+        parts.takeIf { x === this.x && y === this.y && rendering === this.rendering }
+}
 
 /**
  * What a plane over [x] and [y] draws, the other channels at [displayed]. HSL's and HSV's own planes
  * are two brushes, exactly. Any other pair is a raster, built as [LocalPlaneRendering] says on
  * [Dispatchers.Default] whenever a held channel changes, and shared with any other plane asking for the
- * same, with the previous one drawn until it arrives; a raster of one [PlaneRendering] never stands in
- * for another's. A raster of another pair is another space's colors rather than an earlier state of
- * these, so after a change of channels nothing is drawn until the new pair's arrives. A preview draws one
- * frame and has no later one to wait for, so there the raster is built at once.
+ * same, with the previous one drawn until it arrives. A raster of another pair is another space's colors
+ * rather than an earlier state of these, and a raster of another [PlaneRendering] is laid out and drawn
+ * that rendering's way, so after a change of either nothing is drawn until the new one arrives. A preview
+ * draws one frame and has no later one to wait for, so there the raster is built at once.
  */
 @Composable
 internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: DoubleArray): DrawScope.() -> Unit {
@@ -340,10 +344,10 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
                 val built = planeRasters.raster(next) {
                     withContext(Dispatchers.Default) { rasterizePlaneInSteps(next.x, next.y, next.held.toDoubleArray(), next.rendering) }
                 }
-                raster.value = PlaneRaster(next.x, next.y, built)
+                raster.value = PlaneRaster(next.x, next.y, next.rendering, built)
             }
         }
-        raster.value?.takeIf { it.x === x && it.y === y }?.parts
+        raster.value?.partsFor(x, y, rendering)
     }
     return { if (parts != null) drawPlaneParts(parts, rendering) }
 }
