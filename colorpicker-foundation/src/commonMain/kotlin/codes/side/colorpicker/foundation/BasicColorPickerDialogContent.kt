@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
@@ -28,6 +31,12 @@ import androidx.compose.ui.unit.dp
 private val SideBySideMinWidth = 480.dp
 
 private enum class DialogArrangement { Stacked, SideBySide, Unbounded }
+
+/**
+ * True in a part composed only to be measured and never drawn, as a dialog's stacked copy is while the dialog
+ * lays out side by side. A library slider there builds no track, whose colors would never be seen.
+ */
+internal val LocalMeasuredOnly: ProvidableCompositionLocal<Boolean> = compositionLocalOf { false }
 
 // The tallest height the content has been laid out at in its current arrangement. Read and written in layout
 // alone, so growing it recomposes nothing.
@@ -88,17 +97,19 @@ public fun BasicColorPickerDialogContent(
     // Built here rather than in the measure block, so every measure pass hands SubcomposeLayout the same content,
     // and a slot recomposes only when what it reads changes.
     val stacked: @Composable () -> Unit = {
-        StackedParts(
-            modifier = Modifier
-                .then(if (sideBySide.value) Modifier.clearAndSetSemantics {} else Modifier)
-                .onFocusChanged { stackedHasFocus.value = it.hasFocus }
-                .focusGroup()
-                .verticalScroll(stackedScroll),
-            header = header,
-            spaceSwitcher = spaceSwitcher,
-            picker = picker,
-            spacing = spacing,
-        )
+        CompositionLocalProvider(LocalMeasuredOnly provides sideBySide.value) {
+            StackedParts(
+                modifier = Modifier
+                    .then(if (sideBySide.value) Modifier.clearAndSetSemantics {} else Modifier)
+                    .onFocusChanged { stackedHasFocus.value = it.hasFocus }
+                    .focusGroup()
+                    .verticalScroll(stackedScroll),
+                header = header,
+                spaceSwitcher = spaceSwitcher,
+                picker = picker,
+                spacing = spacing,
+            )
+        }
     }
     // Without the scroll, which a height with no limit makes throw.
     val unbounded: @Composable () -> Unit = { StackedParts(Modifier, header, spaceSwitcher, picker, spacing) }
