@@ -99,3 +99,20 @@ jobs:
         run: ./gradlew :colorpicker-material3:linkDebugFrameworkIosSimulatorArm64
       - name: Run iOS simulator tests
         run: ./gradlew :colorpicker-foundation:iosSimulatorArm64Test :colorpicker-material3:iosSimulatorArm64Test :color:iosSimulatorArm64Test :color-compose:iosSimulatorArm64Test
+      # A release is the first time publish.yml runs, and what it uploads to Maven Central cannot be replaced.
+      # Publishing locally builds the same publications here, where only macOS builds all six of each module:
+      # the POMs, the sources and the Dokka javadoc jars. Nothing is signed without the key.
+      - name: Publish every module locally
+        run: ./gradlew publishToMavenLocal
+      - name: Check each module published its six targets
+        run: |
+          VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          for module in color color-compose colorpicker-foundation colorpicker-material3; do
+            for suffix in "" -android -jvm -wasm-js -iosarm64 -iossimulatorarm64; do
+              pom="$HOME/.m2/repository/codes/side/$module$suffix/$VERSION/$module$suffix-$VERSION.pom"
+              if [ ! -f "$pom" ]; then
+                echo "::error::$module$suffix $VERSION was not published"
+                exit 1
+              fi
+            done
+          done

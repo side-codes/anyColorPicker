@@ -33,6 +33,14 @@ jobs:
     permissions:
       contents: write
     steps:
+      # A release goes out from its tag, which the step below checks against VERSION_NAME. Run by hand from a
+      # branch with snapshot unticked, this workflow would otherwise release whatever VERSION_NAME says, with no
+      # tag and no GitHub Release.
+      - name: Refuse a release from anything but a tag
+        if: inputs.snapshot != true && !startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "::error::A release runs from a v* tag, and $GITHUB_REF is not one. Tick snapshot, or push the tag."
+          exit 1
       - uses: actions/checkout@v7
         with:
           # The API removal check reads the dumps at the last release tag.
