@@ -29,9 +29,10 @@ private val SideBySideMinWidth = 480.dp
 
 private enum class DialogArrangement { Stacked, SideBySide, Unbounded }
 
-// The tallest height the content has been laid out at. Read and written in layout alone, so growing it
-// recomposes nothing.
+// The tallest height the content has been laid out at in its current arrangement. Read and written in layout
+// alone, so growing it recomposes nothing.
 private class HeightFloor {
+    var arrangement: DialogArrangement? = null
     var height = 0
 }
 
@@ -51,8 +52,10 @@ private class HeightFloor {
  * The parts are measured, never asked for intrinsic sizes, so a slot built on `SubcomposeLayout`, as
  * `BoxWithConstraints` and lazy lists are, lays out as any other does.
  *
- * It never shrinks while it is composed for the same [state]: a space with no plane is laid out at the
- * height of the tallest space shown so far, so the dialog around it does not jump when the space changes.
+ * It never shrinks while it is composed for the same [state] and arranged the same way: a space with no plane
+ * is laid out at the height of the tallest space shown so far, so the dialog around it does not jump when the
+ * space changes. Arranged another way, as when a window resized too short to stack puts the plane beside the
+ * sliders, it starts again from the new arrangement's own height.
  *
  * @param picker draws the picker in the orientation it is handed.
  * @param header drawn first; `null` leaves it out.
@@ -113,7 +116,9 @@ public fun BasicColorPickerDialogContent(
         }
     }
     SubcomposeLayout(modifier) { constraints ->
+        val arrangement: DialogArrangement
         val placeable = if (!constraints.hasBoundedHeight) {
+            arrangement = DialogArrangement.Unbounded
             if (Snapshot.withoutReadObservation { sideBySide.value }) sideBySide.value = false
             subcompose(DialogArrangement.Unbounded, unbounded).single().measure(constraints.copy(minHeight = 0))
         } else {
@@ -125,10 +130,18 @@ public fun BasicColorPickerDialogContent(
             val beside = overflows && constraints.maxWidth >= SideBySideMinWidth.roundToPx()
             if (Snapshot.withoutReadObservation { sideBySide.value } != beside) sideBySide.value = beside
             if (beside) {
+                arrangement = DialogArrangement.SideBySide
                 subcompose(DialogArrangement.SideBySide, besideTheSliders).single().measure(constraints.copy(minHeight = 0))
             } else {
+                arrangement = DialogArrangement.Stacked
                 stackedPlaceable
             }
+        }
+        // A floor kept from another arrangement would hold this one at a height it has no use for: the stacked
+        // form's, left empty under the plane and the sliders.
+        if (floor.arrangement != arrangement) {
+            floor.arrangement = arrangement
+            floor.height = 0
         }
         val height = maxOf(placeable.height, floor.height).coerceIn(constraints.minHeight, constraints.maxHeight)
         floor.height = height
