@@ -6,6 +6,7 @@ import codes.side.color.Lch
 import codes.side.color.OkLch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -37,10 +38,10 @@ class PlaneWorkersTest {
 
     @Test
     fun cancellingABuildStopsEveryWorker() = runTest {
-        // Every worker yields before its first row and after every sixteen; cancelled two rounds in, each has filled
-        // at most thirty-two of its sixty-four rows.
+        // Yielding, as in the browser: every worker yields before its first row and after every sixteen; cancelled two
+        // rounds in, the four have filled at most 128 of the 256 rows.
         val rows = rows(OkLch.C, OkLch.L, 200.0, PlaneGrid(8, 256))
-        val build = launch { rows.fillInSteps(workers = 4) }
+        val build = launch { rows.fillInSteps(workers = 4, yields = true) }
         launch {
             repeat(3) { yield() }
             build.cancel()
@@ -49,6 +50,17 @@ class PlaneWorkersTest {
         val filled = (0 until 256).count { r -> rows.pixels[r * 8] != 0 }
         assertTrue(build.isCancelled, "the build was cancelled")
         assertTrue(filled in 1..128, "$filled of 256 rows filled")
+    }
+
+    @Test
+    fun offTheInputThreadABuildDoesNotStepAside() = runTest {
+        // A coroutine queued behind the build's workers runs only once they are done: they never yield their thread.
+        val rows = rows(OkLch.C, OkLch.L, 200.0, PlaneGrid(8, 64))
+        launch(start = CoroutineStart.UNDISPATCHED) { rows.fillInSteps(workers = 2, yields = false) }
+        var seen = -1
+        launch { seen = (0 until 64).count { r -> rows.pixels[r * 8] != 0 } }
+        testScheduler.advanceUntilIdle()
+        assertEquals(64, seen)
     }
 
     @Test

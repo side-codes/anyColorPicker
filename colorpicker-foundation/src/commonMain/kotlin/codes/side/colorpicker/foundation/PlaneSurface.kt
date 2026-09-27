@@ -32,7 +32,9 @@ import codes.side.color.Okhsv
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -217,18 +219,24 @@ internal fun planeWorkerCount(rendering: PlaneRendering): Int =
 
 /**
  * Fills every row of [pixels][PlaneRows.pixels], shared among [workers] coroutines in the caller's
- * context, each yielding every few rows and stopping there when cancelled. Row r is worker r % workers's:
- * how much of a row lies outside sRGB changes down a plane, so interleaved rows share the work more evenly
- * than bands would.
+ * context, each taking the next row as soon as it is free: on a phone's mix of fast and slow cores, equal
+ * shares would leave the plane waiting on its slowest. A build that [yields], as in the browser, where
+ * it shares its thread with input, steps aside every few rows; elsewhere it runs on threads of its own,
+ * where stepping aside costs a wake-up that on a phone outlasts the rows between, and only checks that it
+ * is still wanted. Either way it stops at the next row when cancelled.
  */
-internal suspend fun PlaneRows.fillInSteps(workers: Int) {
+internal suspend fun PlaneRows.fillInSteps(workers: Int, yields: Boolean = planeBuildSharesInputThread) {
+    val next = Channel<Int>(Channel.UNLIMITED)
+    for (r in 0 until rowCount) next.trySend(r)
+    next.close()
     coroutineScope {
         for (worker in 0 until workers) {
             val rows = if (worker == 0) this@fillInSteps else sharingPixels()
             launch {
                 var filled = 0
-                for (r in worker until rowCount step workers) {
-                    if (filled % ROWS_PER_YIELD == 0) yield()
+                while (true) {
+                    if (!yields) ensureActive() else if (filled % ROWS_PER_YIELD == 0) yield()
+                    val r = next.tryReceive().getOrNull() ?: break
                     rows.fill(r)
                     filled++
                 }
