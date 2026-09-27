@@ -5,6 +5,7 @@ import kotlin.math.acos
 import kotlin.math.cbrt
 import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -69,14 +70,21 @@ internal fun maxChroma(t: DoubleArray, l: Double, a: Double, b: Double, sMax: Do
  * The largest chroma up to [chroma] that the gamut of [t] holds at Oklab lightness [l], strictly
  * between 0 and 1, and hue ([a], [b]): [chroma] itself when the color is inside, else the nearest
  * edge below it. Inside the sliver past pure blue that is the edge before the sliver, not the one
- * beyond it.
+ * beyond it. [iterative] finds the edges by [walkInward] rather than the closed forms. The two agree
+ * to 1e-12, except near black, where the channels are about as small as EDGE_TOLERANCE, so two can
+ * reach zero within it of each other and either may be stopped on; the colors then differ by what the
+ * tolerance allows.
  */
-internal fun chromaWithin(t: DoubleArray, l: Double, a: Double, b: Double, chroma: Double): Double {
+internal fun chromaWithin(t: DoubleArray, l: Double, a: Double, b: Double, chroma: Double, iterative: Boolean = false): Double {
     if (inside(t, l, chroma * a, chroma * b, 1.0 + EDGE_TOLERANCE)) return chroma
     // At or past the outer edge, the nearest edge below is the outer edge itself, which is what the search would
     // find. Only a chroma inside the sliver, short of the outer edge, needs the search for the edge before it.
-    val outer = gamutMemo().outerEdge(t, l, a, b)
-    return if (chroma >= outer) outer else largestEdge(t, l, a, b, withCeiling = true, limit = chroma)
+    val outer = gamutMemo().outerEdge(t, l, a, b, iterative)
+    return when {
+        chroma >= outer -> outer
+        iterative -> walkInward(t, l, a, b, chroma)
+        else -> largestEdge(t, l, a, b, withCeiling = true, limit = chroma)
+    }
 }
 
 /** This thread's [GamutMemo]. */
@@ -101,9 +109,25 @@ internal class GamutMemo {
     var cuspLightness: Double = 0.0
         private set
 
+    private var boundT: DoubleArray? = null
+    private var bound = 0.0
+
+    /**
+     * A chroma no color of the gamut of [t] reaches, at any lightness and hue, its channels allowed EDGE_TOLERANCE
+     * past 0..1. The last gamut's is remembered.
+     */
+    fun chromaBound(t: DoubleArray): Double {
+        if (boundT !== t) {
+            bound = chromaReach(t)
+            boundT = t
+        }
+        return bound
+    }
+
     // Enough for a plane's row, whose colors reach the gamut along a few hue directions that differ in their last
     // bits. Overwritten oldest first.
     private val edgeT = arrayOfNulls<DoubleArray>(EDGES_KEPT)
+    private val edgeIterative = BooleanArray(EDGES_KEPT)
     private val edgeKeys = DoubleArray(EDGES_KEPT * 3)
     private val edgeChroma = DoubleArray(EDGES_KEPT)
     private var nextEdge = 0
@@ -121,17 +145,21 @@ internal class GamutMemo {
         return this
     }
 
-    /** The largest chroma at which the line of lightness [l] and hue ([a], [b]) leaves the gamut of [t] for good. */
-    fun outerEdge(t: DoubleArray, l: Double, a: Double, b: Double): Double {
+    /**
+     * The largest chroma at which the line of lightness [l] and hue ([a], [b]) leaves the gamut of [t] for good, by
+     * the closed forms or, [iterative], by [walkInward]. Each is remembered apart from the other.
+     */
+    fun outerEdge(t: DoubleArray, l: Double, a: Double, b: Double, iterative: Boolean = false): Double {
         for (i in 0 until EDGES_KEPT) {
             val key = i * 3
-            if (edgeT[i] === t && edgeKeys[key].sameBits(l) && edgeKeys[key + 1].sameBits(a) && edgeKeys[key + 2].sameBits(b)) {
+            if (edgeT[i] === t && edgeIterative[i] == iterative && edgeKeys[key].sameBits(l) && edgeKeys[key + 1].sameBits(a) && edgeKeys[key + 2].sameBits(b)) {
                 return edgeChroma[i]
             }
         }
-        val chroma = largestEdge(t, l, a, b, withCeiling = true, limit = Double.POSITIVE_INFINITY)
+        val chroma = if (iterative) outerEdgeByWalk(t, l, a, b) else largestEdge(t, l, a, b, withCeiling = true, limit = Double.POSITIVE_INFINITY)
         val i = nextEdge
         edgeT[i] = t
+        edgeIterative[i] = iterative
         edgeKeys[i * 3] = l
         edgeKeys[i * 3 + 1] = a
         edgeKeys[i * 3 + 2] = b
@@ -183,6 +211,158 @@ private fun largestEdge(t: DoubleArray, l: Double, a: Double, b: Double, withCei
         }
     }
     return edge
+}
+
+// Crossings a walk follows before handing over to the closed forms; a line crosses 0 or 1 at most eighteen times.
+private const val WALK_CROSSINGS = 24
+
+/**
+ * [largestEdge]'s answer without its closed forms: the largest x up to [from], where the line (l, x·a, x·b) is
+ * outside the gamut of [t], at which the line is inside, give or take EDGE_TOLERANCE. From [from] it follows a
+ * channel that is outside down to where that channel last crossed back over its level, and goes on from there
+ * while any channel is still outside. Every point it passes has a channel outside, so the first point where none
+ * is, is the answer. No cube root or trigonometry: each crossing is Newton's method inside a stretch where the
+ * channel's cubic is monotone.
+ */
+internal fun walkInward(t: DoubleArray, l: Double, a: Double, b: Double, from: Double): Double {
+    val m = OKLAB_TO_LMS
+    // Cube-rooted LMS is u + x·q, with u the matrix's first column times l.
+    val u0 = m[0] * l
+    val u1 = m[3] * l
+    val u2 = m[6] * l
+    val q0 = m[1] * a + m[2] * b
+    val q1 = m[4] * a + m[5] * b
+    val q2 = m[7] * a + m[8] * b
+    var x = from
+    for (crossing in 0 until WALK_CROSSINGS) {
+        var row = -1
+        var level = 0.0
+        for (r in 0..2) {
+            val value = channelAt(t, r, u0, u1, u2, q0, q1, q2, x)
+            if (value !in -EDGE_TOLERANCE..1.0 + EDGE_TOLERANCE) {
+                row = r
+                level = if (value < 0.0) 0.0 else 1.0
+                break
+            }
+        }
+        if (row < 0) return x
+        x = lastCrossing(t, row, u0, u1, u2, q0, q1, q2, level, x)
+    }
+    return largestEdge(t, l, a, b, withCeiling = true, limit = from)
+}
+
+// The outer edge by walking in from just past the chroma no color of the gamut reaches, where the line is outside and
+// stays outside.
+private fun outerEdgeByWalk(t: DoubleArray, l: Double, a: Double, b: Double): Double =
+    walkInward(t, l, a, b, 1.01 * gamutMemo().chromaBound(t))
+
+// GamutMemo.chromaBound's answer: each cube-rooted LMS channel bounded over the widened cube, and Oklab's a and b
+// bounded over those.
+private fun chromaReach(t: DoubleArray): Double {
+    val toLms = invert(t)
+    val low = DoubleArray(3)
+    val high = DoubleArray(3)
+    for (k in 0..2) {
+        var lo = 0.0
+        var hi = 0.0
+        for (j in 0..2) {
+            val entry = toLms[k * 3 + j]
+            lo += min(entry * -EDGE_TOLERANCE, entry * (1.0 + EDGE_TOLERANCE))
+            hi += max(entry * -EDGE_TOLERANCE, entry * (1.0 + EDGE_TOLERANCE))
+        }
+        low[k] = cbrt(lo)
+        high[k] = cbrt(hi)
+    }
+    val m = LMS_TO_OKLAB
+    var reach = 0.0
+    for (row in 1..2) {
+        var lo = 0.0
+        var hi = 0.0
+        for (k in 0..2) {
+            lo += min(m[row * 3 + k] * low[k], m[row * 3 + k] * high[k])
+            hi += max(m[row * 3 + k] * low[k], m[row * 3 + k] * high[k])
+        }
+        val most = max(abs(lo), abs(hi))
+        reach += most * most
+    }
+    return sqrt(reach)
+}
+
+// Linear channel [row] of the gamut of [t] at chroma x along the line whose cube-rooted LMS is u + x·q.
+private fun channelAt(t: DoubleArray, row: Int, u0: Double, u1: Double, u2: Double, q0: Double, q1: Double, q2: Double, x: Double): Double {
+    val s0 = u0 + x * q0
+    val s1 = u1 + x * q1
+    val s2 = u2 + x * q2
+    return t[row * 3] * s0 * s0 * s0 + t[row * 3 + 1] * s1 * s1 * s1 + t[row * 3 + 2] * s2 * s2 * s2
+}
+
+// The largest y below [x] at which channel [row] crosses [level], where the channel is past [level] at x and inside
+// at 0, the grey. The channel's cubic is monotone between the roots of its derivative, so the stretches between
+// them are tried from x down, and the crossing lies in the first whose ends straddle the level.
+private fun lastCrossing(t: DoubleArray, row: Int, u0: Double, u1: Double, u2: Double, q0: Double, q1: Double, q2: Double, level: Double, x: Double): Double {
+    val t0 = t[row * 3]
+    val t1 = t[row * 3 + 1]
+    val t2 = t[row * 3 + 2]
+    // A third of the derivative: A·y² + 2B·y + C.
+    val a3 = t0 * q0 * q0 * q0 + t1 * q1 * q1 * q1 + t2 * q2 * q2 * q2
+    val b2 = t0 * u0 * q0 * q0 + t1 * u1 * q1 * q1 + t2 * u2 * q2 * q2
+    val c1 = t0 * u0 * u0 * q0 + t1 * u1 * u1 * q1 + t2 * u2 * u2 * q2
+    var high = Double.NaN
+    var low = Double.NaN
+    if (abs(a3) <= 1e-14 * (abs(b2) + abs(c1))) {
+        if (b2 != 0.0) high = -c1 / (2.0 * b2)
+    } else {
+        val discriminant = b2 * b2 - a3 * c1
+        if (discriminant >= 0.0) {
+            val root = sqrt(discriminant)
+            val first = (-b2 + root) / a3
+            val second = (-b2 - root) / a3
+            high = max(first, second)
+            low = min(first, second)
+        }
+    }
+    val outsideBelow = channelAt(t, row, u0, u1, u2, q0, q1, q2, x) < level
+    var top = x
+    for (turn in 0..1) {
+        val p = if (turn == 0) high else low
+        if (!(p > 0.0 && p < top)) continue
+        val g = channelAt(t, row, u0, u1, u2, q0, q1, q2, p) - level
+        if (g == 0.0) return p
+        if ((g < 0.0) != outsideBelow) return crossingIn(t, row, u0, u1, u2, q0, q1, q2, level, p, top, outsideBelow)
+        top = p
+    }
+    return crossingIn(t, row, u0, u1, u2, q0, q1, q2, level, 0.0, top, outsideBelow)
+}
+
+// The one crossing of [level] by channel [row] in [low]..[high], where the channel is monotone, inside at [low] and
+// outside at [high]: Newton's steps from [high], each kept in the bracket that still holds the crossing, halving it
+// instead where a step would leave it.
+private fun crossingIn(t: DoubleArray, row: Int, u0: Double, u1: Double, u2: Double, q0: Double, q1: Double, q2: Double, level: Double, low: Double, high: Double, outsideBelow: Boolean): Double {
+    val t0 = t[row * 3]
+    val t1 = t[row * 3 + 1]
+    val t2 = t[row * 3 + 2]
+    var inner = low
+    var outer = high
+    var y = high
+    repeat(64) {
+        val s0 = u0 + y * q0
+        val s1 = u1 + y * q1
+        val s2 = u2 + y * q2
+        val g = t0 * s0 * s0 * s0 + t1 * s1 * s1 * s1 + t2 * s2 * s2 * s2 - level
+        if (g == 0.0) return y
+        if ((g < 0.0) == outsideBelow) outer = y else inner = y
+        val slope = 3.0 * (t0 * q0 * s0 * s0 + t1 * q1 * s1 * s1 + t2 * q2 * s2 * s2)
+        val step = if (slope != 0.0) g / slope else Double.NaN
+        // A step this small is the crossing, even where it lands on the bracket's own end, which is y itself.
+        if (abs(step) <= 1e-15 * abs(y)) return y - step
+        val lo = min(inner, outer)
+        val hi = max(inner, outer)
+        var next = y - step
+        if (!(next > lo && next < hi)) next = 0.5 * (lo + hi)
+        if (hi - lo <= 1e-15 * hi) return next
+        y = next
+    }
+    return y
 }
 
 private fun inside(t: DoubleArray, l: Double, a: Double, b: Double, ceiling: Double): Boolean {
