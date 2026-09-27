@@ -33,7 +33,7 @@
 ### Added
 
 - **`codes.side:color`,** the color model without Compose: `ColorValue`; sRGB, linear sRGB, Display P3, XYZ D65 and D50, Lab, LCH, Oklab, OkLCh, HSL, HWB, HSV, Okhsl, Okhsv and CMYK; spaces an app defines; conversion between them; CSS Color 4 gamut mapping; CSS color strings and hex, both ways.
-- **`GamutMapping.ChromaReduction` takes an `EdgeSolver`:** `ClosedForm`, the default, or `Iterative`, which finds the same edge without cube roots or trigonometry and is faster where every color needs an edge of its own, as on an LCH plane.
+- **`GamutMapping.ChromaReduction` takes an `EdgeSolver`:** `ClosedForm`, the default, or `Iterative`, which finds the edge without cube roots or trigonometry, to 1e-12 in chroma of `ClosedForm`'s and within 1e-8 in linear light near black, and is faster where every color needs an edge of its own, as on an LCH plane.
 - **`GamutMapper.convertToArgb`** writes opaque `0xAARRGGBB` pixels, the bytes of `convert`'s colors, from a table of where the sRGB curve's rounding steps rather than from the curve.
 - **`LocalPlaneRendering`** chooses how planes are built: `PlaneRendering.Fast`, the default, or `PlaneRendering.Canonical`, the reference it is tested against.
 - **`codes.side:color-compose`,** `ColorValue.toComposeColor()` and `Color.toColorValue()`. A Compose color in Display P3 or another of Compose's RGB spaces keeps its space.

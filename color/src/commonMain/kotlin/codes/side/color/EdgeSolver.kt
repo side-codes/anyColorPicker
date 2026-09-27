@@ -20,7 +20,8 @@ public abstract class EdgeSolver internal constructor() {
 
     /**
      * Newton's method on a channel that is outside, inside a stretch where its cubic is monotone,
-     * walking in from the color's own chroma: no cube root or trigonometry. Faster where each color
+     * walking in to the edge from past the most chroma the gamut reaches, or, for a color inside the
+     * sliver past pure blue, from its own chroma: no cube root or trigonometry. Faster where each color
      * needs an edge of its own, as along LCH's lines of constant hue, which curve through Oklab.
      */
     public object Iterative : EdgeSolver() {
