@@ -17,7 +17,7 @@ import codes.side.color.internal.fuse
 public class ColorConverter internal constructor(
     public val source: ColorSpace,
     public val target: ColorSpace,
-    private val steps: Array<Step>,
+    internal val steps: Array<Step>,
 ) {
     private val sourceSize = source.channels.size
     private val targetSize = target.channels.size

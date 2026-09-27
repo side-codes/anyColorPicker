@@ -2,6 +2,7 @@ package codes.side.color
 
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
 
@@ -55,5 +56,26 @@ class GamutMapperTest {
         assertFailsWith<IllegalArgumentException> { mapper.convert(DoubleArray(8), 0, DoubleArray(5), 0, 2) }
         val same = DoubleArray(8)
         mapper.convert(same, 0, same, 0, 2)
+    }
+
+    @Test
+    fun colorsOnTheCubesSurfaceMapAsToGamutMapsThem() {
+        // On sRGB's surface a linear channel lands within a few ulps of 0 or 1, where encoding can round a hair past
+        // 1 back inside: however the mapper tells inside from out, such a color must come back as toGamut gives it.
+        val colors = ArrayList<ColorValue>()
+        for (step in 0 until 360) {
+            for (lightness in listOf(0.1, 0.3, 0.5, 0.7, 0.9, 0.99)) {
+                val edge = Srgb.gamut.maxChroma(lightness, step.toDouble())
+                for (scale in listOf(1.0 - 1e-15, 1.0, 1.0 + 1e-15, 1.0 + 1e-12, 1.0 + 1e-9)) colors += OkLch(lightness, edge * scale, step.toDouble())
+            }
+        }
+        for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
+            val mapper = gamut.mapper(OkLch, GamutMapping.ChromaReduction)
+            val mapped = DoubleArray(3)
+            for (color in colors) {
+                mapper.convert(color.components(), mapped)
+                assertEquals(color.toGamut(gamut, GamutMapping.ChromaReduction).components().toList(), mapped.toList(), "$color into $gamut")
+            }
+        }
     }
 }
