@@ -41,7 +41,8 @@ public object Cmyk : ColorSpace(
         val green = src[1]
         val blue = src[2]
         val key = 1.0 - max(red, max(green, blue))
-        if (key >= 1.0) {
+        // Singular at 1 alone: a key past it, where every channel is below 0, divides like any other.
+        if (key == 1.0) {
             dst[0] = 0.0
             dst[1] = 0.0
             dst[2] = 0.0
