@@ -12,7 +12,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -254,12 +257,43 @@ internal fun rasterizePlane(x: ColorChannel, y: ColorChannel, held: DoubleArray,
  * Draws [parts] stretched over the drawing area, each over its band. Bands meet on the whole pixel
  * nearest their shared edge, so neither overlaps nor leaves a gap, and a band too thin for a pixel draws
  * nothing. The plane's own top and bottom are its drawing area's.
+ *
+ * [PlaneRendering.Fast] puts each sample where the grids are measured with it: the first and last rows
+ * and columns on the band's edges. Scaled whole, a raster's outer samples sit half a cell in, and the
+ * filter holds the edge over the half cell outside them, a flat strip ten pixels tall on a band of
+ * sixteen rows; [PlaneRendering.Canonical] is still drawn that way. So is a band whose cells are smaller
+ * than a pixel, where the strip cannot be seen: drawn aligned, its raster overhangs the band by half a
+ * cell, and only a cell of a pixel or more covers the half pixel a rounded edge can move.
  */
-internal fun DrawScope.drawPlaneParts(parts: List<PlanePart>) {
+internal fun DrawScope.drawPlaneParts(parts: List<PlanePart>, rendering: PlaneRendering) {
     for (part in parts) {
         val top = if (part.band.to == 1.0) 0 else ((1.0 - part.band.to) * size.height).roundToInt()
         val bottom = if (part.band.from == 0.0) size.height.toInt() else ((1.0 - part.band.from) * size.height).roundToInt()
-        if (bottom > top) drawPlaneBitmap(part.bitmap, top, bottom - top)
+        if (bottom <= top) continue
+        val columns = part.bitmap.width
+        val rows = part.bitmap.height
+        val cellWidth = if (columns < 2) 0f else size.width / (columns - 1)
+        val cellHeight = if (rows < 2) 0f else ((part.band.to - part.band.from) * size.height).toFloat() / (rows - 1)
+        if (rendering !== PlaneRendering.Fast || cellWidth < 1f || cellHeight < 1f) {
+            drawPlaneBitmap(part.bitmap, top, bottom - top)
+            continue
+        }
+        val bandTop = ((1.0 - part.band.to) * size.height).toFloat()
+        clipRect(0f, top.toFloat(), size.width, bottom.toFloat()) {
+            withTransform({
+                translate(-cellWidth / 2f, bandTop - cellHeight / 2f)
+                scale(cellWidth, cellHeight, pivot = Offset.Zero)
+            }) {
+                drawImage(
+                    image = part.bitmap,
+                    srcOffset = IntOffset.Zero,
+                    srcSize = IntSize(columns, rows),
+                    dstOffset = IntOffset.Zero,
+                    dstSize = IntSize(columns, rows),
+                    filterQuality = FilterQuality.Low,
+                )
+            }
+        }
     }
 }
 
@@ -311,7 +345,7 @@ internal fun rememberPlaneSurface(x: ColorChannel, y: ColorChannel, displayed: D
         }
         raster.value?.takeIf { it.x === x && it.y === y }?.parts
     }
-    return { if (parts != null) drawPlaneParts(parts) }
+    return { if (parts != null) drawPlaneParts(parts, rendering) }
 }
 
 // HSL's saturation × lightness at one hue: the mid-lightness ramp from grey to the pure hue, under white

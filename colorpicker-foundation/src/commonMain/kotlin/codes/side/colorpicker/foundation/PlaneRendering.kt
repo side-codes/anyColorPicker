@@ -17,7 +17,8 @@ public abstract class PlaneRendering internal constructor() {
      * are [Canonical]'s to within one level of each channel, except Okhsl's saturation × lightness, which
      * is two bands split at its cusp's lightness, each on a 96 × 16 grid that follows the crease exactly
      * and measures less error than Canonical's 256 × 256. Its rows are shared among up to four threads
-     * where the platform has them; the browser has one.
+     * where the platform has them; the browser has one. Its samples are drawn where its grids are
+     * measured with them, the outermost on the plane's edges, where Canonical's sit half a cell in.
      */
     public object Fast : PlaneRendering() {
         override fun toString(): String = "Fast"
