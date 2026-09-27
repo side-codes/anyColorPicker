@@ -168,6 +168,45 @@ class BasicColorPickerTest {
     }
 
     @Test
+    fun sideBySideThePlaneIsAsTallAsTheSlidersBesideIt() = runComposeUiTest {
+        setContent {
+            BasicColorPicker(
+                ColorPickerState(teal),
+                Hsl,
+                plane = { _, _, _ -> Box(Modifier.fillMaxWidth().testTag("plane")) },
+                channelSlider = boxSlider,
+                alphaSlider = boxAlpha,
+                modifier = Modifier.width(400.dp),
+                orientation = Orientation.Horizontal,
+                spacing = 10.dp,
+            )
+        }
+        // Three channels and alpha, 20 dp each and 10 dp apart, beside a plane in the other half of what the
+        // spacing leaves.
+        assertEquals(bounds("h").top, bounds("plane").top)
+        assertEquals(bounds("alpha").bottom, bounds("plane").bottom)
+        assertEquals(110f, (bounds("plane").bottom - bounds("plane").top).value, 0.5f)
+        assertEquals(195f, (bounds("plane").right - bounds("plane").left).value, 0.5f)
+    }
+
+    @Test
+    fun sideBySideAPlaneAskingForMoreHeightGetsIt() = runComposeUiTest {
+        setContent {
+            BasicColorPicker(
+                ColorPickerState(teal),
+                Hsl,
+                plane = { _, _, _ -> Box(Modifier.fillMaxWidth().height(200.dp).testTag("plane")) },
+                channelSlider = boxSlider,
+                alphaSlider = boxAlpha,
+                modifier = Modifier.width(400.dp),
+                orientation = Orientation.Horizontal,
+            )
+        }
+        assertEquals(200f, (bounds("plane").bottom - bounds("plane").top).value, 0.5f)
+        assertEquals(bounds("plane").top, bounds("h").top)
+    }
+
+    @Test
     fun aDisabledPickerDisablesALibrarySliderAndRefusesTouchesToTheRest() = runComposeUiTest {
         var clicks = 0
         setContent {

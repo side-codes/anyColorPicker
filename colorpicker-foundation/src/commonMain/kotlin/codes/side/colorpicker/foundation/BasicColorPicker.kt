@@ -4,13 +4,16 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import codes.side.color.AnalogousCategory
 import codes.side.color.ColorChannel
@@ -19,6 +22,7 @@ import codes.side.color.ColorValue
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
+import kotlin.math.max
 
 /** Whether a picker over [space] shows a plane: [space] has one hue and two other channels. */
 internal fun hasPlane(space: ColorSpace): Boolean = space.channels.size == 3 && space.channels.count { it.isHue } == 1
@@ -52,7 +56,8 @@ internal fun planeAxes(space: ColorSpace): Pair<ColorChannel, ColorChannel>? {
  * @param alphaSlider draws the alpha slider; `null` leaves it out.
  * @param orientation [Orientation.Vertical] stacks the plane, the channel sliders and alpha;
  * [Orientation.Horizontal] puts the plane in the start half and the sliders and alpha in the end
- * half, and gives the sliders the whole width when there is no plane.
+ * half, and gives the sliders the whole width when there is no plane. Beside the sliders the plane is
+ * at least as tall as they are, so the two start and end together.
  * @param spacing the space between the parts.
  */
 @Composable
@@ -79,17 +84,16 @@ public fun BasicColorPicker(
                 if (plane != null && axes != null) plane(state, axes.first, axes.second)
                 PickerSliders(state, space, channelSlider, alphaSlider)
             }
-            Orientation.Horizontal -> Row(
+            Orientation.Horizontal -> SideBySide(
                 modifier = modifier.disabledInput(enabled),
-                horizontalArrangement = Arrangement.spacedBy(spacing),
-            ) {
-                if (plane != null && axes != null) {
-                    Box(Modifier.weight(1f)) { plane(state, axes.first, axes.second) }
-                }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing)) {
-                    PickerSliders(state, space, channelSlider, alphaSlider)
-                }
-            }
+                spacing = spacing,
+                plane = if (plane != null && axes != null) {
+                    { plane(state, axes.first, axes.second) }
+                } else {
+                    null
+                },
+                sliders = { PickerSliders(state, space, channelSlider, alphaSlider) },
+            )
         }
     }
 }
@@ -159,6 +163,55 @@ public fun BasicColorPicker(
         fromValue = { it.toComposeColor() },
     )
     BasicColorPicker(state, space, plane, channelSlider, alphaSlider, modifier, enabled, orientation, spacing)
+}
+
+// The plane in the start half and the sliders in the end half, or the sliders across the whole width when there
+// is no plane. The sliders are measured first and the plane is given their height as its least, so the two start
+// and end together; a plane that asks for more height gets it.
+@Composable
+private fun SideBySide(
+    modifier: Modifier,
+    spacing: Dp,
+    plane: (@Composable () -> Unit)?,
+    sliders: @Composable () -> Unit,
+) {
+    Layout(
+        content = {
+            if (plane != null) Box(propagateMinConstraints = true) { plane() }
+            Column(verticalArrangement = Arrangement.spacedBy(spacing)) { sliders() }
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        val gap = spacing.roundToPx()
+        val planeMeasurable = measurables.takeIf { it.size == 2 }?.first()
+        // Null in a row with no width limit, where the sliders take their own width and the plane matches it.
+        val half = when {
+            !constraints.hasBoundedWidth -> null
+            planeMeasurable == null -> constraints.maxWidth
+            else -> ((constraints.maxWidth - gap) / 2).coerceAtLeast(0)
+        }
+        val sliders = measurables.last().measure(
+            Constraints(minWidth = half ?: 0, maxWidth = half ?: Constraints.Infinity, maxHeight = constraints.maxHeight),
+        )
+        val planePlaceable = planeMeasurable?.let {
+            val planeWidth = half ?: sliders.width
+            it.measure(
+                Constraints(
+                    minWidth = planeWidth,
+                    maxWidth = planeWidth,
+                    minHeight = sliders.height.coerceAtMost(constraints.maxHeight),
+                    maxHeight = constraints.maxHeight,
+                ),
+            )
+        }
+        val slidersX = if (planePlaceable != null) planePlaceable.width + gap else 0
+        val width = constraints.constrainWidth(slidersX + sliders.width)
+        val height = constraints.constrainHeight(max(sliders.height, planePlaceable?.height ?: 0))
+        layout(width, height) {
+            planePlaceable?.placeRelative(0, 0)
+            sliders.placeRelative(slidersX, 0)
+        }
+    }
 }
 
 // A slider for each of [space]'s channels in channel order, then alpha.

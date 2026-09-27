@@ -185,6 +185,22 @@ class ColorPickerTest {
     }
 
     @Test
+    fun aHorizontalPickersPlaneIsAsTallAsItsSliders() = runComposeUiTest {
+        setContent { ColorPicker(teal(), Modifier.width(600.dp).testTag("picker"), space = Hsl, orientation = Orientation.Horizontal) }
+        val plane = onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).getUnclippedBoundsInRoot()
+        val picker = onNodeWithTag("picker").getUnclippedBoundsInRoot()
+        assertEquals(picker.top.value, plane.top.value, 0.5f)
+        assertEquals(picker.bottom.value, plane.bottom.value, 0.5f)
+    }
+
+    @Test
+    fun aVerticalPickersPlaneIsOnePointSixTimesAsWideAsItIsTall() = runComposeUiTest {
+        setContent { ColorPicker(teal(), Modifier.width(320.dp), space = Hsl) }
+        val plane = onNode(SemanticsMatcher.keyIsDefined(SemanticsActions.CustomActions)).getUnclippedBoundsInRoot()
+        assertEquals(200f, (plane.bottom - plane.top).value, 0.5f)
+    }
+
+    @Test
     fun aHorizontalPickerWithNoPlaneGivesTheSlidersTheWholeWidth() = runComposeUiTest {
         setContent {
             ColorPicker(ColorPickerState(Srgb(0.2, 0.4, 0.6)), Modifier.width(400.dp), space = Srgb, orientation = Orientation.Horizontal)
