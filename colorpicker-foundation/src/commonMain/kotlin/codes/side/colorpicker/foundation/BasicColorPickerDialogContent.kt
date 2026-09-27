@@ -1,5 +1,6 @@
 package codes.side.colorpicker.foundation
 
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,12 +10,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -69,6 +73,13 @@ public fun BasicColorPickerDialogContent(
     // reads to keep out of the semantics tree: a composed node that is never placed is still in it, and a
     // screen reader would find every slider twice.
     val sideBySide = remember { mutableStateOf(false) }
+    // Whether a part of the stacked form holds keyboard focus. Laid out side by side, that part is not placed and
+    // nothing shows where focus is, so it is let go.
+    val stackedHasFocus = remember { mutableStateOf(false) }
+    if (sideBySide.value && stackedHasFocus.value) {
+        val focusManager = LocalFocusManager.current
+        SideEffect { focusManager.clearFocus(force = true) }
+    }
     val stackedScroll = rememberScrollState()
     val sideBySideScroll = rememberScrollState()
     // Built here rather than in the measure block, so every measure pass hands SubcomposeLayout the same content,
@@ -77,6 +88,8 @@ public fun BasicColorPickerDialogContent(
         StackedParts(
             modifier = Modifier
                 .then(if (sideBySide.value) Modifier.clearAndSetSemantics {} else Modifier)
+                .onFocusChanged { stackedHasFocus.value = it.hasFocus }
+                .focusGroup()
                 .verticalScroll(stackedScroll),
             header = header,
             spaceSwitcher = spaceSwitcher,
