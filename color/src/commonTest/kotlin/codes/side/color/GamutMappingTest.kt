@@ -9,13 +9,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 // cssMatchesColorJs's expected values are color.js 0.7.1's toGamut({ method: "css" }) of the same
 // OkLCh colors converted to srgb and p3.
 class GamutMappingTest {
 
-    private val methods = listOf(GamutMapping.Css(), GamutMapping.ChromaReduction, GamutMapping.Clip)
+    private val methods = listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Clip)
 
     @Test
     fun aColorTheGamutHoldsComesBackConverted() {
@@ -39,7 +40,7 @@ class GamutMappingTest {
 
     @Test
     fun lightnessPastEitherEndIsWhiteOrBlack() {
-        for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction)) {
+        for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative))) {
             assertComponents(doubleArrayOf(1.0, 1.0, 1.0), OkLch(1.2, 0.2, 30.0).toGamut(Srgb.gamut, method), 1e-15)
             assertComponents(doubleArrayOf(0.0, 0.0, 0.0), OkLch(-0.1, 0.2, 30.0).toGamut(Srgb.gamut, method), 0.0)
         }
@@ -104,7 +105,7 @@ class GamutMappingTest {
                 val lightness = random.nextDouble(0.05, 0.95)
                 val hue = random.nextDouble(0.0, 360.0)
                 val edge = gamut.maxChroma(lightness, hue)
-                val mapped = OkLch(lightness, edge + random.nextDouble(0.001, 0.3), hue).toGamut(gamut, GamutMapping.ChromaReduction)
+                val mapped = OkLch(lightness, edge + random.nextDouble(0.001, 0.3), hue).toGamut(gamut, GamutMapping.ChromaReduction())
                 assertTrue(mapped.isInGamut(gamut, 0.0))
                 val back = mapped.to(OkLch)
                 val at = "$gamut at L $lightness, $hue°"
@@ -121,9 +122,9 @@ class GamutMappingTest {
         // in the gap comes down to the first stretch's end, not up to the second's.
         val edge = Srgb.gamut.maxChroma(0.42, 264.1)
         assertNear(0.2909, edge, 1e-4)
-        val mapped = OkLch(0.42, 0.27, 264.1).toGamut(Srgb.gamut, GamutMapping.ChromaReduction).to(OkLch)
+        val mapped = OkLch(0.42, 0.27, 264.1).toGamut(Srgb.gamut, GamutMapping.ChromaReduction()).to(OkLch)
         assertNear(0.2504, mapped[OkLch.C]!!, 1e-4)
-        assertNear(edge, OkLch(0.42, 0.4, 264.1).toGamut(Srgb.gamut, GamutMapping.ChromaReduction).to(OkLch)[OkLch.C]!!, 1e-9)
+        assertNear(edge, OkLch(0.42, 0.4, 264.1).toGamut(Srgb.gamut, GamutMapping.ChromaReduction()).to(OkLch)[OkLch.C]!!, 1e-9)
     }
 
     @Test
@@ -147,7 +148,7 @@ class GamutMappingTest {
                 // edge's chroma, so its hue turns by no more than the angle the JND spans there.
                 val turn = asin(min(1.0, 0.02 / edge)) * 180.0 / PI
                 assertTrue(hueDifference(hue, back[OkLch.H]!!) <= turn + 1e-6, "$at hue ${back[OkLch.H]}, allowed $turn°")
-                val exact = color.toGamut(gamut, GamutMapping.ChromaReduction).to(OkLch)
+                val exact = color.toGamut(gamut, GamutMapping.ChromaReduction()).to(OkLch)
                 assertTrue(hueDifference(hue, exact[OkLch.H]!!) <= 1e-6, "chroma reduction to $gamut at L $lightness, $hue°: hue ${exact[OkLch.H]}")
             }
         }
@@ -160,7 +161,7 @@ class GamutMappingTest {
         val search = GamutMapping.Css(jnd = 0.0)
         repeat(100) {
             val color = OkLch(random.nextDouble(0.1, 0.9), random.nextDouble(0.3, 0.5), random.nextDouble(0.0, 360.0))
-            val exact = color.toGamut(Srgb.gamut, GamutMapping.ChromaReduction).to(OkLch)[OkLch.C]!!
+            val exact = color.toGamut(Srgb.gamut, GamutMapping.ChromaReduction()).to(OkLch)[OkLch.C]!!
             assertNear(exact, color.toGamut(Srgb.gamut, search).to(OkLch)[OkLch.C]!!, 2e-4, "$color")
         }
     }
@@ -184,9 +185,9 @@ class GamutMappingTest {
     @Test
     fun aGreyRoundedPastWhiteStaysFinite() {
         val grey = OkLch(0.9999999999999998, 0.0, 0.0)
-        assertComponents(doubleArrayOf(1.0, 1.0, 1.0), grey.toGamut(Srgb.gamut, GamutMapping.ChromaReduction), 1e-12)
+        assertComponents(doubleArrayOf(1.0, 1.0, 1.0), grey.toGamut(Srgb.gamut, GamutMapping.ChromaReduction()), 1e-12)
         val out = DoubleArray(3)
-        Srgb.gamut.mapper(OkLch, GamutMapping.ChromaReduction).convert(doubleArrayOf(0.9999999999999998, 0.0, 0.0), out)
+        Srgb.gamut.mapper(OkLch, GamutMapping.ChromaReduction()).convert(doubleArrayOf(0.9999999999999998, 0.0, 0.0), out)
         assertTrue(out.all { it.isFinite() }, out.contentToString())
     }
 
@@ -218,6 +219,27 @@ class GamutMappingTest {
         assertEquals(GamutMapping.Css(), GamutMapping.Css(jnd = 0.02, epsilon = 1e-4))
         assertFailsWith<IllegalArgumentException> { GamutMapping.Css(jnd = -1.0) }
         assertFailsWith<IllegalArgumentException> { GamutMapping.Css(epsilon = 0.0) }
+    }
+
+    @Test
+    fun chromaReductionsAreEqualByTheirSolver() {
+        assertEquals(GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.ClosedForm))
+        assertEquals(GamutMapping.ChromaReduction().hashCode(), GamutMapping.ChromaReduction(EdgeSolver.ClosedForm).hashCode())
+        assertNotEquals<GamutMapping>(GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative))
+        assertEquals("ChromaReduction(Iterative)", GamutMapping.ChromaReduction(EdgeSolver.Iterative).toString())
+    }
+
+    @Test
+    fun theIterativeSolverReducesChromaAsTheClosedFormsDo() {
+        val random = Random(20260930)
+        for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
+            repeat(500) {
+                val color = OkLch(random.nextDouble(0.05, 0.98), random.nextDouble(0.0, 0.5), random.nextDouble(0.0, 360.0))
+                val closed = color.toGamut(gamut, GamutMapping.ChromaReduction()).components()
+                val walked = color.toGamut(gamut, GamutMapping.ChromaReduction(EdgeSolver.Iterative)).components()
+                for (i in 0..2) assertNear(closed[i], walked[i], 1e-11, "$color into $gamut")
+            }
+        }
     }
 
     private fun hueDifference(a: Double, b: Double): Double {

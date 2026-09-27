@@ -70,7 +70,7 @@ class PlaneSurfaceTest {
             val held = DoubleArray(3)
             held[x.space.channels.first { it.isHue }.index] = 264.1
             val colors = planeColors(x, y, held, columns = 9, rows = 7)
-            assertEquals(List(63) { srgbArgb(colors, 3 * it) }, planePixels(x, y, held, PlaneGrid(9, 7)).toList(), "$x × $y")
+            assertEquals(List(63) { srgbArgb(colors, 3 * it) }, planePixels(x, y, held, PlaneGrid(9, 7), PlaneRendering.Canonical).toList(), "$x × $y")
         }
     }
 
@@ -95,5 +95,32 @@ class PlaneSurfaceTest {
         assertEquals(listOf(256, 256), planeGridOf(Lch.C, Lch.L).let { listOf(it.columns, it.rows) })
         assertEquals(listOf(256, 256), planeGridOf(OkLch.C, OkLch.L).let { listOf(it.columns, it.rows) })
         assertEquals(listOf(64, 64), planeGridOf(Lch.L, Lch.C).let { listOf(it.columns, it.rows) }, "any other pair")
+    }
+
+    @Test
+    fun aFastOkhslPlaneSplitsAtItsCrease() {
+        for (hue in listOf(30.0, 110.0, 264.0)) {
+            val held = doubleArrayOf(hue, 0.0, 0.0)
+            val crease = okhslCrease(hue)
+            val bands = planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Fast)
+            assertEquals(listOf(crease to 1.0, 0.0 to crease), bands.map { it.from to it.to }, "at $hue°")
+            assertEquals(listOf(listOf(256, 64), listOf(256, 16)), bands.map { listOf(it.grid.columns, it.grid.rows) }, "at $hue°")
+            assertEquals(listOf(0.0 to 1.0), planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Canonical).map { it.from to it.to })
+        }
+        assertEquals(1, planeBands(OkLch.C, OkLch.L, doubleArrayOf(0.0, 0.0, 200.0), PlaneRendering.Fast).size)
+    }
+
+    @Test
+    fun theBandsMeetOnTheCreaseRow() {
+        for (hue in listOf(110.0, 264.0)) {
+            val held = doubleArrayOf(hue, 0.0, 0.0)
+            val (upper, lower) = planeBands(Okhsl.S, Okhsl.L, held, PlaneRendering.Fast)
+            val top = PlaneRows(Okhsl.S, Okhsl.L, held, 16, upper.grid.rows, PlaneRendering.Fast, yFrom = upper.from, yTo = upper.to)
+            val bottom = PlaneRows(Okhsl.S, Okhsl.L, held, 16, lower.grid.rows, PlaneRendering.Fast, yFrom = lower.from, yTo = lower.to)
+            top.fill(upper.grid.rows - 1)
+            bottom.fill(0)
+            val last = top.pixels.copyOfRange((upper.grid.rows - 1) * 16, upper.grid.rows * 16)
+            assertEquals(last.toList(), bottom.pixels.copyOfRange(0, 16).toList(), "at $hue°")
+        }
     }
 }

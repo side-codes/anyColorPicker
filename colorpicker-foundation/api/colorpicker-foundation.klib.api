@@ -93,6 +93,16 @@ sealed interface codes.side.colorpicker.foundation/ColorSliderScope { // codes.s
         abstract fun <get-thumbColor>(): androidx.compose.ui.graphics/Color // codes.side.colorpicker.foundation/ColorSliderScope.thumbColor.<get-thumbColor>|<get-thumbColor>(){}[0]
 }
 
+abstract class codes.side.colorpicker.foundation/PlaneRendering { // codes.side.colorpicker.foundation/PlaneRendering|null[0]
+    final object Canonical : codes.side.colorpicker.foundation/PlaneRendering { // codes.side.colorpicker.foundation/PlaneRendering.Canonical|null[0]
+        final fun toString(): kotlin/String // codes.side.colorpicker.foundation/PlaneRendering.Canonical.toString|toString(){}[0]
+    }
+
+    final object Fast : codes.side.colorpicker.foundation/PlaneRendering { // codes.side.colorpicker.foundation/PlaneRendering.Fast|null[0]
+        final fun toString(): kotlin/String // codes.side.colorpicker.foundation/PlaneRendering.Fast.toString|toString(){}[0]
+    }
+}
+
 final class codes.side.colorpicker.foundation/ColorPickerDialogState { // codes.side.colorpicker.foundation/ColorPickerDialogState|null[0]
     constructor <init>(codes.side.color/ColorValue, kotlin.collections/List<codes.side.color/ColorSpace>, codes.side.color/ColorSpace = ...) // codes.side.colorpicker.foundation/ColorPickerDialogState.<init>|<init>(codes.side.color.ColorValue;kotlin.collections.List<codes.side.color.ColorSpace>;codes.side.color.ColorSpace){}[0]
 
@@ -159,8 +169,13 @@ final class codes.side.colorpicker.state/ColorPickerState { // codes.side.colorp
 
 final val codes.side.colorpicker.foundation/LocalColorPickerEnabled // codes.side.colorpicker.foundation/LocalColorPickerEnabled|{}LocalColorPickerEnabled[0]
     final fun <get-LocalColorPickerEnabled>(): androidx.compose.runtime/CompositionLocal<kotlin/Boolean> // codes.side.colorpicker.foundation/LocalColorPickerEnabled.<get-LocalColorPickerEnabled>|<get-LocalColorPickerEnabled>(){}[0]
+final val codes.side.colorpicker.foundation/LocalPlaneRendering // codes.side.colorpicker.foundation/LocalPlaneRendering|{}LocalPlaneRendering[0]
+    final fun <get-LocalPlaneRendering>(): androidx.compose.runtime/ProvidableCompositionLocal<codes.side.colorpicker.foundation/PlaneRendering> // codes.side.colorpicker.foundation/LocalPlaneRendering.<get-LocalPlaneRendering>|<get-LocalPlaneRendering>(){}[0]
 final val codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop|#static{}codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop[0]
 final val codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneActionLabels$stableprop // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneActionLabels$stableprop|#static{}codes_side_colorpicker_foundation_PlaneActionLabels$stableprop[0]
+final val codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering$stableprop // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering$stableprop|#static{}codes_side_colorpicker_foundation_PlaneRendering$stableprop[0]
+final val codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop|#static{}codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop[0]
+final val codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop|#static{}codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop[0]
 final val codes.side.colorpicker.state/cmyk // codes.side.colorpicker.state/cmyk|@codes.side.colorpicker.state.ColorPickerState{}cmyk[0]
     final fun (codes.side.colorpicker.state/ColorPickerState).<get-cmyk>(): codes.side.color/CmykColor // codes.side.colorpicker.state/cmyk.<get-cmyk>|<get-cmyk>@codes.side.colorpicker.state.ColorPickerState(){}[0]
 final val codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop // codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop|#static{}codes_side_colorpicker_state_ColorPickerState$stableprop[0]
@@ -222,6 +237,9 @@ final fun codes.side.colorpicker.foundation/BasicColorSlider(kotlin/Float, kotli
 final fun codes.side.colorpicker.foundation/ProvideColorPickerStrings(codes.side.colorpicker.foundation/ColorPickerStrings, kotlin/Function2<androidx.compose.runtime/Composer, kotlin/Int, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int) // codes.side.colorpicker.foundation/ProvideColorPickerStrings|ProvideColorPickerStrings(codes.side.colorpicker.foundation.ColorPickerStrings;kotlin.Function2<androidx.compose.runtime.Composer,kotlin.Int,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop_getter(): kotlin/Int // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop_getter|codes_side_colorpicker_foundation_ColorPickerDialogState$stableprop_getter(){}[0]
 final fun codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneActionLabels$stableprop_getter(): kotlin/Int // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneActionLabels$stableprop_getter|codes_side_colorpicker_foundation_PlaneActionLabels$stableprop_getter(){}[0]
+final fun codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering$stableprop_getter(): kotlin/Int // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering$stableprop_getter|codes_side_colorpicker_foundation_PlaneRendering$stableprop_getter(){}[0]
+final fun codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop_getter(): kotlin/Int // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop_getter|codes_side_colorpicker_foundation_PlaneRendering_Canonical$stableprop_getter(){}[0]
+final fun codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop_getter(): kotlin/Int // codes.side.colorpicker.foundation/codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop_getter|codes_side_colorpicker_foundation_PlaneRendering_Fast$stableprop_getter(){}[0]
 final fun codes.side.colorpicker.foundation/rememberCheckerboardBrush(androidx.compose.ui.graphics/Color, androidx.compose.ui.graphics/Color, androidx.compose.ui.unit/Dp, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): androidx.compose.ui.graphics/Brush // codes.side.colorpicker.foundation/rememberCheckerboardBrush|rememberCheckerboardBrush(androidx.compose.ui.graphics.Color;androidx.compose.ui.graphics.Color;androidx.compose.ui.unit.Dp;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun codes.side.colorpicker.foundation/rememberColorPickerDialogState(codes.side.color/ColorValue, kotlin.collections/List<codes.side.color/ColorSpace>, codes.side.color/ColorSpace?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): codes.side.colorpicker.foundation/ColorPickerDialogState // codes.side.colorpicker.foundation/rememberColorPickerDialogState|rememberColorPickerDialogState(codes.side.color.ColorValue;kotlin.collections.List<codes.side.color.ColorSpace>;codes.side.color.ColorSpace?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter(): kotlin/Int // codes.side.colorpicker.state/codes_side_colorpicker_state_ColorPickerState$stableprop_getter|codes_side_colorpicker_state_ColorPickerState$stableprop_getter(){}[0]

@@ -40,7 +40,7 @@ class BulkAllocationTest {
         val report = StringBuilder()
         for (from in listOf(OkLch, Srgb, Okhsl, Cmyk)) {
             for (gamut in listOf(Srgb.gamut, DisplayP3.gamut)) {
-                for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction, GamutMapping.Clip)) {
+                for (method in listOf(GamutMapping.Css(), GamutMapping.ChromaReduction(), GamutMapping.ChromaReduction(EdgeSolver.Iterative), GamutMapping.Clip)) {
                     val mapper = gamut.mapper(from, method)
                     val src = DoubleArray(count * from.channels.size) { i -> if (from === Srgb) 1.2 - i % 7 * 0.2 else 0.1 + i % 7 * 0.1 }
                     val dst = DoubleArray(count * 3)
@@ -49,6 +49,12 @@ class BulkAllocationTest {
                     mapper.convert(src, 0, dst, 0, count)
                     val allocated = threads.currentThreadAllocatedBytes - before
                     if (allocated >= count) report.appendLine("$mapper: $allocated bytes for $count colors")
+                    val pixels = IntArray(count)
+                    mapper.convertToArgb(src, 0, pixels, 0, 1)
+                    val beforePixels = threads.currentThreadAllocatedBytes
+                    mapper.convertToArgb(src, 0, pixels, 0, count)
+                    val allocatedPixels = threads.currentThreadAllocatedBytes - beforePixels
+                    if (allocatedPixels >= count) report.appendLine("$mapper to pixels: $allocatedPixels bytes for $count colors")
                 }
             }
         }

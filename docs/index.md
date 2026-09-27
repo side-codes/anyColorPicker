@@ -418,6 +418,10 @@ below it, which is what compositing the overlay computes. Every other pair has n
 so it is sampled on a grid, measured for each of the library's planes, and drawn scaled. The grid
 is rebuilt off the main thread when a held channel changes.
 
+`LocalPlaneRendering` decides how. `PlaneRendering.Fast`, the default, shares the rows among up to
+four threads, builds Okhsl's S × L as two smaller grids that meet on its crease, and draws each
+sample where its grid is measured. `PlaneRendering.Canonical` is the reference it is tested against.
+
 The surface is **not** mirrored in right-to-left layouts, unlike the sliders. It maps a
 color space rather than showing progress.
 

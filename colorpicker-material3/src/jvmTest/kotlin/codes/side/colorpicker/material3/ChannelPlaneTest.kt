@@ -280,7 +280,7 @@ class ChannelPlaneTest {
         waitUntil(timeoutMillis = 5_000) { rasterDrawn() }
         // Display P3's green lies outside sRGB. sRGB HSL's brushes would draw sRGB's own green here,
         // where the plane shows P3's brought into sRGB by chroma reduction.
-        val p3Green = p3Hsl.color(doubleArrayOf(120.0, 100.0, 50.0)).toComposeColor(mapping = GamutMapping.ChromaReduction)
+        val p3Green = p3Hsl.color(doubleArrayOf(120.0, 100.0, 50.0)).toComposeColor(mapping = GamutMapping.ChromaReduction())
         assertTrue(maxOf(p3Green.red, p3Green.blue, 1f - p3Green.green) > 0.05f, "P3's green maps away from sRGB's, $p3Green")
         assertColor(p3Green, pixels().at(0.99f, 0.5f), 6f / 255f, "P3 HSL's pure hue")
         state.value = Srgb(1.0, 0.0, 0.0)

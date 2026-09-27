@@ -39,7 +39,7 @@ public sealed interface ChannelPlaneScope : ColorPlaneScope {
  * HSL's saturation × lightness and HSV's saturation × value are drawn exactly, with two gradients. Any
  * other pair is sampled on a grid and drawn scaled, and the grid is rebuilt off the main thread when a
  * held channel changes. The library's own planes each have a grid measured to fit them; any other pair
- * takes 64 × 64.
+ * takes 64 × 64. How the grid is built is [LocalPlaneRendering]'s to say.
  *
  * It takes input as [BasicColorPlane] does and imposes no size. An arrow key moves a channel by its
  * [ColorChannel.step], and Shift with an arrow by its [ColorChannel.pageStep]; at an edge the plane

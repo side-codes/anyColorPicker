@@ -158,6 +158,26 @@ public final class codes/side/colorpicker/foundation/PlaneActionLabels {
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract class codes/side/colorpicker/foundation/PlaneRendering {
+	public static final field $stable I
+}
+
+public final class codes/side/colorpicker/foundation/PlaneRendering$Canonical : codes/side/colorpicker/foundation/PlaneRendering {
+	public static final field $stable I
+	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Canonical;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/foundation/PlaneRendering$Fast : codes/side/colorpicker/foundation/PlaneRendering {
+	public static final field $stable I
+	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Fast;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class codes/side/colorpicker/foundation/PlaneRenderingKt {
+	public static final fun getLocalPlaneRendering ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
 public final class codes/side/colorpicker/state/ColorPickerState {
 	public static final field $stable I
 	public static final field Companion Lcodes/side/colorpicker/state/ColorPickerState$Companion;

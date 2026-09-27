@@ -82,4 +82,58 @@ class PlaneGridTest {
 
     @Test
     fun lchHoldsItsRecordedError() = assertHolds(Lch.C, Lch.L, peak = 43.0, budget = 80.30)
+
+    // An Okhsl band's error, measured as the whole plane's, over the band's own range.
+    private fun worstBandError(hue: Double, band: PlaneBand, columns: Int, rows: Int): Double {
+        val held = doubleArrayOf(hue, 0.0, 0.0)
+        val grid = planeColors(Okhsl.S, Okhsl.L, held, columns, rows, band.from, band.to)
+        val fineColumns = 4 * (columns - 1) + 1
+        val fineRows = 4 * (rows - 1) + 1
+        val truth = planeColors(Okhsl.S, Okhsl.L, held, fineColumns, fineRows, band.from, band.to)
+        var worst = 0.0
+        for (j in 0 until fineRows) {
+            val y0 = min(j / 4, rows - 1)
+            val y1 = min(y0 + 1, rows - 1)
+            val ty = (j % 4) / 4.0
+            for (i in 0 until fineColumns) {
+                val x0 = min(i / 4, columns - 1)
+                val x1 = min(x0 + 1, columns - 1)
+                val tx = (i % 4) / 4.0
+                for (c in 0..2) {
+                    val top = grid[(y0 * columns + x0) * 3 + c] * (1 - tx) + grid[(y0 * columns + x1) * 3 + c] * tx
+                    val bottom = grid[(y1 * columns + x0) * 3 + c] * (1 - tx) + grid[(y1 * columns + x1) * 3 + c] * tx
+                    worst = maxOf(worst, abs(top * (1 - ty) + bottom * ty - truth[(j * fineColumns + i) * 3 + c]))
+                }
+            }
+        }
+        return worst * 255.0
+    }
+
+    private fun okhslBands(hue: Double) = planeBands(Okhsl.S, Okhsl.L, doubleArrayOf(hue, 0.0, 0.0), PlaneRendering.Fast)
+
+    // No band grid holds 2.5/255: the plane's right edge, where a channel reaches zero and the sRGB curve rises
+    // steeply from it, is what the error comes from, and more columns only whittle it. The bands keep the single
+    // grid's 256 columns, so that edge is no worse than the single grid draws it, and hold what it costs there,
+    // less than the single grid's 29.34, which its crease adds to.
+    @Test
+    fun okhslBandsHoldTheRightEdgesError() {
+        for (index in 0..1) {
+            val worst = hues(OKHSL_BAND_PEAK).maxOf { hue -> okhslBands(hue)[index].let { worstBandError(hue, it, it.grid.columns, it.grid.rows) } }
+            assertTrue(worst <= 12.83, "Okhsl band $index: ${decimals(worst, 2)}/255, over 12.83")
+        }
+    }
+
+    // Each band's rows are the fewest that leave only the right edge's error: halving them adds to it.
+    @Test
+    fun okhslBandRowsAreTheFewest() {
+        for (index in 0..1) {
+            val shorter = hues(OKHSL_BAND_PEAK).maxOf { hue -> okhslBands(hue)[index].let { worstBandError(hue, it, it.grid.columns, it.grid.rows / 2) } }
+            assertTrue(shorter > 12.83, "band $index: half the rows would do, ${decimals(shorter, 2)}/255")
+        }
+    }
+
+    private companion object {
+        // Where the bands' error peaked in a sweep over every whole degree.
+        const val OKHSL_BAND_PEAK = 110.0
+    }
 }

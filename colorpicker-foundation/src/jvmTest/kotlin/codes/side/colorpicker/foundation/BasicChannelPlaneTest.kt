@@ -3,12 +3,17 @@ package codes.side.colorpicker.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyInput
@@ -21,12 +26,14 @@ import codes.side.color.ColorChannel
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
 import codes.side.color.OkLch
+import codes.side.color.Okhsl
 import codes.side.color.Srgb
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.assertNear
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 @OptIn(ExperimentalTestApi::class)
 class BasicChannelPlaneTest {
@@ -116,5 +123,36 @@ class BasicChannelPlaneTest {
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
         onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionUp) }
         assertEquals(listOf(51.0 to 50.0, 51.0 to 51.0), emitted.map { it[Hsl.S] to it[Hsl.L] })
+    }
+
+    @Test
+    fun theProvidedRenderingBuildsThePlane() {
+        // At 110°, where Okhsl's single grid blurs its crease, the two presets draw different pixels.
+        fun capture(rendering: PlaneRendering): List<Int> {
+            var argb = emptyList<Int>()
+            runComposeUiTest {
+                setContent {
+                    CompositionLocalProvider(LocalInspectionMode provides true, LocalPlaneRendering provides rendering) {
+                        BasicChannelPlane(ColorPickerState(Okhsl(110.0, 0.5, 0.5)), Okhsl.S, Okhsl.L, Modifier.size(200.dp).testTag("plane")) {}
+                    }
+                }
+                val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
+                argb = List(pixels.height) { row -> pixels[pixels.width - 2, row].toArgb() }
+            }
+            return argb
+        }
+        assertNotEquals(capture(PlaneRendering.Canonical), capture(PlaneRendering.Fast))
+    }
+
+    @Test
+    fun aThinBandDrawsNoRowOfZeroHeight() = runComposeUiTest {
+        // Yellow's cusp is near white, so the upper band is a sliver of a short plane; drawing still covers every row.
+        setContent {
+            CompositionLocalProvider(LocalInspectionMode provides true) {
+                BasicChannelPlane(ColorPickerState(Okhsl(110.0, 0.5, 0.5)), Okhsl.S, Okhsl.L, Modifier.size(width = 120.dp, height = 12.dp).testTag("plane")) {}
+            }
+        }
+        val pixels = onNodeWithTag("plane").captureToImage().toPixelMap()
+        for (row in 0 until pixels.height) assertEquals(1f, pixels[pixels.width / 2, row].alpha, "row $row is drawn")
     }
 }
