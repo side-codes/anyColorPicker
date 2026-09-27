@@ -22,6 +22,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -52,6 +53,20 @@ class BasicColorComparisonTest {
             .assert(SemanticsMatcher("its action says it restores") { it.config[SemanticsActions.OnClick].label == "Restore original color" })
             .performClick()
         assertEquals(1, restored)
+    }
+
+    @Test
+    fun aDisabledRestoreIsAButtonThatRestoresNothing() = runComposeUiTest {
+        var restored = 0
+        setContent {
+            BasicColorComparison(Color.Red, Color.Blue, onRestoreOriginal = { restored++ }, Modifier.size(96.dp, 48.dp), enabled = false)
+        }
+        onNodeWithContentDescription("Original color")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assertIsNotEnabled()
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.RequestFocus))
+            .performClick()
+        assertEquals(0, restored)
     }
 
     @Test

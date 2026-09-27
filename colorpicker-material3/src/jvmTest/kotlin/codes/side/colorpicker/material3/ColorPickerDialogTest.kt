@@ -5,11 +5,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
@@ -18,6 +21,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -263,10 +267,52 @@ class ColorPickerDialogTest {
     }
 
     @Test
+    fun theMenuIsAListOfRadioButtons() = runComposeUiTest {
+        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
+        onNodeWithText("Okhsl")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.DropdownList))
+            .performClick()
+        onAllNodes(radioButton).assertCountEquals(7)
+        onNode(radioButton and hasText("Okhsl")).assertIsSelected()
+        onNode(radioButton and hasText("LCH")).assertIsNotSelected()
+        onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup)).assertCountEquals(1)
+    }
+
+    @Test
+    fun aDisabledMenuDoesNotOpen() = runComposeUiTest {
+        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces, enabled = false) }
+        onNodeWithText("Okhsl").assertIsNotEnabled().performClick()
+        onAllNodes(radioButton).assertCountEquals(0)
+    }
+
+    @Test
     fun theDialogIsAnnouncedByItsTitle() = runComposeUiTest {
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}) }
         onNode(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Select color")).assertExists()
         onAllNodes(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Dialog")).assertCountEquals(0)
+    }
+
+    @Test
+    fun aReplacedTitleLeavesTheDialogsName() = runComposeUiTest {
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, title = { Text("Brand color") }) }
+        onNode(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Select color")).assertExists()
+    }
+
+    @Test
+    fun aPaneTitleInTheModifierRenamesTheDialog() = runComposeUiTest {
+        setContent {
+            ColorPickerDialog(
+                initialValue = teal,
+                onValueSelected = {},
+                onDismissRequest = {},
+                modifier = Modifier.semantics { paneTitle = "Brand color" },
+                title = { Text("Brand color") },
+            )
+        }
+        onNode(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Brand color")).assertExists()
+        onAllNodes(SemanticsMatcher.expectValue(SemanticsProperties.PaneTitle, "Select color")).assertCountEquals(0)
     }
 
     @Test
@@ -279,11 +325,30 @@ class ColorPickerDialogTest {
     }
 
     @Test
-    fun theOriginalRestoresOnlyOnceTheColorIsEdited() = runComposeUiTest {
+    fun theRestoreIsEnabledOnlyOnceTheColorIsEdited() = runComposeUiTest {
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}) }
-        onNodeWithContentDescription("Original color").assert(SemanticsMatcher.keyNotDefined(SemanticsActions.OnClick))
+        onNodeWithContentDescription("Original color")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assertIsNotEnabled()
         sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
-        onNodeWithContentDescription("Original color").assert(SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick))
+        onNodeWithContentDescription("Original color").assertIsEnabled()
+    }
+
+    @Test
+    fun aHeaderToldItIsDisabledRestoresNothing() = runComposeUiTest {
+        var selected: ColorValue? = null
+        setContent {
+            ColorPickerDialog(
+                initialValue = teal,
+                onValueSelected = { selected = it },
+                onDismissRequest = {},
+                header = { ColorPickerDialogDefaults.Header(state, enabled = false) },
+            )
+        }
+        sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        onNodeWithContentDescription("Original color").assertIsNotEnabled().performClick()
+        onNodeWithText("OK").performClick()
+        assertNotEquals(teal, selected)
     }
 
     @Test

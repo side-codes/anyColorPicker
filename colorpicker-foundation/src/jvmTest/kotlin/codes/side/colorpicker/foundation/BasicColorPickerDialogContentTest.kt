@@ -27,6 +27,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHeightIsEqualTo
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -43,6 +44,7 @@ import codes.side.color.Srgb
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
 class BasicColorPickerDialogContentTest {
@@ -192,6 +194,44 @@ class BasicColorPickerDialogContentTest {
             onNodeWithTag("picker ${Orientation.Horizontal}").performKeyInput { pressKey(Key.Tab) }
         }
         assertFalse(hiddenFocused, "focus reached the stacked form, which is not shown")
+    }
+
+    @Test
+    fun theStackedFormLetsGoOfFocusWhenItStopsBeingShown() = runComposeUiTest {
+        var tall by mutableStateOf(false)
+        var stackedFocused = false
+        setContent {
+            Content(width = 600.dp, height = 300.dp) { orientation ->
+                val stacked = orientation == Orientation.Vertical
+                Box(
+                    Modifier
+                        .testTag("picker $orientation")
+                        .fillMaxWidth()
+                        .height(if (!stacked) 200.dp else if (tall) 400.dp else 100.dp)
+                        .onFocusChanged { if (stacked) stackedFocused = it.isFocused }
+                        .focusable(),
+                )
+            }
+        }
+        onNodeWithTag("picker ${Orientation.Vertical}").requestFocus()
+        assertTrue(stackedFocused)
+        tall = true
+        waitForIdle()
+        onNodeWithTag("picker ${Orientation.Horizontal}").assertExists()
+        assertFalse(stackedFocused, "the stacked form, no longer shown, still holds focus")
+    }
+
+    @Test
+    fun focusInTheFormShownIsKept() = runComposeUiTest {
+        setContent {
+            Content(width = 600.dp, height = 300.dp) { orientation ->
+                val height = if (orientation == Orientation.Vertical) 400.dp else 200.dp
+                Box(Modifier.testTag("picker $orientation").fillMaxWidth().height(height).focusable())
+            }
+        }
+        onNodeWithTag("picker ${Orientation.Horizontal}").requestFocus()
+        waitForIdle()
+        onNodeWithTag("picker ${Orientation.Horizontal}").assertIsFocused()
     }
 
     @Test

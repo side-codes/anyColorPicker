@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -26,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
@@ -70,24 +73,26 @@ public object ColorPickerDialogDefaults {
 
     /**
      * The dialog's header: a [ColorComparison] of [state]'s original and edited colors, and the edited color in
-     * hex, `#RRGGBB`, with alpha's two digits after it when the color is not opaque. Pressing the original half
-     * puts the original back while the color is modified.
+     * hex, `#RRGGBB`, with alpha's two digits after it when the color is not opaque. The original half is a button
+     * that puts the original back, enabled while the color is modified.
      *
-     * @param enabled when false the original half does not restore.
+     * @param enabled when false the original half is a disabled button.
      */
     @Composable
     public fun Header(state: ColorPickerDialogState, modifier: Modifier = Modifier, enabled: Boolean = true) {
         val value = state.pickerState.value
+        val original = remember(state.original) { state.original.toComposeColor() }
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(HeaderSpacing),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ColorComparison(
-                original = state.original.toComposeColor(),
+                original = original,
                 current = state.pickerState.color,
-                onRestoreOriginal = if (enabled && state.isModified) state::revert else null,
+                onRestoreOriginal = state::revert,
                 modifier = Modifier.weight(1f),
+                enabled = enabled && state.isModified,
             )
             // Monospaced, so the hex keeps its width while a slider moves.
             Text(value.toHexString(if (value.alpha == 1.0) HexAlpha.None else HexAlpha.Last), fontFamily = FontFamily.Monospace)
@@ -147,12 +152,14 @@ public object ColorPickerDialogDefaults {
 private fun SpaceMenu(state: ColorPickerDialogState, modifier: Modifier, enabled: Boolean) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        OutlinedButton(onClick = { expanded = true }, enabled = enabled) {
+        // A screen reader hears a list to choose from, not a button named after the space shown.
+        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.semantics { role = Role.DropdownList }, enabled = enabled) {
             Text(ColorPickerStrings.current.spaceName(state.space), maxLines = 1)
             Spacer(Modifier.width(ButtonDefaults.IconSpacing))
             DropdownArrow(Modifier.size(ButtonDefaults.IconSize))
         }
-        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
+        // One choice among the spaces, as the row of segmented buttons is.
+        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }, modifier = Modifier.selectableGroup()) {
             for (space in state.spaces) {
                 DropdownMenuItem(
                     text = { Text(ColorPickerStrings.current.spaceName(space)) },
@@ -160,7 +167,10 @@ private fun SpaceMenu(state: ColorPickerDialogState, modifier: Modifier, enabled
                         state.space = space
                         expanded = false
                     },
-                    modifier = Modifier.semantics { selected = space == state.space },
+                    modifier = Modifier.semantics {
+                        role = Role.RadioButton
+                        selected = space == state.space
+                    },
                 )
             }
         }
