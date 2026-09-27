@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 class PlaneRastersTest {
 
-    private fun request(hue: Double) = PlaneRequest(Okhsl.S, Okhsl.L, listOf(hue, 0.0, 0.0))
+    private fun request(hue: Double) = PlaneRequest(Okhsl.S, Okhsl.L, listOf(hue, 0.0, 0.0), PlaneRendering.Fast)
 
     @Test
     fun aRasterBeingBuiltIsAwaitedRatherThanBuiltAgain() = runTest {
@@ -44,7 +44,15 @@ class PlaneRastersTest {
     fun anotherPairOfChannelsIsAnotherRaster() = runTest {
         val rasters = PlaneRasters<String>(kept = 2)
         rasters.raster(request(10.0)) { "okhsl" }
-        assertEquals("okhsv", rasters.raster(PlaneRequest(Okhsv.S, Okhsv.V, listOf(10.0, 0.0, 0.0))) { "okhsv" })
+        assertEquals("okhsv", rasters.raster(PlaneRequest(Okhsv.S, Okhsv.V, listOf(10.0, 0.0, 0.0), PlaneRendering.Fast)) { "okhsv" })
+    }
+
+    @Test
+    fun aRasterOfAnotherRenderingIsAnotherRaster() = runTest {
+        val rasters = PlaneRasters<String>(kept = 2)
+        val held = listOf(10.0, 0.0, 0.0)
+        rasters.raster(PlaneRequest(Okhsl.S, Okhsl.L, held, PlaneRendering.Fast)) { "fast" }
+        assertEquals("canonical", rasters.raster(PlaneRequest(Okhsl.S, Okhsl.L, held, PlaneRendering.Canonical)) { "canonical" })
     }
 
     @Test

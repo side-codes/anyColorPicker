@@ -70,7 +70,7 @@ class PlaneSurfaceTest {
             val held = DoubleArray(3)
             held[x.space.channels.first { it.isHue }.index] = 264.1
             val colors = planeColors(x, y, held, columns = 9, rows = 7)
-            assertEquals(List(63) { srgbArgb(colors, 3 * it) }, planePixels(x, y, held, PlaneGrid(9, 7)).toList(), "$x × $y")
+            assertEquals(List(63) { srgbArgb(colors, 3 * it) }, planePixels(x, y, held, PlaneGrid(9, 7), PlaneRendering.Canonical).toList(), "$x × $y")
         }
     }
 
