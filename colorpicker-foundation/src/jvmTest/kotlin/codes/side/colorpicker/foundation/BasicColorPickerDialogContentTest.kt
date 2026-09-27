@@ -281,6 +281,19 @@ class BasicColorPickerDialogContentTest {
     }
 
     @Test
+    fun aHeightTooShortToStackDropsTheStackedHeight() = runComposeUiTest {
+        var height by mutableStateOf(700.dp)
+        setContent { Content(width = 600.dp, height = height) }
+        // Stacked: header, switcher and a 400 dp picker, 10 dp apart.
+        onNodeWithTag("content").assertHeightIsEqualTo(500.dp)
+        height = 350.dp
+        waitForIdle()
+        // Side by side: the header row over a 200 dp picker.
+        onNodeWithTag("picker ${Orientation.Horizontal}").assertExists()
+        onNodeWithTag("content").assertHeightIsEqualTo(250.dp)
+    }
+
+    @Test
     fun itGrowsWithTheTallestSpace() = runComposeUiTest {
         var tall by mutableStateOf(false)
         setContent {
