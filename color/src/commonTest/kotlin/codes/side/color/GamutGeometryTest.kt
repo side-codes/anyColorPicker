@@ -45,6 +45,30 @@ class GamutGeometryTest {
     }
 
     @Test
+    fun theEdgeHoldsWhereAChannelsCubicTermVanishes() {
+        // At each of these hues one channel's cubic term, along a line of constant hue, passes through zero. Within a
+        // few millionths of a degree of one, the closed form lost the real roots and mapped a vivid red to grey. Each
+        // hue is held to the iterative solver, which uses no closed form, and to a colorful cusp.
+        val hues = listOf(
+            Srgb.gamut to listOf(29.2229263, 52.5546158, 232.5546158),
+            DisplayP3.gamut to listOf(28.1173809, 57.9919545, 237.9919545),
+        )
+        val closedForm = GamutMapping.ChromaReduction(EdgeSolver.ClosedForm)
+        val iterative = GamutMapping.ChromaReduction(EdgeSolver.Iterative)
+        val offsets = listOf(-2e-6, -1e-6, -1e-7, -1e-9, 0.0, 1e-9, 1e-7, 1e-6, 2e-6)
+        for ((gamut, centres) in hues) for (centre in centres) for (offset in offsets) {
+            val hue = centre + offset
+            assertTrue(gamut.cusp(hue)[Oklch.C]!! > 0.1, "$gamut's cusp at $hue°: ${gamut.cusp(hue)}")
+            for (lightness in listOf(0.2, 0.4, 0.6, 0.8, 0.95)) {
+                val color = Oklch(lightness, 0.4, hue)
+                val byClosedForm = color.toGamut(gamut, closedForm).to(Oklch)[Oklch.C]!!
+                val byWalk = color.toGamut(gamut, iterative).to(Oklch)[Oklch.C]!!
+                assertNear(byWalk, byClosedForm, 1e-9, "$gamut at $hue°, L $lightness")
+            }
+        }
+    }
+
+    @Test
     fun maxChromaIsZeroAtBlackAndWhiteAndBeyond() {
         for (lightness in doubleArrayOf(-0.5, 0.0, 1.0, 1.5)) {
             assertEquals(0.0, Srgb.gamut.maxChroma(lightness, 30.0), "at L $lightness")

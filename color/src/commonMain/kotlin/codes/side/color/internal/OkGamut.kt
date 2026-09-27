@@ -438,10 +438,17 @@ private fun inside(t: DoubleArray, l: Double, a: Double, b: Double, ceiling: Dou
         t[6] * lms0 + t[7] * lms1 + t[8] * lms2 in -EDGE_TOLERANCE..ceiling
 }
 
+// A cubic term this small beside the others is taken for zero. At each hue where a channel's cubic term passes
+// through zero, Cardano's discriminant is the difference of two terms each about (b/a)⁶ in size, so near that hue it
+// cancels to noise and the real roots at the gamut's edge are lost, and the cusp with them. The quadratic loses only
+// the roots the cubic term makes, where a·x³ matches the rest, at |x| of 1e5^(1/3), 46, or more: far past any gamut's
+// chroma. [polish] on the whole cubic makes up the little the term moves the roots kept.
+private const val NEGLIGIBLE_CUBIC = 1e-5
+
 // Calls [action] with each real root of a·x³ + b·x² + c·x + d as the closed forms leave it: close
 // enough to tell the roots apart, not to land on the edge, which is what [polish] is for.
 private inline fun forEachRealRoot(a: Double, b: Double, c: Double, d: Double, action: (Double) -> Unit) {
-    if (abs(a) <= 1e-14 * (abs(b) + abs(c) + abs(d))) {
+    if (abs(a) <= NEGLIGIBLE_CUBIC * (abs(b) + abs(c) + abs(d))) {
         forEachQuadraticRoot(b, c, d, action)
         return
     }
