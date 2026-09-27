@@ -8,11 +8,9 @@ import codes.side.color.internal.maxChroma
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cbrt
-import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sin
 import kotlin.math.sqrt
 
 /**
@@ -55,16 +53,21 @@ public object Okhsl : ColorSpace(
             dst[2] = 0.0
             return
         }
-        val radians = hue * PI / 180.0
-        val a = cos(radians)
-        val b = sin(radians)
-        val l = toeInverse(lightness)
-        val cusp = gamutMemo().cusp(LMS_TO_SRGB_LINEAR, a, b)
-        val sMax = cusp.cuspSaturation
-        val lCusp = cusp.cuspLightness
-        val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
-        val c0 = lowChroma(l)
-        val cMid = midChroma(l, a, b, sMax, lCusp, cMax)
+        val memo = gamutMemo().hue(hue)
+        val a = memo.hueCos
+        val b = memo.hueSin
+        if (!memo.hasOkhslRow(lightness, a, b)) {
+            val l = toeInverse(lightness)
+            val cusp = memo.cusp(LMS_TO_SRGB_LINEAR, a, b)
+            val sMax = cusp.cuspSaturation
+            val lCusp = cusp.cuspLightness
+            val cMax = maxChroma(LMS_TO_SRGB_LINEAR, l, a, b, sMax, lCusp)
+            memo.rememberOkhslRow(lightness, a, b, l, lowChroma(l), midChroma(l, a, b, sMax, lCusp, cMax), cMax)
+        }
+        val l = memo.okhslL
+        val c0 = memo.okhslC0
+        val cMid = memo.okhslCMid
+        val cMax = memo.okhslCMax
         val chroma = if (saturation < MID) {
             val t = MID_INVERSE * saturation
             val k1 = MID * c0
@@ -186,10 +189,10 @@ public object Okhsv : ColorSpace(
             dst[2] = 0.0
             return
         }
-        val radians = hue * PI / 180.0
-        val a = cos(radians)
-        val b = sin(radians)
-        val cusp = gamutMemo().cusp(LMS_TO_SRGB_LINEAR, a, b)
+        val memo = gamutMemo().hue(hue)
+        val a = memo.hueCos
+        val b = memo.hueSin
+        val cusp = memo.cusp(LMS_TO_SRGB_LINEAR, a, b)
         val sMax = cusp.cuspSaturation
         val tMax = cuspT(sMax, cusp.cuspLightness)
         val k = 1.0 - S0 / sMax

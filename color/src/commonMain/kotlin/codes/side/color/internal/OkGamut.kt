@@ -1,5 +1,6 @@
 package codes.side.color.internal
 
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.cbrt
@@ -91,10 +92,11 @@ internal fun chromaWithin(t: DoubleArray, l: Double, a: Double, b: Double, chrom
 internal expect fun gamutMemo(): GamutMemo
 
 /**
- * One thread's last cusp and last few outer edges. A plane or a gradient asks the same question once per color, and
- * the answer depends on the matrix, the hue and, for an edge, the lightness alone. Keyed by the exact bits asked
- * with, so a remembered answer is the one a fresh solve gives. Each thread keeps its own and overwrites it in place,
- * so remembering allocates nothing, and no thread reads an entry another is halfway through writing.
+ * One thread's last cusp, last few outer edges, last hue's cosine and sine, and last Okhsl row. A plane or a gradient
+ * asks the same question once per color, and the answer depends on the matrix, the hue and, for an edge or a row, the
+ * lightness alone. Keyed by the exact bits asked with, so a remembered answer is the one a fresh solve gives. Each
+ * thread keeps its own and overwrites it in place, so remembering allocates nothing, and no thread reads an entry
+ * another is halfway through writing.
  */
 internal class GamutMemo {
     private var cuspT: DoubleArray? = null
@@ -108,6 +110,64 @@ internal class GamutMemo {
     /** The Oklab lightness of the cusp last asked for by [cusp]. */
     var cuspLightness: Double = 0.0
         private set
+
+    private var trigHue = Double.NaN
+
+    /** The cosine of the hue last asked for by [hue]. */
+    var hueCos: Double = Double.NaN
+        private set
+
+    /** The sine of the hue last asked for by [hue]. */
+    var hueSin: Double = Double.NaN
+        private set
+
+    /** The cosine and sine of [degrees], into [hueCos] and [hueSin]. */
+    fun hue(degrees: Double): GamutMemo {
+        if (!trigHue.sameBits(degrees)) {
+            val radians = degrees * PI / 180.0
+            hueCos = cos(radians)
+            hueSin = sin(radians)
+            trigHue = degrees
+        }
+        return this
+    }
+
+    private var okhslRowKnown = false
+    private var okhslRowLightness = 0.0
+    private var okhslRowA = 0.0
+    private var okhslRowB = 0.0
+
+    /** Oklab lightness of the Okhsl row last remembered. */
+    var okhslL: Double = 0.0
+        private set
+
+    /** Okhsl's C_0 of the row last remembered. */
+    var okhslC0: Double = 0.0
+        private set
+
+    /** Okhsl's C_mid of the row last remembered. */
+    var okhslCMid: Double = 0.0
+        private set
+
+    /** Okhsl's C_max of the row last remembered. */
+    var okhslCMax: Double = 0.0
+        private set
+
+    /** Whether the terms remembered are those of Okhsl [lightness] at hue ([a], [b]), by their exact bits. */
+    fun hasOkhslRow(lightness: Double, a: Double, b: Double): Boolean =
+        okhslRowKnown && okhslRowLightness.sameBits(lightness) && okhslRowA.sameBits(a) && okhslRowB.sameBits(b)
+
+    /** Remembers Okhsl's terms at [lightness] and hue ([a], [b]): along a plane's row only the saturation changes. */
+    fun rememberOkhslRow(lightness: Double, a: Double, b: Double, l: Double, c0: Double, cMid: Double, cMax: Double) {
+        okhslRowKnown = true
+        okhslRowLightness = lightness
+        okhslRowA = a
+        okhslRowB = b
+        okhslL = l
+        okhslC0 = c0
+        okhslCMid = cMid
+        okhslCMax = cMax
+    }
 
     private var boundT: DoubleArray? = null
     private var bound = 0.0

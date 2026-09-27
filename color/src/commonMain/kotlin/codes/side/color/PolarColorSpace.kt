@@ -1,10 +1,9 @@
 package codes.side.color
 
+import codes.side.color.internal.gamutMemo
 import kotlin.math.PI
 import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.hypot
-import kotlin.math.sin
 
 /**
  * The cylindrical form of a lightness-and-opponent-axes space: lightness, chroma and hue, as LCH is
@@ -26,10 +25,10 @@ public open class PolarColorSpace internal constructor(
     override fun toBase(src: DoubleArray, dst: DoubleArray) {
         val l = src[0]
         val chroma = src[1]
-        val radians = src[2] * PI / 180.0
+        val hue = gamutMemo().hue(src[2])
         dst[0] = l
-        dst[1] = chroma * cos(radians)
-        dst[2] = chroma * sin(radians)
+        dst[1] = chroma * hue.hueCos
+        dst[2] = chroma * hue.hueSin
     }
 
     override fun fromBase(src: DoubleArray, dst: DoubleArray) {

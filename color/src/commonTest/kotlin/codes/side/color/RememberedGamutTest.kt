@@ -46,6 +46,39 @@ class RememberedGamutTest {
     }
 
     @Test
+    fun rowsGiveTheSameInAnyOrder() {
+        // A plane's rows: one lightness and one hue across each, then the same colors one at a time in another
+        // order. The hues include −0.0 beside 0.0.
+        val random = Random(20260930)
+        val rowHues = hues + listOf(-0.0, 0.0)
+        for (space in listOf(Okhsl, Okhsv, OkLch, Lch)) {
+            val colors = rowHues.flatMap { hue ->
+                List(12) { row ->
+                    List(16) { column ->
+                        when (space) {
+                            OkLch -> OkLch(0.04 + row * 0.08, column * 0.4 / 15, hue)
+                            Lch -> Lch(4.0 + row * 8.0, column * 150.0 / 15, hue)
+                            else -> space.color(doubleArrayOf(hue, column / 15.0, 0.04 + row * 0.08))
+                        }
+                    }
+                }.flatten()
+            }
+            // The converter, not ColorValue.to, which takes a powerless hue as missing.
+            val converter = space.converterTo(space.base!!)
+            val packed = DoubleArray(colors.size * 3)
+            colors.forEachIndexed { k, color -> color.components().copyInto(packed, k * 3) }
+            val inRows = DoubleArray(colors.size * 3)
+            converter.convert(packed, 0, inRows, 0, colors.size)
+            val alone = DoubleArray(3)
+            for (k in colors.indices.shuffled(random)) {
+                DisplayP3.gamut.maxChroma(random.nextDouble(0.05, 0.95), rowHues[k % rowHues.size])
+                converter.convert(colors[k].components(), alone)
+                assertEquals(inRows.copyOfRange(k * 3, k * 3 + 3).toList(), alone.toList(), "${colors[k]}")
+            }
+        }
+    }
+
+    @Test
     fun chromaReductionGivesTheSameInAnyOrder() {
         // A plane's rows, chroma across and lightness down, beyond sRGB for most of them.
         val random = Random(20260929)
