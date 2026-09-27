@@ -33,6 +33,10 @@ private val SliderThumbHeight = 44.dp
 // How far outside the indicator the focus ring sits.
 private val FocusRingGap = 4.dp
 
+// How far outside the slider thumb its focus ring sits. With the halo's half width, 5 dp past the bar's edge, the ring
+// stays inside the 6 dp gap the track leaves at the default thumb width.
+private val SliderFocusRingGap = 3.dp
+
 // A picker's plane, width over height.
 private const val PLANE_ASPECT_RATIO = 1.6f
 
@@ -180,21 +184,36 @@ public object ColorPickerDefaults {
 
     /**
      * The sliders' default thumb, drawn as Material draws its handle: a bar in [color] with round ends,
-     * half as wide while [interactionSource] reports a press or drag. The narrowing is drawn inside a
-     * fixed layout width, so the track beside the thumb does not move as it narrows.
+     * half as wide while [interactionSource] reports a press or drag, and ringed while it holds focus from
+     * the keyboard. The narrowing is drawn inside a fixed layout width, so the track beside the thumb does
+     * not move as it narrows, and the ring stays within the gap the track leaves around it.
      */
     @Composable
     public fun SliderThumb(interactionSource: InteractionSource, color: Color, modifier: Modifier = Modifier) {
         val pressed by interactionSource.collectIsPressedAsState()
         val dragged by interactionSource.collectIsDraggedAsState()
+        // Only for whoever needs it, as on the plane: a ring left after a touch marks a thing a toucher has no way
+        // to act on.
+        val focused by interactionSource.collectIsFocusedAsState()
+        val showFocus = focused && LocalInputModeManager.current.inputMode == InputMode.Keyboard
         Canvas(modifier.size(ThumbWidth, SliderThumbHeight)) {
             val width = if (pressed || dragged) size.width / 2f else size.width
+            val left = (size.width - width) / 2f
             drawRoundRect(
                 color = color,
-                topLeft = Offset((size.width - width) / 2f, 0f),
+                topLeft = Offset(left, 0f),
                 size = Size(width, size.height),
                 cornerRadius = CornerRadius(width / 2f),
             )
+            if (showFocus) {
+                // A white ring over a dark halo, as the plane's indicator, so it reads over any track color.
+                val inset = -SliderFocusRingGap.toPx()
+                val ringLeft = left + inset
+                val ringSize = Size(width - 2 * inset, size.height - 2 * inset)
+                val corner = CornerRadius(ringSize.width / 2f)
+                drawRoundRect(Color.Black.copy(alpha = 0.35f), Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 4.dp.toPx()))
+                drawRoundRect(Color.White, Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 2.dp.toPx()))
+            }
         }
     }
 
