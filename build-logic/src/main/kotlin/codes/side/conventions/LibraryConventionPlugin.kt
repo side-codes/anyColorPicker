@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -41,7 +42,14 @@ class LibraryConventionPlugin : Plugin<Project> {
                 browser()
             }
 
-            jvm()
+            // The JVM default-method mode is pinned on both JVM targets: under a Kotlin release that changed the
+            // default, an interface with bodies, such as ColorPickerStrings, would drop its DefaultImpls class, which
+            // code compiled with -jvm-default=disable calls.
+            jvm {
+                compilerOptions {
+                    jvmDefault.set(JvmDefaultMode.ENABLE)
+                }
+            }
 
             (this as ExtensionAware).extensions.configure<KotlinMultiplatformAndroidLibraryTarget>("android") {
                 compileSdk = 37
@@ -51,6 +59,7 @@ class LibraryConventionPlugin : Plugin<Project> {
 
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_17)
+                    jvmDefault.set(JvmDefaultMode.ENABLE)
                 }
             }
 
