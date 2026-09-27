@@ -148,4 +148,24 @@ class GamutMapperTest {
         assertFailsWith<IllegalArgumentException> { mapper.convertToArgb(DoubleArray(6), 0, IntArray(1), 0, 2) }
         assertFailsWith<IllegalArgumentException> { mapper.convertToArgb(DoubleArray(5), 0, IntArray(2), 0, 2) }
     }
+
+    @Test
+    fun aNanComponentPacksAsBlack() {
+        // Through the table and through encoding alike: from these colors convert carries the NaN into every channel,
+        // and each packs as 0.
+        val gamma = ColorSpace.rgb("--gamma-nan", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.gamma(2.2))
+        val sources = listOf(OkLch to doubleArrayOf(0.5, 0.1, 120.0), Srgb to doubleArrayOf(0.5, 0.4, 0.3))
+        for ((space, color) in sources) {
+            for (gamut in listOf(Srgb.gamut, gamma.gamut)) {
+                for (method in methods) {
+                    for (index in 0..2) {
+                        val src = color.copyOf().also { it[index] = Double.NaN }
+                        val pixel = IntArray(1)
+                        gamut.mapper(space, method).convertToArgb(src, 0, pixel, 0, 1)
+                        assertEquals(0xFF000000.toInt(), pixel[0], "$method from $space to $gamut, NaN at $index")
+                    }
+                }
+            }
+        }
+    }
 }

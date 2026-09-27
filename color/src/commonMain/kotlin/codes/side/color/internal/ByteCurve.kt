@@ -3,8 +3,8 @@ package codes.side.color.internal
 import codes.side.color.TransferFunction
 import kotlin.math.roundToInt
 
-/** The byte of an encoded channel: clamped to `0..1`, times 255, rounded half up. */
-internal fun encodedByte(encoded: Double): Int = (encoded.coerceIn(0.0, 1.0) * 255.0).roundToInt()
+/** The byte of an encoded channel: clamped to `0..1`, times 255, rounded half up; 0 for NaN. */
+internal fun encodedByte(encoded: Double): Int = if (encoded.isNaN()) 0 else (encoded.coerceIn(0.0, 1.0) * 255.0).roundToInt()
 
 /** An opaque `0xAARRGGBB` pixel. */
 internal fun argb(r: Int, g: Int, b: Int): Int = (0xFF shl 24) or (r shl 16) or (g shl 8) or b
