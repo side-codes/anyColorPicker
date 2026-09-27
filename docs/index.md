@@ -403,7 +403,7 @@ so with a `ChannelSlider` for the rest and an `AlphaSlider` it makes a full pick
 | **Okhsv**<br>`ChannelPlane(state, Okhsv.S, Okhsv.V)` | ![Okhsv plane](images/okhsv-plane.png)                                   |
 
 ```kotlin
-val state = rememberColorPickerState(Hsl(68.0, 72.0, 62.0))
+val state = rememberColorPickerState(ColorValue.parseCss("#9BB7D4"))
 
 ChannelPlane(state, Hsl.S, Hsl.L, Modifier.fillMaxWidth().height(220.dp))
 ChannelSlider(state, Hsl.H)

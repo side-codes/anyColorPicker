@@ -49,8 +49,10 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorSpaces
+import codes.side.color.ColorValue
 import codes.side.color.HexAlpha
 import codes.side.color.Okhsl
+import codes.side.color.parseCss
 import codes.side.color.toCssString
 import codes.side.color.toHexString
 import codes.side.colorpicker.material3.ChannelSlider
@@ -68,7 +70,8 @@ import kotlin.random.Random
 fun SampleApp() {
     val colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()
     MaterialTheme(colorScheme = colorScheme) {
-        val state = rememberSaveableColorPickerState(Okhsl(250.0, 0.8, 0.6))
+        // Blue Turquoise and, below, True Red: Pantone's Colors of the Year 2005 and 2002, which no screenshot uses.
+        val state = rememberSaveableColorPickerState(ColorValue.parseCss("#53B0AE"))
         // Saved by id: saved state holds strings, not color spaces.
         var spaceId by rememberSaveable { mutableStateOf(Okhsl.id) }
         val space = ColorSpaces.all.first { it.id == spaceId }
@@ -76,7 +79,7 @@ fun SampleApp() {
         var coloringMode by rememberSaveable { mutableStateOf(ColoringMode.Independent) }
         var enabled by rememberSaveable { mutableStateOf(true) }
         // Held as an app holding a Compose Color would hold it, with no ColorPickerState of its own.
-        var color by remember { mutableStateOf(Color(0xFF3366CC)) }
+        var color by remember { mutableStateOf(Color(0xFFBF1932)) }
 
         Scaffold(
             topBar = {

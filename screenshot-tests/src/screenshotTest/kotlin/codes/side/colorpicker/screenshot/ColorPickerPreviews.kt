@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import codes.side.color.ColorValue
 import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.compose.toComposeColor
+import codes.side.color.parseCss
 import codes.side.colorpicker.material3.AlphaSlider
 import codes.side.colorpicker.material3.ChannelPlane
 import codes.side.colorpicker.material3.ChannelSlider
@@ -64,10 +66,28 @@ import com.android.tools.screenshot.PreviewTest
  * visual and a gallery is the only place it can honestly be shown.
  */
 
-/** A fixed pear green, so every render is deterministic. */
-private val Seed = Hsl(68.0, 72.0, 62.0)
-
-private fun state() = ColorPickerState(Seed)
+// Pantone's Colors of the Year, as the sRGB values commonly published for them: one for each case the README shows,
+// fixed so every render is deterministic. A picker's independent and contextual renders share one, so the pair differs
+// only in coloring mode. They are sRGB, so a dialog is told to open in Okhsl rather than on its RGB tab, which has no
+// plane.
+private val ClassicBlue = ColorValue.parseCss("#0F4C81")    // 2020
+private val LivingCoral = ColorValue.parseCss("#FF6F61")    // 2019
+private val Greenery = ColorValue.parseCss("#88B04B")       // 2017
+private val UltraViolet = ColorValue.parseCss("#5F4B8B")    // 2018
+private val Mimosa = ColorValue.parseCss("#F0C05A")         // 2009
+private val Emerald = ColorValue.parseCss("#009473")        // 2013
+private val VivaMagenta = ColorValue.parseCss("#BB2649")    // 2023
+private val Turquoise = ColorValue.parseCss("#45B5AA")      // 2010
+private val TangerineTango = ColorValue.parseCss("#DD4124") // 2012
+private val VeryPeri = ColorValue.parseCss("#6667AB")       // 2022
+private val RadiantOrchid = ColorValue.parseCss("#B163A3")  // 2014
+private val Illuminating = ColorValue.parseCss("#F5DF4D")   // 2021
+private val Honeysuckle = ColorValue.parseCss("#D94F70")    // 2011
+private val Cerulean = ColorValue.parseCss("#9BB7D4")       // 2000
+private val ChiliPepper = ColorValue.parseCss("#9B1B30")    // 2007
+private val AquaSky = ColorValue.parseCss("#7BC4C4")        // 2003
+private val FuchsiaRose = ColorValue.parseCss("#C74375")    // 2001
+private val Tigerlily = ColorValue.parseCss("#E2583E")      // 2004
 
 // One height for every picker, so the README gallery lines up in a grid. A picker with a plane is
 // the tallest: a 255dp plane at this width, three sliders and alpha.
@@ -90,117 +110,117 @@ private fun Frame(content: @Composable () -> Unit) {
 @PreviewTest
 @Preview(name = "RGB independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun RgbIndependentPreview() = Frame { RgbColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun RgbIndependentPreview() = Frame { RgbColorPicker(state = ColorPickerState(ClassicBlue), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "RGB contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun RgbContextualPreview() = Frame { RgbColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun RgbContextualPreview() = Frame { RgbColorPicker(state = ColorPickerState(ClassicBlue), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "HSL independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HslIndependentPreview() = Frame { HslColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun HslIndependentPreview() = Frame { HslColorPicker(state = ColorPickerState(LivingCoral), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "HSL contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HslContextualPreview() = Frame { HslColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun HslContextualPreview() = Frame { HslColorPicker(state = ColorPickerState(LivingCoral), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "HSV independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HsvIndependentPreview() = Frame { HsvColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun HsvIndependentPreview() = Frame { HsvColorPicker(state = ColorPickerState(Greenery), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "HSV contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HsvContextualPreview() = Frame { HsvColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun HsvContextualPreview() = Frame { HsvColorPicker(state = ColorPickerState(Greenery), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "HWB independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HwbIndependentPreview() = Frame { HwbColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun HwbIndependentPreview() = Frame { HwbColorPicker(state = ColorPickerState(UltraViolet), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "HWB contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun HwbContextualPreview() = Frame { HwbColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun HwbContextualPreview() = Frame { HwbColorPicker(state = ColorPickerState(UltraViolet), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "LAB independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun LabIndependentPreview() = Frame { LabColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun LabIndependentPreview() = Frame { LabColorPicker(state = ColorPickerState(Mimosa), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "LAB contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun LabContextualPreview() = Frame { LabColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun LabContextualPreview() = Frame { LabColorPicker(state = ColorPickerState(Mimosa), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "LCH independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun LchIndependentPreview() = Frame { LchColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun LchIndependentPreview() = Frame { LchColorPicker(state = ColorPickerState(Emerald), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "LCH contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun LchContextualPreview() = Frame { LchColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun LchContextualPreview() = Frame { LchColorPicker(state = ColorPickerState(Emerald), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "Oklab independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OklabIndependentPreview() = Frame { OklabColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun OklabIndependentPreview() = Frame { OklabColorPicker(state = ColorPickerState(VivaMagenta), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "Oklab contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OklabContextualPreview() = Frame { OklabColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun OklabContextualPreview() = Frame { OklabColorPicker(state = ColorPickerState(VivaMagenta), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "OkLCh independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkLchIndependentPreview() = Frame { OkLchColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun OkLchIndependentPreview() = Frame { OkLchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "OkLCh contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkLchContextualPreview() = Frame { OkLchColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun OkLchContextualPreview() = Frame { OkLchColorPicker(state = ColorPickerState(Turquoise), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "Okhsl independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkhslIndependentPreview() = Frame { OkhslColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun OkhslIndependentPreview() = Frame { OkhslColorPicker(state = ColorPickerState(TangerineTango), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "Okhsl contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkhslContextualPreview() = Frame { OkhslColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun OkhslContextualPreview() = Frame { OkhslColorPicker(state = ColorPickerState(TangerineTango), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "Okhsv independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkhsvIndependentPreview() = Frame { OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun OkhsvIndependentPreview() = Frame { OkhsvColorPicker(state = ColorPickerState(VeryPeri), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "Okhsv contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun OkhsvContextualPreview() = Frame { OkhsvColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun OkhsvContextualPreview() = Frame { OkhsvColorPicker(state = ColorPickerState(VeryPeri), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "CMYK independent", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun CmykIndependentPreview() = Frame { CmykColorPicker(state = state(), coloringMode = ColoringMode.Independent) }
+fun CmykIndependentPreview() = Frame { CmykColorPicker(state = ColorPickerState(RadiantOrchid), coloringMode = ColoringMode.Independent) }
 
 @PreviewTest
 @Preview(name = "CMYK contextual", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
 @Composable
-fun CmykContextualPreview() = Frame { CmykColorPicker(state = state(), coloringMode = ColoringMode.Contextual) }
+fun CmykContextualPreview() = Frame { CmykColorPicker(state = ColorPickerState(RadiantOrchid), coloringMode = ColoringMode.Contextual) }
 
 @PreviewTest
 @Preview(name = "Horizontal picker", widthDp = 720, heightDp = 360)
 @Composable
-fun HorizontalPickerPreview() = Frame { OkhslColorPicker(state = state(), orientation = Orientation.Horizontal) }
+fun HorizontalPickerPreview() = Frame { OkhslColorPicker(state = ColorPickerState(Illuminating), orientation = Orientation.Horizontal) }
 
 // Kept character-for-character identical to SquareThumb in the sample app, so the image
 // in the README is the thing the sample actually runs.
@@ -238,7 +258,7 @@ private val SquareThumbSize = 48.dp
 @Preview(name = "Custom thumb", widthDp = 440, heightDp = 200)
 @Composable
 fun CustomThumbPreview() = Frame {
-    val state = state()
+    val state = ColorPickerState(Honeysuckle)
     ChannelSlider(
         state = state,
         channel = Okhsl.H,
@@ -256,7 +276,7 @@ fun CustomThumbPreview() = Frame {
 @Preview(name = "Saturation lightness plane", widthDp = 440, heightDp = 420)
 @Composable
 fun HslPlanePreview() = Frame {
-    val state = state()
+    val state = ColorPickerState(Cerulean)
     ChannelPlane(state, Hsl.S, Hsl.L, Modifier.fillMaxWidth().height(260.dp))
     ChannelSlider(state, Hsl.H)
 }
@@ -265,7 +285,7 @@ fun HslPlanePreview() = Frame {
 @Preview(name = "Okhsl plane", widthDp = 440, heightDp = 420)
 @Composable
 fun OkhslPlanePreview() = Frame {
-    val state = state()
+    val state = ColorPickerState(ChiliPepper)
     ChannelPlane(state, Okhsl.S, Okhsl.L, Modifier.fillMaxWidth().height(260.dp))
     ChannelSlider(state, Okhsl.H)
 }
@@ -274,7 +294,7 @@ fun OkhslPlanePreview() = Frame {
 @Preview(name = "Okhsv plane", widthDp = 440, heightDp = 420)
 @Composable
 fun OkhsvPlanePreview() = Frame {
-    val state = state()
+    val state = ColorPickerState(AquaSky)
     ChannelPlane(state, Okhsv.S, Okhsv.V, Modifier.fillMaxWidth().height(260.dp))
     ChannelSlider(state, Okhsv.H)
 }
@@ -286,10 +306,11 @@ fun OkhsvPlanePreview() = Frame {
 @Composable
 fun DialogPreview() = Frame {
     ColorPickerDialog(
-        initialValue = Seed.withAlpha(0.8),
+        initialValue = FuchsiaRose.withAlpha(0.8),
         onValueSelected = {},
         onDismissRequest = {},
         modifier = Modifier.padding(horizontal = 24.dp),
+        initialSpace = Okhsl,
     )
 }
 
@@ -299,7 +320,7 @@ fun DialogPreview() = Frame {
 @Preview(name = "Dialog horizontal", widthDp = 1280, heightDp = 600)
 @Composable
 fun DialogHorizontalPreview() = Frame {
-    ColorPickerDialog(initialValue = Seed.withAlpha(0.8), onValueSelected = {}, onDismissRequest = {})
+    ColorPickerDialog(initialValue = FuchsiaRose.withAlpha(0.8), onValueSelected = {}, onDismissRequest = {}, initialSpace = Okhsl)
 }
 
 @PreviewTest
@@ -307,7 +328,7 @@ fun DialogHorizontalPreview() = Frame {
 @Composable
 fun SwatchPreview() = Frame {
     ColorSwatch(
-        color = Seed.withAlpha(0.55).toComposeColor(),
+        color = Tigerlily.withAlpha(0.55).toComposeColor(),
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp),
