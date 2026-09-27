@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -26,6 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
@@ -149,12 +152,14 @@ public object ColorPickerDialogDefaults {
 private fun SpaceMenu(state: ColorPickerDialogState, modifier: Modifier, enabled: Boolean) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        OutlinedButton(onClick = { expanded = true }, enabled = enabled) {
+        // A screen reader hears a list to choose from, not a button named after the space shown.
+        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.semantics { role = Role.DropdownList }, enabled = enabled) {
             Text(ColorPickerStrings.current.spaceName(state.space), maxLines = 1)
             Spacer(Modifier.width(ButtonDefaults.IconSpacing))
             DropdownArrow(Modifier.size(ButtonDefaults.IconSize))
         }
-        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
+        // One choice among the spaces, as the row of segmented buttons is.
+        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }, modifier = Modifier.selectableGroup()) {
             for (space in state.spaces) {
                 DropdownMenuItem(
                     text = { Text(ColorPickerStrings.current.spaceName(space)) },
@@ -162,7 +167,10 @@ private fun SpaceMenu(state: ColorPickerDialogState, modifier: Modifier, enabled
                         state.space = space
                         expanded = false
                     },
-                    modifier = Modifier.semantics { selected = space == state.space },
+                    modifier = Modifier.semantics {
+                        role = Role.RadioButton
+                        selected = space == state.space
+                    },
                 )
             }
         }

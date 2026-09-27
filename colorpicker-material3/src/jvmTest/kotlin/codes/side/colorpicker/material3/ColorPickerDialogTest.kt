@@ -18,6 +18,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -260,6 +261,27 @@ class ColorPickerDialogTest {
         onNodeWithText("LCH").assertExists()
         onNodeWithText("Chroma").assertExists()
         onNodeWithText("Okhsl").assertDoesNotExist()
+    }
+
+    @Test
+    fun theMenuIsAListOfRadioButtons() = runComposeUiTest {
+        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces) }
+        onNodeWithText("Okhsl")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.DropdownList))
+            .performClick()
+        onAllNodes(radioButton).assertCountEquals(7)
+        onNode(radioButton and hasText("Okhsl")).assertIsSelected()
+        onNode(radioButton and hasText("LCH")).assertIsNotSelected()
+        onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.SelectableGroup)).assertCountEquals(1)
+    }
+
+    @Test
+    fun aDisabledMenuDoesNotOpen() = runComposeUiTest {
+        val spaces = listOf<ColorSpace>(Okhsl, OkLch, Oklab, Hsv, Hsl, Lab, Lch)
+        setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}, spaces = spaces, enabled = false) }
+        onNodeWithText("Okhsl").assertIsNotEnabled().performClick()
+        onAllNodes(radioButton).assertCountEquals(0)
     }
 
     @Test
