@@ -5,8 +5,6 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -20,13 +18,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.state.ColorPickerState
 import codes.side.colorpicker.state.ColoringMode
+import kotlin.math.roundToInt
 
 // Material's slider handle height (SliderTokens.HandleHeight).
 private val SliderThumbHeight = 44.dp
@@ -36,6 +38,20 @@ private val FocusRingGap = 4.dp
 
 // A picker's plane, width over height.
 private const val PLANE_ASPECT_RATIO = 1.6f
+
+// As wide as the picker allows, and as tall as the least height it asks for, as it does beside the sliders, or else
+// PLANE_ASPECT_RATIO times less than its width. aspectRatio keeps the proportion against such a height, which leaves
+// a short plane centred in the space the sliders make.
+private fun Modifier.planeSize(): Modifier = layout { measurable, constraints ->
+    val width = if (constraints.hasBoundedWidth) constraints.maxWidth else constraints.minWidth
+    val height = if (constraints.minHeight > 0) {
+        constraints.minHeight
+    } else {
+        constraints.constrainHeight((width / PLANE_ASPECT_RATIO).roundToInt())
+    }
+    val placeable = measurable.measure(Constraints.fixed(width, height))
+    layout(width, height) { placeable.place(0, 0) }
+}
 
 /**
  * Defaults for the Material color picker components: the theme values, whose composable factories read the ambient
@@ -230,7 +246,8 @@ public object ColorPickerDefaults {
 
     /**
      * The plane a picker draws unless given another: a [ChannelPlane] over the axes the picker hands it,
-     * filling the width the picker gives it, the whole picker's or its start half's, at 1.6 times its height.
+     * filling the width the picker gives it, the whole picker's or its start half's, at 1.6 times its height;
+     * beside the sliders, as tall as they are.
      */
     public fun plane(
         enabled: Boolean,
@@ -240,7 +257,7 @@ public object ColorPickerDefaults {
             state,
             x,
             y,
-            Modifier.fillMaxWidth().aspectRatio(PLANE_ASPECT_RATIO),
+            Modifier.planeSize(),
             enabled = enabled,
             onValueChangeFinished = onValueChangeFinished,
         )
