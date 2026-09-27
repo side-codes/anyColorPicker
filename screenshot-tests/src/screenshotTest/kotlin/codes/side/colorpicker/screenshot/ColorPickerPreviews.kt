@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -299,17 +300,18 @@ fun OkhsvPlanePreview() = Frame {
     ChannelSlider(state, Okhsv.H)
 }
 
-// A phone's dialog window keeps the dialog clear of the screen's edges. The preview's window runs edge to edge, so
-// the margin is given here.
+// The dialog at a phone's width, a 440 dp screen less the margins its dialog window keeps, on a canvas in the landscape
+// screenshot's proportions, so the README shows the two at one size. Left to itself on a canvas this wide, the dialog
+// would take Material's widest, 560 dp.
 @PreviewTest
-@Preview(name = "Dialog", widthDp = 440, heightDp = 960)
+@Preview(name = "Dialog", widthDp = 2048, heightDp = 960)
 @Composable
 fun DialogPreview() = Frame {
     ColorPickerDialog(
         initialValue = FuchsiaRose.withAlpha(0.8),
         onValueSelected = {},
         onDismissRequest = {},
-        modifier = Modifier.padding(horizontal = 24.dp),
+        modifier = Modifier.width(392.dp),
         initialSpace = Okhsl,
     )
 }
