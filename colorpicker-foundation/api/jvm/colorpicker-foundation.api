@@ -16,7 +16,7 @@ public final class codes/side/colorpicker/foundation/BasicChannelSliderKt {
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorComparisonKt {
-	public static final fun BasicColorComparison-ep2nmRk (JJLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;JJLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorComparison-VALQH9M (JJLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZJJLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPickerDialogContentKt {

@@ -279,11 +279,30 @@ class ColorPickerDialogTest {
     }
 
     @Test
-    fun theOriginalRestoresOnlyOnceTheColorIsEdited() = runComposeUiTest {
+    fun theRestoreIsEnabledOnlyOnceTheColorIsEdited() = runComposeUiTest {
         setContent { ColorPickerDialog(initialValue = teal, onValueSelected = {}, onDismissRequest = {}) }
-        onNodeWithContentDescription("Original color").assert(SemanticsMatcher.keyNotDefined(SemanticsActions.OnClick))
+        onNodeWithContentDescription("Original color")
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assertIsNotEnabled()
         sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
-        onNodeWithContentDescription("Original color").assert(SemanticsMatcher.keyIsDefined(SemanticsActions.OnClick))
+        onNodeWithContentDescription("Original color").assertIsEnabled()
+    }
+
+    @Test
+    fun aHeaderToldItIsDisabledRestoresNothing() = runComposeUiTest {
+        var selected: ColorValue? = null
+        setContent {
+            ColorPickerDialog(
+                initialValue = teal,
+                onValueSelected = { selected = it },
+                onDismissRequest = {},
+                header = { ColorPickerDialogDefaults.Header(state, enabled = false) },
+            )
+        }
+        sliderNamed("Hue").performSemanticsAction(SemanticsActions.SetProgress) { it(0.5f) }
+        onNodeWithContentDescription("Original color").assertIsNotEnabled().performClick()
+        onNodeWithText("OK").performClick()
+        assertNotEquals(teal, selected)
     }
 
     @Test

@@ -17,6 +17,8 @@ import codes.side.colorpicker.foundation.ColorPickerStrings
  *
  * @param onRestoreOriginal called when the original half is pressed, which makes that half a button that puts
  * the original back; `null` leaves it a swatch.
+ * @param enabled when false the original half, when it is a button, is a disabled one. The colors are drawn as
+ * they are either way, since a dimmed swatch would show colors other than the ones compared.
  * @param colors checkerboard colors; see [ColorPickerDefaults.colors].
  * @param originalLabel what a screen reader calls the original half; `null` says nothing.
  * @param currentLabel what a screen reader calls the current half; `null` says nothing.
@@ -28,6 +30,7 @@ public fun ColorComparison(
     current: Color,
     onRestoreOriginal: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     shape: Shape = ColorPickerDefaults.currentShapes().swatchShape,
     colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
     originalLabel: String? = ColorPickerStrings.current.originalColor(),
@@ -41,6 +44,7 @@ public fun ColorComparison(
         modifier = modifier
             .defaultMinSize(minWidth = ColorPickerDefaults.SwatchSize * 2, minHeight = ColorPickerDefaults.SwatchSize)
             .clip(shape),
+        enabled = enabled,
         checkerboardLight = colors.checkerboardLight,
         checkerboardDark = colors.checkerboardDark,
         originalLabel = originalLabel,

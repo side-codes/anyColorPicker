@@ -70,24 +70,26 @@ public object ColorPickerDialogDefaults {
 
     /**
      * The dialog's header: a [ColorComparison] of [state]'s original and edited colors, and the edited color in
-     * hex, `#RRGGBB`, with alpha's two digits after it when the color is not opaque. Pressing the original half
-     * puts the original back while the color is modified.
+     * hex, `#RRGGBB`, with alpha's two digits after it when the color is not opaque. The original half is a button
+     * that puts the original back, enabled while the color is modified.
      *
-     * @param enabled when false the original half does not restore.
+     * @param enabled when false the original half is a disabled button.
      */
     @Composable
     public fun Header(state: ColorPickerDialogState, modifier: Modifier = Modifier, enabled: Boolean = true) {
         val value = state.pickerState.value
+        val original = remember(state.original) { state.original.toComposeColor() }
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(HeaderSpacing),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ColorComparison(
-                original = state.original.toComposeColor(),
+                original = original,
                 current = state.pickerState.color,
-                onRestoreOriginal = if (enabled && state.isModified) state::revert else null,
+                onRestoreOriginal = state::revert,
                 modifier = Modifier.weight(1f),
+                enabled = enabled && state.isModified,
             )
             // Monospaced, so the hex keeps its width while a slider moves.
             Text(value.toHexString(if (value.alpha == 1.0) HexAlpha.None else HexAlpha.Last), fontFamily = FontFamily.Monospace)

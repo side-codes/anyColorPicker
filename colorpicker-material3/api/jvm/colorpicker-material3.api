@@ -17,7 +17,7 @@ public final class codes/side/colorpicker/material3/CmykColorPickerKt {
 }
 
 public final class codes/side/colorpicker/material3/ColorComparisonKt {
-	public static final fun ColorComparison-9TxLVRM (JJLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/Shape;Lcodes/side/colorpicker/material3/ColorPickerColors;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
+	public static final fun ColorComparison-7TXmnS8 (JJLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/ui/graphics/Shape;Lcodes/side/colorpicker/material3/ColorPickerColors;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/material3/ColorPickerColors {

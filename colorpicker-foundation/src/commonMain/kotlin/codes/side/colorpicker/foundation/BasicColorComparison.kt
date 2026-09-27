@@ -18,6 +18,8 @@ import androidx.compose.ui.semantics.semantics
  *
  * @param onRestoreOriginal called when the original half is pressed, which makes that half a button that puts
  * the original back; `null` leaves it a swatch.
+ * @param enabled when false the original half, when it is a button, is a disabled one: pressing it restores
+ * nothing, it takes no focus, and a screen reader hears that it is disabled.
  * @param originalLabel what a screen reader calls the original half, "Original color" by default; `null` says
  * nothing.
  * @param currentLabel what a screen reader calls the current half, "New color" by default; `null` says
@@ -31,6 +33,7 @@ public fun BasicColorComparison(
     current: Color,
     onRestoreOriginal: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     checkerboardLight: Color = Color.White,
     checkerboardDark: Color = Color.LightGray,
     originalLabel: String? = ColorPickerStrings.current.originalColor(),
@@ -42,7 +45,7 @@ public fun BasicColorComparison(
         // as in a scrolling column, is one fillMaxHeight cannot fill.
         Row(Modifier.matchParentSize()) {
             val restore = if (onRestoreOriginal != null) {
-                Modifier.clickable(onClickLabel = restoreLabel, role = Role.Button, onClick = onRestoreOriginal)
+                Modifier.clickable(enabled = enabled, onClickLabel = restoreLabel, role = Role.Button, onClick = onRestoreOriginal)
             } else {
                 Modifier
             }
