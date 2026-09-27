@@ -131,6 +131,20 @@ class OkhsxTest {
     }
 
     @Test
+    fun okhsvRoundTripsJustPastPureBlue() {
+        // Just past pure blue's hue sRGB's edge has a gap, a sliver outside it, and Okhsv's square reaches a little past
+        // sRGB's outer edge there. A color the model puts there comes back as it went, not drawn in to the edge first.
+        for (step in 0..60) {
+            val hue = 264.0 + step * 0.005
+            for (s in listOf(0.5, 0.75, 0.9, 0.97, 0.99, 1.0)) for (v in listOf(0.5, 0.75, 0.9, 0.97, 1.0)) {
+                val back = Okhsv(hue, s, v).to(Oklab).to(Okhsv)
+                assertNear(s, back[Okhsv.S]!!, 1e-9, "s at $hue°, s $s, v $v")
+                assertNear(v, back[Okhsv.V]!!, 1e-9, "v at $hue°, s $s, v $v")
+            }
+        }
+    }
+
+    @Test
     fun outsideSrgbTheChromaStopsAtSrgbsEdge() {
         val p3Red = DisplayP3(1.0, 0.0, 0.0)
         val original = p3Red.to(Oklch)
