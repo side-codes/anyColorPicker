@@ -255,22 +255,21 @@ private fun DialogBody(
             text = {
                 BasicColorPickerDialogContent(
                     state = state,
-                    picker = { orientation ->
-                        ColorPicker(
-                            state = state.pickerState,
-                            space = state.space,
-                            enabled = enabled,
-                            orientation = orientation,
-                            thumb = thumb,
-                            plane = plane,
-                            channelSlider = channelSlider,
-                            alphaSlider = alphaSlider,
-                        )
-                    },
                     header = header?.let { slot -> { scope.slot() } },
                     spaceSwitcher = spaceSwitcher?.let { slot -> { scope.slot() } },
                     spacing = DialogSpacing,
-                )
+                ) { orientation ->
+                    ColorPicker(
+                        state = state.pickerState,
+                        space = state.space,
+                        enabled = enabled,
+                        orientation = orientation,
+                        thumb = thumb,
+                        plane = plane,
+                        channelSlider = channelSlider,
+                        alphaSlider = alphaSlider,
+                    )
+                }
             },
             properties = properties,
         )

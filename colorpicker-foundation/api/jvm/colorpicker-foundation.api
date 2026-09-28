@@ -23,7 +23,7 @@ public final class codes/side/colorpicker/foundation/BasicColorComparisonKt {
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPickerDialogContentKt {
-	public static final fun BasicColorPickerDialogContent-HYR8e34 (Lcodes/side/colorpicker/foundation/ColorPickerDialogState;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPickerDialogContent-WH-ejsw (Lcodes/side/colorpicker/foundation/ColorPickerDialogState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;FLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPickerKt {

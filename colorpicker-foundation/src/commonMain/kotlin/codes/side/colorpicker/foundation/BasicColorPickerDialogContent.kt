@@ -66,19 +66,19 @@ private class HeightFloor {
  * space changes. Arranged another way, as when a window resized too short to stack puts the plane beside the
  * sliders, it starts again from the new arrangement's own height.
  *
- * @param picker draws the picker in the orientation it is handed.
  * @param header drawn first; `null` leaves it out.
  * @param spaceSwitcher drawn after [header]; `null` leaves it out.
  * @param spacing the space between the parts.
+ * @param picker draws the picker in the orientation it is handed.
  */
 @Composable
 public fun BasicColorPickerDialogContent(
     state: ColorPickerDialogState,
-    picker: @Composable (Orientation) -> Unit,
     modifier: Modifier = Modifier,
     header: (@Composable () -> Unit)? = null,
     spaceSwitcher: (@Composable () -> Unit)? = null,
     spacing: Dp = 0.dp,
+    picker: @Composable (Orientation) -> Unit,
 ) {
     val floor = remember(state) { HeightFloor() }
     // Whether the content is laid out side by side, which the stacked form, composed then only to be measured,
