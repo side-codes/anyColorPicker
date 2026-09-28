@@ -5,16 +5,24 @@ import codes.side.color.internal.Step
 import codes.side.color.internal.cssName
 import codes.side.color.internal.isDashedName
 
-/** How faithfully a space's conversions describe color. */
-public enum class Exactness {
+/**
+ * How faithfully a space's conversions describe color.
+ *
+ * A class rather than an enum, so a later release can add a grade, such as one for a profile-based
+ * space: a `when` over it needs an `else`.
+ */
+public abstract class Exactness internal constructor(private val name: String) {
+
+    override fun toString(): String = name
+
     /** Conversions are exact up to floating-point rounding. */
-    Exact,
+    public object Exact : Exactness("Exact")
 
     /** Conversions rest on a fitted approximation; Okhsl and Okhsv. */
-    Approximate,
+    public object Approximate : Exactness("Approximate")
 
     /** The components are not colorimetric; the naive CMYK formula. */
-    NonColorimetric,
+    public object NonColorimetric : Exactness("NonColorimetric")
 }
 
 /**
