@@ -9,9 +9,9 @@ import codes.side.color.Hwb
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * [ColorPicker] for [Hwb], over [state]: a whiteness × blackness plane, hue, whiteness and blackness

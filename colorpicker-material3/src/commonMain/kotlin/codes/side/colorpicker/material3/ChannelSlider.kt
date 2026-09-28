@@ -7,8 +7,8 @@ import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicChannelSlider
 import codes.side.colorpicker.foundation.ChannelSliderScope
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * A slider for one [channel] of any color space, the library's or an app's. It shows the channel's

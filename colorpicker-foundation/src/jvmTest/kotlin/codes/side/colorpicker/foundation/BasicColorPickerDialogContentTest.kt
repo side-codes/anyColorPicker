@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.Hsv
 import codes.side.color.Okhsl
 import codes.side.color.Srgb
+import codes.side.colorpicker.state.ColorPickerDialogState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

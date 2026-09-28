@@ -9,9 +9,9 @@ import codes.side.color.Oklab
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * [ColorPicker] for [Oklab], over [state]: lightness, a and b sliders and alpha, contextual by default.

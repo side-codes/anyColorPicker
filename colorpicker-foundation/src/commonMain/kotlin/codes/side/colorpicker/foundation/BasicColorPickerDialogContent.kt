@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import codes.side.colorpicker.state.ColorPickerDialogState
 
 // The narrowest width the picker goes beside its sliders at: under it, the sliders' half is too narrow for a
 // label and a value above each track.

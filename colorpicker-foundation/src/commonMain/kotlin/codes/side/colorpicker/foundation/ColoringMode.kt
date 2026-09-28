@@ -1,9 +1,8 @@
-package codes.side.colorpicker.state
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Composable
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.colorpicker.foundation.LocalPickerColoringMode
 
 /**
  * Controls how a slider's gradient track is rendered with respect to other channels.

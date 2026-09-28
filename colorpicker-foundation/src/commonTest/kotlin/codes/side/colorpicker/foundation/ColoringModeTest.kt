@@ -1,4 +1,4 @@
-package codes.side.colorpicker.state
+package codes.side.colorpicker.foundation
 
 import codes.side.color.Cmyk
 import codes.side.color.ColorSpace

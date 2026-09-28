@@ -18,11 +18,11 @@ import codes.side.color.compose.toColorValue
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.BasicColorPickerDialogContent
 import codes.side.colorpicker.foundation.ChannelSliderPart
-import codes.side.colorpicker.foundation.ColorPickerDialogState
 import codes.side.colorpicker.foundation.ColorPickerStrings
 import codes.side.colorpicker.foundation.ColorSliderScope
 import codes.side.colorpicker.foundation.PlanePart
-import codes.side.colorpicker.foundation.rememberColorPickerDialogState
+import codes.side.colorpicker.state.ColorPickerDialogState
+import codes.side.colorpicker.state.rememberColorPickerDialogState
 
 // The space between the dialog's header, switcher and picker.
 private val DialogSpacing = 16.dp

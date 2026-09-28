@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.LayoutDirection
 import codes.side.color.ColorChannel
 import codes.side.color.Srgb
-import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.anchorOf
 import kotlin.math.abs
 import kotlin.math.roundToInt

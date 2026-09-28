@@ -34,6 +34,7 @@ import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import codes.side.color.compose.toComposeColor
 import codes.side.color.parseCss
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.material3.AlphaSlider
 import codes.side.colorpicker.material3.ChannelPlane
 import codes.side.colorpicker.material3.ChannelSlider
@@ -52,7 +53,6 @@ import codes.side.colorpicker.material3.OklabColorPicker
 import codes.side.colorpicker.material3.OklchColorPicker
 import codes.side.colorpicker.material3.RgbColorPicker
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 import com.android.tools.screenshot.PreviewTest
 
 /**

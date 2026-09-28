@@ -16,9 +16,9 @@ import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 // The space between a picker's parts.
 private val PickerSpacing = 12.dp
