@@ -40,8 +40,8 @@ public fun AlphaSlider(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.alphaName()) },
-    valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
+    label: (@Composable () -> Unit)? = { ColorPickerDefaults.SliderLabel(ColorPickerStrings.current.alphaName()) },
+    valueLabel: (@Composable () -> Unit)? = { ColorPickerDefaults.SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
     thumb: @Composable AlphaSliderScope.() -> Unit = pickerThumb(),
 ) {
     SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->

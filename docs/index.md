@@ -323,7 +323,7 @@ HslColorPicker(
     channelSlider = { part ->
         if (part.channel === Hsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { ColorPickerDefaults.SliderLabel(hue) }, semanticLabel = hue)
         } else {
             ChannelSlider(part.state, part.channel)
         }
@@ -406,10 +406,10 @@ Sliders expose slots and semantics for customization:
 ChannelSlider(
     state = state,
     channel = Hsl.H,
-    label = { SliderLabel("Farbton") },          // leading label slot (null to hide)
-    valueLabel = { SliderValueLabel("200°") },   // trailing value slot (null to hide)
-    semanticLabel = "Farbton",                   // accessibility label
-    semanticValueText = "200 Grad",              // accessibility value announcement
+    label = { ColorPickerDefaults.SliderLabel("Farbton") },          // leading label slot (null to hide)
+    valueLabel = { ColorPickerDefaults.SliderValueLabel("200°") },   // trailing value slot (null to hide)
+    semanticLabel = "Farbton",                                       // accessibility label
+    semanticValueText = "200 Grad",                                  // accessibility value announcement
 )
 ```
 
@@ -607,7 +607,7 @@ ColorPickerDialog(
     channelSlider = { part ->
         if (part.channel === Okhsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { ColorPickerDefaults.SliderLabel(hue) }, semanticLabel = hue)
         } else {
             ChannelSlider(part.state, part.channel)
         }
@@ -866,6 +866,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { part -> … }`                                                          |                                                            |
 | `showAlpha = false`                                                                         | `alphaSlider = null`                                                                     | `plane = null` leaves the plane out                        |
 | `thumb = { source -> MyThumb(source) }`                                                     | `thumb = { MyThumb(interactionSource) }`                                                 | the slot reads its scope                                   |
+| `SliderLabel(text)`, `SliderValueLabel(text)`                                               | `ColorPickerDefaults.SliderLabel(text)`, `ColorPickerDefaults.SliderValueLabel(text)`    |                                                            |
 | `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |
 | `ColorSlider(gradientColors = persistentListOf(…))`                                         | `ColorSlider(trackColors = listOf(…))`                                                   |                                                            |
 | `LocalColorPickerColors.current`, …                                                         | `ColorPickerDefaults.currentColors()`, …                                                 | provided by `ColorPickerTheme`                             |

@@ -39,7 +39,9 @@ public final class codes/side/colorpicker/material3/ColorPickerDefaults {
 	public static final field INSTANCE Lcodes/side/colorpicker/material3/ColorPickerDefaults;
 	public final fun Plane (Lcodes/side/colorpicker/foundation/PlanePart;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 	public final fun PlaneThumb-6a0pyJM (Landroidx/compose/foundation/interaction/InteractionSource;Landroidx/compose/ui/Modifier;FLandroidx/compose/runtime/Composer;II)V
+	public final fun SliderLabel (Ljava/lang/String;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 	public final fun SliderThumb-N8B1yIo (Landroidx/compose/foundation/interaction/InteractionSource;JLandroidx/compose/ui/Modifier;FLandroidx/compose/runtime/Composer;II)V
+	public final fun SliderValueLabel (Ljava/lang/String;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 	public final fun colors-6xbWgXg (JJFFLandroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/material3/ColorPickerColors;
 	public final fun currentColors (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerColors;
 	public final fun currentDimensions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
@@ -425,10 +427,5 @@ public final class codes/side/colorpicker/material3/RgbColorPickerKt {
 	public static final fun RgbColorPicker (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 	public static final fun RgbColorPicker (Lcodes/side/colorpicker/state/ColorPickerState;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 	public static final fun RgbColorPicker-a6Bmh3g (JLkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Lcodes/side/colorpicker/material3/ColorPickerColors;Lcodes/side/colorpicker/material3/ColorPickerShapes;Lcodes/side/colorpicker/material3/ColorPickerDimensions;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
-}
-
-public final class codes/side/colorpicker/material3/SliderLabelDefaultsKt {
-	public static final fun SliderLabel (Ljava/lang/String;Landroidx/compose/runtime/Composer;I)V
-	public static final fun SliderValueLabel (Ljava/lang/String;Landroidx/compose/runtime/Composer;I)V
 }
 

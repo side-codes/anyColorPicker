@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -223,6 +225,33 @@ public object ColorPickerDefaults {
                 drawRoundRect(Color.White, Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 2.dp.toPx()))
             }
         }
+    }
+
+    /**
+     * The sliders' default label: [text] in `MaterialTheme.typography.labelMedium`, for a `label` slot
+     * that keeps the built-in look.
+     */
+    @Composable
+    public fun SliderLabel(text: String, modifier: Modifier = Modifier) {
+        Text(
+            text = text,
+            modifier = modifier,
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
+
+    /**
+     * The sliders' default value label: [text] in `MaterialTheme.typography.labelMedium` and a monospaced
+     * font, so its digits hold their places as the value changes; for a `valueLabel` slot.
+     */
+    @Composable
+    public fun SliderValueLabel(text: String, modifier: Modifier = Modifier) {
+        Text(
+            text = text,
+            modifier = modifier,
+            style = MaterialTheme.typography.labelMedium,
+            fontFamily = FontFamily.Monospace,
+        )
     }
 
     /**

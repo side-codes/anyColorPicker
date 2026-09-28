@@ -51,8 +51,8 @@ import codes.side.colorpicker.foundation.LocalColorPickerEnabled
  * @param interactionSource receives the slider's press, drag, focus and hover interactions, which [thumb]
  * reads from [ColorSliderScope.interactionSource]. Note that if `null` is provided, interactions will
  * still happen internally.
- * @param label optional slot shown above the track's start; see [SliderLabel].
- * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
+ * @param label optional slot shown above the track's start; see [ColorPickerDefaults.SliderLabel].
+ * @param valueLabel optional slot shown above the track's end; see [ColorPickerDefaults.SliderValueLabel].
  * @param thumb draws the thumb, reading where it is, whether the slider is enabled, its interactions and
  * its opaque color from [ColorSliderScope]; the picker's inside a picker, else
  * [ColorPickerDefaults.SliderThumb], a rounded bar.
