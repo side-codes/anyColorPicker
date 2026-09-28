@@ -173,6 +173,54 @@ class BasicColorPlaneTest {
     }
 
     @Test
+    fun batchedAccessibilityActionsBuildOnBothPreviouslyReportedAxes() = runComposeUiTest {
+        val held = HeldPlane()
+        showPlane(held)
+        val actions = onNodeWithTag("plane").fetchSemanticsNode().config[SemanticsActions.CustomActions]
+        runOnIdle {
+            actions[0].action()
+            actions[2].action()
+            actions[0].action()
+        }
+        assertEquals(0.7f, held.x, 1e-6f)
+        assertEquals(0.6f, held.y, 1e-6f)
+        assertEquals(3, held.finished)
+    }
+
+    @Test
+    fun keysStepFromTheClampedPositionAndRecoverFromNaN() = runComposeUiTest {
+        val held = HeldPlane(Float.NaN, 1.5f)
+        showPlane(held)
+        onNodeWithTag("plane").requestFocus()
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
+        assertEquals(0.01f, held.x, 1e-6f)
+        assertEquals(1f, held.y)
+        onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionDown) }
+        assertEquals(0.99f, held.y, 1e-6f)
+    }
+
+    @Test
+    fun rejectedKeysStepFromTheDrawnPositionAfterRecomposition() = runComposeUiTest {
+        val reports = mutableListOf<Pair<Float, Float>>()
+        setContent {
+            BasicColorPlane(
+                0.5f, 0.5f, { x, y -> reports += x to y }, surface = {},
+                modifier = Modifier.size(200.dp).testTag("plane"), thumb = {},
+            )
+        }
+        onNodeWithTag("plane").requestFocus()
+        repeat(3) {
+            onNodeWithTag("plane").performKeyInput { pressKey(Key.DirectionRight) }
+            waitForIdle()
+        }
+        assertEquals(3, reports.size)
+        reports.forEach { (x, y) ->
+            assertEquals(0.51f, x, 1e-6f)
+            assertEquals(0.5f, y)
+        }
+    }
+
+    @Test
     fun theActionsAreNamedByTheLabels() = runComposeUiTest {
         showPlane(HeldPlane())
         val actions = onNodeWithTag("plane").fetchSemanticsNode().config[SemanticsActions.CustomActions]
