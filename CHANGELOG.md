@@ -30,6 +30,7 @@
 - **A `thumb` slot reads its component's scope** instead of being handed an `InteractionSource`: `thumb = { MyThumb(interactionSource, thumbColor) }`. A slider's scope carries its position, whether it is enabled, its interactions and the opaque color under the thumb, and a channel or alpha slider's its channel and value, or its alpha, too; a plane's carries its position, and a channel plane's its channels and the color under the thumb. A picker's `thumb` reaches its sliders the same way. It is no longer nullable: leave it out for the default.
 - **Sliders and planes take `dimensions`** in place of `thumbWidth`, `thumbTrackGap` and `ColorSlider`'s `trackHeight`. `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)` changes one size and keeps the theme's others.
 - **`ColorSlider` takes `trackColors: List<Color>`** in place of `gradientColors: ImmutableList<Color>`. kotlinx-collections-immutable is no longer a dependency.
+- **`ColorSlider` and `ColorPlane` take `enabled` before `onValueChangeFinished`, which is `() -> Unit = {}` rather than nullable,** as on every other slider, plane and picker.
 
 ### Added
 
