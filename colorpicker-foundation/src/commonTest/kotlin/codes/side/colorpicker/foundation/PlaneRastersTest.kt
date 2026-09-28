@@ -3,12 +3,14 @@ package codes.side.colorpicker.foundation
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PlaneRastersTest {
 
     private fun request(hue: Double) = PlaneRequest(Okhsl.S, Okhsl.L, listOf(hue, 0.0, 0.0), PlaneRendering.Fast)
