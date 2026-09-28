@@ -46,8 +46,8 @@ internal fun pickerThumb(): @Composable ColorSliderScope.() -> Unit = LocalPicke
  * dimmed, and deaf to the keyboard and a screen reader too.
  *
  * @param space the space whose channels the picker shows. Okhsl by default: its lightness is perceived
- * lightness, and its saturation is measured against the display, so every position is a color the
- * screen can show.
+ * lightness, and its saturation is measured against sRGB, so every position is a color sRGB shows, bar
+ * a sliver just past pure blue.
  * @param enabled when false the picker is dimmed, refuses input and reports itself disabled.
  * @param orientation [Orientation.Vertical] stacks the plane, the channel sliders and alpha;
  * [Orientation.Horizontal] puts the plane in the start half and the sliders and alpha in the end half,
