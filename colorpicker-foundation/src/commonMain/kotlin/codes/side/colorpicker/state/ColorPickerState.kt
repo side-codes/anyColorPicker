@@ -179,8 +179,13 @@ public class ColorPickerState(initialValue: ColorValue) {
     public companion object {
         /**
          * Saves a state's value and remembered hues. A saved space is found by id among [knownSpaces]
-         * and then the library's own, as `ColorValue.parseCss` finds one; a value whose space is not
-         * found restores as null, so the state starts again from its initial value.
+         * and then the library's own, as `ColorValue.parseCss` finds one.
+         *
+         * A saved value restores as null, so the state starts again from its initial value, when its
+         * space is not found, when that space now refuses its components, or when it was saved in
+         * another format, 1.x's included. A space that is found reads the saved components as it is
+         * defined now, so an app that changes what one of its spaces means gives it a new id, or colors
+         * saved under the old meaning come back as other colors.
          *
          * @throws IllegalArgumentException if two different spaces in [knownSpaces] share an id.
          */

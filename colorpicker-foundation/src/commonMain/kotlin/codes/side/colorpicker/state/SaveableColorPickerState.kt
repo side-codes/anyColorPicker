@@ -84,6 +84,7 @@ private fun restored(saved: List<*>, spaces: Map<String, ColorSpace>): ColorPick
  *
  * [initialValue] is read once. Its space is known to the saver, and so is every space in
  * [knownSpaces]; a value later edited into a space in neither restores as [initialValue].
+ * [ColorPickerState.Saver] lists what else restores that way.
  */
 @Composable
 public fun rememberSaveableColorPickerState(
