@@ -31,8 +31,9 @@ import codes.side.color.compose.toComposeColor
  * Okhsl slider shows the hue last picked on an HSL one; that is this library's own, as CSS carries
  * no hue across spaces (csswg-drafts#8484).
  *
- * Backed by snapshot state: read from any thread, write on the main thread. Create one with
- * [rememberColorPickerState] or [rememberSaveableColorPickerState], or hold one in a view model.
+ * Backed by snapshot state. Read and write it on the main thread, as composition does; another thread
+ * takes [value], which is immutable, rather than the state. Create one with [rememberColorPickerState]
+ * or [rememberSaveableColorPickerState], or hold one in a view model.
  */
 @Stable
 public class ColorPickerState(initialValue: ColorValue) {
