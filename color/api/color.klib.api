@@ -260,8 +260,6 @@ final class codes.side.color/HueFamily { // codes.side.color/HueFamily|null[0]
 }
 
 final class codes.side.color/RgbGamut { // codes.side.color/RgbGamut|null[0]
-    final val peakLuminance // codes.side.color/RgbGamut.peakLuminance|{}peakLuminance[0]
-        final fun <get-peakLuminance>(): kotlin/Double // codes.side.color/RgbGamut.peakLuminance.<get-peakLuminance>|<get-peakLuminance>(){}[0]
     final val space // codes.side.color/RgbGamut.space|{}space[0]
         final fun <get-space>(): codes.side.color/RgbColorSpace // codes.side.color/RgbGamut.space.<get-space>|<get-space>(){}[0]
 
