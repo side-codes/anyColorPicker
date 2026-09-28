@@ -14,6 +14,10 @@ import codes.side.color.ColorSpace
  * - [Contextual]: the gradient shows what the resulting color would be at each
  *   position, contextual on the current values of the other channels. E.g. the
  *   hue slider shows the rainbow rendered at the current saturation and lightness.
+ *
+ * An enum, unlike the library's other sets of options, because an app keeps it in saved UI state:
+ * `rememberSaveable { mutableStateOf(mode) }` saves an enum on Android and cannot save a class. A
+ * coloring added later therefore comes in a major release.
  */
 public enum class ColoringMode {
     /** Gradient shows the channel's full theoretical range, ignoring other channels. */
