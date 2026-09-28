@@ -34,7 +34,7 @@ public class RgbGamut internal constructor(
     public fun maxChroma(lightness: Double, hue: Double): Double {
         require(lightness.isFinite() && hue.isFinite()) { "Lightness and hue must be finite, were $lightness and $hue" }
         if (lightness <= 0.0 || lightness >= 1.0) return 0.0
-        val radians = hue * PI / 180.0
+        val radians = hueRadians(hue)
         val a = cos(radians)
         val b = sin(radians)
         val cusp = gamutMemo().cusp(lmsToLinear, a, b)
@@ -44,7 +44,7 @@ public class RgbGamut internal constructor(
     /** The most colorful color of [hue], in degrees, that this gamut holds, in [Oklch]. */
     public fun cusp(hue: Double): ColorValue {
         require(hue.isFinite()) { "Hue must be finite, was $hue" }
-        val radians = hue * PI / 180.0
+        val radians = hueRadians(hue)
         val a = cos(radians)
         val b = sin(radians)
         val cusp = gamutMemo().cusp(lmsToLinear, a, b)
@@ -61,3 +61,7 @@ public class RgbGamut internal constructor(
 
     override fun toString(): String = "RgbGamut(${space.id})"
 }
+
+// The hue wrapped as ColorValue stores it, before trigonometry: multiplying a huge finite angle
+// first can overflow, and even smaller angles lose the turn's position during argument reduction.
+private fun hueRadians(hue: Double): Double = ColorValue.wrapHue(hue) * PI / 180.0
