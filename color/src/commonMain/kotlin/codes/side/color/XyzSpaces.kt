@@ -6,6 +6,7 @@ import codes.side.color.internal.XYZ_D50_TO_D65
 import codes.side.color.internal.XYZ_D65_TO_D50
 import codes.side.color.internal.runSteps
 
+@OptIn(ExperimentalColorSpaceApi::class)
 private fun xyzChannels(): List<ColorChannel> = listOf(
     ColorChannel("x", 0.0..1.0, analogous = AnalogousCategory.Reds),
     ColorChannel("y", 0.0..1.0, analogous = AnalogousCategory.Greens),

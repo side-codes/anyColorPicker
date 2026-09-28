@@ -194,6 +194,7 @@ public object Hwb : HwbColorSpace("hwb", Srgb)
 /** HSV over [Srgb]. */
 public object Hsv : HsvColorSpace("hsv", Srgb)
 
+@OptIn(ExperimentalColorSpaceApi::class)
 private fun hueChannel(over: RgbColorSpace): ColorChannel = ColorChannel(
     id = "h",
     referenceRange = 0.0..360.0,

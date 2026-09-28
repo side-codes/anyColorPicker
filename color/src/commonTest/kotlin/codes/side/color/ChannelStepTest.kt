@@ -4,6 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+@OptIn(ExperimentalColorSpaceApi::class)
 class ChannelStepTest {
 
     private fun assertSteps(step: Double, pageStep: Double, vararg channels: ColorChannel) {

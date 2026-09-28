@@ -35,7 +35,7 @@ public abstract class AnalogousCategory internal constructor(private val name: S
  * that space; OkLCh, Okhsl and Okhsv share Oklab's; LCH has CIELab's. A picker keeps one
  * remembered hue per family.
  */
-public class HueFamily(public val id: String) {
+public class HueFamily @ExperimentalColorSpaceApi constructor(public val id: String) {
 
     override fun equals(other: Any?): Boolean = other is HueFamily && other.id == id
 
@@ -43,6 +43,7 @@ public class HueFamily(public val id: String) {
 
     override fun toString(): String = "HueFamily($id)"
 
+    @OptIn(ExperimentalColorSpaceApi::class)
     public companion object {
         /** The hue angle of Oklab, shared by OkLCh, Okhsl and Okhsv. */
         public val Oklab: HueFamily = HueFamily("oklab")
@@ -61,7 +62,7 @@ public sealed class ChannelKind {
     public data object Linear : ChannelKind()
 
     /** An angle in degrees, wrapped into `0..<360`. */
-    public class Hue(public val family: HueFamily) : ChannelKind() {
+    public class Hue @ExperimentalColorSpaceApi constructor(public val family: HueFamily) : ChannelKind() {
         override fun equals(other: Any?): Boolean = other is Hue && other.family == family
 
         override fun hashCode(): Int = family.hashCode()
@@ -86,7 +87,7 @@ public sealed class ChannelKind {
  * @throws IllegalArgumentException if [referenceRange] has no finite, positive span, if [step] is not
  * positive and finite, or if [pageStep] is not finite or is smaller than [step].
  */
-public class ColorChannel(
+public class ColorChannel @ExperimentalColorSpaceApi constructor(
     public val id: String,
     public val referenceRange: ClosedFloatingPointRange<Double>,
     public val kind: ChannelKind = ChannelKind.Linear,

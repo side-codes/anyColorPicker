@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import codes.side.color.ColorSpace
 import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
+import codes.side.color.ExperimentalColorSpaceApi
 import codes.side.color.HueFamily
 import codes.side.color.compose.toColorValue
 
@@ -51,6 +52,7 @@ private fun saved(state: ColorPickerState): ArrayList<Any> {
     return saved
 }
 
+@OptIn(ExperimentalColorSpaceApi::class)
 private fun restored(saved: List<*>, spaces: Map<String, ColorSpace>): ColorPickerState? {
     if (saved.firstOrNull() != SAVED_FORMAT) return null
     val space = spaces[saved.getOrNull(1) as? String ?: return null] ?: return null

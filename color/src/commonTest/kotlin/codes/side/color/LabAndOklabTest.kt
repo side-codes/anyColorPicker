@@ -129,6 +129,7 @@ class LabAndOklabTest {
     }
 
     @Test
+    @OptIn(ExperimentalColorSpaceApi::class)
     fun aPolarSpaceKeepsItsLightnessKind() {
         val polar = ColorSpace.polar("--angled-polar", AngledLightness, 1.0, 0.0, HueFamily("--angled"))
         assertEquals(AngledLightness.channels[0].kind, polar.L.kind)
