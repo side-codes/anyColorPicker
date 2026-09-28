@@ -30,18 +30,22 @@ internal val LocalColorPickerDimensions: ProvidableCompositionLocal<ColorPickerD
  * Wrap a screen in this to style every picker on it at once. A ready-made picker does the same
  * for its own sliders, which is what lets a replaced slider slot inherit them without the call
  * site forwarding anything.
+ *
+ * One left `null` is inherited rather than fixed here: from an enclosing [ColorPickerTheme], or else
+ * from [ColorPickerDefaults] where each component reads it, so a `MaterialTheme` nested inside still
+ * colors and shapes the pickers under it.
  */
 @Composable
 public fun ColorPickerTheme(
-    colors: ColorPickerColors = ColorPickerDefaults.currentColors(),
-    shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
-    dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
+    colors: ColorPickerColors? = null,
+    shapes: ColorPickerShapes? = null,
+    dimensions: ColorPickerDimensions? = null,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalColorPickerColors provides colors,
-        LocalColorPickerShapes provides shapes,
-        LocalColorPickerDimensions provides dimensions,
+        LocalColorPickerColors provides (colors ?: LocalColorPickerColors.current),
+        LocalColorPickerShapes provides (shapes ?: LocalColorPickerShapes.current),
+        LocalColorPickerDimensions provides (dimensions ?: LocalColorPickerDimensions.current),
         content = content,
     )
 }

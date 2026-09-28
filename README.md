@@ -675,7 +675,8 @@ ColorPickerTheme(
 ```
 
 A component reads the theme in its parameter defaults, so an explicit argument still wins over
-whatever an enclosing `ColorPickerTheme` provided.
+whatever an enclosing `ColorPickerTheme` provided. What a `ColorPickerTheme` is not given it
+leaves to the theme around it, so a `MaterialTheme` nested inside still colors the pickers under it.
 
 `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()` keep every value you leave out, and
 each class's `copy` does the same from one you already have, such as
