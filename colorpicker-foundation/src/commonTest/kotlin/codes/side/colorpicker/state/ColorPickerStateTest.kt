@@ -113,6 +113,24 @@ class ColorPickerStateTest {
     }
 
     @Test
+    fun aColorfulValueWithAMissingHueReadsHueZeroAsItIsDrawn() {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        state.value = Hsl(null, 80.0, 50.0)
+        assertEquals(0.0, state.displayValue(Hsl.H), "drawn red, so shown red rather than the remembered 200")
+        state[Hsl.S] = 70.0
+        assertEquals(Hsl(0.0, 70.0, 50.0), state.value, "a saturation edit keeps it red")
+    }
+
+    @Test
+    fun aGreyWrittenWithAMissingHueStillShowsTheRememberedOne() {
+        val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
+        state.value = Hsl(null, 0.0, 50.0)
+        assertEquals(200.0, state.displayValue(Hsl.H))
+        state[Hsl.S] = 70.0
+        assertEquals(Hsl(200.0, 70.0, 50.0), state.value)
+    }
+
+    @Test
     fun aDeliberateHueAtZeroSaturationIsLeftAlone() {
         val state = ColorPickerState(Hsl(200.0, 80.0, 50.0))
         state[Hsl.S] = 0.0
