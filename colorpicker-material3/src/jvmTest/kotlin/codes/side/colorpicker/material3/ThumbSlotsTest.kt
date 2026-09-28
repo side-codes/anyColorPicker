@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import codes.side.color.ColorChannel
 import codes.side.color.Hsl
 import codes.side.color.Srgb
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

@@ -15,7 +15,7 @@ public final class codes/side/colorpicker/foundation/BasicChannelPlaneKt {
 }
 
 public final class codes/side/colorpicker/foundation/BasicChannelSliderKt {
-	public static final fun BasicChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
+	public static final fun BasicChannelSlider (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorChannel;Landroidx/compose/ui/Modifier;ZLkotlin/ranges/ClosedFloatingPointRange;Lcodes/side/colorpicker/foundation/ColoringMode;Lkotlin/jvm/functions/Function0;Ljava/lang/String;Ljava/lang/String;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorComparisonKt {
@@ -23,13 +23,13 @@ public final class codes/side/colorpicker/foundation/BasicColorComparisonKt {
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPickerDialogContentKt {
-	public static final fun BasicColorPickerDialogContent-HYR8e34 (Lcodes/side/colorpicker/foundation/ColorPickerDialogState;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;FLandroidx/compose/runtime/Composer;II)V
+	public static final fun BasicColorPickerDialogContent-WH-ejsw (Lcodes/side/colorpicker/state/ColorPickerDialogState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;FLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPickerKt {
-	public static final fun BasicColorPicker-1mG4CRQ (JLkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
-	public static final fun BasicColorPicker-fwlkeO0 (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
-	public static final fun BasicColorPicker-yKJFJhA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/state/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
+	public static final fun BasicColorPicker-1mG4CRQ (JLkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/foundation/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
+	public static final fun BasicColorPicker-fwlkeO0 (Lcodes/side/color/ColorValue;Lkotlin/jvm/functions/Function1;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/foundation/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
+	public static final fun BasicColorPicker-yKJFJhA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorSpace;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/ui/Modifier;ZLandroidx/compose/foundation/gestures/Orientation;Lcodes/side/colorpicker/foundation/ColoringMode;Lkotlin/jvm/functions/Function0;FLandroidx/compose/runtime/Composer;III)V
 }
 
 public final class codes/side/colorpicker/foundation/BasicColorPlaneKt {
@@ -60,30 +60,6 @@ public final class codes/side/colorpicker/foundation/CheckerboardKt {
 	public static final fun checkerboard--WgHM3s (Landroidx/compose/ui/Modifier;JJF)Landroidx/compose/ui/Modifier;
 	public static synthetic fun checkerboard--WgHM3s$default (Landroidx/compose/ui/Modifier;JJFILjava/lang/Object;)Landroidx/compose/ui/Modifier;
 	public static final fun rememberCheckerboardBrush-d_3_b6Q (JJFLandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/graphics/Brush;
-}
-
-public final class codes/side/colorpicker/foundation/ColorPickerDialogState {
-	public static final field $stable I
-	public static final field Companion Lcodes/side/colorpicker/foundation/ColorPickerDialogState$Companion;
-	public fun <init> (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;)V
-	public synthetic fun <init> (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun getOriginal ()Lcodes/side/color/ColorValue;
-	public final fun getPickerState ()Lcodes/side/colorpicker/state/ColorPickerState;
-	public final fun getResult ()Lcodes/side/color/ColorValue;
-	public final fun getSpace ()Lcodes/side/color/ColorSpace;
-	public final fun getSpaces ()Ljava/util/List;
-	public final fun isModified ()Z
-	public final fun revert ()V
-	public final fun setSpace (Lcodes/side/color/ColorSpace;)V
-}
-
-public final class codes/side/colorpicker/foundation/ColorPickerDialogState$Companion {
-	public final fun Saver (Ljava/util/Collection;)Landroidx/compose/runtime/saveable/Saver;
-	public static synthetic fun Saver$default (Lcodes/side/colorpicker/foundation/ColorPickerDialogState$Companion;Ljava/util/Collection;ILjava/lang/Object;)Landroidx/compose/runtime/saveable/Saver;
-}
-
-public final class codes/side/colorpicker/foundation/ColorPickerDialogStateKt {
-	public static final fun rememberColorPickerDialogState (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;Landroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/foundation/ColorPickerDialogState;
 }
 
 public abstract interface class codes/side/colorpicker/foundation/ColorPickerPart {
@@ -153,6 +129,20 @@ public abstract interface class codes/side/colorpicker/foundation/ColorSliderSco
 	public abstract fun getThumbColor-0d7_KjU ()J
 }
 
+public final class codes/side/colorpicker/foundation/ColoringMode : java/lang/Enum {
+	public static final field Companion Lcodes/side/colorpicker/foundation/ColoringMode$Companion;
+	public static final field Contextual Lcodes/side/colorpicker/foundation/ColoringMode;
+	public static final field Independent Lcodes/side/colorpicker/foundation/ColoringMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/foundation/ColoringMode;
+	public static fun values ()[Lcodes/side/colorpicker/foundation/ColoringMode;
+}
+
+public final class codes/side/colorpicker/foundation/ColoringMode$Companion {
+	public final fun current (Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/foundation/ColoringMode;
+	public final fun defaultFor (Lcodes/side/color/ColorSpace;)Lcodes/side/colorpicker/foundation/ColoringMode;
+}
+
 public final class codes/side/colorpicker/foundation/DisabledStateKt {
 	public static final fun getLocalColorPickerEnabled ()Landroidx/compose/runtime/CompositionLocal;
 }
@@ -174,24 +164,40 @@ public abstract interface class codes/side/colorpicker/foundation/PlanePart : co
 	public abstract fun getY ()Lcodes/side/color/ColorChannel;
 }
 
-public abstract class codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-}
-
-public final class codes/side/colorpicker/foundation/PlaneRendering$Canonical : codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Canonical;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class codes/side/colorpicker/foundation/PlaneRendering$Fast : codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Fast;
-	public fun toString ()Ljava/lang/String;
+public final class codes/side/colorpicker/foundation/PlaneRendering : java/lang/Enum {
+	public static final field Canonical Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static final field Fast Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static fun values ()[Lcodes/side/colorpicker/foundation/PlaneRendering;
 }
 
 public final class codes/side/colorpicker/foundation/PlaneRenderingKt {
 	public static final fun getLocalPlaneRendering ()Landroidx/compose/runtime/ProvidableCompositionLocal;
+}
+
+public final class codes/side/colorpicker/state/ColorPickerDialogState {
+	public static final field $stable I
+	public static final field Companion Lcodes/side/colorpicker/state/ColorPickerDialogState$Companion;
+	public fun <init> (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;)V
+	public synthetic fun <init> (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getOriginal ()Lcodes/side/color/ColorValue;
+	public final fun getPickerState ()Lcodes/side/colorpicker/state/ColorPickerState;
+	public final fun getResult ()Lcodes/side/color/ColorValue;
+	public final fun getSpace ()Lcodes/side/color/ColorSpace;
+	public final fun getSpaces ()Ljava/util/List;
+	public final fun isModified ()Z
+	public final fun revert ()V
+	public final fun setSpace (Lcodes/side/color/ColorSpace;)V
+}
+
+public final class codes/side/colorpicker/state/ColorPickerDialogState$Companion {
+	public final fun Saver (Ljava/util/Collection;)Landroidx/compose/runtime/saveable/Saver;
+	public static synthetic fun Saver$default (Lcodes/side/colorpicker/state/ColorPickerDialogState$Companion;Ljava/util/Collection;ILjava/lang/Object;)Landroidx/compose/runtime/saveable/Saver;
+}
+
+public final class codes/side/colorpicker/state/ColorPickerDialogStateKt {
+	public static final fun rememberColorPickerDialogState (Lcodes/side/color/ColorValue;Ljava/util/List;Lcodes/side/color/ColorSpace;Landroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/state/ColorPickerDialogState;
 }
 
 public final class codes/side/colorpicker/state/ColorPickerState {
@@ -229,35 +235,6 @@ public final class codes/side/colorpicker/state/ColorPickerStateViewsKt {
 	public static final fun getSrgbLinear (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD50 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD65 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
-	public static final fun set-11RcLd0 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-1Y7pCtI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-7jXRPvs (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-9Crj1pI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-BJ8B4ww (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-Fmdgyq8 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-LTCmHu4 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-QdQAm9Q (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-S9D4_nc (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-Y2eWPdA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-cKsaJvA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-mmr5dew (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-mvXxeeQ (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-tro4B1k (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-w1g9Peg (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-}
-
-public final class codes/side/colorpicker/state/ColoringMode : java/lang/Enum {
-	public static final field Companion Lcodes/side/colorpicker/state/ColoringMode$Companion;
-	public static final field Contextual Lcodes/side/colorpicker/state/ColoringMode;
-	public static final field Independent Lcodes/side/colorpicker/state/ColoringMode;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/state/ColoringMode;
-	public static fun values ()[Lcodes/side/colorpicker/state/ColoringMode;
-}
-
-public final class codes/side/colorpicker/state/ColoringMode$Companion {
-	public final fun current (Lcodes/side/color/ColorChannel;Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/state/ColoringMode;
-	public final fun defaultFor (Lcodes/side/color/ColorSpace;)Lcodes/side/colorpicker/state/ColoringMode;
 }
 
 public final class codes/side/colorpicker/state/RememberColorPickerStateKt {

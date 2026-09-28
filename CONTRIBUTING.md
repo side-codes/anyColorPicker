@@ -20,6 +20,18 @@ In order to create a new feature request or bug report just file an issue. To fi
 
 Versioning follows [Semantic Versioning](https://semver.org): public API is added only in a minor release and removed or changed incompatibly only in a major one, and a patch leaves it alone. CI runs `scripts/check-api-removals.sh`, which fails when a declaration in the API dumps at the last release tag is missing from its module's `api/`; run it before proposing an API change. It catches removed declarations and changed signatures, not a class losing a supertype, so that still needs a reviewer's eye.
 
+## API conventions
+
+Decisions that shape the public API, so the next one is made the same way. Add to this list when a new one is settled.
+
+- **A set of options is an enum, even one that may grow,** as every one in the library is: `ColoringMode`, `PlaneRendering`, `EdgeSolver`, `Exactness`, `AnalogousCategory`, `HexAlpha` and `CssSyntax`. An app can keep an enum in saved UI state: `rememberSaveable { mutableStateOf(mode) }` saves one on Android and cannot save a class, which would crash the app on rotation. An option added to an enum breaks callers' exhaustive `when`, so it waits for a major release.
+- **Sliders, planes and pickers take `enabled` after `modifier` and before `onValueChangeFinished: () -> Unit = {}`,** and a component's main content slot comes last.
+- **Default slot content lives in `ColorPickerDefaults`,** as `SliderThumb`, `SliderLabel` and `Plane` do.
+- **A public constant is a `val`, not a `const val`,** which would be copied into every caller's compiled code.
+- **A constructor a factory already covers requires `ExperimentalColorSpaceApi`,** so it can gain parameters in a minor release.
+
+## Code style
+
 Our code style is defined via the [`.editorconfig`](.editorconfig) file at the repository root; most IDEs (including IntelliJ IDEA and Android Studio) pick it up automatically.
 
 When submitting code, please make every effort to follow existing conventions and code style in order to keep the code as readable as possible.

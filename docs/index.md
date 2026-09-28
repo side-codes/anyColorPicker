@@ -323,7 +323,7 @@ HslColorPicker(
     channelSlider = { part ->
         if (part.channel === Hsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { ColorPickerDefaults.SliderLabel(hue) }, semanticLabel = hue)
         } else {
             ChannelSlider(part.state, part.channel)
         }
@@ -406,10 +406,10 @@ Sliders expose slots and semantics for customization:
 ChannelSlider(
     state = state,
     channel = Hsl.H,
-    label = { SliderLabel("Farbton") },          // leading label slot (null to hide)
-    valueLabel = { SliderValueLabel("200°") },   // trailing value slot (null to hide)
-    semanticLabel = "Farbton",                   // accessibility label
-    semanticValueText = "200 Grad",              // accessibility value announcement
+    label = { ColorPickerDefaults.SliderLabel("Farbton") },          // leading label slot (null to hide)
+    valueLabel = { ColorPickerDefaults.SliderValueLabel("200°") },   // trailing value slot (null to hide)
+    semanticLabel = "Farbton",                                       // accessibility label
+    semanticValueText = "200 Grad",                                  // accessibility value announcement
 )
 ```
 
@@ -607,7 +607,7 @@ ColorPickerDialog(
     channelSlider = { part ->
         if (part.channel === Okhsl.H) {
             val hue = stringResource(Res.string.hue)
-            ChannelSlider(part.state, part.channel, label = { SliderLabel(hue) }, semanticLabel = hue)
+            ChannelSlider(part.state, part.channel, label = { ColorPickerDefaults.SliderLabel(hue) }, semanticLabel = hue)
         } else {
             ChannelSlider(part.state, part.channel)
         }
@@ -675,7 +675,8 @@ ColorPickerTheme(
 ```
 
 A component reads the theme in its parameter defaults, so an explicit argument still wins over
-whatever an enclosing `ColorPickerTheme` provided.
+whatever an enclosing `ColorPickerTheme` provided. What a `ColorPickerTheme` is not given it
+leaves to the theme around it, so a `MaterialTheme` nested inside still colors the pickers under it.
 
 `ColorPickerDefaults.colors()`, `shapes()` and `dimensions()` keep every value you leave out, and
 each class's `copy` does the same from one you already have, such as
@@ -768,7 +769,6 @@ state.hsl.l                       // a typed view; there is one for each of the 
 
 state.value = Oklch(0.7, 0.15, 140.0)
 state[Hsl.L] = 40.0               // leaves the color in HSL
-state.set(state.okhsl.with(l = 0.4))
 state.value = state.value.withAlpha(0.5)
 
 state.isInteracting               // true while a slider or plane is being dragged
@@ -854,17 +854,19 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | `state.pickerColor`                                                                         | `state.value`                                                                            |                                                            |
 | `state.argbInt`                                                                             | `state.color.toArgb()`                                                                   |                                                            |
 | `updateHue(h)`, `updateRed(r)`, … (30)                                                      | `state[Hsl.H] = h`, `state[Srgb.R] = r`                                                  | NaN and out-of-limit values throw instead of being ignored |
-| `updateFromHsl(hsl)`, …                                                                     | `state.value = x` or `state.set(view)`                                                   |                                                            |
+| `updateFromHsl(hsl)`, …                                                                     | `state.value = x`                                                                        |                                                            |
 | `updateAlpha(a)`                                                                            | `state.value = state.value.withAlpha(a)`                                                 |                                                            |
 | `updateFromArgbInt(i)`                                                                      | `state.value = Color(i).toColorValue()`                                                  |                                                            |
 | `HueSlider(state)`, `RedSlider(state)`, … (21)                                              | `ChannelSlider(state, Hsl.H)`, `ChannelSlider(state, Srgb.R)`                            |                                                            |
 | `HslPlane`, `OkhslPlane`, `OkhsvPlane`                                                      | `ChannelPlane(state, Hsl.S, Hsl.L)`, …                                                   |                                                            |
+| `codes.side.colorpicker.state.ColoringMode`                                                 | `codes.side.colorpicker.foundation.ColoringMode`                                         |                                                            |
 | `PlaneActionLabels.Default`                                                                 | `ColorPickerStrings.current.planeAxisActions()`                                          |                                                            |
 | `HslColorPicker(color: HslColor, onColorChange)`                                            | `HslColorPicker(value: ColorValue, onValueChange)` or `(color: Color, onColorChange)`    | fully controlled                                           |
 | a caller's value applied when the gesture ends                                              | applied at once; the callback is synchronous                                             |                                                            |
 | per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { part -> … }`                                                          |                                                            |
 | `showAlpha = false`                                                                         | `alphaSlider = null`                                                                     | `plane = null` leaves the plane out                        |
 | `thumb = { source -> MyThumb(source) }`                                                     | `thumb = { MyThumb(interactionSource) }`                                                 | the slot reads its scope                                   |
+| `SliderLabel(text)`, `SliderValueLabel(text)`                                               | `ColorPickerDefaults.SliderLabel(text)`, `ColorPickerDefaults.SliderValueLabel(text)`    |                                                            |
 | `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |
 | `ColorSlider(gradientColors = persistentListOf(…))`                                         | `ColorSlider(trackColors = listOf(…))`                                                   |                                                            |
 | `LocalColorPickerColors.current`, …                                                         | `ColorPickerDefaults.currentColors()`, …                                                 | provided by `ColorPickerTheme`                             |

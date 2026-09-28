@@ -49,6 +49,7 @@ public open class PolarColorSpace internal constructor(
         colorOf(arrayOf(l, c, h), alpha)
 }
 
+@OptIn(ExperimentalColorSpaceApi::class)
 private fun polarChannels(of: ColorSpace, chromaReference: Double, hueFamily: HueFamily): List<ColorChannel> {
     require(of.channels.size == 3) { "${of.id} is not a lightness-and-opponent-axes space" }
     val lightness = of.channels[0]

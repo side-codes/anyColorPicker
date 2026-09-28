@@ -9,9 +9,9 @@ import codes.side.color.Lab
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * [ColorPicker] for [Lab], CSS lab() with its D50 white, over [state]: lightness, a and b sliders and

@@ -55,13 +55,13 @@ import codes.side.color.Okhsl
 import codes.side.color.parseCss
 import codes.side.color.toCssString
 import codes.side.color.toHexString
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.material3.ChannelSlider
 import codes.side.colorpicker.material3.ColorPicker
 import codes.side.colorpicker.material3.ColorPickerDefaults
 import codes.side.colorpicker.material3.ColorPickerDialog
 import codes.side.colorpicker.material3.ColorSwatch
 import codes.side.colorpicker.material3.RgbColorPicker
-import codes.side.colorpicker.state.ColoringMode
 import codes.side.colorpicker.state.rememberSaveableColorPickerState
 import kotlin.random.Random
 

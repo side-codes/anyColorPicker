@@ -129,7 +129,7 @@ public fun BasicColorPlane(
     surface: DrawScope.() -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onValueChangeFinished: (() -> Unit)? = null,
+    onValueChangeFinished: () -> Unit = {},
     shape: Shape = RectangleShape,
     semanticLabel: String? = null,
     semanticValueText: String? = null,
@@ -189,7 +189,7 @@ internal fun BasicColorPlaneImpl(
     surface: DrawScope.() -> Unit,
     modifier: Modifier,
     enabled: Boolean,
-    onValueChangeFinished: (() -> Unit)?,
+    onValueChangeFinished: () -> Unit,
     shape: Shape,
     semanticLabel: String?,
     semanticValueText: String?,
@@ -214,7 +214,7 @@ internal fun BasicColorPlaneImpl(
     // focus cannot leave on, and a device driven by a D-pad alone has nothing else to press.
     fun step(dx: Int, dy: Int, coarse: Boolean): Boolean {
         if (!currentOnStep(dx, dy, coarse)) return false
-        currentOnFinished?.invoke()
+        currentOnFinished()
         return true
     }
 
@@ -294,13 +294,13 @@ internal fun BasicColorPlaneImpl(
                             change.consume()
                         }
 
-                        currentOnFinished?.invoke()
+                        currentOnFinished()
                         source.tryEmit(if (completed) DragInteraction.Stop(press) else DragInteraction.Cancel(press))
                     } catch (e: CancellationException) {
                         // Torn down mid-drag, as when the plane is disabled under the finger: the drag
                         // has still ended, and a thumb drawn from the source would otherwise stay dragged.
                         source.tryEmit(DragInteraction.Cancel(press))
-                        currentOnFinished?.invoke()
+                        currentOnFinished()
                         throw e
                     }
                 }

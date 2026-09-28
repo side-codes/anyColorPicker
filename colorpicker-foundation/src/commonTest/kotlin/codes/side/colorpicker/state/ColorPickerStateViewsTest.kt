@@ -15,21 +15,6 @@ import codes.side.color.Srgb
 import codes.side.color.SrgbLinear
 import codes.side.color.XyzD50
 import codes.side.color.XyzD65
-import codes.side.color.asCmyk
-import codes.side.color.asDisplayP3
-import codes.side.color.asHsl
-import codes.side.color.asHsv
-import codes.side.color.asHwb
-import codes.side.color.asLab
-import codes.side.color.asLch
-import codes.side.color.asOkhsl
-import codes.side.color.asOkhsv
-import codes.side.color.asOklab
-import codes.side.color.asOklch
-import codes.side.color.asSrgb
-import codes.side.color.asSrgbLinear
-import codes.side.color.asXyzD50
-import codes.side.color.asXyzD65
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -55,71 +40,6 @@ class ColorPickerStateViewsTest {
         assertEquals(color.to(Okhsl), state.okhsl.value)
         assertEquals(color.to(Okhsv), state.okhsv.value)
         assertEquals(color.to(Cmyk), state.cmyk.value)
-    }
-
-    @Test
-    fun settingAViewReplacesTheValue() {
-        val state = ColorPickerState(Srgb(1.0, 0.0, 0.0))
-
-        val srgb = Srgb(0.1, 0.2, 0.3)
-        state.set(srgb.asSrgb())
-        assertEquals(srgb, state.value)
-
-        val srgbLinear = SrgbLinear(0.1, 0.2, 0.3)
-        state.set(srgbLinear.asSrgbLinear())
-        assertEquals(srgbLinear, state.value)
-
-        val displayP3 = DisplayP3(0.1, 0.2, 0.3)
-        state.set(displayP3.asDisplayP3())
-        assertEquals(displayP3, state.value)
-
-        val xyzD65 = XyzD65(0.1, 0.2, 0.3)
-        state.set(xyzD65.asXyzD65())
-        assertEquals(xyzD65, state.value)
-
-        val xyzD50 = XyzD50(0.1, 0.2, 0.3)
-        state.set(xyzD50.asXyzD50())
-        assertEquals(xyzD50, state.value)
-
-        val lab = Lab(50.0, 10.0, 20.0)
-        state.set(lab.asLab())
-        assertEquals(lab, state.value)
-
-        val lch = Lch(50.0, 10.0, 20.0)
-        state.set(lch.asLch())
-        assertEquals(lch, state.value)
-
-        val oklab = Oklab(0.5, 0.1, 0.1)
-        state.set(oklab.asOklab())
-        assertEquals(oklab, state.value)
-
-        val oklch = Oklch(0.5, 0.1, 20.0)
-        state.set(oklch.asOklch())
-        assertEquals(oklch, state.value)
-
-        val hsl = Hsl(20.0, 50.0, 50.0)
-        state.set(hsl.asHsl())
-        assertEquals(hsl, state.value)
-
-        val hwb = Hwb(20.0, 10.0, 10.0)
-        state.set(hwb.asHwb())
-        assertEquals(hwb, state.value)
-
-        val hsv = Hsv(20.0, 50.0, 50.0)
-        state.set(hsv.asHsv())
-        assertEquals(hsv, state.value)
-
-        val okhsl = Okhsl(20.0, 0.5, 0.5)
-        state.set(okhsl.asOkhsl())
-        assertEquals(okhsl, state.value)
-
-        val okhsv = Okhsv(20.0, 0.5, 0.5)
-        state.set(okhsv.asOkhsv())
-        assertEquals(okhsv, state.value)
-
-        val cmyk = Cmyk(0.1, 0.2, 0.3, 0.4)
-        state.set(cmyk.asCmyk())
-        assertEquals(cmyk, state.value)
     }
 
     @Test

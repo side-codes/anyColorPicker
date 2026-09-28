@@ -263,7 +263,7 @@ class BasicColorPlaneTest {
                 surface = {},
                 modifier = Modifier.testTag("plane").size(200.dp),
                 enabled = true,
-                onValueChangeFinished = null,
+                onValueChangeFinished = {},
                 shape = RectangleShape,
                 semanticLabel = null,
                 semanticValueText = null,

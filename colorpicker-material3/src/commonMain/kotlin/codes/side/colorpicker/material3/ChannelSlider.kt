@@ -7,8 +7,8 @@ import codes.side.color.ColorChannel
 import codes.side.colorpicker.foundation.BasicChannelSlider
 import codes.side.colorpicker.foundation.ChannelSliderScope
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * A slider for one [channel] of any color space, the library's or an app's. It shows the channel's
@@ -42,9 +42,9 @@ import codes.side.colorpicker.state.ColoringMode
  * @param interactionSource receives the slider's interactions; see [ColorSlider]. Note that if `null` is
  * provided, interactions will still happen internally.
  * @param label slot above the track's start; the channel's name from [ColorPickerStrings] by default.
- * See [SliderLabel].
+ * See [ColorPickerDefaults.SliderLabel].
  * @param valueLabel slot above the track's end; the value in the channel's usual units, in the locale's
- * number format, by default. See [SliderValueLabel].
+ * number format, by default. See [ColorPickerDefaults.SliderValueLabel].
  * @param thumb draws the thumb, reading the channel, its value and the opaque color under it from
  * [ChannelSliderScope]; the picker's inside a picker, else [ColorPickerDefaults.SliderThumb].
  * @throws IllegalArgumentException if [range] is not a finite span of increasing values within
@@ -65,13 +65,13 @@ public fun ChannelSlider(
     shapes: ColorPickerShapes = ColorPickerDefaults.currentShapes(),
     dimensions: ColorPickerDimensions = ColorPickerDefaults.currentDimensions(),
     interactionSource: MutableInteractionSource? = null,
-    label: (@Composable () -> Unit)? = { SliderLabel(ColorPickerStrings.current.channelName(channel)) },
+    label: (@Composable () -> Unit)? = { ColorPickerDefaults.SliderLabel(ColorPickerStrings.current.channelName(channel)) },
     valueLabel: (@Composable () -> Unit)? = {
-        SliderValueLabel(ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), false))
+        ColorPickerDefaults.SliderValueLabel(ColorPickerStrings.current.channelValue(channel, state.displayValue(channel), false))
     },
     thumb: @Composable ChannelSliderScope.() -> Unit = pickerThumb(),
 ) {
-    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+    SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->
         BasicChannelSlider(
             state = state,
             channel = channel,

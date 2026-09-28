@@ -3,6 +3,7 @@ package codes.side.colorpicker.state
 import codes.side.color.ColorSpace
 import codes.side.color.ColorValue
 import codes.side.color.DisplayP3
+import codes.side.color.ExperimentalColorSpaceApi
 import codes.side.color.Hsl
 import codes.side.color.Hsv
 import codes.side.color.HueFamily
@@ -139,6 +140,7 @@ class HueMemoryTest {
     }
 
     @Test
+    @OptIn(ExperimentalColorSpaceApi::class)
     fun restoredHuesReplaceLearnedOnes() {
         val memory = memoryOf(Hsl(200.0, 80.0, 50.0))
         memory.restore(mapOf(HueFamily.rgbHexcone(Srgb) to 90.0, HueFamily("--elsewhere") to 10.0), emptyList())

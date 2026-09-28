@@ -1,9 +1,8 @@
-package codes.side.colorpicker.state
+package codes.side.colorpicker.foundation
 
 import androidx.compose.runtime.Composable
 import codes.side.color.ColorChannel
 import codes.side.color.ColorSpace
-import codes.side.colorpicker.foundation.LocalPickerColoringMode
 
 /**
  * Controls how a slider's gradient track is rendered with respect to other channels.
@@ -15,6 +14,9 @@ import codes.side.colorpicker.foundation.LocalPickerColoringMode
  * - [Contextual]: the gradient shows what the resulting color would be at each
  *   position, contextual on the current values of the other channels. E.g. the
  *   hue slider shows the rainbow rendered at the current saturation and lightness.
+ *
+ * An enum, so an app can keep it in saved UI state: `rememberSaveable { mutableStateOf(mode) }` saves
+ * an enum on Android and cannot save a class. A coloring added later therefore comes in a major release.
  */
 public enum class ColoringMode {
     /** Gradient shows the channel's full theoretical range, ignoring other channels. */

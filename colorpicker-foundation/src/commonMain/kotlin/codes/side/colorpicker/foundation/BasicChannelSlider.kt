@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalLayoutDirection
 import codes.side.color.ColorChannel
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 import kotlin.math.roundToInt
 
 /**

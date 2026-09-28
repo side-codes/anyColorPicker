@@ -1,4 +1,4 @@
-package codes.side.colorpicker.foundation
+package codes.side.colorpicker.state
 
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.SaverScope

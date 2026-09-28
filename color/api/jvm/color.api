@@ -194,17 +194,12 @@ public final class codes/side/color/DisplayP3Color {
 	public static synthetic fun with-DaZF8n8$default (Lcodes/side/color/ColorValue;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;Ljava/lang/Double;ILjava/lang/Object;)Lcodes/side/color/ColorValue;
 }
 
-public abstract class codes/side/color/EdgeSolver {
-}
-
-public final class codes/side/color/EdgeSolver$ClosedForm : codes/side/color/EdgeSolver {
-	public static final field INSTANCE Lcodes/side/color/EdgeSolver$ClosedForm;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class codes/side/color/EdgeSolver$Iterative : codes/side/color/EdgeSolver {
-	public static final field INSTANCE Lcodes/side/color/EdgeSolver$Iterative;
-	public fun toString ()Ljava/lang/String;
+public final class codes/side/color/EdgeSolver : java/lang/Enum {
+	public static final field ClosedForm Lcodes/side/color/EdgeSolver;
+	public static final field Iterative Lcodes/side/color/EdgeSolver;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/color/EdgeSolver;
+	public static fun values ()[Lcodes/side/color/EdgeSolver;
 }
 
 public final class codes/side/color/Exactness : java/lang/Enum {
@@ -632,7 +627,6 @@ public class codes/side/color/RgbColorSpace : codes/side/color/ColorSpace {
 
 public final class codes/side/color/RgbGamut {
 	public final fun cusp (D)Lcodes/side/color/ColorValue;
-	public final fun getPeakLuminance ()D
 	public final fun getSpace ()Lcodes/side/color/RgbColorSpace;
 	public final fun mapper (Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;)Lcodes/side/color/GamutMapper;
 	public static synthetic fun mapper$default (Lcodes/side/color/RgbGamut;Lcodes/side/color/ColorSpace;Lcodes/side/color/GamutMapping;ILjava/lang/Object;)Lcodes/side/color/GamutMapper;

@@ -38,6 +38,33 @@ class ThumbDefaultsTest {
     }
 
     @Test
+    fun aSliderThumbIsTheThemesThumbWidthAcross() = runComposeUiTest {
+        setContent {
+            ColorPickerTheme(dimensions = ColorPickerDefaults.dimensions(thumbWidth = 10.dp)) {
+                ColorPickerDefaults.SliderThumb(remember { MutableInteractionSource() }, Color.Red, Modifier.testTag("thumb"))
+            }
+        }
+        val bounds = onNodeWithTag("thumb").getUnclippedBoundsInRoot()
+        assertEquals(10f, (bounds.right - bounds.left).value, 0.5f)
+    }
+
+    @Test
+    fun aSlidersThumbTakesTheSlidersOwnThumbWidth() = runComposeUiTest {
+        setContent {
+            ColorSlider(
+                value = 0.5f,
+                onValueChange = {},
+                trackColors = listOf(Color.Red, Color.Blue),
+                thumbColor = Color.Red,
+                dimensions = ColorPickerDefaults.dimensions(thumbWidth = 12.dp),
+                thumb = { ColorPickerDefaults.SliderThumb(interactionSource, thumbColor, Modifier.testTag("thumb")) },
+            )
+        }
+        val bounds = onNodeWithTag("thumb", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertEquals(12f, (bounds.right - bounds.left).value, 0.5f, "the gap the track leaves is the width the thumb is drawn at")
+    }
+
+    @Test
     fun aPlaneThumbIsItsDiameterAcross() = runComposeUiTest {
         setContent { ColorPickerDefaults.PlaneThumb(remember { MutableInteractionSource() }, Modifier.testTag("thumb"), diameter = 30.dp) }
         val bounds = onNodeWithTag("thumb").getUnclippedBoundsInRoot()

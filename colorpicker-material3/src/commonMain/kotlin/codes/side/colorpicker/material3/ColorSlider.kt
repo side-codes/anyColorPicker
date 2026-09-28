@@ -51,8 +51,8 @@ import codes.side.colorpicker.foundation.LocalColorPickerEnabled
  * @param interactionSource receives the slider's press, drag, focus and hover interactions, which [thumb]
  * reads from [ColorSliderScope.interactionSource]. Note that if `null` is provided, interactions will
  * still happen internally.
- * @param label optional slot shown above the track's start; see [SliderLabel].
- * @param valueLabel optional slot shown above the track's end; see [SliderValueLabel].
+ * @param label optional slot shown above the track's start; see [ColorPickerDefaults.SliderLabel].
+ * @param valueLabel optional slot shown above the track's end; see [ColorPickerDefaults.SliderValueLabel].
  * @param thumb draws the thumb, reading where it is, whether the slider is enabled, its interactions and
  * its opaque color from [ColorSliderScope]; the picker's inside a picker, else
  * [ColorPickerDefaults.SliderThumb], a rounded bar.
@@ -64,8 +64,8 @@ public fun ColorSlider(
     trackColors: List<Color>,
     thumbColor: Color,
     modifier: Modifier = Modifier,
-    onValueChangeFinished: (() -> Unit)? = null,
     enabled: Boolean = true,
+    onValueChangeFinished: () -> Unit = {},
     showCheckerboard: Boolean = false,
     semanticLabel: String? = null,
     semanticValueText: String? = ColorPickerStrings.current.sliderPosition(value),
@@ -79,7 +79,7 @@ public fun ColorSlider(
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val gradient = remember(trackColors, layoutDirection) { trackBrush(trackColors, layoutDirection) }
-    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+    SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->
         BasicColorSlider(
             value = value,
             onValueChange = onValueChange,
@@ -103,13 +103,15 @@ private fun trackBrush(colors: List<Color>, direction: LayoutDirection): Brush =
 /**
  * The Material frame of [ColorSlider], [ChannelSlider] and [AlphaSlider]: the label row above the
  * slider, the minimum touch size the slider is handed as its modifier, and the disabled look over
- * both.
+ * both. The slider is composed with [dimensions] in force, so a thumb sized from the theme, as
+ * [ColorPickerDefaults.SliderThumb] is, fills the gap its own track leaves.
  */
 @Composable
 internal fun SliderFrame(
     modifier: Modifier,
     enabled: Boolean,
     colors: ColorPickerColors,
+    dimensions: ColorPickerDimensions,
     label: (@Composable () -> Unit)?,
     valueLabel: (@Composable () -> Unit)?,
     slider: @Composable (Modifier) -> Unit,
@@ -129,11 +131,13 @@ internal fun SliderFrame(
             }
         }
 
-        slider(
-            Modifier
-                .fillMaxWidth()
-                .minimumInteractiveComponentSize(),
-        )
+        ColorPickerTheme(dimensions = dimensions) {
+            slider(
+                Modifier
+                    .fillMaxWidth()
+                    .minimumInteractiveComponentSize(),
+            )
+        }
     }
 }
 

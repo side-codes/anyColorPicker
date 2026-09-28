@@ -42,8 +42,8 @@ import codes.side.color.Oklch
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.color.toHexString
-import codes.side.colorpicker.foundation.ColorPickerDialogState
 import codes.side.colorpicker.foundation.ColorPickerStrings
+import codes.side.colorpicker.state.ColorPickerDialogState
 
 // Material's guidance caps a row of segmented buttons at five.
 private const val MAX_SEGMENTS = 5

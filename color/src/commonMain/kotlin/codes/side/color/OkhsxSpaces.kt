@@ -295,6 +295,7 @@ private fun toeInverse(x: Double): Double = (x * x + TOE_K1 * x) / (TOE_K3 * (x 
 // The cusp's T = C/(1 − L), from its S = C/L and its lightness.
 private fun cuspT(sMax: Double, lCusp: Double): Double = lCusp * sMax / (1.0 - lCusp)
 
+@OptIn(ExperimentalColorSpaceApi::class)
 private fun okHueChannel(): ColorChannel = ColorChannel(
     id = "h",
     referenceRange = 0.0..360.0,

@@ -20,8 +20,6 @@ import kotlin.math.sin
 public class RgbGamut internal constructor(
     /** The RGB space whose `0..1` cube this gamut is. */
     public val space: RgbColorSpace,
-    /** Peak luminance relative to diffuse white: `1.0`, standard dynamic range. */
-    public val peakLuminance: Double = 1.0,
 ) {
     internal val lmsToLinear: DoubleArray get() = space.lmsToLinear
 

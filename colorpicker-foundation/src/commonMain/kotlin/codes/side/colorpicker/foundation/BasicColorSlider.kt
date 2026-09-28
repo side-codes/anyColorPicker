@@ -107,7 +107,7 @@ public fun BasicColorSlider(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     thumbColor: Color = Color.Unspecified,
-    onValueChangeFinished: (() -> Unit)? = null,
+    onValueChangeFinished: () -> Unit = {},
     step: Float = 0.01f,
     pageStep: Float = 0.1f,
     semanticLabel: String? = null,
@@ -149,7 +149,7 @@ internal fun BasicColorSliderImpl(
     modifier: Modifier,
     enabled: Boolean,
     thumbColor: Color,
-    onValueChangeFinished: (() -> Unit)?,
+    onValueChangeFinished: () -> Unit,
     semanticLabel: String?,
     semanticValueText: String?,
     interactionSource: MutableInteractionSource?,
@@ -172,13 +172,13 @@ internal fun BasicColorSliderImpl(
 
     // A key's step ends where it lands, so one that changes the value reports its end at once.
     fun step(direction: Int, page: Boolean) {
-        if (onStep(direction, page)) onValueChangeFinished?.invoke()
+        if (onStep(direction, page)) onValueChangeFinished()
     }
 
     fun jump(to: Float) {
         if (to == fraction) return
         onValueChange(to)
-        onValueChangeFinished?.invoke()
+        onValueChangeFinished()
     }
 
     Layout(
@@ -199,7 +199,7 @@ internal fun BasicColorSliderImpl(
                             false
                         } else {
                             onValueChange(next)
-                            onValueChangeFinished?.invoke()
+                            onValueChangeFinished()
                             true
                         }
                     }
@@ -283,7 +283,7 @@ internal fun BasicColorSliderImpl(
                                 showPress()
                                 up.consume()
                                 report(down.position.x)
-                                currentOnFinished?.invoke()
+                                currentOnFinished()
                             }
                             if (pressed) {
                                 source.tryEmit(if (tapped) PressInteraction.Release(press) else PressInteraction.Cancel(press))
@@ -300,7 +300,7 @@ internal fun BasicColorSliderImpl(
                                 report(change.position.x)
                                 change.consume()
                             }
-                            currentOnFinished?.invoke()
+                            currentOnFinished()
                             source.tryEmit(if (completed) DragInteraction.Stop(start) else DragInteraction.Cancel(start))
                             source.tryEmit(if (completed) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                         }
@@ -310,7 +310,7 @@ internal fun BasicColorSliderImpl(
                         // drag that moved the value has still ended.
                         drag?.let { source.tryEmit(DragInteraction.Cancel(it)) }
                         if (pressed) source.tryEmit(PressInteraction.Cancel(press))
-                        if (drag != null) currentOnFinished?.invoke()
+                        if (drag != null) currentOnFinished()
                         throw e
                     }
                 }

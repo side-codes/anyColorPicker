@@ -9,9 +9,9 @@ import codes.side.color.ColorValue
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * [ColorPicker] for [Cmyk], over [state]: cyan, magenta, yellow and key sliders and alpha, contextual by

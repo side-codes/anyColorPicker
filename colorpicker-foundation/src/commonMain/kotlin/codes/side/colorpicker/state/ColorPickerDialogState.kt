@@ -1,4 +1,4 @@
-package codes.side.colorpicker.foundation
+package codes.side.colorpicker.state
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -11,9 +11,6 @@ import androidx.compose.runtime.setValue
 import codes.side.color.ColorSpace
 import codes.side.color.ColorSpaces
 import codes.side.color.ColorValue
-import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.colorPickerStateSaver
-import codes.side.colorpicker.state.spacesById
 
 /**
  * What a color dialog edits: the color it opened with, the spaces it offers, the one it shows, and the

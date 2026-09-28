@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -83,13 +85,13 @@ public object ColorPickerDefaults {
     public val PlaneThumbSize: Dp = 24.dp
 
     /** Opacity a disabled component draws at, the Material 3 disabled content value. */
-    public const val DisabledAlpha: Float = 0.38f
+    public val DisabledAlpha: Float = 0.38f
 
     /**
      * Colour a disabled component keeps. Full, by default: dimming alone is the Material
      * convention, and draining the colour as well is a choice a caller makes.
      */
-    public const val DisabledSaturation: Float = 1f
+    public val DisabledSaturation: Float = 1f
 
     // surfaceBright/surfaceDim keep visible checkerboard contrast in both
     // light and dark color schemes.
@@ -139,9 +141,9 @@ public object ColorPickerDefaults {
 
     /**
      * Creates a [ColorPickerDimensions] from the constants above. A size left [Dp.Unspecified] takes
-     * its constant, so a call naming one value keeps the rest.
+     * its constant, so a call naming one value keeps the rest. It reads no theme, so it can build
+     * dimensions outside composition too.
      */
-    @Composable
     public fun dimensions(
         trackHeight: Dp = Dp.Unspecified,
         thumbWidth: Dp = Dp.Unspecified,
@@ -184,37 +186,72 @@ public object ColorPickerDefaults {
 
     /**
      * The sliders' default thumb, drawn as Material draws its handle: a bar in [color] with round ends,
-     * half as wide while [interactionSource] reports a press or drag, and ringed while it holds focus from
-     * the keyboard. The narrowing is drawn inside a fixed layout width, so the track beside the thumb does
-     * not move as it narrows, and the ring stays within the gap the track leaves around it.
+     * [width] across, half as wide while [interactionSource] reports a press or drag, and ringed while it
+     * holds focus from the keyboard. The narrowing is drawn inside a fixed layout width, so the track beside
+     * the thumb does not move as it narrows, and the ring stays within the gap the track leaves around it.
+     *
+     * @param width the thumb's width: by default the thumb width of the slider it is drawn in, which is the
+     * gap its track leaves.
      */
     @Composable
-    public fun SliderThumb(interactionSource: InteractionSource, color: Color, modifier: Modifier = Modifier) {
+    public fun SliderThumb(
+        interactionSource: InteractionSource,
+        color: Color,
+        modifier: Modifier = Modifier,
+        width: Dp = currentDimensions().thumbWidth,
+    ) {
         val pressed by interactionSource.collectIsPressedAsState()
         val dragged by interactionSource.collectIsDraggedAsState()
         // Only for whoever needs it, as on the plane: a ring left after a touch marks a thing a toucher has no way
         // to act on.
         val focused by interactionSource.collectIsFocusedAsState()
         val showFocus = focused && LocalInputModeManager.current.inputMode == InputMode.Keyboard
-        Canvas(modifier.size(ThumbWidth, SliderThumbHeight)) {
-            val width = if (pressed || dragged) size.width / 2f else size.width
-            val left = (size.width - width) / 2f
+        Canvas(modifier.size(width, SliderThumbHeight)) {
+            val barWidth = if (pressed || dragged) size.width / 2f else size.width
+            val left = (size.width - barWidth) / 2f
             drawRoundRect(
                 color = color,
                 topLeft = Offset(left, 0f),
-                size = Size(width, size.height),
-                cornerRadius = CornerRadius(width / 2f),
+                size = Size(barWidth, size.height),
+                cornerRadius = CornerRadius(barWidth / 2f),
             )
             if (showFocus) {
                 // A white ring over a dark halo, as the plane's indicator, so it reads over any track color.
                 val inset = -SliderFocusRingGap.toPx()
                 val ringLeft = left + inset
-                val ringSize = Size(width - 2 * inset, size.height - 2 * inset)
+                val ringSize = Size(barWidth - 2 * inset, size.height - 2 * inset)
                 val corner = CornerRadius(ringSize.width / 2f)
                 drawRoundRect(Color.Black.copy(alpha = 0.35f), Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 4.dp.toPx()))
                 drawRoundRect(Color.White, Offset(ringLeft, inset), ringSize, corner, style = Stroke(width = 2.dp.toPx()))
             }
         }
+    }
+
+    /**
+     * The sliders' default label: [text] in `MaterialTheme.typography.labelMedium`, for a `label` slot
+     * that keeps the built-in look.
+     */
+    @Composable
+    public fun SliderLabel(text: String, modifier: Modifier = Modifier) {
+        Text(
+            text = text,
+            modifier = modifier,
+            style = MaterialTheme.typography.labelMedium,
+        )
+    }
+
+    /**
+     * The sliders' default value label: [text] in `MaterialTheme.typography.labelMedium` and a monospaced
+     * font, so its digits hold their places as the value changes; for a `valueLabel` slot.
+     */
+    @Composable
+    public fun SliderValueLabel(text: String, modifier: Modifier = Modifier) {
+        Text(
+            text = text,
+            modifier = modifier,
+            style = MaterialTheme.typography.labelMedium,
+            fontFamily = FontFamily.Monospace,
+        )
     }
 
     /**

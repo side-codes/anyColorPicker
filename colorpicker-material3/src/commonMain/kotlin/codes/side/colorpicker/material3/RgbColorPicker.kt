@@ -9,9 +9,9 @@ import codes.side.color.Srgb
 import codes.side.colorpicker.foundation.AlphaSliderPart
 import codes.side.colorpicker.foundation.ChannelSliderPart
 import codes.side.colorpicker.foundation.ColorSliderScope
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.foundation.PlanePart
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 
 /**
  * [ColorPicker] for [Srgb], over [state]: red, green and blue sliders and alpha, contextual by default.

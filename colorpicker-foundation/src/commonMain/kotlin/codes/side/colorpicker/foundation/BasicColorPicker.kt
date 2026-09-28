@@ -28,7 +28,6 @@ import codes.side.color.ColorValue
 import codes.side.color.compose.toColorValue
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 import kotlin.math.max
 
 /** Whether a picker over [space] shows a plane: [space] has one hue and two other channels. */

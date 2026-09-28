@@ -36,8 +36,8 @@ import codes.side.color.Okhsl
 import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.colorpicker.foundation.BasicColorPicker
+import codes.side.colorpicker.foundation.ColoringMode
 import codes.side.colorpicker.state.ColorPickerState
-import codes.side.colorpicker.state.ColoringMode
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -125,7 +125,6 @@ class RgbSpacesTest {
     @Test
     fun rgbGamutBelongsToItsSpace() {
         assertEquals(Srgb, Srgb.gamut.space)
-        assertEquals(1.0, Srgb.gamut.peakLuminance)
         assertEquals(DisplayP3, DisplayP3.gamut.space)
     }
 }

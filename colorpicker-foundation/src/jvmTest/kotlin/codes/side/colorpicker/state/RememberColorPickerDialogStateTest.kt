@@ -1,4 +1,4 @@
-package codes.side.colorpicker.foundation
+package codes.side.colorpicker.state
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,6 +12,7 @@ import codes.side.color.Hsv
 import codes.side.color.Okhsl
 import codes.side.color.Oklch
 import codes.side.color.Srgb
+import codes.side.colorpicker.foundation.Recreation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotSame
