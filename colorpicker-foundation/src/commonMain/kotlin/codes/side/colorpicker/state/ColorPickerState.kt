@@ -100,8 +100,9 @@ public class ColorPickerState(initialValue: ColorValue) {
     public operator fun get(channel: ColorChannel): Double? = current.to(channel.space)[channel]
 
     /**
-     * What a slider on [channel] shows: its value; for a missing hue, the one last chosen in its
-     * family, or 0 when none has been; for any other missing component, 0, as CSS reads `none`.
+     * What a slider on [channel] shows: its value; for a grey's missing hue, the one last chosen in its
+     * family, or 0 when none has been; for any other missing component, a colorful color's hue included,
+     * 0, as CSS reads `none` and as the color is drawn.
      */
     public fun displayValue(channel: ColorChannel): Double = displayComponents(channel.space)[channel.index]
 
@@ -111,9 +112,14 @@ public class ColorPickerState(initialValue: ColorValue) {
         val color = of.to(space)
         return DoubleArray(space.channels.size) { index ->
             val channel = space.channels[index]
-            color[channel] ?: if (channel.isHue) memory.hue(channel) ?: 0.0 else 0.0
+            color[channel] ?: if (channel.isHue) missingHue(color, channel) else 0.0
         }
     }
+
+    // What [color]'s missing [hue] reads as. A grey has no hue to draw, so it reads the one last chosen
+    // in its family; a colorful color is drawn at hue 0, as CSS reads `none`, and reads that.
+    private fun missingHue(color: ColorValue, hue: ColorChannel): Double =
+        if (color.space.powerless(color.components()) and (1 shl hue.index) != 0) memory.hue(hue) ?: 0.0 else 0.0
 
     /**
      * Sets [channel] to [value], or to `none` when it is null, and leaves the color in [channel]'s
@@ -166,7 +172,7 @@ public class ColorPickerState(initialValue: ColorValue) {
     private fun edited(channel: ColorChannel, value: Double?): ColorValue {
         var color = editBase.to(channel.space)
         val hue = channel.space.hueChannel()
-        if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, memory.hue(hue) ?: 0.0)
+        if (hue != null && hue !== channel && color.isMissing(hue)) color = color.with(hue, missingHue(color, hue))
         return color.with(channel, value)
     }
 
