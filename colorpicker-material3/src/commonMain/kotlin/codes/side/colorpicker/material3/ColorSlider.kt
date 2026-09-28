@@ -79,7 +79,7 @@ public fun ColorSlider(
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val gradient = remember(trackColors, layoutDirection) { trackBrush(trackColors, layoutDirection) }
-    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+    SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->
         BasicColorSlider(
             value = value,
             onValueChange = onValueChange,
@@ -103,13 +103,15 @@ private fun trackBrush(colors: List<Color>, direction: LayoutDirection): Brush =
 /**
  * The Material frame of [ColorSlider], [ChannelSlider] and [AlphaSlider]: the label row above the
  * slider, the minimum touch size the slider is handed as its modifier, and the disabled look over
- * both.
+ * both. The slider is composed with [dimensions] in force, so a thumb sized from the theme, as
+ * [ColorPickerDefaults.SliderThumb] is, fills the gap its own track leaves.
  */
 @Composable
 internal fun SliderFrame(
     modifier: Modifier,
     enabled: Boolean,
     colors: ColorPickerColors,
+    dimensions: ColorPickerDimensions,
     label: (@Composable () -> Unit)?,
     valueLabel: (@Composable () -> Unit)?,
     slider: @Composable (Modifier) -> Unit,
@@ -129,11 +131,13 @@ internal fun SliderFrame(
             }
         }
 
-        slider(
-            Modifier
-                .fillMaxWidth()
-                .minimumInteractiveComponentSize(),
-        )
+        ColorPickerTheme(dimensions = dimensions) {
+            slider(
+                Modifier
+                    .fillMaxWidth()
+                    .minimumInteractiveComponentSize(),
+            )
+        }
     }
 }
 

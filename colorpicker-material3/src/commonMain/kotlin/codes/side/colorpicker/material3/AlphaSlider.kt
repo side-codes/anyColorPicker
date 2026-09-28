@@ -44,7 +44,7 @@ public fun AlphaSlider(
     valueLabel: (@Composable () -> Unit)? = { SliderValueLabel(ColorPickerStrings.current.alphaValue(state.value.alpha, false)) },
     thumb: @Composable AlphaSliderScope.() -> Unit = pickerThumb(),
 ) {
-    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+    SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->
         BasicAlphaSlider(
             state = state,
             modifier = sliderModifier,

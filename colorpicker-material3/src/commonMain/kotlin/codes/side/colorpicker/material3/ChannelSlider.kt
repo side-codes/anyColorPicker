@@ -71,7 +71,7 @@ public fun ChannelSlider(
     },
     thumb: @Composable ChannelSliderScope.() -> Unit = pickerThumb(),
 ) {
-    SliderFrame(modifier, enabled, colors, label, valueLabel) { sliderModifier ->
+    SliderFrame(modifier, enabled, colors, dimensions, label, valueLabel) { sliderModifier ->
         BasicChannelSlider(
             state = state,
             channel = channel,
