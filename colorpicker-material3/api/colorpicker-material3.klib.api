@@ -69,11 +69,10 @@ final class codes.side.colorpicker.material3/ColorPickerShapes { // codes.side.c
 }
 
 final object codes.side.colorpicker.material3/ColorPickerDefaults { // codes.side.colorpicker.material3/ColorPickerDefaults|null[0]
-    final const val DisabledAlpha // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledAlpha|{}DisabledAlpha[0]
+    final val DisabledAlpha // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledAlpha|{}DisabledAlpha[0]
         final fun <get-DisabledAlpha>(): kotlin/Float // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledAlpha.<get-DisabledAlpha>|<get-DisabledAlpha>(){}[0]
-    final const val DisabledSaturation // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledSaturation|{}DisabledSaturation[0]
+    final val DisabledSaturation // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledSaturation|{}DisabledSaturation[0]
         final fun <get-DisabledSaturation>(): kotlin/Float // codes.side.colorpicker.material3/ColorPickerDefaults.DisabledSaturation.<get-DisabledSaturation>|<get-DisabledSaturation>(){}[0]
-
     final val PlaneMinSize // codes.side.colorpicker.material3/ColorPickerDefaults.PlaneMinSize|{}PlaneMinSize[0]
         final fun <get-PlaneMinSize>(): androidx.compose.ui.unit/Dp // codes.side.colorpicker.material3/ColorPickerDefaults.PlaneMinSize.<get-PlaneMinSize>|<get-PlaneMinSize>(){}[0]
     final val PlaneThumbSize // codes.side.colorpicker.material3/ColorPickerDefaults.PlaneThumbSize|{}PlaneThumbSize[0]

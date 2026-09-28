@@ -36,8 +36,6 @@ public final class codes/side/colorpicker/material3/ColorPickerColors {
 
 public final class codes/side/colorpicker/material3/ColorPickerDefaults {
 	public static final field $stable I
-	public static final field DisabledAlpha F
-	public static final field DisabledSaturation F
 	public static final field INSTANCE Lcodes/side/colorpicker/material3/ColorPickerDefaults;
 	public final fun Plane (Lcodes/side/colorpicker/foundation/PlanePart;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 	public final fun PlaneThumb-6a0pyJM (Landroidx/compose/foundation/interaction/InteractionSource;Landroidx/compose/ui/Modifier;FLandroidx/compose/runtime/Composer;II)V
@@ -47,6 +45,8 @@ public final class codes/side/colorpicker/material3/ColorPickerDefaults {
 	public final fun currentDimensions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
 	public final fun currentShapes (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerShapes;
 	public final fun dimensions-R_JCAzs (FFFFFLandroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
+	public final fun getDisabledAlpha ()F
+	public final fun getDisabledSaturation ()F
 	public final fun getPlaneMinSize-D9Ej5fM ()F
 	public final fun getPlaneThumbSize-D9Ej5fM ()F
 	public final fun getSwatchSize-D9Ej5fM ()F
