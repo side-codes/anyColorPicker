@@ -24,7 +24,7 @@ Versioning follows [Semantic Versioning](https://semver.org): public API is adde
 
 Decisions that shape the public API, so the next one is made the same way. Add to this list when a new one is settled.
 
-- **A set of options is an enum, even one that may grow,** as `ColoringMode`, `Exactness`, `AnalogousCategory`, `HexAlpha` and `CssSyntax` are. An app can keep an enum in saved UI state: `rememberSaveable { mutableStateOf(mode) }` saves one on Android and cannot save a class, which would crash the app on rotation. An option added to an enum breaks callers' exhaustive `when`, so it waits for a major release.
+- **A set of options is an enum, even one that may grow,** as every one in the library is: `ColoringMode`, `PlaneRendering`, `EdgeSolver`, `Exactness`, `AnalogousCategory`, `HexAlpha` and `CssSyntax`. An app can keep an enum in saved UI state: `rememberSaveable { mutableStateOf(mode) }` saves one on Android and cannot save a class, which would crash the app on rotation. An option added to an enum breaks callers' exhaustive `when`, so it waits for a major release.
 - **Sliders, planes and pickers take `enabled` after `modifier` and before `onValueChangeFinished: () -> Unit = {}`,** and a component's main content slot comes last.
 - **Default slot content lives in `ColorPickerDefaults`,** as `SliderThumb`, `SliderLabel` and `Plane` do.
 - **A public constant is a `val`, not a `const val`,** which would be copied into every caller's compiled code.

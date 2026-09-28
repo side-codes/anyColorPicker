@@ -38,6 +38,17 @@ final enum class codes.side.color/CssSyntax : kotlin/Enum<codes.side.color/CssSy
     final fun values(): kotlin/Array<codes.side.color/CssSyntax> // codes.side.color/CssSyntax.values|values#static(){}[0]
 }
 
+final enum class codes.side.color/EdgeSolver : kotlin/Enum<codes.side.color/EdgeSolver> { // codes.side.color/EdgeSolver|null[0]
+    enum entry ClosedForm // codes.side.color/EdgeSolver.ClosedForm|null[0]
+    enum entry Iterative // codes.side.color/EdgeSolver.Iterative|null[0]
+
+    final val entries // codes.side.color/EdgeSolver.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/EdgeSolver> // codes.side.color/EdgeSolver.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/EdgeSolver // codes.side.color/EdgeSolver.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/EdgeSolver> // codes.side.color/EdgeSolver.values|values#static(){}[0]
+}
+
 final enum class codes.side.color/Exactness : kotlin/Enum<codes.side.color/Exactness> { // codes.side.color/Exactness|null[0]
     enum entry Approximate // codes.side.color/Exactness.Approximate|null[0]
     enum entry Exact // codes.side.color/Exactness.Exact|null[0]
@@ -93,16 +104,6 @@ abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null
         final fun hwb(kotlin/String, codes.side.color/RgbColorSpace): codes.side.color/HwbColorSpace // codes.side.color/ColorSpace.Companion.hwb|hwb(kotlin.String;codes.side.color.RgbColorSpace){}[0]
         final fun polar(kotlin/String, codes.side.color/ColorSpace, kotlin/Double, kotlin/Double, codes.side.color/HueFamily): codes.side.color/PolarColorSpace // codes.side.color/ColorSpace.Companion.polar|polar(kotlin.String;codes.side.color.ColorSpace;kotlin.Double;kotlin.Double;codes.side.color.HueFamily){}[0]
         final fun rgb(kotlin/String, codes.side.color/RgbPrimaries, codes.side.color/WhitePoint, codes.side.color/TransferFunction): codes.side.color/RgbColorSpace // codes.side.color/ColorSpace.Companion.rgb|rgb(kotlin.String;codes.side.color.RgbPrimaries;codes.side.color.WhitePoint;codes.side.color.TransferFunction){}[0]
-    }
-}
-
-abstract class codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver|null[0]
-    final object ClosedForm : codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver.ClosedForm|null[0]
-        final fun toString(): kotlin/String // codes.side.color/EdgeSolver.ClosedForm.toString|toString(){}[0]
-    }
-
-    final object Iterative : codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver.Iterative|null[0]
-        final fun toString(): kotlin/String // codes.side.color/EdgeSolver.Iterative.toString|toString(){}[0]
     }
 }
 

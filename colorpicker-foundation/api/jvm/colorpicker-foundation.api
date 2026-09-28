@@ -164,20 +164,12 @@ public abstract interface class codes/side/colorpicker/foundation/PlanePart : co
 	public abstract fun getY ()Lcodes/side/color/ColorChannel;
 }
 
-public abstract class codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-}
-
-public final class codes/side/colorpicker/foundation/PlaneRendering$Canonical : codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Canonical;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class codes/side/colorpicker/foundation/PlaneRendering$Fast : codes/side/colorpicker/foundation/PlaneRendering {
-	public static final field $stable I
-	public static final field INSTANCE Lcodes/side/colorpicker/foundation/PlaneRendering$Fast;
-	public fun toString ()Ljava/lang/String;
+public final class codes/side/colorpicker/foundation/PlaneRendering : java/lang/Enum {
+	public static final field Canonical Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static final field Fast Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/colorpicker/foundation/PlaneRendering;
+	public static fun values ()[Lcodes/side/colorpicker/foundation/PlaneRendering;
 }
 
 public final class codes/side/colorpicker/foundation/PlaneRenderingKt {

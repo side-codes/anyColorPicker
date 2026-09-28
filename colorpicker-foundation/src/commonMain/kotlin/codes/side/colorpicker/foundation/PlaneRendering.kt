@@ -8,7 +8,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
  * [LocalPlaneRendering]. HSL's saturation × lightness and HSV's saturation × value are two gradients
  * either way.
  */
-public abstract class PlaneRendering internal constructor() {
+public enum class PlaneRendering {
 
     /**
      * The default. Each row goes straight to pixels through
@@ -21,17 +21,13 @@ public abstract class PlaneRendering internal constructor() {
      * its grids are measured with them, the outermost on the plane's edges, where Canonical's sit half a
      * cell in.
      */
-    public object Fast : PlaneRendering() {
-        override fun toString(): String = "Fast"
-    }
+    Fast,
 
     /**
      * Each color mapped to Doubles by [EdgeSolver.ClosedForm][codes.side.color.EdgeSolver.ClosedForm]
      * and rounded, one row after another: the reference [Fast] is tested against.
      */
-    public object Canonical : PlaneRendering() {
-        override fun toString(): String = "Canonical"
-    }
+    Canonical,
 }
 
 /** How the [BasicChannelPlane]s below build their fields: [PlaneRendering.Fast] unless provided. */
