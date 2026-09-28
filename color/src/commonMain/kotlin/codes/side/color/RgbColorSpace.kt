@@ -34,7 +34,15 @@ public class RgbPrimaries(
         greenX == other.greenX && greenY == other.greenY &&
         blueX == other.blueX && blueY == other.blueY
 
-    override fun hashCode(): Int = listOf(redX, redY, greenX, greenY, blueX, blueY).hashCode()
+    override fun hashCode(): Int {
+        // Equality treats the two signs of zero alike; their hashes must agree too.
+        var result = (redX + 0.0).hashCode()
+        result = 31 * result + (redY + 0.0).hashCode()
+        result = 31 * result + (greenX + 0.0).hashCode()
+        result = 31 * result + (greenY + 0.0).hashCode()
+        result = 31 * result + (blueX + 0.0).hashCode()
+        return 31 * result + (blueY + 0.0).hashCode()
+    }
 
     override fun toString(): String = "RgbPrimaries(R $redX,$redY G $greenX,$greenY B $blueX,$blueY)"
 

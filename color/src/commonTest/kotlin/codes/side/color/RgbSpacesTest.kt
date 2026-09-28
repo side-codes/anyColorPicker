@@ -102,6 +102,15 @@ class RgbSpacesTest {
     }
 
     @Test
+    fun equalPrimariesWithSignedZeroWorkAsMapKeys() {
+        val positive = RgbPrimaries(0.0, 0.33, 0.30, 0.60, 0.15, 0.06)
+        val negative = RgbPrimaries(-0.0, 0.33, 0.30, 0.60, 0.15, 0.06)
+        assertEquals(positive, negative)
+        assertEquals(positive.hashCode(), negative.hashCode())
+        assertEquals("primaries", mapOf(positive to "primaries")[negative])
+    }
+
+    @Test
     fun anAppSpaceCannotTakeALibraryId() {
         // Spaces are equal by id, so one called srgb would be taken for Srgb and never converted.
         assertFailsWith<IllegalArgumentException> { ColorSpace.rgb("srgb", RgbPrimaries.Srgb, WhitePoint.D65, TransferFunction.Srgb) }
