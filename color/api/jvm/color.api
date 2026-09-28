@@ -1,37 +1,15 @@
-public abstract class codes/side/color/AnalogousCategory {
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class codes/side/color/AnalogousCategory$Blues : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Blues;
-}
-
-public final class codes/side/color/AnalogousCategory$Colorfulness : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Colorfulness;
-}
-
-public final class codes/side/color/AnalogousCategory$Greens : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Greens;
-}
-
-public final class codes/side/color/AnalogousCategory$Hue : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Hue;
-}
-
-public final class codes/side/color/AnalogousCategory$Lightness : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Lightness;
-}
-
-public final class codes/side/color/AnalogousCategory$OpponentA : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$OpponentA;
-}
-
-public final class codes/side/color/AnalogousCategory$OpponentB : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$OpponentB;
-}
-
-public final class codes/side/color/AnalogousCategory$Reds : codes/side/color/AnalogousCategory {
-	public static final field INSTANCE Lcodes/side/color/AnalogousCategory$Reds;
+public final class codes/side/color/AnalogousCategory : java/lang/Enum {
+	public static final field Blues Lcodes/side/color/AnalogousCategory;
+	public static final field Colorfulness Lcodes/side/color/AnalogousCategory;
+	public static final field Greens Lcodes/side/color/AnalogousCategory;
+	public static final field Hue Lcodes/side/color/AnalogousCategory;
+	public static final field Lightness Lcodes/side/color/AnalogousCategory;
+	public static final field OpponentA Lcodes/side/color/AnalogousCategory;
+	public static final field OpponentB Lcodes/side/color/AnalogousCategory;
+	public static final field Reds Lcodes/side/color/AnalogousCategory;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/color/AnalogousCategory;
+	public static fun values ()[Lcodes/side/color/AnalogousCategory;
 }
 
 public abstract class codes/side/color/ChannelKind {
@@ -229,20 +207,13 @@ public final class codes/side/color/EdgeSolver$Iterative : codes/side/color/Edge
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract class codes/side/color/Exactness {
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class codes/side/color/Exactness$Approximate : codes/side/color/Exactness {
-	public static final field INSTANCE Lcodes/side/color/Exactness$Approximate;
-}
-
-public final class codes/side/color/Exactness$Exact : codes/side/color/Exactness {
-	public static final field INSTANCE Lcodes/side/color/Exactness$Exact;
-}
-
-public final class codes/side/color/Exactness$NonColorimetric : codes/side/color/Exactness {
-	public static final field INSTANCE Lcodes/side/color/Exactness$NonColorimetric;
+public final class codes/side/color/Exactness : java/lang/Enum {
+	public static final field Approximate Lcodes/side/color/Exactness;
+	public static final field Exact Lcodes/side/color/Exactness;
+	public static final field NonColorimetric Lcodes/side/color/Exactness;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcodes/side/color/Exactness;
+	public static fun values ()[Lcodes/side/color/Exactness;
 }
 
 public abstract interface annotation class codes/side/color/ExperimentalColorSpaceApi : java/lang/annotation/Annotation {

@@ -10,6 +10,23 @@ open annotation class codes.side.color/ExperimentalColorSpaceApi : kotlin/Annota
     constructor <init>() // codes.side.color/ExperimentalColorSpaceApi.<init>|<init>(){}[0]
 }
 
+final enum class codes.side.color/AnalogousCategory : kotlin/Enum<codes.side.color/AnalogousCategory> { // codes.side.color/AnalogousCategory|null[0]
+    enum entry Blues // codes.side.color/AnalogousCategory.Blues|null[0]
+    enum entry Colorfulness // codes.side.color/AnalogousCategory.Colorfulness|null[0]
+    enum entry Greens // codes.side.color/AnalogousCategory.Greens|null[0]
+    enum entry Hue // codes.side.color/AnalogousCategory.Hue|null[0]
+    enum entry Lightness // codes.side.color/AnalogousCategory.Lightness|null[0]
+    enum entry OpponentA // codes.side.color/AnalogousCategory.OpponentA|null[0]
+    enum entry OpponentB // codes.side.color/AnalogousCategory.OpponentB|null[0]
+    enum entry Reds // codes.side.color/AnalogousCategory.Reds|null[0]
+
+    final val entries // codes.side.color/AnalogousCategory.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/AnalogousCategory> // codes.side.color/AnalogousCategory.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/AnalogousCategory> // codes.side.color/AnalogousCategory.values|values#static(){}[0]
+}
+
 final enum class codes.side.color/CssSyntax : kotlin/Enum<codes.side.color/CssSyntax> { // codes.side.color/CssSyntax|null[0]
     enum entry Legacy // codes.side.color/CssSyntax.Legacy|null[0]
     enum entry Modern // codes.side.color/CssSyntax.Modern|null[0]
@@ -19,6 +36,18 @@ final enum class codes.side.color/CssSyntax : kotlin/Enum<codes.side.color/CssSy
 
     final fun valueOf(kotlin/String): codes.side.color/CssSyntax // codes.side.color/CssSyntax.valueOf|valueOf#static(kotlin.String){}[0]
     final fun values(): kotlin/Array<codes.side.color/CssSyntax> // codes.side.color/CssSyntax.values|values#static(){}[0]
+}
+
+final enum class codes.side.color/Exactness : kotlin/Enum<codes.side.color/Exactness> { // codes.side.color/Exactness|null[0]
+    enum entry Approximate // codes.side.color/Exactness.Approximate|null[0]
+    enum entry Exact // codes.side.color/Exactness.Exact|null[0]
+    enum entry NonColorimetric // codes.side.color/Exactness.NonColorimetric|null[0]
+
+    final val entries // codes.side.color/Exactness.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<codes.side.color/Exactness> // codes.side.color/Exactness.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): codes.side.color/Exactness // codes.side.color/Exactness.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<codes.side.color/Exactness> // codes.side.color/Exactness.values|values#static(){}[0]
 }
 
 final enum class codes.side.color/HexAlpha : kotlin/Enum<codes.side.color/HexAlpha> { // codes.side.color/HexAlpha|null[0]
@@ -31,26 +60,6 @@ final enum class codes.side.color/HexAlpha : kotlin/Enum<codes.side.color/HexAlp
 
     final fun valueOf(kotlin/String): codes.side.color/HexAlpha // codes.side.color/HexAlpha.valueOf|valueOf#static(kotlin.String){}[0]
     final fun values(): kotlin/Array<codes.side.color/HexAlpha> // codes.side.color/HexAlpha.values|values#static(){}[0]
-}
-
-abstract class codes.side.color/AnalogousCategory { // codes.side.color/AnalogousCategory|null[0]
-    open fun toString(): kotlin/String // codes.side.color/AnalogousCategory.toString|toString(){}[0]
-
-    final object Blues : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Blues|null[0]
-
-    final object Colorfulness : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Colorfulness|null[0]
-
-    final object Greens : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Greens|null[0]
-
-    final object Hue : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Hue|null[0]
-
-    final object Lightness : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Lightness|null[0]
-
-    final object OpponentA : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.OpponentA|null[0]
-
-    final object OpponentB : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.OpponentB|null[0]
-
-    final object Reds : codes.side.color/AnalogousCategory // codes.side.color/AnalogousCategory.Reds|null[0]
 }
 
 abstract class codes.side.color/ColorSpace { // codes.side.color/ColorSpace|null[0]
@@ -95,16 +104,6 @@ abstract class codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver|null
     final object Iterative : codes.side.color/EdgeSolver { // codes.side.color/EdgeSolver.Iterative|null[0]
         final fun toString(): kotlin/String // codes.side.color/EdgeSolver.Iterative.toString|toString(){}[0]
     }
-}
-
-abstract class codes.side.color/Exactness { // codes.side.color/Exactness|null[0]
-    open fun toString(): kotlin/String // codes.side.color/Exactness.toString|toString(){}[0]
-
-    final object Approximate : codes.side.color/Exactness // codes.side.color/Exactness.Approximate|null[0]
-
-    final object Exact : codes.side.color/Exactness // codes.side.color/Exactness.Exact|null[0]
-
-    final object NonColorimetric : codes.side.color/Exactness // codes.side.color/Exactness.NonColorimetric|null[0]
 }
 
 abstract class codes.side.color/GamutMapping { // codes.side.color/GamutMapping|null[0]

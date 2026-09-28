@@ -5,29 +5,16 @@ import kotlin.math.abs
 /**
  * CSS Color 4's analogous-component categories. A component missing in the source stays missing
  * in a destination channel of the same category when a color is converted.
- *
- * A class rather than an enum, so a category a later CSS level defines can be added: a `when` over
- * it needs an `else`.
  */
-public abstract class AnalogousCategory internal constructor(private val name: String) {
-
-    override fun toString(): String = name
-
-    public object Reds : AnalogousCategory("Reds")
-
-    public object Greens : AnalogousCategory("Greens")
-
-    public object Blues : AnalogousCategory("Blues")
-
-    public object Lightness : AnalogousCategory("Lightness")
-
-    public object Colorfulness : AnalogousCategory("Colorfulness")
-
-    public object Hue : AnalogousCategory("Hue")
-
-    public object OpponentA : AnalogousCategory("OpponentA")
-
-    public object OpponentB : AnalogousCategory("OpponentB")
+public enum class AnalogousCategory {
+    Reds,
+    Greens,
+    Blues,
+    Lightness,
+    Colorfulness,
+    Hue,
+    OpponentA,
+    OpponentB,
 }
 
 /**
