@@ -44,7 +44,8 @@ public final class codes/side/colorpicker/material3/ColorPickerDefaults {
 	public final fun currentColors (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerColors;
 	public final fun currentDimensions (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
 	public final fun currentShapes (Landroidx/compose/runtime/Composer;I)Lcodes/side/colorpicker/material3/ColorPickerShapes;
-	public final fun dimensions-R_JCAzs (FFFFFLandroidx/compose/runtime/Composer;II)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
+	public final fun dimensions-RyVG9vg (FFFFF)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
+	public static synthetic fun dimensions-RyVG9vg$default (Lcodes/side/colorpicker/material3/ColorPickerDefaults;FFFFFILjava/lang/Object;)Lcodes/side/colorpicker/material3/ColorPickerDimensions;
 	public final fun getDisabledAlpha ()F
 	public final fun getDisabledSaturation ()F
 	public final fun getPlaneMinSize-D9Ej5fM ()F

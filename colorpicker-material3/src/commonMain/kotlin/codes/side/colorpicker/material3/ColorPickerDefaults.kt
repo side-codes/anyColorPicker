@@ -139,9 +139,9 @@ public object ColorPickerDefaults {
 
     /**
      * Creates a [ColorPickerDimensions] from the constants above. A size left [Dp.Unspecified] takes
-     * its constant, so a call naming one value keeps the rest.
+     * its constant, so a call naming one value keeps the rest. It reads no theme, so it can build
+     * dimensions outside composition too.
      */
-    @Composable
     public fun dimensions(
         trackHeight: Dp = Dp.Unspecified,
         thumbWidth: Dp = Dp.Unspecified,
