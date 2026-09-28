@@ -229,21 +229,6 @@ public final class codes/side/colorpicker/state/ColorPickerStateViewsKt {
 	public static final fun getSrgbLinear (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD50 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
 	public static final fun getXyzD65 (Lcodes/side/colorpicker/state/ColorPickerState;)Lcodes/side/color/ColorValue;
-	public static final fun set-11RcLd0 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-1Y7pCtI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-7jXRPvs (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-9Crj1pI (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-BJ8B4ww (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-Fmdgyq8 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-LTCmHu4 (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-QdQAm9Q (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-S9D4_nc (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-Y2eWPdA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-cKsaJvA (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-mmr5dew (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-mvXxeeQ (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-tro4B1k (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
-	public static final fun set-w1g9Peg (Lcodes/side/colorpicker/state/ColorPickerState;Lcodes/side/color/ColorValue;)V
 }
 
 public final class codes/side/colorpicker/state/ColoringMode : java/lang/Enum {

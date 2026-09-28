@@ -769,7 +769,6 @@ state.hsl.l                       // a typed view; there is one for each of the 
 
 state.value = Oklch(0.7, 0.15, 140.0)
 state[Hsl.L] = 40.0               // leaves the color in HSL
-state.set(state.okhsl.with(l = 0.4))
 state.value = state.value.withAlpha(0.5)
 
 state.isInteracting               // true while a slider or plane is being dragged
@@ -855,7 +854,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 | `state.pickerColor`                                                                         | `state.value`                                                                            |                                                            |
 | `state.argbInt`                                                                             | `state.color.toArgb()`                                                                   |                                                            |
 | `updateHue(h)`, `updateRed(r)`, … (30)                                                      | `state[Hsl.H] = h`, `state[Srgb.R] = r`                                                  | NaN and out-of-limit values throw instead of being ignored |
-| `updateFromHsl(hsl)`, …                                                                     | `state.value = x` or `state.set(view)`                                                   |                                                            |
+| `updateFromHsl(hsl)`, …                                                                     | `state.value = x`                                                                        |                                                            |
 | `updateAlpha(a)`                                                                            | `state.value = state.value.withAlpha(a)`                                                 |                                                            |
 | `updateFromArgbInt(i)`                                                                      | `state.value = Color(i).toColorValue()`                                                  |                                                            |
 | `HueSlider(state)`, `RedSlider(state)`, … (21)                                              | `ChannelSlider(state, Hsl.H)`, `ChannelSlider(state, Srgb.R)`                            |                                                            |

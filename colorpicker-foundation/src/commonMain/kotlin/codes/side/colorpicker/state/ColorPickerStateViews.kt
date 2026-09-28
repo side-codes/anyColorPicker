@@ -37,119 +37,44 @@ import codes.side.color.toXyzD65
 /** The color in sRGB. */
 public val ColorPickerState.srgb: SrgbColor get() = value.toSrgb()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: SrgbColor) {
-    value = color.value
-}
-
 /** The color in linear sRGB. */
 public val ColorPickerState.srgbLinear: SrgbLinearColor get() = value.toSrgbLinear()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: SrgbLinearColor) {
-    value = color.value
-}
 
 /** The color in Display P3. */
 public val ColorPickerState.displayP3: DisplayP3Color get() = value.toDisplayP3()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: DisplayP3Color) {
-    value = color.value
-}
-
 /** The color in CIE XYZ relative to D65. */
 public val ColorPickerState.xyzD65: XyzD65Color get() = value.toXyzD65()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: XyzD65Color) {
-    value = color.value
-}
 
 /** The color in CIE XYZ relative to D50. */
 public val ColorPickerState.xyzD50: XyzD50Color get() = value.toXyzD50()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: XyzD50Color) {
-    value = color.value
-}
-
 /** The color in CIELAB. */
 public val ColorPickerState.lab: LabColor get() = value.toLab()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: LabColor) {
-    value = color.value
-}
 
 /** The color in CIE LCH. A grey's hue is null. */
 public val ColorPickerState.lch: LchColor get() = value.toLch()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: LchColor) {
-    value = color.value
-}
-
 /** The color in Oklab. */
 public val ColorPickerState.oklab: OklabColor get() = value.toOklab()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: OklabColor) {
-    value = color.value
-}
 
 /** The color in OkLCh. A grey's hue is null. */
 public val ColorPickerState.oklch: OklchColor get() = value.toOklch()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: OklchColor) {
-    value = color.value
-}
-
 /** The color in HSL. A grey's hue is null. */
 public val ColorPickerState.hsl: HslColor get() = value.toHsl()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: HslColor) {
-    value = color.value
-}
 
 /** The color in HWB. A grey's hue is null. */
 public val ColorPickerState.hwb: HwbColor get() = value.toHwb()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: HwbColor) {
-    value = color.value
-}
-
 /** The color in HSV. A grey's hue is null. */
 public val ColorPickerState.hsv: HsvColor get() = value.toHsv()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: HsvColor) {
-    value = color.value
-}
 
 /** The color in Okhsl, brought to sRGB's edge when outside it. A grey's hue is null. */
 public val ColorPickerState.okhsl: OkhslColor get() = value.toOkhsl()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: OkhslColor) {
-    value = color.value
-}
-
 /** The color in Okhsv, brought to sRGB's edge when outside it. A grey's hue is null. */
 public val ColorPickerState.okhsv: OkhsvColor get() = value.toOkhsv()
 
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: OkhsvColor) {
-    value = color.value
-}
-
 /** The color in naive CMYK. */
 public val ColorPickerState.cmyk: CmykColor get() = value.toCmyk()
-
-/** Replaces the color with [color]. */
-public fun ColorPickerState.set(color: CmykColor) {
-    value = color.value
-}
