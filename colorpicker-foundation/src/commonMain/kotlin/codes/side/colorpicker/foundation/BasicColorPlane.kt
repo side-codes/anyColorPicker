@@ -9,8 +9,10 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -18,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -90,7 +93,7 @@ public sealed interface ColorPlaneScope {
  *
  * [xValue] runs left to right and [yValue] bottom to top, so `yValue = 1f` is the top edge. Dragging
  * reports both at once, which is what lets a caller write two channels in a single update and leave
- * the rest of the colour alone. A value outside `0..1` is drawn at the nearer edge.
+ * the rest of the colour alone. A value outside `0..1` is drawn at the nearer edge, and NaN at 0.
  *
  * Unlike the sliders, the surface is not mirrored in right-to-left layouts. It is a map of a colour
  * space rather than a progress control, and mirroring it would make the x channel grow leftwards here
@@ -135,18 +138,28 @@ public fun BasicColorPlane(
     thumb: @Composable ColorPlaneScope.() -> Unit,
 ) {
     val currentOnValueChange by rememberUpdatedState(onValueChange)
+    val currentPosition by rememberUpdatedState(Offset(sliderFraction(xValue), sliderFraction(yValue)))
+    // Like the basic slider, accumulate steps until composition answers them. Keep both axes
+    // together so changing direction before recomposition does not undo the previous step.
+    val unanswered = remember { mutableStateOf<Offset?>(null) }
+    val stepping = unanswered.value != null
+    SideEffect { if (stepping) unanswered.value = null }
     BasicColorPlaneImpl(
         xValue = xValue,
         yValue = yValue,
         onValueChange = onValueChange,
         onStep = { dx, dy, coarse ->
             val step = if (coarse) PlaneCoarseKeyStep else PlaneKeyStep
-            val newX = (xValue + dx * step).coerceIn(0f, 1f)
-            val newY = (yValue + dy * step).coerceIn(0f, 1f)
-            if (newX == xValue && newY == yValue) {
+            val from = unanswered.value ?: currentPosition
+            val next = Offset(
+                (from.x + dx * step).coerceIn(0f, 1f),
+                (from.y + dy * step).coerceIn(0f, 1f),
+            )
+            if (next == from) {
                 false
             } else {
-                currentOnValueChange(newX, newY)
+                unanswered.value = next
+                currentOnValueChange(next.x, next.y)
                 true
             }
         },

@@ -4,7 +4,7 @@
 
 Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform: ready-made Material 3 pickers, and the same pickers without Material for a design system of your own.
 
-> **This README describes 2.0, which is not released yet.** The latest release is 1.2.1, documented at the [v1.2.1 tag](https://github.com/side-codes/anyColorPicker/tree/v1.2.1#readme). [Migrating from 1.x](#-migrating-from-1x) maps one API onto the other.
+> **This README describes 2.0, which is not released yet.** For published versions and their documentation, see [releases](https://github.com/side-codes/anyColorPicker/releases). [Migrating from 1.x](#-migrating-from-1x) maps one API onto the other.
 
 ## ✨ Features
 
@@ -13,7 +13,7 @@ Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and W
 - Eleven ready-made pickers, each over a `ColorPickerState`, a `ColorValue` or a Compose `Color`
 - A color model built on CSS Color 4: a `ColorValue` keeps the space it was written in, its `none` components and any value outside sRGB
 - CSS color strings and hex, both ways
-- CSS Color 4 gamut mapping, so a color outside sRGB is drawn with its lightness and hue intact
+- CSS Color 4 gamut mapping, so a color outside sRGB is drawn with its lightness and hue held to within a just-noticeable difference
 - A grey keeps its hue: dragged to grey and back, a color returns in the hue it had rather than red
 - Two-dimensional planes over any two channels of a space
 - Alpha channel support
@@ -53,9 +53,20 @@ Each artifact brings the ones below it, and each works on its own:
 | `codes.side:colorpicker-material3`  | The Material 3 pickers, sliders, planes, swatch, dialog and theme, in `codes.side.colorpicker.material3`.                                                     |
 | `codes.side:colorpicker-foundation` | `ColorPickerState`, in `codes.side.colorpicker.state`; the `Basic*` components and `ColorPickerStrings`, in `codes.side.colorpicker.foundation`. No Material. |
 | `codes.side:color-compose`          | `ColorValue.toComposeColor()` and `Color.toColorValue()`.                                                                                                     |
-| `codes.side:color`                  | `ColorValue`, the color spaces, conversion, gamut mapping, CSS strings and hex. No Compose.                                                                   |
+| `codes.side:color`                  | `ColorValue`, the color spaces, conversion, gamut mapping, CSS strings and hex. No Compose runtime or UI.                                                     |
 
 Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
+
+### Requirements
+
+Built with Kotlin 2.4.20, Compose Multiplatform 1.12.1 and Material 3 1.9.0. Android needs
+`minSdk` 24 and is built against `compileSdk` 37; the desktop jars are Java 17 bytecode. Building
+the repository itself needs JDK 21.
+
+Until 2.0.0 is published, `./gradlew publishToMavenLocal` puts `2.0.0-SNAPSHOT` in `mavenLocal()`.
+
+The 1.x `codes.side:colorpicker` artifact cannot share a classpath with 2.x: both ship
+`codes.side.colorpicker.state.ColorPickerState`.
 
 ## 🎨 Gallery
 
@@ -82,17 +93,16 @@ with a hue defaults to `Independent`; the RGB, Lab, Oklab and CMYK pickers defau
 
 ![Color swatch](docs/images/color-swatch.png)
 
-These images are the Compose Preview Screenshot Testing references, rendered from the
-library's own components and re-checked on every CI run, so they cannot drift from what
-the code actually draws. Regenerate them with
-`./gradlew :screenshot-tests:updateDebugScreenshotTest`.
+These images are copies of the Compose Preview Screenshot Testing references, rendered from the
+library's own components. CI checks the references, not these copies: after
+`./gradlew :screenshot-tests:updateDebugScreenshotTest`, copy the changed ones here.
 
 ## 🚀 Quick Start
 
 ```kotlin
 @Composable
 fun MyScreen() {
-    val state = rememberColorPickerState(Okhsl(250.0, 0.8, 0.6))
+    val state = rememberSaveableColorPickerState(Okhsl(250.0, 0.8, 0.6))
 
     Column {
         ColorPicker(state)
@@ -102,7 +112,8 @@ fun MyScreen() {
 ```
 
 `ColorPicker` is an Okhsl picker unless given a `space`: its lightness is perceived lightness and
-its saturation is measured against the display, so every position is a color the screen shows.
+its saturation is measured against sRGB, so every position is a color sRGB shows, bar a sliver just
+past pure blue.
 `ColorPicker(state, space = Oklch)` picks in any other space, and the named pickers,
 `HslColorPicker` to `CmykColorPicker`, fix one.
 
@@ -153,22 +164,23 @@ The units are CSS's, so a number copied from a stylesheet or a design tool means
 
 - **Okhsl** is Björn Ottosson's perceptual replacement for HSL, and the one to reach for if you
   are choosing between the two. Lightness is perceived lightness, so a blue and a yellow at `0.5`
-  look equally light; in HSL they differ by more than half the scale. Saturation is measured
-  against the sRGB gamut, so `1` is as colorful as the display can go at that hue and lightness —
-  every coordinate is a real color and no part of a slider is dead travel.
+  look about equally light; in HSL they differ by more than half the scale. Saturation is measured
+  against the sRGB gamut, so `1` is as colorful as sRGB goes at that hue and lightness — every
+  coordinate is a real color, bar a sliver just past pure blue, and no part of a slider is dead
+  travel.
 - **Okhsv** has Okhsl's perceptual hue and gamut-relative saturation in the HSV arrangement
   artists expect: full saturation at full value is the most vivid form of a hue, and pulling value
   down darkens toward black. Prefer Okhsl when the middle of the lightness track should be a mid
   tone.
-- **Oklab** is the perceptual space the two above are built on, and the one to interpolate,
-  compare or blend in: equal steps are close to equal perceived steps, and moving `L` does not drag
+- **Oklab** is the perceptual space the two above are built on, and the one to interpolate and
+  compare colors in: equal steps are close to equal perceived steps, and moving `L` does not drag
   the perceived hue with it. **OkLCh** is its cylindrical form, CSS's `oklch()`, for changing one
   of lightness, chroma and hue while holding the others. Neither is bounded by the display, so most
-  of their range lies outside sRGB and is drawn as the nearest color sRGB holds.
+  of their range lies outside sRGB and is gamut-mapped into it to be drawn.
 - **Lab** and **LCH** are CIELAB with a D50 white, which is what CSS `lab()`, Photoshop and
   Compose's `ColorSpaces.CieLab` all quote, so a value copied from any of them means here what it
   meant there. About an eighth of the a–b square is inside sRGB.
-- **HSL**, **HSV** and **HWB** are CSS's formulas over sRGB.
+- **HSL** and **HWB** follow CSS formulas over sRGB; **HSV** is the conventional sRGB hexcone model.
 - **CMYK** is the naive conversion, with no color profile. It round-trips on screen and is not
   what a press will print — real CMYK is device dependent, its gamut is not sRGB's, and crossing
   between them needs an ICC profile and a rendering intent. Treat it as a screen-space
@@ -191,22 +203,28 @@ among those it is given.
 ### Gamut mapping
 
 Drawing a color outside sRGB does not clamp each channel independently, which would shift
-lightness and hue as a side effect. It runs the [CSS Color 4 algorithm](https://www.w3.org/TR/css-color-4/#gamut-mapping):
-binary search down the chroma axis, comparing each candidate against its clipped form, and stop
-once the two are within a just-noticeable difference. Lightness and hue survive and chroma pays.
+lightness and hue as a side effect. It runs CSS Color 4's
+[binary search with local MINDE](https://www.w3.org/TR/css-color-4/#GMA-Binary-local-MINDE), one of
+the three algorithms it allows: binary search down the chroma axis at constant lightness and
+hue, comparing each candidate against its clipped form, and return the clipped form once the two are
+within a just-noticeable difference. Chroma pays; lightness and hue move by less than that
+difference.
 
 ```kotlin
 val vivid = Oklch(0.7, 0.3, 150.0)
 
 vivid.isInGamut(Srgb.gamut)                     // false
-vivid.toGamut(Srgb.gamut)                       // the same lightness and hue, less chroma
+vivid.toGamut(Srgb.gamut)                       // less chroma, the same lightness and hue
 vivid.toGamut(Srgb.gamut, GamutMapping.Clip)    // each channel clipped, when that is what you want
 vivid.toComposeColor()                          // mapped as toGamut maps it
 ```
 
 The search runs in Oklab whatever space the color came from, as CSS specifies, so what survives is
-Oklab's lightness and hue, not CIELAB's. Okhsl and Okhsv never need it: their saturation is
-measured against the gamut, so they are inside it by construction.
+Oklab's lightness and hue, not CIELAB's. `GamutMapping.ChromaReduction()` solves for the gamut's
+edge instead, and keeps lightness and hue to rounding. Okhsl and Okhsv rarely
+need either: their saturation is measured against sRGB, so they are inside it by construction,
+except in a sliver just past pure blue (264.05–264.21°), where they stray by under 0.001 of a
+linear channel.
 
 ### CSS and hex
 
@@ -217,7 +235,7 @@ Okhsl(120.0, 0.5, 0.25).toCssString()     // "color(--okhsl 120 0.5 0.25)"
 Hsl(120.0, 50.0, null).toCssString()      // "hsl(120 50% none)"
 
 ColorValue.parseCss("oklch(70% 0.15 140 / 50%)")   // an OkLCh value at half alpha
-ColorValue.parseCssOrNull("not a color")           // null, never throws
+ColorValue.parseCssOrNull("not a color")           // null for invalid color text
 ```
 
 A value is written in its own space and never mapped into a gamut, so a Display P3 red stays
@@ -420,7 +438,8 @@ grey-to-hue ramp under a white / transparent / black overlay: the color at light
 mid-lightness color blended toward white by `2L-1` above the middle and toward black by `1-2L`
 below it, which is what compositing the overlay computes. Every other pair has no such identity,
 so it is sampled on a grid, measured for each of the library's planes, and drawn scaled. The grid
-is rebuilt off the main thread when a held channel changes.
+is rebuilt off the main thread when a held channel changes, except on the web, where it shares the
+one thread with input and yields to it every few rows.
 
 `LocalPlaneRendering` decides how. `PlaneRendering.Fast`, the default, shares the rows among up to
 four threads, builds Okhsl's S × L as two smaller grids that meet on its crease, and draws each

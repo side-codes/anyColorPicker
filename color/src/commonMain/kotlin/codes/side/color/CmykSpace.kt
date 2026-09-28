@@ -3,8 +3,10 @@ package codes.side.color
 import kotlin.math.max
 
 /**
- * Naive CMYK over [Srgb]: K = 1 − max(R, G, B), with no color profile. A reversible way to put four
- * numbers on screen, not what a press prints, which takes an ICC profile.
+ * Naive CMYK over [Srgb]: K = 1 − max(R, G, B), with no color profile. An RGB color round-trips
+ * unless its highest channel is exactly 0 and another is below it, which is singular and comes back
+ * black. Many CMYK values give one RGB, so a trip through RGB need not keep the ink amounts. What a
+ * press prints takes an ICC profile.
  */
 @OptIn(ExperimentalColorSpaceApi::class)
 public object Cmyk : ColorSpace(

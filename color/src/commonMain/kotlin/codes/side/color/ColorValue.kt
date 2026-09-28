@@ -261,7 +261,7 @@ public class ColorValue internal constructor(
             else -> value
         }
 
-        private fun wrapHue(degrees: Double): Double {
+        internal fun wrapHue(degrees: Double): Double {
             var wrapped = degrees % 360.0
             if (wrapped < 0.0) wrapped += 360.0
             return if (wrapped >= 360.0) 0.0 else wrapped

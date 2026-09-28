@@ -129,7 +129,7 @@ class ComposeBridgeTest {
     fun parametricTransferMatchesSrgbAndMirrors() {
         // Either side of d but not at it: ICC takes d itself on the power segment, CSS's sRGB on the
         // linear one, 2.3e-9 apart.
-        val curve = ParametricTransfer(checkNotNull((ComposeSpaces.Srgb as Rgb).transferParameters))
+        val curve = ParametricTransfer(checkNotNull(ComposeSpaces.Srgb.transferParameters))
         for (x in listOf(0.02, 0.04, 0.041, 0.2, 0.5, 1.0, 1.5)) {
             assertEquals(TransferFunction.Srgb.decode(x), curve.decode(x), 1e-12, "decode $x")
             assertEquals(-curve.decode(x), curve.decode(-x), "decode -$x")

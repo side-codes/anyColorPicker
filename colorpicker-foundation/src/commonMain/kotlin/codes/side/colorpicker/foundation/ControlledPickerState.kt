@@ -33,8 +33,13 @@ internal fun <T> rememberControlledPickerState(
     toValue: (T) -> ColorValue,
     fromValue: (ColorValue) -> T,
 ): ColorPickerState {
-    val saver = remember(space) { ColorPickerState.Saver(ColorSpaces.all + space) }
-    val state = rememberSaveable(saver = saver) { ColorPickerState(toValue(external)) }
+    val externalValue = remember(external, toValue) { toValue(external) }
+    // Alpha edits and incoming values keep the caller's space, which may differ from the
+    // picker's. Restoring that value must also restore the hue memory saved alongside it.
+    val saver = remember(space, externalValue.space) {
+        ColorPickerState.Saver(ColorSpaces.all + space + externalValue.space)
+    }
+    val state = rememberSaveable(saver = saver) { ColorPickerState(externalValue) }
     val currentOnChange by rememberUpdatedState(onChange)
     val currentFromValue by rememberUpdatedState(fromValue)
     state.onEdit = { edited ->
@@ -51,7 +56,7 @@ internal fun <T> rememberControlledPickerState(
         when {
             emitted != null && fromValue(emitted) == external -> emitted
             fromValue(state.value) == external -> state.value
-            else -> toValue(external)
+            else -> externalValue
         },
     )
     return state

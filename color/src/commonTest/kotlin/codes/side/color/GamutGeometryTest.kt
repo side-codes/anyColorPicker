@@ -97,6 +97,17 @@ class GamutGeometryTest {
     }
 
     @Test
+    fun hugeFiniteHuesAnswerAsTheSameAngleStoredInAColor() {
+        for (hue in listOf(1e20, -1e20, Double.MAX_VALUE, -Double.MAX_VALUE)) {
+            val wrapped = Oklch(0.6, 0.1, hue)[Oklch.H]!!
+            for (gamut in gamuts) {
+                assertEquals(gamut.maxChroma(0.6, wrapped), gamut.maxChroma(0.6, hue), 1e-12, "$gamut at $hue")
+                assertComponents(gamut.cusp(wrapped).components(), gamut.cusp(hue), 1e-12)
+            }
+        }
+    }
+
+    @Test
     fun theCuspSitsOnTheGamutsEdge() {
         for (gamut in gamuts) {
             for (hue in (0 until 360 step 15).map { it.toDouble() } + listOf(245.2, 264.1)) {
