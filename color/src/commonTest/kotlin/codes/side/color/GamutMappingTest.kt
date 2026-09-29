@@ -52,6 +52,15 @@ class GamutMappingTest {
     }
 
     @Test
+    fun aComponentThatOverflowsTheConversionStillMapsIntoTheGamut() {
+        // Past about 1e102 the cube in Oklab → LMS overflows, and infinities of both signs meet as NaN.
+        for (method in methods) {
+            val mapped = Oklab(0.5, 1e103, 1e103).toGamut(Srgb.gamut, method)
+            assertTrue(mapped.components().all { it in 0.0..1.0 }, "$method: ${mapped.components().toList()}")
+        }
+    }
+
+    @Test
     fun cssMatchesColorJs() {
         val cases = listOf(
             Srgb.gamut to listOf(
