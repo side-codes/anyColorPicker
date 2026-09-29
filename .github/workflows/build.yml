@@ -116,3 +116,8 @@ jobs:
               fi
             done
           done
+      # A POM that exists says nothing of whether an app can use it. tools/consumer is a build of its own that
+      # depends on colorpicker-material3 alone, as an app does, and links a dynamic iOS framework against what
+      # was just published, which resolves every native symbol the libraries need.
+      - name: Link an app against the published artifacts
+        run: ./gradlew -p tools/consumer compileKotlinJvm linkDebugFrameworkIosSimulatorArm64 -PpickerVersion="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"

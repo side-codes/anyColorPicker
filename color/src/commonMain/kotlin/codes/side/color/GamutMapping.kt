@@ -101,6 +101,10 @@ public abstract class GamutMapping internal constructor() {
      * Exact chroma reduction at constant OkLCh lightness and hue: the most chroma the gamut holds
      * there up to the color's own, found by [solver], then a clip of the last rounding.
      * The method for planes, gradients and boundaries.
+     *
+     * [EdgeSolver.ClosedForm] finds the edge to within 1e-9 of linear light, which below an OkLCh
+     * lightness of 0.001 is more than the color itself holds, so there lightness and hue come back
+     * changed; the color is still far darker than one 8-bit step. [EdgeSolver.Iterative] keeps them.
      */
     public class ChromaReduction(public val solver: EdgeSolver = EdgeSolver.ClosedForm) : GamutMapping() {
         private val iterative = solver === EdgeSolver.Iterative
@@ -155,6 +159,9 @@ public fun ColorValue.isInGamut(gamut: RgbGamut, tolerance: Double = ColorRules.
  * Missing components resolve as CSS resolves them for gamut mapping, through the color in OkLCh: a
  * missing lightness carries into OkLCh's and counts as 0, which is black, and any other counts as 0
  * in the conversion. The result has none, except a missing alpha.
+ *
+ * A component beyond about 1e102 overflows the conversion: the result is still a color of the gamut,
+ * but not one related to this color, and from about 1e150 it is black.
  */
 public fun ColorValue.toGamut(gamut: RgbGamut, method: GamutMapping = GamutMapping.Css()): ColorValue {
     val color = resolved()
@@ -189,8 +196,10 @@ internal fun toLinear(t: DoubleArray, l: Double, a: Double, b: Double, out: Doub
 
 internal fun inCube(v: DoubleArray): Boolean = v[0] in 0.0..1.0 && v[1] in 0.0..1.0 && v[2] in 0.0..1.0
 
+// NaN, from a conversion that overflowed, clamps to 0: coerceIn passes it through, and a NaN channel
+// would make the mapped color invalid.
 private fun clamp(v: DoubleArray) {
-    for (i in 0..2) v[i] = v[i].coerceIn(0.0, 1.0)
+    for (i in 0..2) v[i] = if (v[i].isNaN()) 0.0 else v[i].coerceIn(0.0, 1.0)
 }
 
 // SDR's ends: lightness 1 or more is white, 0 or less black. True when [l] was one of them.
