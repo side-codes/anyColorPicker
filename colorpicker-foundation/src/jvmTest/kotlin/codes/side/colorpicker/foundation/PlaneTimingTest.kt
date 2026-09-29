@@ -2,12 +2,12 @@ package codes.side.colorpicker.foundation
 
 import codes.side.color.Hwb
 import codes.side.color.Lch
-import codes.side.color.Oklch
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
+import kotlin.test.Test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlin.test.Test
 
 class PlaneTimingTest {
 
