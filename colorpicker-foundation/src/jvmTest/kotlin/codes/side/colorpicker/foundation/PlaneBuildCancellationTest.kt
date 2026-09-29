@@ -1,11 +1,11 @@
 package codes.side.colorpicker.foundation
 
 import codes.side.color.Lch
+import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.test.Test
-import kotlin.test.assertTrue
 
 class PlaneBuildCancellationTest {
 
