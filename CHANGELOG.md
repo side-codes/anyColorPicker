@@ -6,7 +6,7 @@
 
 ### Breaking changes
 
-- **`codes.side:colorpicker` stops at 1.2.1.** 2.0 is `codes.side:colorpicker-material3`, which brings `codes.side:colorpicker-foundation`: the state, the `Basic*` components and the strings, with no Material dependency, for an app on another design system.
+- **`codes.side:colorpicker` stops at 1.2.0.** 2.0 is `codes.side:colorpicker-material3`, which brings `codes.side:colorpicker-foundation`: the state, the `Basic*` components and the strings, with no Material dependency, for an app on another design system.
 - **The Material components, `ColorPickerTheme`, `ColorPickerDefaults` and the theme classes are in `codes.side.colorpicker.material3`,** one package as `androidx.compose.material3` is, where 1.x had `codes.side.colorpicker.ui` and `codes.side.colorpicker.theme`.
 - **A color is a `ColorValue`.** The `model`, `conversion` and `util` packages are gone: `HslColor`, `RgbColor`, `CmykColor`, `LabColor`, `OklabColor`, `OklchColor`, `OkhslColor`, `OkhsvColor`, `PickerColor`, their conversions and hex functions, and `randomHslColor`. A `ColorValue` is a color in one of fifteen spaces, in CSS's units, so HSL's saturation and lightness run 0–100 rather than 0–1.
 - **`ColorPickerState` holds a `ColorValue`.** It is built from a `ColorValue` or a Compose `Color`, with no default. `state.value`, `state[channel]` and fifteen typed views (`state.hsl`, `state.oklch`, …) replace the eight typed getters, `pickerColor` and `argbInt`, and `state[channel] = x` and `state.value = x` replace the thirty `update…` functions. Writing NaN or a value outside a channel's limit throws where 1.x ignored or clamped it.
@@ -65,7 +65,18 @@
 - **`ColorPickerDialogDefaults` and `ColorPickerDialogScope`,** the dialog's default spaces, title, header, switcher and buttons, and the scope its slots read the dialog's state from and confirm or dismiss it through.
 - **`ColorPickerDialogState`, `BasicColorPickerDialogContent` and `BasicColorComparison`,** the dialog without Material: its state, saved with `ColorPickerDialogState.Saver`; its body, which puts the plane beside the sliders in a window too short to stack them; and the split swatch.
 
-## 1.2.1
+### Dependencies
+
+Built with Kotlin 2.4.20 and Compose Multiplatform 1.12.1, up from 1.2.0's 2.4.10 and 1.12.0. Each artifact brings the one above it in this list, and adds:
+
+- **`codes.side:color`:** Compose's `runtime-annotation` alone, for its stability annotations.
+- **`codes.side:color-compose`:** Compose UI graphics.
+- **`codes.side:colorpicker-foundation`:** Compose runtime, foundation and UI, and kotlinx-coroutines 1.11.0.
+- **`codes.side:colorpicker-material3`:** Material 3 1.9.0, at runtime only, so it stays off an app's compile classpath.
+
+## 1.2.1 (never published)
+
+Merged but never released, so `codes.side:colorpicker` stops at 1.2.0. Its fixes are in 2.0.0.
 
 ### Fixed
 

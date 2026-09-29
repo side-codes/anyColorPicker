@@ -226,6 +226,12 @@ need either: their saturation is measured against sRGB, so they are inside it by
 except in a sliver just past pure blue (264.05–264.21°), where they stray by under 0.001 of a
 linear channel.
 
+Two limits of the arithmetic. Below an OkLCh lightness of 0.001, `ChromaReduction`'s default solver
+finds the edge less precisely than the color itself, so lightness and hue come back changed, though
+the color stays far darker than one 8-bit step; `ChromaReduction(EdgeSolver.Iterative)` keeps them.
+And a component beyond about 1e102 overflows the conversion: it maps to a color of the gamut, but not
+one related to it, and from about 1e150 to black.
+
 ### CSS and hex
 
 ```kotlin
@@ -840,7 +846,7 @@ take a channel. The color types live in `codes.side.color`, which `colorpicker-m
 
 | 1.x                                                                                         | 2.0                                                                                      | Note                                                       |
 |---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| `implementation("codes.side:colorpicker:1.2.1")`                                            | `implementation("codes.side:colorpicker-material3:2.0.0")`                               | `codes.side:colorpicker` stops at 1.2.1                    |
+| `implementation("codes.side:colorpicker:1.2.0")`                                            | `implementation("codes.side:colorpicker-material3:2.0.0")`                               | `codes.side:colorpicker` stops at 1.2.0                    |
 | `codes.side.colorpicker.ui.*`, `codes.side.colorpicker.theme.*`                             | `codes.side.colorpicker.material3.*`                                                     |                                                            |
 | `HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)`                                 | `Hsl(200.0, 80.0, 50.0)`                                                                 | CSS's units: HSL's S and L are 0–100                       |
 | `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `Oklch(…)`           | each a `ColorValue`                                        |
