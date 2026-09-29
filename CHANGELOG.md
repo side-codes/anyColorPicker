@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (unreleased)
+## 2.0.0
 
 2.0 builds the pickers on a color model of its own, following CSS Color 4, publishes them as Material 3 components over a foundation any design system can draw, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](README.md#-migrating-from-1x) maps each removed declaration to its replacement.
 
@@ -72,7 +72,7 @@ Built with Kotlin 2.4.20 and Compose Multiplatform 1.12.1, up from 1.2.0's 2.4.1
 - **`codes.side:color`:** Compose's `runtime-annotation` alone, for its stability annotations.
 - **`codes.side:color-compose`:** Compose UI graphics.
 - **`codes.side:colorpicker-foundation`:** Compose runtime, foundation and UI, and kotlinx-coroutines 1.11.0.
-- **`codes.side:colorpicker-material3`:** Material 3 1.9.0, at runtime only, so it stays off an app's compile classpath.
+- **`codes.side:colorpicker-material3`:** Material 3 1.9.0, as an implementation dependency, so on Android and desktop it stays off an app's compile classpath.
 
 ## 1.2.1 (never published)
 
