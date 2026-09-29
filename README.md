@@ -4,7 +4,7 @@
 
 Kotlin Multiplatform color picker library for Android, iOS, Desktop (JVM), and Web (Wasm), built with Compose Multiplatform: ready-made Material 3 pickers, and the same pickers without Material for a design system of your own.
 
-> **This README describes 2.0, which is not released yet.** For published versions and their documentation, see [releases](https://github.com/side-codes/anyColorPicker/releases). [Migrating from 1.x](#-migrating-from-1x) maps one API onto the other.
+> **This README describes 2.0.** 1.x is documented at the [v1.2.0 tag](https://github.com/side-codes/anyColorPicker/tree/v1.2.0#readme), and [Migrating from 1.x](#-migrating-from-1x) maps one API onto the other.
 
 ## ✨ Features
 
@@ -62,8 +62,6 @@ Published targets: `android`, `jvm`, `iosArm64`, `iosSimulatorArm64`, `wasmJs`.
 Built with Kotlin 2.4.20, Compose Multiplatform 1.12.1 and Material 3 1.9.0. Android needs
 `minSdk` 24 and is built against `compileSdk` 37; the desktop jars are Java 17 bytecode. Building
 the repository itself needs JDK 21.
-
-Until 2.0.0 is published, `./gradlew publishToMavenLocal` puts `2.0.0-SNAPSHOT` in `mavenLocal()`.
 
 The 1.x `codes.side:colorpicker` artifact cannot share a classpath with 2.x: both ship
 `codes.side.colorpicker.state.ColorPickerState`.
