@@ -2,7 +2,7 @@
 
 # anyColorPicker
 
-anyColorPicker is a color picker library for Kotlin Multiplatform and Compose Multiplatform, on Android, iOS, desktop (JVM) and the web (Wasm): ready-made Material 3 pickers, and the same pickers without Material for a design system of your own.
+anyColorPicker is a color picker library for Kotlin Multiplatform and Compose Multiplatform, on Android, iOS, desktop (JVM) and the web (Wasm): ready-made Material 3 pickers, and the same pickers without Material for a design system of your own. On Android it is a Jetpack Compose color picker: an Android-only app adds one dependency and needs no Kotlin Multiplatform setup.
 
 > **This README describes 2.0.** 1.x is documented at the [v1.2.0 tag](https://github.com/side-codes/anyColorPicker/tree/v1.2.0#readme), and [Migrating from 1.x](https://side-codes.github.io/anyColorPicker/migrating-from-1x.html) maps one API onto the other.
 
@@ -14,7 +14,7 @@ Every picker, in both coloring modes: [Gallery](https://side-codes.github.io/any
 
 ## Features
 
-- Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm)
+- Compose Multiplatform (Android, iOS, Desktop/JVM, Web/Wasm), and Jetpack Compose in Android-only apps
 - A picker for any color space: the fifteen built in — sRGB, linear sRGB, Display P3, XYZ D65 and D50, Lab, LCH, Oklab, OkLCh, HSL, HWB, HSV, Okhsl, Okhsv and CMYK — and any an app defines
 - Eleven ready-made pickers, each over a `ColorPickerState`, a `ColorValue` or a Compose `Color`
 - A color model built on CSS Color 4: a `ColorValue` keeps the space it was written in, its `none` components and any value outside sRGB
@@ -55,6 +55,11 @@ On a design system other than Material, depend on `codes.side:colorpicker-founda
 ## Quick start
 
 ```kotlin
+import codes.side.color.Okhsl
+import codes.side.colorpicker.material3.ColorPicker
+import codes.side.colorpicker.material3.ColorSwatch
+import codes.side.colorpicker.state.rememberSaveableColorPickerState
+
 @Composable
 fun MyScreen() {
     val state = rememberSaveableColorPickerState(Okhsl(250.0, 0.8, 0.6))
@@ -75,6 +80,8 @@ past pure blue.
 A picker can equally sit over a value you hold yourself:
 
 ```kotlin
+import codes.side.colorpicker.material3.HslColorPicker
+
 var color by remember { mutableStateOf(Color(0xFF3366CC)) }
 
 HslColorPicker(color = color, onColorChange = { color = it })
