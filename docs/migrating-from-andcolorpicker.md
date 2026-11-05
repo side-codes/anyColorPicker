@@ -1,8 +1,7 @@
 ---
 title: "Migrating from andcolorpicker"
 description: "Move from the discontinued View-based andcolorpicker 0.6.x Android library to anyColorPicker's Jetpack Compose components, concept by concept."
-section: Guides
-nav_order: 200
+icon: material/swap-horizontal
 ---
 
 The View-based `codes.side:andcolorpicker` artifact (XML `HSLColorPickerSeekBar` and friends) is discontinued. This library is a full Compose Multiplatform rewrite published under new coordinates:

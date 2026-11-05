@@ -1,8 +1,7 @@
 ---
 title: "Color planes"
 description: "ChannelPlane in anyColorPicker picks two channels of a color space at once: HSL, Okhsl and Okhsv planes, rendering, keyboard and screen reader access."
-section: Components
-nav_order: 90
+icon: material/gradient-horizontal
 ---
 
 `ChannelPlane(state, x, y)` picks two channels of one space at once, holding the space's others,

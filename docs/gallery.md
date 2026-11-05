@@ -1,8 +1,7 @@
 ---
 title: "Gallery of color pickers"
 description: "Screenshots of every anyColorPicker color picker: RGB, HSL, HSV, HWB, Lab, LCH, Oklab, OkLCh, Okhsl, Okhsv and CMYK, in both coloring modes."
-section: Get started
-nav_order: 20
+icon: material/view-gallery-outline
 ---
 
 Every picker takes a `ColoringMode`. `Independent` shows each channel's full range;

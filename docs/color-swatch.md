@@ -1,8 +1,7 @@
 ---
 title: "Color swatch"
 description: "ColorSwatch in anyColorPicker draws a Compose color over a transparency checkerboard, so a color's alpha reads correctly."
-section: Components
-nav_order: 110
+icon: material/checkerboard
 ---
 
 `ColorSwatch` draws the color over a transparency checkerboard, so alpha reads correctly:

@@ -1,8 +1,7 @@
 ---
 title: "Without Material"
 description: "Build a color picker for your own design system with anyColorPicker's foundation: BasicColorPicker, BasicChannelSlider and BasicChannelPlane."
-section: Components
-nav_order: 150
+icon: material/layers-outline
 ---
 
 `codes.side:colorpicker-foundation` holds the same components with no look of their own. Each draws
@@ -70,6 +69,8 @@ fun RoundThumb(color: Color) {
     Box(Modifier.size(24.dp).background(Color.White, CircleShape).padding(3.dp).background(color, CircleShape))
 }
 ```
+
+![An Okhsv color picker built from the foundation components, with round thumbs and pill tracks](images/without-material.png){ width="440" }
 
 ## The disabled state
 

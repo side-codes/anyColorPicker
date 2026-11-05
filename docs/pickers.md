@@ -1,8 +1,7 @@
 ---
 title: "Color pickers"
 description: "The anyColorPicker Compose color pickers: ColorPicker in any color space, the eleven named pickers, slots, layout, and controlled ColorValue and Color forms."
-section: Components
-nav_order: 70
+icon: material/eyedropper-variant
 ---
 
 ```kotlin

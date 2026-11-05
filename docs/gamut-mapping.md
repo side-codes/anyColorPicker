@@ -1,8 +1,7 @@
 ---
 title: "Gamut mapping"
 description: "How anyColorPicker draws a color outside sRGB with CSS Color 4 gamut mapping, holding lightness and hue within a just-noticeable difference."
-section: Colors
-nav_order: 50
+icon: material/vector-triangle
 ---
 
 Drawing a color outside sRGB does not clamp each channel independently, which would shift

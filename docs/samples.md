@@ -1,8 +1,7 @@
 ---
 title: "Running the samples"
 description: "Run the anyColorPicker sample app on desktop, Android and iOS from the repository with Gradle."
-section: Guides
-nav_order: 180
+icon: material/play-circle-outline
 ---
 
 The same sample app runs on every supported platform:

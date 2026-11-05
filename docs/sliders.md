@@ -1,8 +1,7 @@
 ---
 title: "Channel sliders"
 description: "ChannelSlider and AlphaSlider in anyColorPicker: a Compose slider for one channel of any color space, with keyboard, screen reader and label support."
-section: Components
-nav_order: 80
+icon: material/tune-variant
 ---
 
 `ChannelSlider(state, channel)` is a slider for one channel of any space, and `AlphaSlider(state)`
@@ -15,6 +14,8 @@ ChannelSlider(state, Oklch.C, range = 0.0..0.2)     // a narrower track
 ChannelSlider(state, Srgb.R)
 AlphaSlider(state)
 ```
+
+![Okhsl hue, OkLCh chroma over its full range and over 0 to 0.2, sRGB red and alpha sliders](images/channel-sliders.png){ width="440" }
 
 - The thumb sits at the channel's displayed value, so a grey's hue slider shows the hue last
   chosen. A value outside `range`, such as OkLCh chroma 0.5 or extended sRGB, pins the thumb to

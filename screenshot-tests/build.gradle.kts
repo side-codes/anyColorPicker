@@ -71,6 +71,10 @@ val readmeGoldens = mapOf(
     "HorizontalPickerPreview" to "horizontal-picker",
     "DialogPreview" to "dialog",
     "DialogHorizontalPreview" to "dialog-horizontal",
+    "ChannelSlidersPreview" to "channel-sliders",
+    "ThemingPreview" to "theming",
+    "LocalizationPreview" to "localization",
+    "WithoutMaterialPreview" to "without-material",
 )
 
 val docsImageDir = rootProject.layout.projectDirectory.dir("docs/images")

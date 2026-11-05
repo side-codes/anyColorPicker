@@ -1,8 +1,7 @@
 ---
 title: "State management"
 description: "ColorPickerState holds the color a Compose picker edits, remembers a grey's hue, reads any channel in any space, and survives process death."
-section: State and architecture
-nav_order: 160
+icon: material/state-machine
 ---
 
 `ColorPickerState` holds the color a picker edits, as one `ColorValue`, and the hues it

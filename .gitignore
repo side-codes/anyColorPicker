@@ -10,3 +10,6 @@ build/
 .claude/
 .kotlin/
 /tools/reference/node_modules/
+# The documentation site's build output and cache (mkdocs.yml)
+/site/
+/.cache/

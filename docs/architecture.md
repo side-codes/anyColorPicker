@@ -1,8 +1,7 @@
 ---
 title: "Architecture: a value stays in its space"
 description: "Why anyColorPicker keeps a color in the space it was written in and converts forward only, as CSS Color 4, color.js and Sass do, so edits never lose precision."
-section: State and architecture
-nav_order: 170
+icon: material/sitemap-outline
 ---
 
 Color space conversions lose precision: floats round, and a conversion cannot invent what a

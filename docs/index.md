@@ -1,7 +1,10 @@
 ---
 title: "Color picker for Compose Multiplatform and Jetpack Compose"
 description: "A Kotlin Multiplatform color picker for Compose Multiplatform and Jetpack Compose on Android, iOS, desktop and web: Material 3 pickers, or your own design."
+icon: material/home-outline
 ---
+
+# Color picker for Compose Multiplatform and Jetpack Compose
 
 anyColorPicker is a color picker library for Kotlin Multiplatform and Compose Multiplatform, on Android, iOS, desktop (JVM) and the web (Wasm): ready-made Material 3 pickers, and the same pickers without Material for a design system of your own. On Android it is a Jetpack Compose color picker: an Android-only app adds one dependency and needs no Kotlin Multiplatform setup.
 
@@ -89,4 +92,4 @@ HslColorPicker(color = color, onColorChange = { color = it })
 ```
 
 The source, issues and releases are on [GitHub](https://github.com/side-codes/anyColorPicker), under the
-Apache License 2.0. Each page of this documentation is listed below.
+Apache License 2.0.
