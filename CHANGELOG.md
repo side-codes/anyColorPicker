@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-2.0 builds the pickers on a color model of its own, following CSS Color 4, publishes them as Material 3 components over a foundation any design system can draw, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](README.md#-migrating-from-1x) maps each removed declaration to its replacement.
+2.0 builds the pickers on a color model of its own, following CSS Color 4, publishes them as Material 3 components over a foundation any design system can draw, and removes 1.x's color classes, sliders and planes. [Migrating from 1.x](https://side-codes.github.io/anyColorPicker/migrating-from-1x.html) maps each removed declaration to its replacement.
 
 ### Breaking changes
 

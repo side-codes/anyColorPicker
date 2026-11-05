@@ -36,9 +36,9 @@ dependencies {
     screenshotTestImplementation(libs.screenshot.validation.api)
 }
 
-// The README embeds these renders. The plugin names every reference
+// The README and the docs pages embed these renders. The plugin names every reference
 // <Function>_<preview name>_<hash>_0.png, and that hash changes whenever a preview's
-// parameters change — pointing the README straight at them would break each image link
+// parameters change — pointing the docs straight at them would break each image link
 // on the next tweak. Copy them out under stable names keyed on the function name.
 val readmeGoldens = mapOf(
     "RgbIndependentPreview" to "rgb-independent",
@@ -76,7 +76,7 @@ val readmeGoldens = mapOf(
 val docsImageDir = rootProject.layout.projectDirectory.dir("docs/images")
 
 val copyGoldensToDocs = tasks.register<Copy>("copyGoldensToDocs") {
-    description = "Copies screenshot-test references into docs/images under README-stable names."
+    description = "Copies screenshot-test references into docs/images under stable names."
     from(layout.projectDirectory.dir("src/screenshotTestDebug/reference"))
     include("**/*.png")
     includeEmptyDirs = false
@@ -89,7 +89,7 @@ val copyGoldensToDocs = tasks.register<Copy>("copyGoldensToDocs") {
     eachFile { path = name }
     into(docsImageDir)
 
-    // A Copy that matches nothing still succeeds, which would silently rot the README.
+    // A Copy that matches nothing still succeeds, which would silently rot the docs images.
     val expected = readmeGoldens.values.toList()
     val outDir = docsImageDir.asFile
     doLast {
@@ -98,7 +98,7 @@ val copyGoldensToDocs = tasks.register<Copy>("copyGoldensToDocs") {
     }
 }
 
-// Recording new references without refreshing the README images would leave the two
+// Recording new references without refreshing the docs images would leave the two
 // silently disagreeing, so the copy always follows the update.
 // The screenshot plugin registers its per-variant tasks from a variant callback, after
 // this script is evaluated, so tasks.named() cannot see them yet. Match lazily instead.

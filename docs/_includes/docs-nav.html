@@ -1,0 +1,16 @@
+{%- comment -%}
+Every page with a nav_order is listed, in its section, in nav_order. llms.txt lists the same pages the same way.
+{%- endcomment -%}
+{%- assign sections = site.pages | where_exp: "doc", "doc.nav_order != nil" | sort: "nav_order" | group_by: "section" -%}
+<nav aria-label="Documentation">
+  <hr>
+  <p><a href="{{ "/" | relative_url }}">anyColorPicker</a> documentation</p>
+  {%- for section in sections %}
+  <p><strong>{{ section.name }}</strong></p>
+  <ul>
+    {%- for doc in section.items %}
+    <li>{% if doc.url == page.url %}{{ doc.title }}{% else %}<a href="{{ doc.url | relative_url }}">{{ doc.title }}</a>{% endif %}</li>
+    {%- endfor %}
+  </ul>
+  {%- endfor %}
+</nav>

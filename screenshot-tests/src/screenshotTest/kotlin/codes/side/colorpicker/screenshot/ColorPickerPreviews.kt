@@ -62,12 +62,13 @@ import com.android.tools.screenshot.PreviewTest
  *   ./gradlew :screenshot-tests:validateDebugScreenshotTest  check against them
  *
  * These are the only rendered images in the repo: the recorded references double as the
- * README screenshots, which copyGoldensToDocs copies into docs/images under stable names.
+ * screenshots in the README and the docs pages, which copyGoldensToDocs copies into
+ * docs/images under stable names.
  * Every picker appears in both coloring modes, because the difference between them is
  * visual and a gallery is the only place it can honestly be shown.
  */
 
-// Pantone's Colors of the Year, as the sRGB values commonly published for them: one for each case the README shows,
+// Pantone's Colors of the Year, as the sRGB values commonly published for them: one for each case the docs show,
 // fixed so every render is deterministic. A picker's independent and contextual renders share one, so the pair differs
 // only in coloring mode. They are sRGB, so a dialog is told to open in Okhsl rather than on its RGB tab, which has no
 // plane.
@@ -90,7 +91,7 @@ private val AquaSky = ColorValue.parseCss("#7BC4C4")        // 2003
 private val FuchsiaRose = ColorValue.parseCss("#C74375")    // 2001
 private val Tigerlily = ColorValue.parseCss("#E2583E")      // 2004
 
-// One height for every picker, so the README gallery lines up in a grid. A picker with a plane is
+// One height for every picker, so the gallery lines up in a grid. A picker with a plane is
 // the tallest: a 255dp plane at this width, three sliders and alpha.
 private const val PICKER_HEIGHT_DP = 640
 
@@ -224,7 +225,7 @@ fun CmykContextualPreview() = Frame { CmykColorPicker(state = ColorPickerState(R
 fun HorizontalPickerPreview() = Frame { OkhslColorPicker(state = ColorPickerState(Illuminating), orientation = Orientation.Horizontal) }
 
 // Kept character-for-character identical to SquareThumb in the sample app, so the image
-// in the README is the thing the sample actually runs.
+// in the docs is the thing the sample actually runs.
 @Composable
 private fun SquareThumb(color: Color, interaction: InteractionSource) {
     val fill = color.copy(alpha = 1f)
@@ -301,7 +302,7 @@ fun OkhsvPlanePreview() = Frame {
 }
 
 // The dialog at a phone's width, a 440 dp screen less the margins its dialog window keeps, on a canvas in the landscape
-// screenshot's proportions, so the README shows the two at one size. Left to itself on a canvas this wide, the dialog
+// screenshot's proportions, so the docs show the two at one size. Left to itself on a canvas this wide, the dialog
 // would take Material's widest, 560 dp.
 @PreviewTest
 @Preview(name = "Dialog", widthDp = 2048, heightDp = 960)

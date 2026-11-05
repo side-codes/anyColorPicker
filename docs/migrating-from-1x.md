@@ -1,0 +1,48 @@
+---
+title: "Migrating from 1.x"
+description: "Move an app from anyColorPicker 1.x to 2.0, declaration by declaration: coordinates, packages, color classes, state, sliders, planes, slots and the dialog."
+section: Guides
+nav_order: 190
+---
+
+2.0 replaces 1.x's color classes with `ColorValue` and its per-channel components with ones that
+take a channel. The color types live in `codes.side.color`, which `colorpicker-material3` brings with it.
+
+| 1.x                                                                                         | 2.0                                                                                      | Note                                                       |
+|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| `implementation("codes.side:colorpicker:1.2.0")`                                            | `implementation("codes.side:colorpicker-material3:2.0.0")`                               | `codes.side:colorpicker` stops at 1.2.0                    |
+| `codes.side.colorpicker.ui.*`, `codes.side.colorpicker.theme.*`                             | `codes.side.colorpicker.material3.*`                                                     |                                                            |
+| `HslColor(hue = 200f, saturation = 0.8f, lightness = 0.5f)`                                 | `Hsl(200.0, 80.0, 50.0)`                                                                 | CSS's units: HSL's S and L are 0–100                       |
+| `RgbColor`, `CmykColor`, `LabColor`, `OkhslColor`, `OkhsvColor`, `OklabColor`, `OklchColor` | `Srgb(…)`, `Cmyk(…)`, `Lab(…)`, `Okhsl(…)`, `Okhsv(…)`, `Oklab(…)`, `Oklch(…)`           | each a `ColorValue`                                        |
+| `hsl.toRgb()`, `rgb.toOklch()`, …                                                           | `value.to(Srgb)`, `value.to(Oklch)`                                                      |                                                            |
+| `codes.side.colorpicker.conversion.HexAlpha`                                                | `codes.side.color.HexAlpha`                                                              |                                                            |
+| `color.toHexString(HexAlpha.First)`                                                         | `value.toHexString(HexAlpha.First)`                                                      |                                                            |
+| `"#3380CC".toRgbColorOrNull(HexAlpha.None)`                                                 | `ColorValue.parseHexOrNull("#3380CC", HexAlpha.None)`                                    |                                                            |
+| `hsl.toComposeColor()`, `color.toHslColor()`                                                | `value.toComposeColor()`, `color.toColorValue().to(Hsl)`                                 |                                                            |
+| `ColorPickerState(initialColor: PickerColor = HslColor())`                                  | `ColorPickerState(initialValue: ColorValue)` or `(initialColor: Color)`                  | no default color                                           |
+| `state.hslColor`, `rgbColor`, … (8)                                                         | `state.hsl`, `state.srgb`, … (15 typed views) or `state.value.to(Hsl)`                   | units are CSS's                                            |
+| `state.pickerColor`                                                                         | `state.value`                                                                            |                                                            |
+| `state.argbInt`                                                                             | `state.color.toArgb()`                                                                   |                                                            |
+| `updateHue(h)`, `updateRed(r)`, … (30)                                                      | `state[Hsl.H] = h`, `state[Srgb.R] = r`                                                  | NaN and out-of-limit values throw instead of being ignored |
+| `updateFromHsl(hsl)`, …                                                                     | `state.value = x`                                                                        |                                                            |
+| `updateAlpha(a)`                                                                            | `state.value = state.value.withAlpha(a)`                                                 |                                                            |
+| `updateFromArgbInt(i)`                                                                      | `state.value = Color(i).toColorValue()`                                                  |                                                            |
+| `HueSlider(state)`, `RedSlider(state)`, … (21)                                              | `ChannelSlider(state, Hsl.H)`, `ChannelSlider(state, Srgb.R)`                            |                                                            |
+| `HslPlane`, `OkhslPlane`, `OkhsvPlane`                                                      | `ChannelPlane(state, Hsl.S, Hsl.L)`, …                                                   |                                                            |
+| `codes.side.colorpicker.state.ColoringMode`                                                 | `codes.side.colorpicker.foundation.ColoringMode`                                         |                                                            |
+| `PlaneActionLabels.Default`                                                                 | `ColorPickerStrings.current.planeAxisActions()`                                          |                                                            |
+| `HslColorPicker(color: HslColor, onColorChange)`                                            | `HslColorPicker(value: ColorValue, onValueChange)` or `(color: Color, onColorChange)`    | fully controlled                                           |
+| a caller's value applied when the gesture ends                                              | applied at once; the callback is synchronous                                             |                                                            |
+| per-channel slots (`hueSlider = …`)                                                         | `channelSlider = { part -> … }`                                                          |                                                            |
+| `showAlpha = false`                                                                         | `alphaSlider = null`                                                                     | `plane = null` leaves the plane out                        |
+| `thumb = { source -> MyThumb(source) }`                                                     | `thumb = { MyThumb(interactionSource) }`                                                 | the slot reads its scope                                   |
+| `SliderLabel(text)`, `SliderValueLabel(text)`                                               | `ColorPickerDefaults.SliderLabel(text)`, `ColorPickerDefaults.SliderValueLabel(text)`    |                                                            |
+| `thumbWidth = 48.dp`                                                                        | `dimensions = ColorPickerDefaults.currentDimensions().copy(thumbWidth = 48.dp)`          |                                                            |
+| `ColorSlider(gradientColors = persistentListOf(…))`                                         | `ColorSlider(trackColors = listOf(…))`                                                   |                                                            |
+| `LocalColorPickerColors.current`, …                                                         | `ColorPickerDefaults.currentColors()`, …                                                 | provided by `ColorPickerTheme`                             |
+| `ColorPickerDialog(onColorSelected: (HslColor) -> Unit, initialColor: HslColor)`            | `ColorPickerDialog(initialValue, onValueSelected, onDismissRequest)` or the `Color` form | the title and buttons are slots                            |
+| per-component `String` parameters to localize                                               | `ProvideColorPickerStrings(yourStrings) { … }`                                           | the parameters still win                                   |
+| a saved 1.x state                                                                           | not restored; the state starts from its initial value                                    |                                                            |
+| `randomHslColor()`                                                                          | removed                                                                                  |                                                            |
+
+1.x is documented at the [v1.2.0 tag](https://github.com/side-codes/anyColorPicker/tree/v1.2.0#readme).
