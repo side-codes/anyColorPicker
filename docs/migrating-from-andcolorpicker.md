@@ -1,6 +1,6 @@
 ---
 title: "Migrating from andcolorpicker"
-description: "Move from the discontinued View-based andcolorpicker 0.6.x Android library to anyColorPicker's Compose components, concept by concept."
+description: "Move from the discontinued View-based andcolorpicker 0.6.x Android library to anyColorPicker's Jetpack Compose components, concept by concept."
 section: Guides
 nav_order: 200
 ---

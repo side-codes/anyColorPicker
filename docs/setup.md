@@ -1,6 +1,6 @@
 ---
 title: "Setup and requirements"
-description: "Add anyColorPicker to an Android or Kotlin Multiplatform project from Maven Central: the artifacts, published targets and requirements."
+description: "Add anyColorPicker to a Jetpack Compose Android app or a Kotlin Multiplatform project from Maven Central: the artifacts, published targets and requirements."
 section: Get started
 nav_order: 10
 ---
