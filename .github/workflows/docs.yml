@@ -1,0 +1,67 @@
+name: Docs
+
+# Builds the documentation site from docs/ on every change to it, and publishes it to GitHub Pages from master.
+# A pull request gets the build alone, so a broken link or a missing page fails it before it can reach the site.
+on:
+  push:
+    branches: [ master ]
+    paths: &docs-paths
+      - 'docs/**'
+      - 'docs-overrides/**'
+      - 'mkdocs.yml'
+      - 'requirements-docs.txt'
+      - 'scripts/docs-llms-txt.py'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths: *docs-paths
+  workflow_dispatch:
+
+# Least privilege: building only reads the repo. The deploy job alone may write to Pages.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: docs-build-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.15'
+          cache: 'pip'
+          cache-dependency-path: requirements-docs.txt
+      - name: Install the site's build
+        run: pip install -r requirements-docs.txt
+      # --strict fails on a link to a page, image or heading that does not exist.
+      - name: Build the site
+        run: zensical build --strict --config-file mkdocs.yml
+      - name: Write llms.txt
+        run: python scripts/docs-llms-txt.py site
+      - name: Upload the site for Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # One deployment at a time, and never cancelled halfway: a newer push queues behind it.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,8 +1,7 @@
 ---
 title: "Localization, words and numbers"
 description: "Translate or reword every label and screen reader announcement in anyColorPicker with ColorPickerStrings, with numbers in the device's locale format."
-section: Components
-nav_order: 130
+icon: material/translate
 ---
 
 Every label, spoken description and value the components show comes from `ColorPickerStrings`:
@@ -34,3 +33,9 @@ keeps them. A string passed to a component still wins over the provided ones.
 
 Every component supports right-to-left layouts except the
 [color planes](planes.md), which map a color space rather than showing progress.
+
+An HSL picker in Egyptian Arabic, in an app with no strings of its own: the numbers in Arabic-Indic
+digits, the sliders running from the right, the plane as in any other language, and the words the
+library's English.
+
+![HSL color picker in Egyptian Arabic, right to left, with its values in Arabic-Indic digits](images/localization.png){ width="440" }

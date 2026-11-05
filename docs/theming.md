@@ -1,8 +1,7 @@
 ---
 title: "Theming"
 description: "Style anyColorPicker's pickers, sliders, planes and swatch with ColorPickerDefaults colors, shapes and dimensions, or a whole screen with ColorPickerTheme."
-section: Components
-nav_order: 140
+icon: material/format-paint
 ---
 
 Every slider, plane and picker accepts `colors`, `shapes` and `dimensions` built with
@@ -36,6 +35,8 @@ ColorPickerTheme(
     ChannelPlane(state, Okhsl.S, Okhsl.L)
 }
 ```
+
+![An Okhsl color picker inside ColorPickerTheme, every slider track 24 dp high](images/theming.png){ width="440" }
 
 A component reads the theme in its parameter defaults, so an explicit argument still wins over
 whatever an enclosing `ColorPickerTheme` provided. What a `ColorPickerTheme` is not given it

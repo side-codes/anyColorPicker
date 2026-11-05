@@ -1,8 +1,7 @@
 ---
 title: "Choosing a color space"
 description: "Which color space to pick in with anyColorPicker, and what each is for: Okhsl, Okhsv, Oklab, OkLCh, Lab, LCH, HSL, HWB, HSV, CMYK, sRGB, Display P3 and XYZ."
-section: Colors
-nav_order: 40
+icon: material/palette-outline
 ---
 
 - **Okhsl** is Björn Ottosson's perceptual replacement for HSL, and the one to reach for if you

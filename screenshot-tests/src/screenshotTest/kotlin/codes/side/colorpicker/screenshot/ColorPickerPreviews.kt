@@ -9,38 +9,53 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import codes.side.color.ColorValue
 import codes.side.color.Hsl
 import codes.side.color.Okhsl
 import codes.side.color.Okhsv
+import codes.side.color.Oklch
+import codes.side.color.Srgb
 import codes.side.color.compose.toComposeColor
 import codes.side.color.parseCss
+import codes.side.colorpicker.foundation.BasicAlphaSlider
+import codes.side.colorpicker.foundation.BasicChannelPlane
+import codes.side.colorpicker.foundation.BasicChannelSlider
+import codes.side.colorpicker.foundation.BasicColorPicker
 import codes.side.colorpicker.foundation.ColoringMode
+import codes.side.colorpicker.foundation.checkerboard
 import codes.side.colorpicker.material3.AlphaSlider
 import codes.side.colorpicker.material3.ChannelPlane
 import codes.side.colorpicker.material3.ChannelSlider
 import codes.side.colorpicker.material3.CmykColorPicker
+import codes.side.colorpicker.material3.ColorPicker
 import codes.side.colorpicker.material3.ColorPickerDefaults
 import codes.side.colorpicker.material3.ColorPickerDialog
+import codes.side.colorpicker.material3.ColorPickerTheme
 import codes.side.colorpicker.material3.ColorSwatch
 import codes.side.colorpicker.material3.HslColorPicker
 import codes.side.colorpicker.material3.HsvColorPicker
@@ -90,6 +105,10 @@ private val ChiliPepper = ColorValue.parseCss("#9B1B30")    // 2007
 private val AquaSky = ColorValue.parseCss("#7BC4C4")        // 2003
 private val FuchsiaRose = ColorValue.parseCss("#C74375")    // 2001
 private val Tigerlily = ColorValue.parseCss("#E2583E")      // 2004
+private val BlueIris = ColorValue.parseCss("#5A5B9F")       // 2008
+private val PeachFuzz = ColorValue.parseCss("#FFBE98")      // 2024
+private val MochaMousse = ColorValue.parseCss("#A47864")    // 2025
+private val TrueRed = ColorValue.parseCss("#BF1932")        // 2002
 
 // One height for every picker, so the gallery lines up in a grid. A picker with a plane is
 // the tallest: a 255dp plane at this width, three sliders and alpha.
@@ -336,4 +355,85 @@ fun SwatchPreview() = Frame {
             .fillMaxWidth()
             .height(80.dp),
     )
+}
+
+// The sliders of the channel sliders page, as that page writes them.
+@PreviewTest
+@Preview(name = "Channel sliders", widthDp = 440, heightDp = 400)
+@Composable
+fun ChannelSlidersPreview() = Frame {
+    val state = ColorPickerState(BlueIris.withAlpha(0.8))
+    ChannelSlider(state, Okhsl.H)
+    ChannelSlider(state, Oklch.C)
+    ChannelSlider(state, Oklch.C, range = 0.0..0.2)
+    ChannelSlider(state, Srgb.R)
+    AlphaSlider(state)
+}
+
+// The theming page's ColorPickerTheme around a ColorPicker: every slider takes the theme's track height, though none
+// is given it as a parameter.
+@PreviewTest
+@Preview(name = "Theming", widthDp = 440, heightDp = PICKER_HEIGHT_DP)
+@Composable
+fun ThemingPreview() = Frame {
+    ColorPickerTheme(dimensions = ColorPickerDefaults.dimensions(trackHeight = 24.dp)) {
+        ColorPicker(ColorPickerState(PeachFuzz))
+    }
+}
+
+// Egyptian Arabic, right to left: the numbers in Arabic-Indic digits and the sliders running from the right, while the
+// plane keeps its orientation. The words stay the library's English, as in any language an app has not translated.
+@PreviewTest
+@Preview(name = "Localization", widthDp = 440, heightDp = PICKER_HEIGHT_DP, locale = "ar-rEG")
+@Composable
+fun LocalizationPreview() = Frame {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        HslColorPicker(state = ColorPickerState(MochaMousse))
+    }
+}
+
+// The picker of the Without Material page, as that page writes it.
+@PreviewTest
+@Preview(name = "Without Material", widthDp = 440, heightDp = 464)
+@Composable
+fun WithoutMaterialPreview() = Frame {
+    val state = ColorPickerState(TrueRed)
+    BasicColorPicker(
+        state = state,
+        space = Okhsv,
+        plane = { part ->
+            BasicChannelPlane(
+                part.state, part.x, part.y,
+                Modifier.fillMaxWidth().aspectRatio(1.6f),
+                shape = RoundedCornerShape(16.dp),
+                thumb = { RoundThumb(thumbColor) },
+            )
+        },
+        channelSlider = { part ->
+            BasicChannelSlider(
+                part.state, part.channel, Modifier.fillMaxWidth(),
+                track = { Box(Modifier.fillMaxWidth().height(12.dp).clip(CircleShape).background(gradient)) },
+                thumb = { RoundThumb(thumbColor) },
+            )
+        },
+        alphaSlider = { part ->
+            BasicAlphaSlider(
+                part.state, Modifier.fillMaxWidth(),
+                track = {
+                    Box(
+                        Modifier.fillMaxWidth().height(12.dp).clip(CircleShape)
+                            .checkerboard(Color.White, Color.LightGray)
+                            .background(gradient),
+                    )
+                },
+                thumb = { RoundThumb(thumbColor) },
+            )
+        },
+        spacing = 16.dp,
+    )
+}
+
+@Composable
+private fun RoundThumb(color: Color) {
+    Box(Modifier.size(24.dp).background(Color.White, CircleShape).padding(3.dp).background(color, CircleShape))
 }

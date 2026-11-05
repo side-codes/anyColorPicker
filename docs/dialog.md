@@ -1,8 +1,7 @@
 ---
 title: "Color picker dialog"
 description: "ColorPickerDialog: a Material 3 color picker dialog for Compose that shows the original color beside the new one and switches between color spaces."
-section: Components
-nav_order: 120
+icon: material/dock-window
 ---
 
 A Material 3 `AlertDialog`: the original color beside the one being edited, with its hex, a

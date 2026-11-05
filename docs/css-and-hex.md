@@ -1,8 +1,7 @@
 ---
 title: "CSS color strings and hex"
 description: "Write and parse CSS Color 4 strings and hex colors in Kotlin with anyColorPicker, and choose which end of an eight-digit hex holds the alpha."
-section: Colors
-nav_order: 60
+icon: material/pound
 ---
 
 ## CSS color strings

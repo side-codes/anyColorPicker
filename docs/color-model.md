@@ -1,8 +1,7 @@
 ---
 title: "The color model"
 description: "How anyColorPicker holds a color in Kotlin: a ColorValue in one color space, in CSS Color 4 units, with none components, your own spaces and Compose colors."
-section: Colors
-nav_order: 30
+icon: material/cube-outline
 ---
 
 A `ColorValue` is a color in one space: that space's components, in its own units, and an alpha.

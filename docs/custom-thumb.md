@@ -1,8 +1,7 @@
 ---
 title: "Custom slider thumb"
 description: "Replace the Material 3 slider thumb in anyColorPicker with your own Compose thumb that reacts to press and drag, and size the track gap with thumbWidth."
-section: Components
-nav_order: 100
+icon: material/radiobox-marked
 ---
 
 Every slider takes a `thumb` slot, so the Material 3 thumb can be replaced outright — its

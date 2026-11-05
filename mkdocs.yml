@@ -1,0 +1,105 @@
+# The documentation site, https://side-codes.github.io/anyColorPicker/, built from docs/ by Zensical
+# (requirements-docs.txt) and published by .github/workflows/docs.yml. Preview it with `zensical serve`.
+site_name: anyColorPicker
+site_description: Color picker for Kotlin Multiplatform, Compose Multiplatform and Jetpack Compose on Android, iOS, desktop and web, in OkLCh, Okhsl, Oklab, HSL, HSV, HWB, Lab, LCH, RGB, Display P3 and CMYK, with CSS Color 4 gamut mapping.
+site_url: https://side-codes.github.io/anyColorPicker/
+# Pages are setup.html rather than setup/: the README, the sitemap and links elsewhere use those addresses.
+use_directory_urls: false
+
+repo_name: side-codes/anyColorPicker
+repo_url: https://github.com/side-codes/anyColorPicker
+edit_uri: ""
+
+copyright: Copyright &copy; 2020 Illia Achour. Apache License 2.0.
+
+# Only the pages at the top of docs/ and their images are the site; any other folder there stays out of it.
+exclude_docs: |
+  /*/
+  !/images/
+
+theme:
+  name: material
+  variant: classic
+  custom_dir: docs-overrides
+  language: en
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: white
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.sections
+    - content.code.copy
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/side-codes/anyColorPicker
+  # The paragraph under the title of llms.txt, which scripts/docs-llms-txt.py writes from the nav below.
+  llms_txt_summary: >-
+    anyColorPicker is a color picker library for Kotlin Multiplatform and Compose Multiplatform, on Android, iOS,
+    desktop (JVM) and the web (Wasm), and a Jetpack Compose color picker in Android-only apps.
+    `codes.side:colorpicker-material3` holds ready-made Material 3 pickers, sliders, planes, a swatch and a dialog;
+    `codes.side:colorpicker-foundation` holds the same components without Material; `codes.side:color` is the color
+    model alone, built on CSS Color 4. All are on Maven Central.
+
+# The sidebar, and the sections of llms.txt. Each page's title, description and icon are in its front matter.
+nav:
+  - Overview: index.md
+  - Get started:
+      - setup.md
+      - gallery.md
+  - Colors:
+      - color-model.md
+      - color-spaces.md
+      - gamut-mapping.md
+      - css-and-hex.md
+  - Components:
+      - pickers.md
+      - sliders.md
+      - planes.md
+      - custom-thumb.md
+      - color-swatch.md
+      - dialog.md
+      - localization.md
+      - theming.md
+      - without-material.md
+  - State and architecture:
+      - state.md
+      - architecture.md
+  - Guides:
+      - samples.md
+      - migrating-from-1x.md
+      - migrating-from-andcolorpicker.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+plugins:
+  - search

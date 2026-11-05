@@ -40,3 +40,10 @@ updates:
       actions:
         patterns:
           - "*"
+
+  # The documentation site's build, pinned in requirements-docs.txt.
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

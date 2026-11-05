@@ -1,8 +1,7 @@
 ---
 title: "Migrating from 1.x"
 description: "Move an app from anyColorPicker 1.x to 2.0, declaration by declaration: coordinates, packages, color classes, state, sliders, planes, slots and the dialog."
-section: Guides
-nav_order: 190
+icon: material/arrow-up-bold-circle-outline
 ---
 
 2.0 replaces 1.x's color classes with `ColorValue` and its per-channel components with ones that

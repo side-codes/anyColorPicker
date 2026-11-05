@@ -1,0 +1,2 @@
+# The documentation site's build (mkdocs.yml). Pinned: a new version can change how every page looks.
+zensical==0.1.0
