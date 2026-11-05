@@ -1,0 +1,15 @@
+---
+layout: null
+---
+{%- assign sections = site.pages | where_exp: "doc", "doc.nav_order != nil" | sort: "nav_order" | group_by: "section" -%}
+# {{ site.title }}
+
+> {{ site.description }}
+
+anyColorPicker is a color picker library for Kotlin Multiplatform and Compose Multiplatform, on Android, iOS, desktop (JVM) and the web (Wasm). `codes.side:colorpicker-material3` holds ready-made Material 3 pickers, sliders, planes, a swatch and a dialog; `codes.side:colorpicker-foundation` holds the same components without Material; `codes.side:color` is the color model alone, built on CSS Color 4. All are on Maven Central. Source and issues: {{ site.github.repository_url }}
+{% for section in sections %}
+## {{ section.name }}
+{% for doc in section.items %}
+- [{{ doc.title }}]({{ doc.url | absolute_url }}): {{ doc.description }}
+{%- endfor %}
+{% endfor %}
