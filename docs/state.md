@@ -33,6 +33,15 @@ A hue chosen in one space is carried into the others, so an Okhsl slider shows t
 picked on an HSL one; that is this library's own rule, as CSS carries no hue across spaces
 ([csswg-drafts#8484](https://github.com/w3c/csswg-drafts/issues/8484)).
 
+```mermaid
+stateDiagram-v2
+    direction LR
+    colorful: Colorful, hue 200°
+    grey: Grey, 200° remembered
+    colorful --> grey: desaturate
+    grey --> colorful: saturate
+```
+
 Writing a channel that is out of its limit, or not a number, throws.
 
 ## Holding and saving the state

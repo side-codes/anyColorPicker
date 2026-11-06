@@ -86,6 +86,17 @@ var color by remember { mutableStateOf(Color(0xFF3366CC)) }
 OkhslColorPicker(color = color, onColorChange = { color = it })
 ```
 
+```mermaid
+sequenceDiagram
+    actor User
+    participant Picker
+    participant App as Your code
+    User->>Picker: drags a slider
+    Picker->>App: onValueChange(new value), in the same event
+    App->>Picker: value = it, or clamped, or rounded, or unchanged
+    Picker->>User: draws exactly the value it was given
+```
+
 - Every change reaches the callback in the same event, as the whole new value in the picker's
   space, and the picker draws only what you pass back. Ignore the callback and the picker holds
   still; clamp or round the value and it shows the clamp or the rounding at once.

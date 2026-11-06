@@ -11,4 +11,12 @@
   <meta property="og:url" content="{{ page.canonical_url }}">
   <meta property="og:image" content="{{ config.site_url }}images/social-preview.png">
   <meta name="twitter:card" content="summary_large_image">
+  {#- The theme lets inline code break anywhere, which splits a name a reader copies (HsvColorPick|er,
+      colorpicker-|material3). In a table, code stays on one line and the table scrolls sideways instead;
+      in running text, code breaks at its spaces, and inside a name only when the name alone is wider
+      than the line. -#}
+  <style>
+    .md-typeset code { word-break: normal; }
+    .md-typeset table code { white-space: nowrap; }
+  </style>
 {% endblock %}
