@@ -15,6 +15,13 @@ import yaml
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
+class ConfigLoader(yaml.SafeLoader):
+    """Reads mkdocs.yml without running it: a `!!python/name:` reference (a Markdown extension's hook) stays a string."""
+
+
+ConfigLoader.add_multi_constructor("tag:yaml.org,2002:python/name:", lambda loader, suffix, node: suffix)
+
+
 def front_matter(page: pathlib.Path) -> dict:
     text = page.read_text(encoding="utf-8")
     if not text.startswith("---\n"):
@@ -23,7 +30,7 @@ def front_matter(page: pathlib.Path) -> dict:
 
 
 def main() -> None:
-    config = yaml.safe_load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"))
+    config = yaml.load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"), Loader=ConfigLoader)
     site = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / config.get("site_dir", "site")
     docs = ROOT / config.get("docs_dir", "docs")
     base = config["site_url"]

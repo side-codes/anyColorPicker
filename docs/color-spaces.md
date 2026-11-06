@@ -30,5 +30,31 @@ icon: material/palette-outline
 - **sRGB**, **linear sRGB**, **Display P3** and **XYZ** are there for interchange, and
   `ColorPicker(state, space = DisplayP3)` puts sliders on any of them.
 
+## How the spaces connect
+
+Every space is defined on another, down to XYZ D65. A conversion climbs to the nearest space both
+ends share and comes back down: HSL to CMYK goes through sRGB alone, while HSL to LCH climbs all
+the way to XYZ D65 and comes down through XYZ D50 and Lab.
+
+```mermaid
+flowchart TD
+    xyz65["XYZ D65"] --> xyz50["XYZ D50"]
+    xyz65 --> linear["linear sRGB"]
+    xyz65 --> p3["Display P3"]
+    xyz65 --> oklab["Oklab"]
+    xyz50 --> lab["Lab"] --> lch["LCH"]
+    linear --> srgb["sRGB"]
+    srgb --> hsl["HSL"]
+    srgb --> hwb["HWB"]
+    srgb --> hsv["HSV"]
+    srgb --> cmyk["CMYK"]
+    oklab --> oklch["OkLCh"]
+    oklab --> okhsl["Okhsl"]
+    oklab --> okhsv["Okhsv"]
+```
+
+Okhsl and Okhsv are built on Oklab but measure their saturation against sRGB's gamut, which is why
+they stay inside it, bar a sliver just past pure blue.
+
 Each space's channels and units are listed in [The color model](color-model.md), and the
 [Gallery](gallery.md) shows a picker for each.

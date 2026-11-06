@@ -15,11 +15,11 @@ edited. A slider edits in its own channel's space: the color is converted there 
 is set, and the result stays there. Reading another space converts forward, once, from that
 value; nothing is re-derived from a conversion.
 
-```
-User drags the OkLCh chroma slider
-  -> the value is converted into OkLCh once and its chroma set (the value is now OkLCh)
-  -> the Okhsl sliders read it: one conversion, OkLCh -> Okhsl
-  -> the OkLCh sliders read it: no conversion at all
+```mermaid
+flowchart LR
+    drag["The user drags the OkLCh chroma slider"] -->|"set chroma"| value[("The value, converted into OkLCh once")]
+    value -->|"one conversion"| okhsl["The Okhsl sliders"]
+    value -->|"none"| oklch["The OkLCh sliders"]
 ```
 
 This means:
