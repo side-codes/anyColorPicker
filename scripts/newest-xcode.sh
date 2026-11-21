@@ -20,8 +20,10 @@ lowercase() {
   printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
 }
 
-tab="$(printf '\t')"
-newest="$(
+# One line per released Xcode: its major, minor and patch, then its path, tab-separated. The loop is a function, not
+# written inside $(...): macOS's bash 3.2 misparses a case pattern's ) there.
+releases() {
+  local app version
   for app in "$dir"/Xcode*.app; do
     if [ ! -d "$app" ] || [ -L "$app" ]; then
       continue
@@ -36,8 +38,11 @@ newest="$(
     if [[ "$version" =~ ^([0-9]+)(\.([0-9]+))?(\.([0-9]+))?$ ]]; then
       printf '%s\t%s\t%s\t%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[3]:-0}" "${BASH_REMATCH[5]:-0}" "$app"
     fi
-  done | sort -t "$tab" -k1,1n -k2,2n -k3,3n | tail -n 1 | cut -f 4
-)"
+  done
+}
+
+tab="$(printf '\t')"
+newest="$(releases | sort -t "$tab" -k1,1n -k2,2n -k3,3n | tail -n 1 | cut -f 4)"
 if [ -z "$newest" ]; then
   echo "::error::No released Xcode with a version in its Info.plist is in $dir." >&2
   exit 1
