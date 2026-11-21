@@ -74,23 +74,25 @@ jobs:
         with:
           # The API removal check reads the dumps at the last release tag.
           fetch-depth: 0
-      # publish.yml runs this on macOS, whose awk, sort and comm are BSD's. Running it here
-      # too means a difference shows on a pull request rather than first on a release tag.
-      - name: Check nothing the last release published was removed
-        run: bash scripts/check-api-removals.sh
       - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v6
+      # publish.yml runs this on macOS, whose awk, sort and comm are BSD's. Running it here
+      # too means a difference shows on a pull request rather than first on a release tag.
+      # It asks Gradle for VERSION_NAME, so it runs once Java and Gradle are set up.
+      - name: Check nothing the last release published was removed
+        run: bash scripts/check-api-removals.sh
       # macos-15 defaults to Xcode 16.4, whose iOS SDK predates UIViewLayoutRegion — a
       # symbol Compose Multiplatform's ui-uikit references. Kotlin/Native static caches
       # link whole modules rather than tree-shaking, so any iOS *test executable* fails to
       # link without a 26.x SDK (the static framework link survives because an archive
-      # never resolves external symbols). The image ships several Xcodes; take the newest.
+      # never resolves external symbols). The image ships several Xcodes; take the newest
+      # release, by the version in each app's Info.plist, skipping betas and release candidates.
       - name: Select the newest installed Xcode
         run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          XCODE="$(bash scripts/newest-xcode.sh)"
           echo "Using $XCODE"
           sudo xcode-select -s "$XCODE/Contents/Developer"
           xcodebuild -version
@@ -106,7 +108,7 @@ jobs:
         run: ./gradlew publishToMavenLocal
       - name: Check each module published its six targets
         run: |
-          VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          VERSION="$(./gradlew -q printVersionName)"
           for module in color color-compose colorpicker-foundation colorpicker-material3; do
             for suffix in "" -android -jvm -wasm-js -iosarm64 -iossimulatorarm64; do
               pom="$HOME/.m2/repository/codes/side/$module$suffix/$VERSION/$module$suffix-$VERSION.pom"
@@ -120,4 +122,6 @@ jobs:
       # depends on colorpicker-material3 alone, as an app does, and links a dynamic iOS framework against what
       # was just published, which resolves every native symbol the libraries need.
       - name: Link an app against the published artifacts
-        run: ./gradlew -p tools/consumer compileKotlinJvm linkDebugFrameworkIosSimulatorArm64 -PpickerVersion="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+        run: |
+          VERSION="$(./gradlew -q printVersionName)"
+          ./gradlew -p tools/consumer compileKotlinJvm linkDebugFrameworkIosSimulatorArm64 -PpickerVersion="$VERSION"

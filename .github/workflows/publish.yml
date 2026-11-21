@@ -55,10 +55,11 @@ jobs:
       # symbol Compose Multiplatform's ui-uikit references. Kotlin/Native static caches
       # link whole modules rather than tree-shaking, so any iOS *test executable* fails to
       # link without a 26.x SDK (the static framework link survives because an archive
-      # never resolves external symbols). The image ships several Xcodes; take the newest.
+      # never resolves external symbols). The image ships several Xcodes; take the newest
+      # release, by the version in each app's Info.plist, skipping betas and release candidates.
       - name: Select the newest installed Xcode
         run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          XCODE="$(bash scripts/newest-xcode.sh)"
           echo "Using $XCODE"
           sudo xcode-select -s "$XCODE/Contents/Developer"
           xcodebuild -version
@@ -66,12 +67,13 @@ jobs:
 
       # The version lives in gradle.properties, not in the tag. Publishing the wrong one
       # is unrecoverable because Maven Central is immutable, so refuse to start on a
-      # mismatch rather than redeploying an already-released coordinate.
+      # mismatch rather than redeploying an already-released coordinate. Gradle reads the
+      # version, so this compares the tag with what the publication will carry.
       - name: Check the tag matches VERSION_NAME
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PROJECT_VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          PROJECT_VERSION="$(./gradlew -q printVersionName)"
           echo "tag=$TAG_VERSION gradle.properties=$PROJECT_VERSION"
           if [ "$TAG_VERSION" != "$PROJECT_VERSION" ]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match VERSION_NAME=$PROJECT_VERSION. Bump VERSION_NAME and retag."
@@ -98,7 +100,7 @@ jobs:
       # command line so gradle.properties is never edited just to test.
       - name: Publish to Maven Central
         run: |
-          VERSION="$(sed -n 's/^VERSION_NAME=//p' gradle.properties)"
+          VERSION="$(./gradlew -q printVersionName --no-configuration-cache)"
           if [ "${{ inputs.snapshot }}" = "true" ]; then
             # VERSION_NAME may be a snapshot already; it must not publish as -SNAPSHOT-SNAPSHOT.
             VERSION="${VERSION%-SNAPSHOT}"
