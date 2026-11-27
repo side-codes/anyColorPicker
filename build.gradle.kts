@@ -28,3 +28,13 @@ apiValidation {
         enabled = true
     }
 }
+
+// CI and scripts/check-api-removals.sh ask Gradle for the version rather than reading gradle.properties themselves,
+// so they get the one the modules publish: the file read as Gradle reads it, or a -PVERSION_NAME override.
+// They run `./gradlew -q printVersionName` with -q first: the wrapper sees -q only before the first word that isn't an
+// option (a task name, or an option's value such as -I's), and without it writes its download progress to stdout too.
+tasks.register("printVersionName") {
+    description = "Prints VERSION_NAME, the version every library module publishes."
+    val versionName = providers.gradleProperty("VERSION_NAME")
+    doLast { println(versionName.get()) }
+}

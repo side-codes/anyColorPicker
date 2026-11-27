@@ -30,7 +30,12 @@ git rev-parse --verify --quiet "$ref^{commit}" > /dev/null || {
 echo "Comparing the API dumps against $ref."
 
 # Only a vX.Y.Z tag says which major version it was; any other ref is compared without the exemption.
-current_major="$(sed -n 's/^VERSION_NAME=\([0-9]*\).*/\1/p' gradle.properties)"
+# Gradle reads VERSION_NAME as the build that publishes it does; its major is the digits it starts with.
+version_name="$(./gradlew -q printVersionName)" || {
+  echo "::error::Gradle could not print VERSION_NAME." >&2
+  exit 2
+}
+current_major="${version_name%%[!0-9]*}"
 ref_version="${ref#v}"
 ref_major="${ref_version%%.*}"
 if [[ "$ref_major" =~ ^[0-9]+$ ]] && [ "$current_major" -gt "$ref_major" ]; then
